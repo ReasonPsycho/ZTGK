@@ -14,10 +14,10 @@ public:
     Texture(const char* texturePath) :texturePath(texturePath) {}
     ~Texture();
     // the texture ID
-    unsigned int ID{};
+    GLuint ID;
     
     // constructor reads and builds the texture
-    void use() const;
+    void use();
     void init();
     
 private:

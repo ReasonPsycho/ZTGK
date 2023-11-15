@@ -58,7 +58,7 @@ bool   show_another_window = false;
 ImVec4 clear_color         = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 Shader ourShader("res/shaders/basic.vert", "res/shaders/basic.frag");
-Texture texture("res/textures/stone.jpg");
+Texture ourTexture("res/textures/stone.jpg");
 unsigned int VBO, VAO, EBO;
 
 // timing
@@ -166,9 +166,6 @@ bool init()
 }
 
 bool init_textures_vertices(){
-    // build and compile our shader zprogram
-    // ------------------------------------
-
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -203,11 +200,12 @@ bool init_textures_vertices(){
     // texture coord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-
+    ourTexture.init();
     ourShader.init();
+    ourTexture.use();
     ourShader.use();
-    texture.init();
-    ourShader.setInt("ourTexture", texture.ID);
+    ourShader.setInt("ourTexture", 0);
+
     return true;
 }
 
@@ -255,8 +253,8 @@ void update()
 
 void render()
 {
-    texture.use();
-    ourShader.use();
+    ourTexture.use();
+    ourShader.use(); //Don't need this yet tbh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -302,4 +300,3 @@ void end_frame()
     glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);
 }
-

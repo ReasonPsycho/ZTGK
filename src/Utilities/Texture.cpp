@@ -25,8 +25,8 @@ void Texture::init() {  //TODO Expand size of this dude
 }
 
 
-void Texture::use() const {
-    //glActiveTexture(GL_TEXTURE0);
+void Texture::use() {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ID);
 }
 

@@ -12,7 +12,7 @@ class Shader
 {
 public:
     // the program ID
-    unsigned int ID{};
+    GLuint ID;
 
     // constructor reads and builds the shader
     Shader(const char* vertexPath, const char* fragmentPath)
@@ -25,6 +25,7 @@ public:
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
     void setFloat(const std::string &name, float value) const;
+    void setGLuint(const std::string &name, GLuint value) const;
 
 private:
     const char* vertexPath{};
@@ -32,6 +33,7 @@ private:
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
     static void checkCompileErrors(unsigned int shader, std::string type);
+
 };
 
 #endif
