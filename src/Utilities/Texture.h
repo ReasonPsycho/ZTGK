@@ -14,7 +14,7 @@ public:
     Texture(const char* texturePath) :texturePath(texturePath) {}
     ~Texture();
     // the texture ID
-    GLuint ID;
+    GLuint ID{};
     
     // constructor reads and builds the texture
     void use();

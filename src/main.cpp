@@ -84,7 +84,7 @@ int main(int, char**)
     spdlog::info("Initialized ImGui.");
     
     // configure global opengl state
-    glEnable(GL_DEPTH_TEST);
+   // glEnable(GL_DEPTH_TEST);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -253,6 +253,13 @@ void update()
 
 void render()
 {
+    int display_w, display_h;
+    glfwMakeContextCurrent(window);
+    glfwGetFramebufferSize(window, &display_w, &display_h);
+
+    glViewport(0, 0, display_w, display_h);
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
     ourTexture.use();
     ourShader.use(); //Don't need this yet tbh
     glBindVertexArray(VAO);
@@ -278,13 +285,7 @@ void imgui_render()
 void imgui_end()
 {
     ImGui::Render();
-    int display_w, display_h;
-    glfwMakeContextCurrent(window);
-    glfwGetFramebufferSize(window, &display_w, &display_h);
-
-    glViewport(0, 0, display_w, display_h);
-    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+    
     
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
