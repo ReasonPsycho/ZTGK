@@ -7,6 +7,7 @@
 #include "imgui_impl/imgui_impl_opengl3.h"
 #include "Utilities/Shader.h"
 #include "Utilities/Texture.h"
+#include "Cube.h"
 #include <stdio.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -22,59 +23,63 @@
 #include <spdlog/spdlog.h>
 
 
-static void glfw_error_callback(int error, const char* description)
-{
+static void glfw_error_callback(int error, const char *description) {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
 bool init();
+
 bool init_textures_vertices();
+
 void init_imgui();
 
 void input();
+
 void update();
+
 void render();
 
 void imgui_begin();
+
 void imgui_render();
+
 void imgui_end();
 
 void end_frame();
 
 void cleanup();
 
-constexpr int32_t WINDOW_WIDTH  = 1920;
+constexpr int32_t WINDOW_WIDTH = 1920;
 constexpr int32_t WINDOW_HEIGHT = 1080;
 
-GLFWwindow* window = nullptr;
+GLFWwindow *window = nullptr;
 
 // Change these to lower GL version like 4.5 if GL 4.6 can't be initialized on your machine
-const     char*   glsl_version     = "#version 460";
+const char *glsl_version = "#version 460";
 constexpr int32_t GL_VERSION_MAJOR = 4;
 constexpr int32_t GL_VERSION_MINOR = 6;
 
-bool   show_demo_window    = false;
-bool   show_another_window = false;
-ImVec4 clear_color         = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+bool show_demo_window = false;
+bool show_another_window = false;
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 Shader ourShader("res/shaders/basic.vert", "res/shaders/basic.frag");
 Texture ourTexture("res/textures/stone.jpg");
-unsigned int VBO, VAO, EBO;
+Cube cube;
+glm::mat4 transform = glm::mat4(1.0f); // Intanitiate transform for a test
 
 // timing
 float deltaTime = 0.0f; //TODO add delta time when i can
 float lastFrame = 0.0f;
 
-int main(int, char**)
-{
-    if (!init())
-    {
+int main(int, char **) {
+    if (!init()) {
         spdlog::error("Failed to initialize project!");
         return EXIT_FAILURE;
     }
     spdlog::info("Initialized project.");
 
-    if(!init_textures_vertices()){
+    if (!init_textures_vertices()) {
         spdlog::error("Failed to textures and vertices!");
         return EXIT_FAILURE;
     }
@@ -82,13 +87,12 @@ int main(int, char**)
 
     init_imgui();
     spdlog::info("Initialized ImGui.");
-    
-    // configure global opengl state
-   // glEnable(GL_DEPTH_TEST);
 
+    // configure global opengl state
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     // Main loop
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         // Process I/O operations here
         input();
 
@@ -106,18 +110,13 @@ int main(int, char**)
         // End frame and swap buffers (double buffering)
         end_frame();
     }
-    
+
     cleanup();
     // Cleanup
     return 0;
 }
 
 void cleanup() {
-    //DELETE Veretecies stuff
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    
     //Orginal clean up
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -127,12 +126,10 @@ void cleanup() {
     glfwTerminate();
 }
 
-bool init()
-{
+bool init() {
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit()) 
-    {
+    if (!glfwInit()) {
         spdlog::error("Failed to initalize GLFW!");
         return false;
     }
@@ -140,13 +137,12 @@ bool init()
     // GL 4.6 + GLSL 460
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_VERSION_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
-    glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
     // Create window with graphics context
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
-    if (window == NULL)
-    {
+    if (window == NULL) {
         spdlog::error("Failed to create GLFW Window!");
         return false;
     }
@@ -154,10 +150,9 @@ bool init()
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable VSync - fixes FPS at the refresh rate of your screen
 
-    bool err = !gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
-    if (err)
-    {
+    if (err) {
         spdlog::error("Failed to initialize OpenGL loader!");
         return false;
     }
@@ -165,56 +160,26 @@ bool init()
     return true;
 }
 
-bool init_textures_vertices(){
+
+bool init_textures_vertices() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-            // positions          // colors           // texture coords
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
-    };
-    unsigned int indices[] = {
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
-    };
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+ 
     ourTexture.init();
     ourShader.init();
     ourTexture.use();
     ourShader.use();
     ourShader.setInt("ourTexture", 0);
-
+cube.init();
     return true;
 }
 
-void init_imgui()
-{
+void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void) io;
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
@@ -241,57 +206,49 @@ void init_imgui()
     //IM_ASSERT(font != NULL);
 }
 
-void input()
-{
+void input() {
     // I/O ops go here
 }
 
-void update()
-{
+void update() {
     // Update game objects' state here
 }
 
-void render()
-{
+void render() {
     int display_w, display_h;
     glfwMakeContextCurrent(window);
     glfwGetFramebufferSize(window, &display_w, &display_h);
 
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-    ourTexture.use();
-    ourShader.use(); //Don't need this yet tbh
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    cube.render(ourShader,ourTexture);
+
 }
 
-void imgui_begin()
-{
+void imgui_begin() {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
 
-void imgui_render()
-{
+void imgui_render() {
     /// Add new ImGui controls here
     // Show the big demo window
     if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
 }
 
-void imgui_end()
-{
+void imgui_end() {
     ImGui::Render();
-    
-    
+
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void end_frame()
-{
+void end_frame() {
     // Poll and handle events (inputs, window resize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
     // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.

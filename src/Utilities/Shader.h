@@ -26,6 +26,7 @@ public:
     void setInt(const std::string &name, int value) const;
     void setFloat(const std::string &name, float value) const;
     void setGLuint(const std::string &name, GLuint value) const;
+    void setMatrix4(const std::string &name, bool transpose, const GLfloat *value) const;
 
 private:
     const char* vertexPath{};

@@ -23,7 +23,9 @@ add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES}
 		Utilities/Shader.cpp
 		Utilities/Shader.h
 		Utilities/Texture.cpp
-		Utilities/Texture.h)
+		Utilities/Texture.h
+        Cube.cpp
+        Cube.h)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_SUFFIX="")

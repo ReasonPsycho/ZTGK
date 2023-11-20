@@ -71,6 +71,10 @@ void Shader::setFloat(const std::string &name, float value) const {
 void Shader::setGLuint(const std::string &name, GLuint value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
+void Shader::setMatrix4(const std::string &name,bool transpose, const GLfloat *value) const {
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()),1, transpose, value);
+    
+}
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     int success;
