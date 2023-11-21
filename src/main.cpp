@@ -164,13 +164,13 @@ bool init() {
 bool init_textures_vertices() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
- 
+
+    cube.init();
     ourTexture.init();
     ourShader.init();
     ourTexture.use();
     ourShader.use();
     ourShader.setInt("ourTexture", 0);
-cube.init();
     return true;
 }
 
@@ -223,7 +223,7 @@ void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    cube.render(ourShader,ourTexture);
+    cube.render(&ourShader,&ourTexture);
 
 }
 

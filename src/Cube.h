@@ -19,7 +19,7 @@ public:
     ~Cube();
     
     void init();
-    void render(Shader shaderProgram, Texture texture);
+    void render(Shader* shaderProgram, Texture* texture);
 private:
     GLuint VBO, VAO, EBO;
     glm::mat4 model;

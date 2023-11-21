@@ -100,11 +100,11 @@ Cube::~Cube() {
     glDeleteBuffers(1, &EBO);
 }
 
-void Cube::render(Shader shader,Texture texture) {
-    texture.use();
-    shader.use(); //Don't need this yet tbh
+void Cube::render(Shader* shader,Texture* texture) {
+    texture->use();
+    shader->use(); //Don't need this yet tbh
     model = glm::rotate(model,0.001f, glm::vec3(1, 1, 1)) ;
-    shader.setMatrix4("transform",false, glm::value_ptr(model));
+    shader->setMatrix4("transform",false, glm::value_ptr(model));
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 }
