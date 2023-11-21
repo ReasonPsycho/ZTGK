@@ -19,7 +19,7 @@ void Texture::init() {  //TODO Expand size of this dude
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        spdlog::error( "Failed to load texture");
     }
     stbi_image_free(data);
 }

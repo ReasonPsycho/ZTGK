@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "spdlog/spdlog.h"
 
 class Shader
 {

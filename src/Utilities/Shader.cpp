@@ -85,7 +85,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            spdlog::error( "Shader compilation error of type: " + type + infoLog);
         }
     }
     else
@@ -94,7 +94,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            spdlog::error( "Shader compilation error of type:  ",type,infoLog);
         }
     }
 }

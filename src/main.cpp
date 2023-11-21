@@ -8,6 +8,7 @@
 #include "Utilities/Shader.h"
 #include "Utilities/Texture.h"
 #include "Cube.h"
+#include "Camera.h"
 #include <stdio.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -29,9 +30,13 @@ static void glfw_error_callback(int error, const char *description) {
 
 bool init();
 
-bool init_textures_vertices();
+void init_textures_vertices();
 
 void init_imgui();
+
+void init_camera();
+
+void before_frame();
 
 void input();
 
@@ -49,6 +54,11 @@ void end_frame();
 
 void cleanup();
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow *window);
+
 constexpr int32_t WINDOW_WIDTH = 1920;
 constexpr int32_t WINDOW_HEIGHT = 1080;
 
@@ -59,17 +69,27 @@ const char *glsl_version = "#version 460";
 constexpr int32_t GL_VERSION_MAJOR = 4;
 constexpr int32_t GL_VERSION_MINOR = 6;
 
+//Not my things but I could probably change them
+
 bool show_demo_window = false;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+#
+
+//My original things for set up
+
+//Camera set up
+int display_w, display_h;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = 0;
+float lastY = 0;
 
 Shader ourShader("res/shaders/basic.vert", "res/shaders/basic.frag");
 Texture ourTexture("res/textures/stone.jpg");
 Cube cube;
-glm::mat4 transform = glm::mat4(1.0f); // Intanitiate transform for a test
 
 // timing
-float deltaTime = 0.0f; //TODO add delta time when i can
+float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int main(int, char **) {
@@ -79,20 +99,23 @@ int main(int, char **) {
     }
     spdlog::info("Initialized project.");
 
-    if (!init_textures_vertices()) {
-        spdlog::error("Failed to textures and vertices!");
-        return EXIT_FAILURE;
-    }
+    init_textures_vertices();
     spdlog::info("Initialized textures and vertices.");
 
     init_imgui();
     spdlog::info("Initialized ImGui.");
 
+    init_camera();
+    spdlog::info("Initialized camera and viewport.");
+    
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+        //Setting up things for the rest of functionalities (ex. delta time)
+        before_frame();
+        
         // Process I/O operations here
         input();
 
@@ -161,7 +184,7 @@ bool init() {
 }
 
 
-bool init_textures_vertices() {
+void init_textures_vertices() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -171,7 +194,6 @@ bool init_textures_vertices() {
     ourTexture.use();
     ourShader.use();
     ourShader.setInt("ourTexture", 0);
-    return true;
 }
 
 void init_imgui() {
@@ -206,25 +228,32 @@ void init_imgui() {
     //IM_ASSERT(font != NULL);
 }
 
+void before_frame()
+{
+    // Setting up delta time
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+};
+
 void input() {
-    // I/O ops go here
+    processInput(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 }
 
 void update() {
-    // Update game objects' state here
+
 }
 
 void render() {
-    int display_w, display_h;
-    glfwMakeContextCurrent(window);
-    glfwGetFramebufferSize(window, &display_w, &display_h);
-
-    glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    camera.UpdateShader(ourShader,display_w,display_h);
+    
     cube.render(&ourShader,&ourTexture);
-
 }
 
 void imgui_begin() {
@@ -248,6 +277,62 @@ void imgui_end() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboard(UPWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWNWARD, deltaTime);
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+    display_h = height;
+    display_w = width;
+}
+
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+    
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset, true,deltaTime);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yoffset),deltaTime);
+}
+
 void end_frame() {
     // Poll and handle events (inputs, window resize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -257,4 +342,15 @@ void end_frame() {
     glfwPollEvents();
     glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);
+}
+
+void init_camera() {
+    glfwMakeContextCurrent(window);
+    glfwGetFramebufferSize(window, &display_w, &display_h);
+    glViewport(0, 0, display_w, display_h);
+    lastX = display_w / 2.0f;
+    lastY = display_h / 2.0f;
+    
+    // Capture and lock the mouse to the window
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }

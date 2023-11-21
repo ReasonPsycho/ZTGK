@@ -8,13 +8,14 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "spdlog/spdlog.h"
 
 class Texture{
 public:
     Texture(const char* texturePath) :texturePath(texturePath) {}
     ~Texture();
     // the texture ID
-    GLuint ID{};
+    GLuint ID{}; // TODO add more than one texture on top of it
     
     // constructor reads and builds the texture
     void use();
