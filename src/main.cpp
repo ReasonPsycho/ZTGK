@@ -1,6 +1,5 @@
-// dear imgui: standalone example application for GLFW + OpenGL 3, using programmable pipeline
-// If you are new to dear imgui, see examples/README.txt and documentation at the top of imgui.cpp.
-// (GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan graphics context creation, etc.)
+
+#pragma region Includes
 
 #include "imgui.h"
 #include "imgui_impl/imgui_impl_glfw.h"
@@ -23,6 +22,9 @@
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
 
+#pragma endregion Includes
+
+#pragma region Function definitions
 
 static void glfw_error_callback(int error, const char *description) {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
@@ -59,6 +61,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+#pragma endregion Function definitions
+
+#pragma region Orginal set up
+
 constexpr int32_t WINDOW_WIDTH = 1920;
 constexpr int32_t WINDOW_HEIGHT = 1080;
 
@@ -74,9 +80,10 @@ constexpr int32_t GL_VERSION_MINOR = 6;
 bool show_demo_window = false;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-#
 
-//My original things for set up
+#pragma endregion Orginal set up
+
+#pragma region My set up
 
 //Camera set up
 int display_w, display_h;
@@ -92,7 +99,13 @@ Cube cube;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+#pragma endregion My set up
+
+
 int main(int, char **) {
+
+    #pragma region Init
+
     if (!init()) {
         spdlog::error("Failed to initialize project!");
         return EXIT_FAILURE;
@@ -111,6 +124,10 @@ int main(int, char **) {
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    #pragma endregion Init
+
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. delta time)
@@ -138,6 +155,9 @@ int main(int, char **) {
     // Cleanup
     return 0;
 }
+
+
+#pragma region Functions
 
 void cleanup() {
     //Orginal clean up
@@ -354,3 +374,5 @@ void init_camera() {
     // Capture and lock the mouse to the window
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
+
+#pragma endregion Functions
