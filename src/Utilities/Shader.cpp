@@ -54,7 +54,6 @@ void Shader::init() {
     glDeleteShader(fragment);
 }
 
-
 void Shader::use() const {
     glUseProgram(ID);
 }
@@ -73,7 +72,6 @@ void Shader::setGLuint(const std::string &name, GLuint value) const {
 }
 void Shader::setMatrix4(const std::string &name,bool transpose, const GLfloat *value) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()),1, transpose, value);
-    
 }
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type) {

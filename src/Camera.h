@@ -62,7 +62,7 @@ public:
     void ProcessMouseScroll(float yoffset, float deltaTime = 1);
     
     //updates shader values
-    void UpdateShader(Shader shader,int display_w,int display_h);
+    void UpdateShader(Shader* shader,int display_w,int display_h);
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();

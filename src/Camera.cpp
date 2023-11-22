@@ -84,12 +84,12 @@ void Camera::updateCameraVectors() {
     Up    = glm::normalize(glm::cross(Right, Front));
 }
 
-void Camera::UpdateShader(Shader shader,int display_w,int display_h) {
+void Camera::UpdateShader(Shader* shader,int display_w,int display_h) {
     // pass projection matrix to shader 
     glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)display_w / (float)display_h, 0.1f, 100.0f);
-    shader.setMatrix4("projection", false, glm::value_ptr(projection));
+    shader->setMatrix4("projection", false, glm::value_ptr(projection));
 
     // camera/view transformation
     glm::mat4 view = GetViewMatrix();
-    shader.setMatrix4("view", false, glm::value_ptr(view));
+    shader->setMatrix4("view", false, glm::value_ptr(view));
 }
