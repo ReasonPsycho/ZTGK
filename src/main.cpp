@@ -14,6 +14,8 @@
 
 #include <glad/glad.h>  // Initialize with gladLoadGL()
 
+
+
 //Instancing
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -126,6 +128,8 @@ int main(int, char **) {
     glDepthFunc(GL_LESS);
 
     #pragma endregion Init
+
+    auto shader = glCreateShader(GL_COMPUTE_SHADER);
 
 
     // Main loop
