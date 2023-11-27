@@ -12,6 +12,7 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+using namespace gl;
 
 class Cube { // A class to hold cube (to test concept)
 public:

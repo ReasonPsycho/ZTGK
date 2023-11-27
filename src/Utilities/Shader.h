@@ -1,13 +1,13 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h> // include glad to get all the required OpenGL headers
-
+#include <glbinding/gl/gl.h>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include "spdlog/spdlog.h"
+using namespace gl;
 
 class Shader
 {

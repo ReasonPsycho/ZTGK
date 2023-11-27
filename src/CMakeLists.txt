@@ -36,8 +36,13 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_SUFFIX="")
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
         ${glad_SOURCE_DIR}
         ${stb_image_SOURCE_DIR}
-        ${imgui_SOURCE_DIR})
+        ${imgui_SOURCE_DIR}
+        ${KHR_SOURCE_DIR}
+        ${GLBINDING_SOURCE_DIR}
+        ${GLOBJECTS_SOURCE_DIR})
 
+find_package(globjects REQUIRED)
+find_package(glbinding REQUIRED)
 
 # Link the glbinding library
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
@@ -48,9 +53,8 @@ target_link_libraries(${PROJECT_NAME} imgui)
 target_link_libraries(${PROJECT_NAME} spdlog)
 target_link_libraries(${PROJECT_NAME} glfw)
 target_link_libraries(${PROJECT_NAME} glm::glm)
-target_link_libraries(${PROJECT_NAME} cpplocate)
-target_link_libraries(${PROJECT_NAME} glbinding)
-target_link_libraries(${PROJECT_NAME} globjects)
+target_link_libraries(${PROJECT_NAME} glbinding::glbinding)
+target_link_libraries(${PROJECT_NAME} globjects::globjects)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink

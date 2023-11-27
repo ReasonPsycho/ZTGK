@@ -1,0 +1,5 @@
+name: globjects
+version: 1.0.0
+description: Strict OpenGL objects wrapper.
+author: CG Internals GmbH
+dataPath: ${ModulePath}/data

@@ -1,5 +1,7 @@
 #include "Texture.h"
 
+using namespace gl;
+
 void Texture::init() {  //TODO Expand size of this dude
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
@@ -29,7 +31,6 @@ void Texture::use() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ID);
 }
-
 Texture::~Texture() { 
     glDeleteTextures(1,&ID); 
 }

@@ -23,12 +23,20 @@ CPMAddPackage("gh:g-truc/glm#0.9.9.8")
 CPMAddPackage("gh:ocornut/imgui@1.88")
 CPMAddPackage("gh:gabime/spdlog@1.10.0")
 
-set(GLM_LIBRARIES glm)
-set(GLFW_LIBRARIES glfw)
+set(KHR_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/cmake/KHRplatform)
+set(GLBINDING_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/cmake/glbinding)
+set(GLOBJECTS_DIR ${CMAKE_CURRENT_LIST_DIR}/globjects/cmake/globjects)
 
-CPMAddPackage("gh:cginternals/cpplocate@2.3")
-CPMAddPackage("gh:cginternals/glbinding@4.0")
-CPMAddPackage("gh:cginternals/globjects@2.0")
+set(KHR_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/include/KHR)
+set(GLBINDING_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/include/glbinding)
+set(GLOBJECTS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/globjects/include/globjects)
+
+include(${KHR_DIR}/KHRplatform-export.cmake)
+include(${GLBINDING_DIR}/glbinding-export.cmake)
+include(${GLOBJECTS_DIR}/globjects-export.cmake)
+
+include(${GLBINDING_DIR}/glbinding-export-release.cmake)
+include(${GLOBJECTS_DIR}/globjects-export-release.cmake)
 
 set(imgui_SOURCE_DIR ${imgui_SOURCE_DIR} CACHE INTERNAL "")
 add_library(imgui STATIC ${imgui_SOURCE_DIR}/imgui.cpp
@@ -44,9 +52,8 @@ set_target_properties(glad
         glm
         imgui
         spdlog
-        cpplocate
-        glbinding
-        globjects
+        glbinding::glbinding
+        globjects::globjects
         PROPERTIES FOLDER "thirdparty")
 
 if (TARGET zlibstatic)

@@ -12,9 +12,12 @@
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 
-#include <glad/glad.h>  // Initialize with gladLoadGL()
+//#include <glad/glad.h>  // Initialize with gladLoadGL()
 
+#include <glbinding/glbinding.h>
+#include <glbinding/gl/gl.h>
 
+using namespace gl;
 
 //Instancing
 #include <glm/glm.hpp>
@@ -124,12 +127,12 @@ int main(int, char **) {
     spdlog::info("Initialized camera and viewport.");
     
     // configure global opengl state
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
+   glDepthFunc(static_cast<gl::GLenum>(GL_LESS));
 
     #pragma endregion Init
 
-    auto shader = glCreateShader(GL_COMPUTE_SHADER);
+    auto shader = glCreateShader(static_cast<gl::GLenum>(GL_COMPUTE_SHADER));
 
 
     // Main loop
@@ -185,7 +188,7 @@ bool init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_VERSION_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
     // Create window with graphics context
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
@@ -196,14 +199,16 @@ bool init() {
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable VSync - fixes FPS at the refresh rate of your screen
+    glbinding::initialize(glfwGetProcAddress);
 
+    /* was used for glads
     bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
     if (err) {
         spdlog::error("Failed to initialize OpenGL loader!");
         return false;
     }
-
+    */
     return true;
 }
 
@@ -258,7 +263,7 @@ void update() {
 
 void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(static_cast<ClearBufferMask>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     camera.UpdateShader(&ourShader,display_w,display_h);
     
@@ -347,12 +352,10 @@ void end_frame() {
     // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
     // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
     glfwPollEvents();
-    glfwMakeContextCurrent(window);
     glfwSwapBuffers(window);
 }
 
 void init_camera() {
-    glfwMakeContextCurrent(window);
     glfwGetFramebufferSize(window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
     lastX = display_w / 2.0f;

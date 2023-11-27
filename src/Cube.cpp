@@ -5,6 +5,7 @@
 #include "Cube.h"
 #include "Utilities/Shader.h"
 #include "Utilities/Texture.h"
+using namespace gl;
 
 
 Cube::Cube()  {
