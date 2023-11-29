@@ -76,6 +76,13 @@ void Shader::setMatrix4(const std::string &name,bool transpose, const GLfloat *v
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()),1, transpose, value);
 }
 
+void Shader::setVec3(const std::string &name, float d, float d1, float d2) {
+    glUniform3f(glGetUniformLocation(ID, name.c_str()),d, d1, d2);
+
+}
+
+
+
 void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     int success;
     char infoLog[1024];
@@ -98,4 +105,5 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         }
     }
 }
+
 

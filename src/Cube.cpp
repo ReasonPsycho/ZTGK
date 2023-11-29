@@ -106,6 +106,8 @@ void Cube::render(Shader* shader,Texture* texture) {
     shader->use(); //Don't need this yet tbh
     model = glm::rotate(model,0.001f, glm::vec3(1, 1, 1)) ;
     shader->setMatrix4("transform",false, glm::value_ptr(model));
+    shader->setVec3("lightColor",  1.0f, 0.0f, 1.0f);
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 }

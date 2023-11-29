@@ -200,7 +200,6 @@ bool init() {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable VSync - fixes FPS at the refresh rate of your screen
     glbinding::initialize(glfwGetProcAddress);
-
     /* was used for glads
     bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
