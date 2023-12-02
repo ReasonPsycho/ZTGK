@@ -29,6 +29,17 @@ using namespace gl;
 
 #pragma endregion Includes
 
+#pragma region constants
+
+glm::vec3 pointLightPositions[] = {
+        glm::vec3( 0.7f,  0.2f,  2.0f),
+        glm::vec3( 2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f,  2.0f, -12.0f),
+        glm::vec3( 0.0f,  0.0f, -3.0f)
+};
+
+#pragma endregion constants
+
 #pragma region Function definitions
 
 static void glfw_error_callback(int error, const char *description) {
@@ -97,7 +108,8 @@ float lastX = 0;
 float lastY = 0;
 
 Shader ourShader("res/shaders/basic.vert", "res/shaders/basic.frag");
-Texture ourTexture("res/textures/stone.jpg");
+Texture container2("res/textures/container2.png");
+Texture container2_specular("res/textures/container2_specular.png");
 Cube cube;
 
 // timing
@@ -131,9 +143,6 @@ int main(int, char **) {
    glDepthFunc(static_cast<gl::GLenum>(GL_LESS));
 
     #pragma endregion Init
-
-    auto shader = glCreateShader(static_cast<gl::GLenum>(GL_COMPUTE_SHADER));
-
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -217,11 +226,14 @@ void init_textures_vertices() {
     // ------------------------------------------------------------------
 
     cube.init();
-    ourTexture.init();
+    container2.init();
+    container2_specular.init();
     ourShader.init();
-    ourTexture.use();
+    container2.use(GL_TEXTURE0);
+    container2_specular.use(GL_TEXTURE1);
     ourShader.use();
-    ourShader.setInt("ourTexture", 0);
+    ourShader.setInt("material.diffuse", 0);  //shouldn't that be inside the shader?
+    ourShader.setInt("material.specular", 1);
 }
 
 void init_imgui() {
@@ -265,8 +277,47 @@ void render() {
     glClear(static_cast<ClearBufferMask>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     camera.UpdateShader(&ourShader,display_w,display_h);
+    ourShader.use(); //Don't need this yet tbh
+
+    // directional light
+    ourShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    ourShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    ourShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    ourShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+    // point light 1
+    ourShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+    ourShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    ourShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+    ourShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    ourShader.setFloat("pointLights[0].constant", 1.0f);
+    ourShader.setFloat("pointLights[0].linear", 0.09f);
+    ourShader.setFloat("pointLights[0].quadratic", 0.032f);
+    // point light 2
+    ourShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+    ourShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    ourShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+    ourShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    ourShader.setFloat("pointLights[1].constant", 1.0f);
+    ourShader.setFloat("pointLights[1].linear", 0.09f);
+    ourShader.setFloat("pointLights[1].quadratic", 0.032f);
+    // point light 3
+    ourShader.setVec3("pointLights[2].position", pointLightPositions[2]);
+    ourShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    ourShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+    ourShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    ourShader.setFloat("pointLights[2].constant", 1.0f);
+    ourShader.setFloat("pointLights[2].linear", 0.09f);
+    ourShader.setFloat("pointLights[2].quadratic", 0.032f);
+    // point light 4
+    ourShader.setVec3("pointLights[3].position", pointLightPositions[3]);
+    ourShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    ourShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+    ourShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    ourShader.setFloat("pointLights[3].constant", 1.0f);
+    ourShader.setFloat("pointLights[3].linear", 0.09f);
+    ourShader.setFloat("pointLights[3].quadratic", 0.032f);
     
-    cube.render(&ourShader,&ourTexture);
+    cube.render(&ourShader,&container2,&container2_specular);
 }
 
 void imgui_begin() {

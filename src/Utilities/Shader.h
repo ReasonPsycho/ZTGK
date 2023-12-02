@@ -8,6 +8,7 @@
 #include <iostream>
 #include "spdlog/spdlog.h"
 #include "glm/detail/type_vec3.hpp"
+#include "glm/vec3.hpp"
 
 using namespace gl;
 
@@ -32,6 +33,7 @@ public:
     void setMatrix4(const std::string &name, bool transpose, const GLfloat *value) const;
 
     void setVec3(const std::string &name, float d, float d1, float d2);
+    void setVec3(const std::string &name, glm::vec3 vec3);
 
 private:
     const char* vertexPath{};

@@ -14,67 +14,51 @@ Cube::Cube()  {
 
 void Cube::init() {
     float vertices[] = {
-            // Front face
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom left
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,  // bottom right
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,   // top right
-            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,  // top left
+            // positions          // normals           // texture coords
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-            // Back face
-            -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // bottom left
-            0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom right
-            0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top right
-            -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,  // top left
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-            // Left face
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
-            -0.5f, -0.5f, 0.5f, 1.0f, 0.0f,  // bottom right
-            -0.5f, 0.5f, 0.5f, 1.0f, 1.0f,   // top right
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top left
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-            // Right face
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // bottom left
-            0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom right
-            0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   // top right
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,  // top left
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-            // Top face
-            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,  // bottom left
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,   // bottom right
-            0.5f, 0.5f, -0.5f, 1.0f, 0.0f,  // top right
-            -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, // top left
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-            // Bottom face
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom left
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom right
-            0.5f, -0.5f, -0.5f, 1.0f, 1.0f,  // top right
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top left
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
-    unsigned int indices[] = {
-            // Front face
-            0, 1, 2,
-            2, 3, 0,
 
-            // Back face
-            4, 5, 6,
-            6, 7, 4,
 
-            // Left face
-            8, 9, 10,
-            10, 11, 8,
-
-            // Right face
-            12, 13, 14,
-            14, 15, 12,
-
-            // Top face
-            16, 17, 18,
-            18, 19, 16,
-
-            // Bottom face
-            20, 21, 22,
-            22, 23, 20
-    };
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -84,15 +68,15 @@ void Cube::init() {
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0); // Position attribute
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))); // Texture coordinate attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); // Normals attribute
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); // textures ^^ attribute
+    glEnableVertexAttribArray(2);
 }
 
 Cube::~Cube() {
@@ -101,13 +85,15 @@ Cube::~Cube() {
     glDeleteBuffers(1, &EBO);
 }
 
-void Cube::render(Shader* shader,Texture* texture) {
-    texture->use();
-    shader->use(); //Don't need this yet tbh
+void Cube::render(Shader* shader,Texture* texture0,Texture* texture1) {
+    texture0->use(GL_TEXTURE0);
+    texture1->use(GL_TEXTURE1);
     model = glm::rotate(model,0.001f, glm::vec3(1, 1, 1)) ;
-    shader->setMatrix4("transform",false, glm::value_ptr(model));
-    shader->setVec3("lightColor",  1.0f, 0.0f, 1.0f);
+    
+    shader->use(); //Don't need this yet tbh
+    shader->setMatrix4("model",false, glm::value_ptr(model));
+    shader->setFloat("material.shininess", 32.0f);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }

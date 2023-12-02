@@ -18,7 +18,7 @@ public:
     GLuint ID{}; // TODO add more than one texture on top of it
     
     // constructor reads and builds the texture
-    void use();
+    void use(GLenum GL_TEXTUREX);
     void init();
     
 private:
