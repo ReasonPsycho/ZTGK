@@ -42,7 +42,7 @@ struct SpotLight {
     vec3 specular;       
 };
 
-#define NR_POINT_LIGHTS 4
+#define NR_POINT_LIGHTS 4 //TODO set it up for rest of the lioght and just do max
 
 in vec3 FragPos;
 in vec3 Normal;
