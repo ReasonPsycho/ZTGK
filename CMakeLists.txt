@@ -14,8 +14,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(global_settings)
 
+message("CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+
 # ---- Dependencies ----
 add_subdirectory(thirdparty)
 
 # ---- Main project's files ----
 add_subdirectory(src)
+

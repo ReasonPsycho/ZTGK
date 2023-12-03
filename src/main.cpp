@@ -4,10 +4,9 @@
 #include "imgui.h"
 #include "imgui_impl/imgui_impl_glfw.h"
 #include "imgui_impl/imgui_impl_opengl3.h"
-#include "Utilities/Shader.h"
-#include "Utilities/Texture.h"
-#include "Cube.h"
+
 #include "Camera.h"
+#include "modelLoading/Model.h"
 #include <stdio.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -26,6 +25,8 @@ using namespace gl;
 
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
+
+#include <iostream>
 
 #pragma endregion Includes
 
@@ -107,10 +108,10 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 0;
 float lastY = 0;
 
+
+string modelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/backpack/backpack.obj";
 Shader ourShader("res/shaders/basic.vert", "res/shaders/basic.frag");
-Texture container2("res/textures/container2.png");
-Texture container2_specular("res/textures/container2_specular.png");
-Cube cube;
+Model ourModel(&modelPath);
 
 // timing
 float deltaTime = 0.0f;
@@ -217,6 +218,8 @@ bool init() {
         return false;
     }
     */
+
+    stbi_set_flip_vertically_on_load(true);
     return true;
 }
 
@@ -225,15 +228,11 @@ void init_textures_vertices() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
-    cube.init();
-    container2.init();
-    container2_specular.init();
     ourShader.init();
-    container2.use(GL_TEXTURE0);
-    container2_specular.use(GL_TEXTURE1);
     ourShader.use();
     ourShader.setInt("material.diffuse", 0);  //shouldn't that be inside the shader?
     ourShader.setInt("material.specular", 1);
+    ourModel.loadModel();
 }
 
 void init_imgui() {
@@ -284,40 +283,13 @@ void render() {
     ourShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
     ourShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
     ourShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-    // point light 1
-    ourShader.setVec3("pointLights[0].position", pointLightPositions[0]);
-    ourShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-    ourShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-    ourShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    ourShader.setFloat("pointLights[0].constant", 1.0f);
-    ourShader.setFloat("pointLights[0].linear", 0.09f);
-    ourShader.setFloat("pointLights[0].quadratic", 0.032f);
-    // point light 2
-    ourShader.setVec3("pointLights[1].position", pointLightPositions[1]);
-    ourShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-    ourShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-    ourShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-    ourShader.setFloat("pointLights[1].constant", 1.0f);
-    ourShader.setFloat("pointLights[1].linear", 0.09f);
-    ourShader.setFloat("pointLights[1].quadratic", 0.032f);
-    // point light 3
-    ourShader.setVec3("pointLights[2].position", pointLightPositions[2]);
-    ourShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-    ourShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-    ourShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-    ourShader.setFloat("pointLights[2].constant", 1.0f);
-    ourShader.setFloat("pointLights[2].linear", 0.09f);
-    ourShader.setFloat("pointLights[2].quadratic", 0.032f);
-    // point light 4
-    ourShader.setVec3("pointLights[3].position", pointLightPositions[3]);
-    ourShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-    ourShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-    ourShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-    ourShader.setFloat("pointLights[3].constant", 1.0f);
-    ourShader.setFloat("pointLights[3].linear", 0.09f);
-    ourShader.setFloat("pointLights[3].quadratic", 0.032f);
-    
-    cube.render(&ourShader,&container2,&container2_specular);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+    ourShader.setMatrix4("model", false, glm::value_ptr(model));
+    ourModel.Draw(ourShader);
+
 }
 
 void imgui_begin() {
