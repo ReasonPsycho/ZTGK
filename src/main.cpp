@@ -7,6 +7,7 @@
 
 #include "Camera.h"
 #include "modelLoading/Model.h"
+#include "AsteroidsSystem.h"
 #include <stdio.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -104,14 +105,11 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 60.0f));
 float lastX = 0;
 float lastY = 0;
 
-
-string modelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/backpack/backpack.obj";
-Shader ourShader("res/shaders/basic.vert", "res/shaders/basic.frag");
-Model ourModel(&modelPath);
+AsteroidsSystem asteroidsSystem(2000000);
 
 // timing
 float deltaTime = 0.0f;
@@ -227,12 +225,7 @@ bool init() {
 void init_textures_vertices() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-
-    ourShader.init();
-    ourShader.use();
-    ourShader.setInt("material.diffuse", 0);  //shouldn't that be inside the shader?
-    ourShader.setInt("material.specular", 1);
-    ourModel.loadModel();
+    asteroidsSystem.Init();
 }
 
 void init_imgui() {
@@ -274,21 +267,10 @@ void update() {
 void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(static_cast<ClearBufferMask>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-    camera.UpdateShader(&ourShader,display_w,display_h);
-    ourShader.use(); //Don't need this yet tbh
-
-    // directional light
-    ourShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    ourShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    ourShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-    ourShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-    ourShader.setMatrix4("model", false, glm::value_ptr(model));
-    ourModel.Draw(ourShader);
+    
+    camera.UpdateShader(&asteroidsSystem.asteroidShader,display_w,display_h);
+    
+    asteroidsSystem.Draw();
 
 }
 
@@ -302,6 +284,10 @@ void imgui_begin() {
 void imgui_render() {
     /// Add new ImGui controls here
     // Show the big demo window
+    char buffer[64];
+    snprintf(buffer, sizeof buffer, "%f", 1 / deltaTime);
+    ImGui::Text(buffer);
+
     if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
 }

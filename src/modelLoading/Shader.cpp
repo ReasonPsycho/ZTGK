@@ -103,7 +103,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "Shader compilation error of type:  ",type,infoLog);
+            spdlog::error( "Shader compilation error of type:  "+type+infoLog);
         }
     }
 }
