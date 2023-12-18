@@ -20,9 +20,16 @@
 using namespace gl;
 
 struct AsteroidData {
-    glm::mat4 model;
-    glm::vec4 velocity;
+    glm::vec4 position;
     glm::vec4 rotation;
+    glm::vec4 scale;
+    glm::vec4 velocity;
+    glm::vec4 angularVelocity;
+};
+
+struct CellData {
+    int spatialLookup[2];
+    int startIndices;
 };
 
 static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/asteroid/rock.obj";
@@ -33,11 +40,13 @@ public:
     GLuint ID{};
     AsteroidsSystem(int size);
     void Init();
-    void Draw();
+    void Draw(float deltaTime);
     std::vector<AsteroidData> asteroidsData;
     Model asteroidModel = Model(&asteroidModelPath);
     Shader asteroidShader = Shader("res/shaders/asteroid.vert", "res/shaders/asteroid.frag");
-    ComputeShader computeShader = ComputeShader("res/shaders/asteroid.glsl");
+    ComputeShader cumputeShaderMovment = ComputeShader("res/shaders/asteroidMovment.glsl");
+    ComputeShader cumputeShaderGridCreation = ComputeShader("res/shaders/asteroidGridCreation.glsl");
+    ComputeShader cumputeShaderGridSort = ComputeShader("res/shaders/asteroidGridSort.glsl");
 private:
     int size;
 };

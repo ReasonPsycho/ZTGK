@@ -38,6 +38,7 @@ public:
     void Draw(Shader &shader);
     void loadModel();
 
+    glm::vec3 futhestLenghtsFromCenter;
 private:
     string const *path;
     void processNode(aiNode *node, const aiScene *scene);

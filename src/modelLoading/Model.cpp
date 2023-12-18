@@ -53,7 +53,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     vector<shared_ptr<Texture>> textures;
-
+    this->futhestLenghtsFromCenter = glm::vec3(0.0f);
     // walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
@@ -63,6 +63,18 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
         vertex.Position = vector;
+        
+        if(vector.x > glm::abs(futhestLenghtsFromCenter.x)){
+            futhestLenghtsFromCenter.x =  glm::abs(vector.x);
+        }
+        
+        if(vector.y >  glm::abs(futhestLenghtsFromCenter.y)){
+            futhestLenghtsFromCenter.y =  glm::abs(vector.y);
+        }
+        
+        if(vector.z >  glm::abs(futhestLenghtsFromCenter.z)){
+            futhestLenghtsFromCenter.z =  glm::abs(vector.z);
+        }
         // normals
         if (mesh->HasNormals()) {
             vector.x = mesh->mNormals[i].x;

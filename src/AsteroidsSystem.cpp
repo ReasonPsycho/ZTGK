@@ -8,16 +8,49 @@ AsteroidsSystem::AsteroidsSystem(int size) : size(size) {
     
 }
 
-void AsteroidsSystem::Draw() {
-    
-    
-    computeShader.use();
-    glDispatchCompute(size, 1, 1);
+unsigned int nextPowerOfTwo(unsigned int n) {
+    // If n is already a power of two, return it
+    if (n && !(n & (n - 1)))
+        return n;
 
-    // Ensure memory barriers after the compute shader finishes
+    // Find the position of the most significant bit (MSB)
+    unsigned int count = 0;
+    while (n != 0) {
+        n >>= 1;
+        count++;
+    }
+
+    // The power of two will have only the MSB set, so left shift 1 to the left by count positions
+    return 1 << count;
+}
+
+void AsteroidsSystem::Draw(float deltaTime) {
+    
+    
+    cumputeShaderMovment.use();
+    cumputeShaderMovment.setFloat("deltaTime", deltaTime);
+    glDispatchCompute(size, 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    
+    cumputeShaderGridCreation.use();
+    glDispatchCompute(size, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-     
+    cumputeShaderGridSort.use();
+    int numPairs = nextPowerOfTwo(size) / 2;
+    int numStages = (int) glm::log2((float)numPairs * 2);
+    for (int stageIndex = 0; stageIndex < numStages; stageIndex++) {
+        for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++) {
+            int groupWidth = 1 << (stageIndex - stepIndex);
+            int groupHeight = 2 * groupWidth - 1;
+            cumputeShaderGridSort.setInt("groupWidth",groupWidth);
+            cumputeShaderGridSort.setInt("groupHeight",groupHeight);
+            cumputeShaderGridSort.setInt("stepIndex",stepIndex);
+            glDispatchCompute(numPairs, 1, 1);
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        }   
+    }
+    
     asteroidShader.use();
     for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++)
     {
@@ -45,33 +78,30 @@ void AsteroidsSystem::Init() {
         float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
         displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
         float z = cos(angle) * radius + displacement;
-        model = glm::translate(model, glm::vec3(x, y, z));
-
-        // 2. scale: Scale between 0.05 and 0.25f
-        float scale = static_cast<float>((rand() % 20) / 100.0 + 0.05);
-        model = glm::scale(model, glm::vec3(scale));
-
-        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-        float rotAngle = static_cast<float>((rand() % 360));
-        model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-        glm::vec4 velocity = glm::linearRand(glm::vec4(0.01f),glm::vec4(0.05f));
-        glm::vec4 rotation = glm::linearRand(glm::vec4(0.01f),glm::vec4(0.05f));
-        // 4. now add to list of matrices
-        asteroidsData.push_back(AsteroidData(model,velocity,rotation));
+        
+        glm::vec4 position = glm::vec4(x, y, z,1);
+        glm::vec4 rotation = glm::vec4(glm::linearRand(glm::vec3(-0.5f),glm::vec3(0.5f)),1);
+        glm::vec4 scale =  glm::vec4(glm::linearRand(glm::vec3(0.5f),glm::vec3(2.0f)),1);
+        glm::vec4 velocity = glm::vec4(glm::linearRand(glm::vec3(-0.5f),glm::vec3(0.5f)),1);
+        glm::vec4 angularVelocity =glm::vec4( glm::linearRand(glm::vec3(-0.5f),glm::vec3(0.5f)),1);
+        
+        asteroidsData.push_back(AsteroidData(position,rotation,scale,velocity,angularVelocity));
     }
 
-    
-    
-    glGenBuffers(1, &ID);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ID);
 
-    // Allocate space for the buffer based on the size of the vector
+    GLuint currentId;
+    glGenBuffers(1, &currentId);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
     glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(AsteroidData), asteroidsData.data(), GL_STATIC_DRAW);
-
-    // Bind the buffer to a binding point
     GLuint bindingPoint = 0; // Choose a binding point
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, ID);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
+    
+    glGenBuffers(1, &currentId);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(CellData), asteroidsData.data(), GL_STATIC_DRAW);
+    bindingPoint = 1; // Choose a binding point
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
+
 
     asteroidShader.init();
     asteroidShader.use();
@@ -79,7 +109,13 @@ void AsteroidsSystem::Init() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, asteroidModel.textures_loaded[0]->ID); // note: we also made the textures_loaded vector public (instead of private) from the model class.
 
-    computeShader.init();
+    cumputeShaderMovment.init();
+    cumputeShaderGridCreation.init();
+    cumputeShaderGridCreation.use();
+    float furthestPoint = (asteroidModel.futhestLenghtsFromCenter.x + asteroidModel.futhestLenghtsFromCenter.y + asteroidModel.futhestLenghtsFromCenter.z)/3;
+    cumputeShaderGridCreation.setFloat("collisonRadius", furthestPoint);
+    cumputeShaderGridCreation.setInt("asteroidCount", size);
     
-   
+    cumputeShaderGridSort.init();
+    cumputeShaderGridCreation.setInt("asteroidCount", size);
 }

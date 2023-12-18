@@ -382,7 +382,7 @@ renderProgram->addUniform("viewProjection", glm::mat4(1.0));
 renderProgram->use(); // compiles shaders, links and uses program
 
 auto computeProgram = new Program();
-computeProgram->attach(computeShader);
+computeProgram->attach(cumputeShaderMovment);
 
 computeProgram->dispatchCompute(128, 1, 1);
 ```
