@@ -39,17 +39,10 @@ void AsteroidsSystem::Draw(float deltaTime) {
     cumputeShaderGridSort.use();
     int numPairs = nextPowerOfTwo(size) / 2;
     int numStages = (int) glm::log2((float)numPairs * 2);
-    for (int stageIndex = 0; stageIndex < numStages; stageIndex++) {
-        for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++) {
-            int groupWidth = 1 << (stageIndex - stepIndex);
-            int groupHeight = 2 * groupWidth - 1;
-            cumputeShaderGridSort.setInt("groupWidth",groupWidth);
-            cumputeShaderGridSort.setInt("groupHeight",groupHeight);
-            cumputeShaderGridSort.setInt("stepIndex",stepIndex);
-            glDispatchCompute(numPairs, 1, 1);
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        }   
-    }
+    cumputeShaderGridSort.setInt("numPairs",numPairs);
+    cumputeShaderGridSort.setInt("numStages",numStages);
+    glDispatchCompute(1, 1 , 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     
     asteroidShader.use();
     for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++)
@@ -115,7 +108,9 @@ void AsteroidsSystem::Init() {
     float furthestPoint = (asteroidModel.futhestLenghtsFromCenter.x + asteroidModel.futhestLenghtsFromCenter.y + asteroidModel.futhestLenghtsFromCenter.z)/3;
     cumputeShaderGridCreation.setFloat("collisonRadius", furthestPoint);
     cumputeShaderGridCreation.setInt("asteroidCount", size);
-    
+
+    GLenum maxWorkSizeX;
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE,0,&maxWorkSizeX);
+    cumputeShaderGridSort.setLayout((int)maxWorkSizeX,1,1);
     cumputeShaderGridSort.init();
-    cumputeShaderGridCreation.setInt("asteroidCount", size);
 }

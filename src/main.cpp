@@ -109,7 +109,7 @@ Camera camera(glm::vec3(0.0f, 80.0f, 60.0f));
 float lastX = 0;
 float lastY = 0;
 
-AsteroidsSystem asteroidsSystem(1000000);
+AsteroidsSystem asteroidsSystem(256);
 
 // timing
 float deltaTime = 0.0f;

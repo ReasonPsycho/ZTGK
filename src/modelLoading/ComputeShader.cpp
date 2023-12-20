@@ -4,9 +4,8 @@
 
 #include "ComputeShader.h"
 
-void ComputeShader::init() {
-// 1. retrieve the vertex/fragment source code from filePath
-    std::string computeCode;
+
+ComputeShader::ComputeShader(const char *shaderPath) {
     std::ifstream cShaderFile;
     // ensure ifstream objects can throw exceptions:
     cShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -21,13 +20,32 @@ void ComputeShader::init() {
         // close file handlers
         cShaderFile.close();
         // convert stream into string
-        computeCode = cShaderStream.str();
+        shaderCode = cShaderStream.str();
     }
     catch (std::ifstream::failure& e)
     {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+        spdlog::error("FILE_NOT_SUCCESSFULLY_READ:" ,e.what());
     }
-    const char* cShaderCode = computeCode.c_str();
+}
+
+void ComputeShader::setLayout(int localSizeX,int localSizeY,int localSizeZ) {
+    std::string toBeReplaced = "//HERE SHOULD BE LAYOUT";
+    std:: size_t foundPos = shaderCode.find(toBeReplaced);
+    if(foundPos == std::string::npos) return;
+    std::string newLayout = " layout (local_size_x = "+ std::to_string(localSizeX) +", local_size_y = "+ std::to_string(localSizeY) +", local_size_z = "+ std::to_string(localSizeZ) +") in;";
+    shaderCode.replace(foundPos, toBeReplaced.size(), newLayout);
+}
+
+void ComputeShader::init() {
+// 1. retrieve the vertex/fragment source code from filePath
+    if(shaderCode.empty()) return; // No code no init
+    
+    std::string toBeReplaced = "//HERE SHOULD BE LAYOUT"; // set defouglt layout if it doesn't work
+    if (shaderCode.find(toBeReplaced) != std::string::npos){
+        setLayout(1,1,1);
+    }
+    
+    const char* cShaderCode = shaderCode.c_str();
     // 2. compile shaders
     unsigned int compute;
     // compute shader
@@ -96,5 +114,7 @@ void ComputeShader::checkCompileErrors(unsigned int shader, std::string type) {
         }
     }
 }
+
+
 
 
