@@ -47,6 +47,7 @@ public:
     ComputeShader cumputeShaderMovment = ComputeShader("res/shaders/asteroidMovment.glsl");
     ComputeShader cumputeShaderGridCreation = ComputeShader("res/shaders/asteroidGridCreation.glsl");
     ComputeShader cumputeShaderGridSort = ComputeShader("res/shaders/asteroidGridSort.glsl");
+    ComputeShader cumputeShaderGridCalculateOffset = ComputeShader("res/shaders/asteroidGridCalculateOffset.glsl");
 private:
     int size;
 };

@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
 
 struct AsteroidData
 {
@@ -13,7 +13,6 @@ struct AsteroidData
 
 struct CellData {
     int spatialLookup[2];
-    int startIndices;
 };
 
 struct CellCord {

@@ -37,11 +37,11 @@ void AsteroidsSystem::Draw(float deltaTime) {
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     cumputeShaderGridSort.use();
-    int numPairs = nextPowerOfTwo(size) / 2;
-    int numStages = (int) glm::log2((float)numPairs * 2);
-    cumputeShaderGridSort.setInt("numPairs",numPairs);
-    cumputeShaderGridSort.setInt("numStages",numStages);
     glDispatchCompute(1, 1 , 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    cumputeShaderGridCalculateOffset.use();
+    glDispatchCompute(size, 1 , 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     
     asteroidShader.use();
@@ -106,11 +106,24 @@ void AsteroidsSystem::Init() {
     cumputeShaderGridCreation.init();
     cumputeShaderGridCreation.use();
     float furthestPoint = (asteroidModel.futhestLenghtsFromCenter.x + asteroidModel.futhestLenghtsFromCenter.y + asteroidModel.futhestLenghtsFromCenter.z)/3;
-    cumputeShaderGridCreation.setFloat("collisonRadius", furthestPoint);
+    cumputeShaderGridCreation.setFloat("collisonRadius", furthestPoint * 2);
     cumputeShaderGridCreation.setInt("asteroidCount", size);
 
-    GLenum maxWorkSizeX;
-    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE,0,&maxWorkSizeX);
-    cumputeShaderGridSort.setLayout((int)maxWorkSizeX,1,1);
+
+    int currentWorkSize;
+    glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE,0,&currentWorkSize); //Assign max work size to the work size
+    int numPairs = nextPowerOfTwo(size) / 2;
+    while (numPairs % currentWorkSize != 0){ //Essentialy making sure that we can easly iterate over the data
+        currentWorkSize/=2;
+    }
+    cumputeShaderGridSort.setLayout((int)currentWorkSize,1,1);
     cumputeShaderGridSort.init();
+    cumputeShaderGridSort.use();
+    //int numPairs = nextPowerOfTwo(size) / 2;
+    int numStages = (int) glm::log2((float)numPairs * 2);
+    cumputeShaderGridSort.setInt("numStages",numStages);
+    cumputeShaderGridSort.setInt("numOfIterations", (int)size/currentWorkSize);
+
+    cumputeShaderGridCalculateOffset.init();
+    cumputeShaderGridSort.use();
 }

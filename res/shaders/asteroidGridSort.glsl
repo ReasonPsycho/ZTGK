@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
+//HERE SHOULD BE LAYOUT
 
 struct CellData {
     int spatialLookup[2];
@@ -11,39 +11,35 @@ layout (std430, binding = 1) buffer CellBuffer {
     CellData cellData[];
 };
 
-uniform int numPairs;
+uniform int numOfIterations;
 uniform int numStages;
 
 void main() {
-    int numberOfReapets = int(ceil(numPairs / gl_WorkGroupSize.x));
-    
-    if(numPairs < gl_WorkGroupSize.x){
-        numberOfReapets = 1;
-    }
-    
     for (int stageIndex = 0; stageIndex < numStages; stageIndex++) {
         for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++) {
-
             uint groupWidth = 1 << (stageIndex - stepIndex);
             uint groupHeight = 2 * groupWidth - 1;
-            for (int repeat = 1; repeat < numberOfReapets + 1; repeat++) {
+            for (uint repeat = 0; repeat < numOfIterations; repeat++) {
 
-                uint index = uint(gl_GlobalInvocationID.x * repeat);
+                uint i = uint(gl_LocalInvocationID.x * (repeat + 1));
+                
+                uint hIndex = i & (groupWidth - 1);
+                uint indexLeft = hIndex + (groupHeight + 1) * (i / groupWidth);
+                uint rightStepSize = stepIndex == 0 ? groupHeight - 2 * hIndex : (groupHeight + 1) / 2;
+                uint indexRight = indexLeft + rightStepSize;
 
-                uint h = index & (groupWidth - 1);
-                uint indexLow = h + (groupWidth + 1) * (index / groupWidth);
-                uint indexHigh = indexLow + (stepIndex == 0 ? groupHeight - 2 * h : (groupHeight + 1) / 2);
-
+                bool withinTable = indexRight < cellData.length();
                 barrier();
-                if (indexHigh >= cellData.length()) return;
-                
-                CellData valueLow = cellData[indexLow];
-                CellData valueHigh = cellData[indexHigh];
-                
-                if (valueLow.spatialLookup[1] > valueHigh.spatialLookup[1]){
-                    cellData[indexLow] = valueHigh;
-                    cellData[indexHigh] = valueLow;
-                    barrier();
+                CellData valueLow;
+                CellData valueHigh;
+                if (withinTable){
+                    valueLow = cellData[indexLeft];
+                    valueHigh = cellData[indexRight];
+                }
+                barrier();
+                if ( withinTable && (valueLow.spatialLookup[1] > valueHigh.spatialLookup[1])){
+                    cellData[indexLeft] = valueHigh;
+                    cellData[indexRight] = valueLow;
                 }
             }
         }
