@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
 
 struct AsteroidData
 {
@@ -13,6 +13,7 @@ struct AsteroidData
 
 struct CellData {
     int spatialLookup[2];
+    int startIndices;
 };
 
 struct CellCord {
@@ -38,9 +39,9 @@ CellCord PositionToCellCoord(vec3 position, float radius){
 }
 
 uint HashCell(CellCord cellCord){
-    uint a = uint(cellCord.x * 15823);
-    uint c = uint(cellCord.x * 19609);
-    uint b = uint(cellCord.x * 9737333);
+    uint a = uint(cellCord.x * 9737339);
+    uint c = uint(cellCord.y * 9737341);
+    uint b = uint(cellCord.z * 9737333);
     return (a + b + c) % uint(cellData.length());
 }
 

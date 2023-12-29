@@ -1,6 +1,6 @@
 #version 430
 
-layout (local_size_x = 10, local_size_y = 1, local_size_z = 1) in;
+layout (local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
 
 
 struct AsteroidData
@@ -23,5 +23,5 @@ void main() {
 
     // Perform operations on particles based on index
     asteroidsData[index].position.xyz += (asteroidsData[index].velocity.xyz * vec3(deltaTime));
-    asteroidsData[index].rotation.xyz += (asteroidsData[index].angularVelocity.xyz* vec3(deltaTime));
+    //asteroidsData[index].rotation.xyz += (asteroidsData[index].angularVelocity.xyz* vec3(deltaTime));
 }
