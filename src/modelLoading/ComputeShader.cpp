@@ -5,7 +5,7 @@
 #include "ComputeShader.h"
 
 
-ComputeShader::ComputeShader(const char *shaderPath) {
+ComputeShader::ComputeShader(const char *shaderPath): computeShaderPath(shaderPath) {
     std::ifstream cShaderFile;
     // ensure ifstream objects can throw exceptions:
     cShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -101,7 +101,7 @@ void ComputeShader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "ComputeShader compilation error of type: " + type + infoLog);
+            spdlog::error( "Shader in path: " + computeShaderPath + " has compilation error of type: " + type + infoLog);
         }
     }
     else
@@ -110,7 +110,7 @@ void ComputeShader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "ComputeShader compilation error of type:  " + type + infoLog);
+            spdlog::error( "Shader in path: " + computeShaderPath + " has compilation error of type: " + type + infoLog);
         }
     }
 }

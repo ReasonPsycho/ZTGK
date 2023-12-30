@@ -40,7 +40,7 @@ private:
     const char* fragmentPath{};
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
-    static void checkCompileErrors(unsigned int shader, std::string type);
+    void checkCompileErrors(unsigned int shader, std::string type);
 
 };
 

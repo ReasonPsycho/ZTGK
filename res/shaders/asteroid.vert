@@ -11,6 +11,7 @@ struct AsteroidData
     vec4 scale;
     vec4 velocity;
     vec4 angularVelocity;
+    vec4 separationVector;
 };
 
 

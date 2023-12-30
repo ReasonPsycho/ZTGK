@@ -87,6 +87,8 @@ void Shader::setVec3(const std::string &name, glm::vec3 vec3) {
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     int success;
+    std::string stringFragmentPath = fragmentPath;
+    std::string stringVertexPath = vertexPath;
     char infoLog[1024];
     if (type != "PROGRAM")
     {
@@ -94,7 +96,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "Shader compilation error of type: " + type + infoLog);
+            spdlog::error( "Shader in path: " + stringFragmentPath + " has compilation error of type: " + type + infoLog);
         }
     }
     else
@@ -103,7 +105,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "Shader compilation error of type:  "+type+infoLog);
+            spdlog::error( "Shader in path: " + stringVertexPath + " has compilation error of type: " + type + infoLog);
         }
     }
 }

@@ -25,30 +25,42 @@ struct AsteroidData {
     glm::vec4 scale;
     glm::vec4 velocity;
     glm::vec4 angularVelocity;
+    glm::vec4 separationVector;
 };
 
 struct CellData {
-    int spatialLookup[2];
-    int startIndices;
+    int key;
+    int cellHash;
 };
 
-static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/asteroid/rock.obj";
+struct Offsets {
+    int value;
+};
+
+
+static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/Sphere/Sphere.obj";
 
 
 class AsteroidsSystem {
 public:
     GLuint ID{};
+    float maxScale = 2.0f;
+    float minScale = 0.5f;
+    
     AsteroidsSystem(int size);
     void Init();
     void Draw(float deltaTime);
+    
     std::vector<AsteroidData> asteroidsData;
     Model asteroidModel = Model(&asteroidModelPath);
     Shader asteroidShader = Shader("res/shaders/asteroid.vert", "res/shaders/asteroid.frag");
+    Shader gridLinesShader = Shader("res/shaders/gridLinesShader.vert", "res/shaders/gridLinesShader.frag");
     ComputeShader cumputeShaderMovment = ComputeShader("res/shaders/asteroidMovment.glsl");
     ComputeShader cumputeShaderGridCreation = ComputeShader("res/shaders/asteroidGridCreation.glsl");
     ComputeShader cumputeShaderGridSort = ComputeShader("res/shaders/asteroidGridSort.glsl");
     ComputeShader cumputeShaderGridCalculateOffset = ComputeShader("res/shaders/asteroidGridCalculateOffset.glsl");
     ComputeShader cumputeShaderCollide = ComputeShader("res/shaders/asteroidCollision.glsl");
+    ComputeShader cumputeShaderSeperation = ComputeShader("res/shaders/asteroidSeperation.glsl");
 private:
     int size;
 };

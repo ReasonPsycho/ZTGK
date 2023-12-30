@@ -105,11 +105,11 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(0.0f, 80.0f, 60.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastX = 0;
 float lastY = 0;
 
-AsteroidsSystem asteroidsSystem(1024*20);
+AsteroidsSystem asteroidsSystem(1024);
 
 // timing
 float deltaTime = 0.0f;

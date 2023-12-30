@@ -39,9 +39,10 @@ public:
     void setVec3(const std::string &name, glm::vec3 vec3);
 private:
     std::string shaderCode;
+    std::string computeShaderPath;
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
-    static void checkCompileErrors(unsigned int shader, std::string type);
+    void checkCompileErrors(unsigned int shader, std::string type);
 };
 
 

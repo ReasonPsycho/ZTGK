@@ -1,14 +1,24 @@
 #version 430
 
-layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
 
 struct CellData {
-    int spatialLookup[2];
-    int startIndices;
+    int key;
+    int cellHash;
 };
+
+struct Offsets {
+    int value;
+};
+
 
 layout (std430, binding = 1) buffer CellBuffer {
     CellData cellData[];
+};
+
+layout (std430, binding = 2) buffer OffsetsBuffer {
+    Offsets offsets[];
 };
 
 uniform int groupWidth;
@@ -30,7 +40,7 @@ void main() {
         CellData valueHigh;
         valueLow = cellData[indexLeft];
         valueHigh = cellData[indexRight];
-        if (valueLow.spatialLookup[1] > valueHigh.spatialLookup[1]){
+        if (valueLow.cellHash > valueHigh.cellHash){
             cellData[indexLeft] = valueHigh;
             cellData[indexRight] = valueLow;
         }

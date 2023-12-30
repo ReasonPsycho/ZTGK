@@ -2,7 +2,6 @@
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-
 struct AsteroidData
 {
     vec4 position;
@@ -17,13 +16,14 @@ layout (std430, binding = 0) buffer AsteroidBuffer {
     AsteroidData asteroidsData[]; // Array of velocities
 };
 
-uniform float deltaTime;
+float MeanOfScales(vec3 scale) {
+    return dot(scale, vec3(1.0)) / 3.0;
+}
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
-
-    // Perform operations on particles based on index
-    asteroidsData[index].position.xyz += (asteroidsData[index].velocity.xyz * vec3(deltaTime));
-    asteroidsData[index].separationVector.xyz = vec3(0);
-    //asteroidsData[index].rotation.xyz += (asteroidsData[index].angularVelocity.xyz* vec3(deltaTime));
+    if(asteroidsData[index].separationVector.xyz != vec3(0)){
+        asteroidsData[index].position.xyz += asteroidsData[index].separationVector.xyz ;
+        asteroidsData[index].velocity.xyz = normalize(asteroidsData[index].separationVector.xyz) * MeanOfScales(asteroidsData[index].scale.xyz );
+    }
 }
