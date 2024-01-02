@@ -28,15 +28,15 @@ void AsteroidsSystem::Draw(float deltaTime) {
 
     cumputeShaderMovment.use();
     cumputeShaderMovment.setFloat("deltaTime", deltaTime);
-    glDispatchCompute(size, 1, 1);
+    glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     cumputeShaderGridCreation.use();
-    glDispatchCompute(size, 1, 1);
+    glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     cumputeShaderGridSort.use();
-    int numPairs = nextPowerOfTwo(size) / 2;
+    int numPairs = nextPowerOfTwo(asteroidsData.size()) / 2;
     int numStages = (int) glm::log2((float) numPairs * 2);
     for (int stageIndex = 0; stageIndex < numStages; stageIndex++)
     {
@@ -55,16 +55,16 @@ void AsteroidsSystem::Draw(float deltaTime) {
     }
 
     cumputeShaderGridCalculateOffset.use();
-    glDispatchCompute(size, 1, 1);
+    glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     
     
     cumputeShaderCollide.use();
-    glDispatchCompute(size, 1, 1);
+    glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     cumputeShaderSeperation.use();
-    glDispatchCompute(size, 1, 1);
+    glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     asteroidShader.use();
@@ -85,7 +85,7 @@ void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
 
     
-    size = 20;
+    size = 100000;
     std::vector<glm::vec3> positions(size);
     std::vector<glm::vec3> velocities(size);
     std::vector<glm::vec3> scales(size);
@@ -97,7 +97,7 @@ void AsteroidsSystem::Init() {
     
     for (int i = 0; i < size; ++i) {
         // Generate random positions
-        positions[i] = glm::sphericalRand(10.0f) + center; // Random positions within a sphere of radius 100
+        positions[i] = glm::sphericalRand(80.0f) + center; // Random positions within a sphere of radius 100
         scales[i] = glm::vec3(glm::linearRand(minScale, maxScale));
         // Calculate velocity towards the origin (0, 0, 0)
         glm::vec3 directionToOrigin = glm::normalize(center - positions[i]);
@@ -173,7 +173,7 @@ void AsteroidsSystem::Init() {
     cumputeShaderGridCreation.use();
     float furthestPoint = (asteroidModel.futhestLenghtsFromCenter.x + asteroidModel.futhestLenghtsFromCenter.y +
                            asteroidModel.futhestLenghtsFromCenter.z) / 3;
-    cumputeShaderGridCreation.setFloat("gridRadius", maxScale * furthestPoint);
+    cumputeShaderGridCreation.setFloat("gridRadius", maxScale * furthestPoint *2.0f);
     
     cumputeShaderGridSort.init();
     cumputeShaderGridSort.use();
@@ -184,7 +184,7 @@ void AsteroidsSystem::Init() {
     cumputeShaderCollide.init();
     cumputeShaderCollide.use();
     cumputeShaderCollide.setFloat("collisionRadius", furthestPoint);
-    cumputeShaderCollide.setFloat("gridRadius", maxScale * furthestPoint);
+    cumputeShaderCollide.setFloat("gridRadius", maxScale * furthestPoint  *2.0f);
 
     cumputeShaderSeperation.init();
     cumputeShaderSeperation.use();

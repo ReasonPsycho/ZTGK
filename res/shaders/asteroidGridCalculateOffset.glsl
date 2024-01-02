@@ -20,16 +20,16 @@ layout (std430, binding = 2) buffer OffsetsBuffer {
 };
 
 void main() { // This is dumb implementation it should be seperate structor etc etc.
-    if (gl_GlobalInvocationID.x >= cellData.length()) { return; }
+    int index = int(gl_WorkGroupID .x);
+    if (index >= cellData.length()) { return; }
 
-    int i = int(gl_GlobalInvocationID.x);
     int null = cellData.length();
 
-    int key = cellData[i].cellHash;
-    int keyPrev = i == 0 ? null : cellData[i - 1].cellHash;
+    int key = cellData[index].cellHash;
+    int keyPrev = index == 0 ? null : cellData[index - 1].cellHash;
 
     if (key != keyPrev)
     {
-        offsets[key].value = i;
+        offsets[key].value = index;
     }
 }

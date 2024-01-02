@@ -21,7 +21,7 @@ float MeanOfScales(vec3 scale) {
 }
 
 void main() {
-    uint index = gl_GlobalInvocationID.x;
+    uint index = gl_WorkGroupID .x;
     if(asteroidsData[index].separationVector.xyz != vec3(0)){
         asteroidsData[index].position.xyz += asteroidsData[index].separationVector.xyz ;
         asteroidsData[index].velocity.xyz = normalize(asteroidsData[index].separationVector.xyz) * MeanOfScales(asteroidsData[index].scale.xyz );

@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 3, local_size_y = 3, local_size_z = 3) in;
+layout(local_size_x = 27, local_size_y = 1, local_size_z = 1) in;
 
 struct AsteroidData {
     vec4 position;
@@ -9,6 +9,37 @@ struct AsteroidData {
     vec4 velocity;
     vec4 angularVelocity;
     vec4 separationVector;
+};
+
+const ivec3 offsets3D[27] =
+{
+ivec3(-1, -1, -1),
+ivec3(-1, -1, 0),
+ivec3(-1, -1, 1),
+ivec3(-1, 0, -1),
+ivec3(-1, 0, 0),
+ivec3(-1, 0, 1),
+ivec3(-1, 1, -1),
+ivec3(-1, 1, 0),
+ivec3(-1, 1, 1),
+ivec3(0, -1, -1),
+ivec3(0, -1, 0),
+ivec3(0, -1, 1),
+ivec3(0, 0, -1),
+ivec3(0, 0, 0),
+ivec3(0, 0, 1),
+ivec3(0, 1, -1),
+ivec3(0, 1, 0),
+ivec3(0, 1, 1),
+ivec3(1, -1, -1),
+ivec3(1, -1, 0),
+ivec3(1, -1, 1),
+ivec3(1, 0, -1),
+ivec3(1, 0, 0),
+ivec3(1, 0, 1),
+ivec3(1, 1, -1),
+ivec3(1, 1, 0),
+ivec3(1, 1, 1)
 };
 
 struct CellData {
@@ -32,14 +63,14 @@ layout(std430, binding = 2) buffer OffsetsBuffer {
     Offsets offsets[];
 };
 
-vec3 PositionToCellCoord(vec3 position, float radius) {
-    return floor(position / radius);
+uvec3 PositionToCellCoord(vec3 position, float radius) {
+    return ivec3(floor(position / radius));
 }
 
-uint HashCell(vec3 cellCoord) {
-    uint a = uint(cellCoord.x * 9737339);
-    uint c = uint(cellCoord.y * 9737341);
-    uint b = uint(cellCoord.z * 9737333);
+uint HashCell(uvec3 cellCord){
+    uint a = uint(cellCord.x * 15823);
+    uint c = uint(cellCord.y * 9737333);
+    uint b = uint(cellCord.z * 440817757);
     return (a + b + c) % uint(cellData.length());
 }
 
@@ -55,42 +86,33 @@ uniform float collisionRadius;
 uniform float gridRadius;
 
 void main() {
-    uint index = gl_GlobalInvocationID.x;
+    uint index = gl_WorkGroupID.x;
     vec3 sumOfCollisions = vec3(0);
     int amountOfCollisions = 0;
     AsteroidData currentAsteroid = asteroidsData[index];
     float scale = MeanOfScales(currentAsteroid.scale.xyz);
+    uvec3 cellCoord = PositionToCellCoord(currentAsteroid.position.xyz, gridRadius) + offsets3D[gl_LocalInvocationID.x];
+    uint hash = HashCell(cellCoord);
+    int currentTablePos = offsets[hash].value;
 
-    for (int x = -1; x <= 1; ++x) {
-        for (int y = -1; y <= 1; ++y) {
-            for (int z = -1; z <= 1; ++z) {
-                
-                vec3 cellCoord = PositionToCellCoord(currentAsteroid.position.xyz , gridRadius) + vec3(x, y, z);
-                uint hash = HashCell(cellCoord);
-                int currentTablePos = offsets[hash].value;
+    while (currentTablePos < int(cellData.length()) && cellData[currentTablePos].cellHash == int(hash)) {
+        //if (cellData[currentTablePos].key != int(index)) { We aleready kinda ignore case when points are the same
+        AsteroidData asteroidToCheck = asteroidsData[cellData[currentTablePos].key];
+        float scale2 = MeanOfScales(asteroidToCheck.scale.xyz);
 
-                while (currentTablePos < int(cellData.length()) && cellData[currentTablePos].cellHash == int(hash)) {
-                    //if (cellData[currentTablePos].key != int(index)) { We aleready kinda ignore case when points are the same
-                        AsteroidData asteroidToCheck = asteroidsData[currentTablePos];
-                        float scale2 = MeanOfScales(asteroidToCheck.scale.xyz);
-
-                        float dist = length(asteroidToCheck.position.xyz - currentAsteroid.position.xyz);
-                        if (dist <= collisionRadius * scale + collisionRadius * scale2) {
-                            if(asteroidToCheck.position.xyz != currentAsteroid.position.xyz){
-                                sumOfCollisions += SeparationVector(asteroidToCheck.position.xyz, currentAsteroid.position.xyz, collisionRadius * scale, collisionRadius * scale2);
-                                amountOfCollisions++;
-                            }
-                        }
-                    currentTablePos++;
-                }
+        float dist = length(asteroidToCheck.position.xyz - currentAsteroid.position.xyz);
+        if (dist <= collisionRadius * scale + collisionRadius * scale2) {
+            if (dist != 0){
+                sumOfCollisions += SeparationVector(asteroidToCheck.position.xyz, currentAsteroid.position.xyz, collisionRadius * scale, collisionRadius * scale2);
+                amountOfCollisions++;
             }
         }
+        currentTablePos++;
     }
 
-    if (amountOfCollisions == 0) {
-        asteroidsData[index].separationVector = vec4(0);
-    } else {
+
+    if (amountOfCollisions != 0) {
         sumOfCollisions /= float(amountOfCollisions);
-        asteroidsData[index].separationVector = vec4(-sumOfCollisions, 1);
+        asteroidsData[index].separationVector += vec4(-sumOfCollisions, 1);
     }
 }

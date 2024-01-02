@@ -28,7 +28,7 @@ uniform int stepIndex;
 void main() {
 
 
-    int i = int(gl_GlobalInvocationID.x);
+    int i = int(gl_WorkGroupID .x);
 
     uint hIndex = i & (groupWidth - 1);
     uint indexLeft = hIndex + (groupHeight + 1) * (i / groupWidth);

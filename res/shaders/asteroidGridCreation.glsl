@@ -33,21 +33,21 @@ layout (std430, binding = 2) buffer OffsetsBuffer {
     Offsets offsets[];
 };
 
-vec3 PositionToCellCoord(vec3 position, float radius) {
-    return floor(position / radius);
+uvec3 PositionToCellCoord(vec3 position, float radius) {
+    return ivec3(floor(position / radius));
 }
 
-uint HashCell(vec3 cellCord){
-    uint a = uint(cellCord.x * 9737339);
-    uint c = uint(cellCord.y * 9737341);
-    uint b = uint(cellCord.z * 9737333);
+uint HashCell(uvec3 cellCord){
+    uint a = uint(cellCord.x * 15823);
+    uint c = uint(cellCord.y * 9737333);
+    uint b = uint(cellCord.z * 440817757);
     return (a + b + c) % uint(cellData.length());
 }
 
 uniform float gridRadius;
 
 void main() {
-    uint index = gl_GlobalInvocationID.x;
-    cellData[index].key = int(gl_GlobalInvocationID.x);
-    cellData[index].cellHash = int(HashCell(PositionToCellCoord(asteroidsData[gl_GlobalInvocationID.x].position.xyz,gridRadius)));
+    uint index = gl_WorkGroupID .x;
+    cellData[index].key = int(index);
+    cellData[index].cellHash = int(HashCell(PositionToCellCoord(asteroidsData[index].position.xyz,gridRadius)));
 }

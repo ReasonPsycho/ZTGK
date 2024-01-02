@@ -20,7 +20,7 @@ layout (std430, binding = 0) buffer AsteroidBuffer {
 uniform float deltaTime;
 
 void main() {
-    uint index = gl_GlobalInvocationID.x;
+    uint index = gl_WorkGroupID .x;
 
     // Perform operations on particles based on index
     asteroidsData[index].position.xyz += (asteroidsData[index].velocity.xyz * vec3(deltaTime));
