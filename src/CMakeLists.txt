@@ -35,6 +35,12 @@ add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES}
         AsteroidsSystem.h
         modelLoading/ComputeShader.cpp
         modelLoading/ComputeShader.h
+        LightSystem.cpp
+        LightSystem.h
+        PBRSystem.cpp
+        PBRSystem.h
+        Enitity.cpp
+        Enitity.h
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)

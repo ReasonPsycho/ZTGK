@@ -16,6 +16,7 @@
 #include "glm/gtc/random.hpp"
 #include "modelLoading/Model.h"
 #include <glbinding/gl/gl.h>
+#include <random>
 
 using namespace gl;
 
@@ -38,7 +39,7 @@ struct Offsets {
 };
 
 
-static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/Sphere/Sphere.obj";
+static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/asteroid/Asteroid.fbx";
 
 
 class AsteroidsSystem {
@@ -47,14 +48,14 @@ public:
     float maxScale = 2.0f;
     float minScale = 0.5f;
     
-    AsteroidsSystem(int size);
+    AsteroidsSystem(int size,Shader* asteroidShader);
     void Init();
     void Draw(float deltaTime);
     
     std::vector<AsteroidData> asteroidsData;
+    std::vector<std::shared_ptr<Texture>> textures;
     Model asteroidModel = Model(&asteroidModelPath);
-    Shader asteroidShader = Shader("res/shaders/asteroid.vert", "res/shaders/asteroid.frag");
-    Shader gridLinesShader = Shader("res/shaders/gridLinesShader.vert", "res/shaders/gridLinesShader.frag");
+    Shader* asteroidShader;
     ComputeShader cumputeShaderMovment = ComputeShader("res/shaders/asteroidMovment.glsl");
     ComputeShader cumputeShaderGridCreation = ComputeShader("res/shaders/asteroidGridCreation.glsl");
     ComputeShader cumputeShaderGridSort = ComputeShader("res/shaders/asteroidGridSort.glsl");

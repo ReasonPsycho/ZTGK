@@ -6,7 +6,7 @@
 
 
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch,float nearClip, float farClip) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM),nearClip(nearClip),farClip(farClip)
 {
     Position = position;
     WorldUp = up;
@@ -85,8 +85,9 @@ void Camera::updateCameraVectors() {
 }
 
 void Camera::UpdateShader(Shader* shader,int display_w,int display_h) {
+    shader->use();
     // pass projection matrix to shader 
-    glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)display_w / (float)display_h, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)display_w / (float)display_h, nearClip, farClip);
     shader->setMatrix4("projection", false, glm::value_ptr(projection));
 
     // camera/view transformation

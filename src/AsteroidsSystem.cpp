@@ -4,7 +4,7 @@
 
 #include "AsteroidsSystem.h"
 
-AsteroidsSystem::AsteroidsSystem(int size) : size(size) {
+AsteroidsSystem::AsteroidsSystem(int size, Shader *asteroidShader):size(size),asteroidShader(asteroidShader){
 
 }
 
@@ -67,7 +67,14 @@ void AsteroidsSystem::Draw(float deltaTime) {
     glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    asteroidShader.use();
+    asteroidShader->use();
+    
+    textures[0]->use(GL_TEXTURE3);
+    textures[1]->use(GL_TEXTURE4);
+    textures[2]->use(GL_TEXTURE5);
+    textures[3]->use(GL_TEXTURE6);
+    textures[4]->use(GL_TEXTURE7);
+
     for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++) {
         glBindVertexArray(asteroidModel.meshes[i].VAO);
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(asteroidModel.meshes[i].indices.size()),
@@ -84,32 +91,45 @@ void AsteroidsSystem::Draw(float deltaTime) {
 void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
 
+    const float PI = 3.14159265359;
+    float radius = 10;
+    float span = 2;
     
-    size = 100000;
+    size = 10;
     std::vector<glm::vec3> positions(size);
+    std::vector<glm::vec3> rotations(size);
     std::vector<glm::vec3> velocities(size);
+    std::vector<glm::vec3> angularVelocites(size);
     std::vector<glm::vec3> scales(size);
-
-    glm::vec4 rotation = glm::vec4(1,1,1, 1);
-    glm::vec4 angularVelocity = glm::vec4(0,0,0, 1);
     
-    glm::vec3 center = glm::vec3(-5);
     
     for (int i = 0; i < size; ++i) {
         // Generate random positions
-        positions[i] = glm::sphericalRand(80.0f) + center; // Random positions within a sphere of radius 100
+        float angle = glm::linearRand(0.0f,2 * PI);
+        float distance = glm::linearRand(radius - span,radius + span);
+
+        float asteroidX = distance  * sin(angle);
+        float asteroidZ = distance * cos(angle) ;
+        
+        
+        float anlge2 = glm::linearRand(0.0f,2 * PI);
+        float asteroidY =  glm::linearRand(-span,span) * cos(anlge2) * sin(anlge2);
+        
+
+        positions[i] = glm::vec3(asteroidX,asteroidY,asteroidZ);
+        rotations[i] = glm::vec3(glm::linearRand(0.0f, 2 * PI));
         scales[i] = glm::vec3(glm::linearRand(minScale, maxScale));
-        // Calculate velocity towards the origin (0, 0, 0)
-        glm::vec3 directionToOrigin = glm::normalize(center - positions[i]);
-        float speed = glm::linearRand(1.0f, 2.0f); // Random speed between 1 and 5 units per frame
-        velocities[i] = directionToOrigin * speed;
+        velocities[i] = glm::linearRand(glm::vec3(-1), glm::vec3(1));
+        angularVelocites[i] = glm::linearRand(glm::vec3(-1), glm::vec3(1));
+
     }
 
     // Display generated positions and velocities
     for (int i = 0; i < size; ++i) {
-        asteroidsData.push_back(AsteroidData(glm::vec4 (positions[i],1), rotation, glm::vec4 (scales[i],1), glm::vec4 (velocities[i],1), angularVelocity));
+        asteroidsData.push_back(AsteroidData(glm::vec4 (positions[i],1), glm::vec4 (rotations[i],1), glm::vec4 (scales[i],1), glm::vec4 (velocities[i],1),glm::vec4 (angularVelocites[i],1) ));
     }
-    
+        
+
     /*
     float radius = 40.0;
     float offset = 20.0f;
@@ -136,6 +156,9 @@ void AsteroidsSystem::Init() {
     }
     */
 
+
+ 
+    
     GLuint currentId;
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
@@ -158,16 +181,29 @@ void AsteroidsSystem::Init() {
     bindingPoint = 2; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
     
-    gridLinesShader.init();
-    gridLinesShader.use();
+   shared_ptr<Texture> albedoMap = std::make_shared<Texture>( "ocean-rock_albedo.png","res/textures/ocean-rock-bl", "texture_albedo");
+    textures.insert(textures.end(),albedoMap);
 
-    asteroidShader.init();
-    asteroidShader.use();
-    asteroidShader.setInt("material.diffuse1", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,
-                  asteroidModel.textures_loaded[0]->ID); // note: we also made the textures_loaded vector public (instead of private) from the model class.
+    shared_ptr<Texture> normalMap = std::make_shared<Texture>( "ocean-rock_normal-ogl.png","res/textures/ocean-rock-bl", "texture_albedo");
+    textures.insert(textures.end(),normalMap);
+    
+    shared_ptr<Texture> metallicMap = std::make_shared<Texture>( "ocean-rock_metallic.png","res/textures/ocean-rock-bl", "texture_albedo");
+    textures.insert(textures.end(),metallicMap);
 
+    shared_ptr<Texture> roughnessMap = std::make_shared<Texture>( "ocean-rock_roughness.png","res/textures/ocean-rock-bl", "texture_albedo");
+    textures.insert(textures.end(),roughnessMap);
+
+    shared_ptr<Texture> aoMap = std::make_shared<Texture>("ocean-rock_ao.png","res/textures/ocean-rock-bl", "texture_albedo");
+    textures.insert(textures.end(),aoMap);
+
+    textures[0]->use(GL_TEXTURE3);
+    textures[1]->use(GL_TEXTURE4);
+    textures[2]->use(GL_TEXTURE5);
+    textures[3]->use(GL_TEXTURE6);
+    textures[4]->use(GL_TEXTURE7);
+
+                  
+                  
     cumputeShaderMovment.init();
     cumputeShaderGridCreation.init();
     cumputeShaderGridCreation.use();
@@ -189,3 +225,5 @@ void AsteroidsSystem::Init() {
     cumputeShaderSeperation.init();
     cumputeShaderSeperation.use();
 }
+
+

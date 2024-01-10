@@ -8,6 +8,8 @@
 #include "Camera.h"
 #include "modelLoading/Model.h"
 #include "AsteroidsSystem.h"
+#include "LightSystem.h"
+#include "PBRSystem.h"
 #include <stdio.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -28,6 +30,25 @@ using namespace gl;
 #include <spdlog/spdlog.h>
 
 #include <iostream>
+#include "Enitity.h"
+
+#ifndef ENTITY_H
+#define ENTITY_H
+
+#include <list> //std::list
+#include <memory> //std::unique_ptr
+
+class Entity : public Model
+{
+public:
+	list<unique_ptr<Entity>> children;
+	Entity* parent;
+};
+#endif
+
+string modelPath = "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\models\\Sphere\\Sphere.obj";
+Model model = Model(&modelPath);
+Entity ourEntity(model);
 
 #pragma endregion Includes
 
@@ -51,6 +72,8 @@ static void glfw_error_callback(int error, const char *description) {
 bool init();
 
 void init_textures_vertices();
+
+void load_enteties();
 
 void init_imgui();
 
@@ -109,7 +132,10 @@ Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastX = 0;
 float lastY = 0;
 
-AsteroidsSystem asteroidsSystem(1024);
+LightSystem lightSystem(1);
+PBRSystem pbrSystem(&camera);
+AsteroidsSystem asteroidsSystem(1024,&pbrSystem.pbrInstanceShader);
+
 
 // timing
 float deltaTime = 0.0f;
@@ -131,6 +157,9 @@ int main(int, char **) {
     init_textures_vertices();
     spdlog::info("Initialized textures and vertices.");
 
+    load_enteties();
+    spdlog::info("Initialized entities.");
+
     init_imgui();
     spdlog::info("Initialized ImGui.");
 
@@ -139,7 +168,8 @@ int main(int, char **) {
     
     // configure global opengl state
     glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
-   glDepthFunc(static_cast<gl::GLenum>(GL_LESS));
+    glEnable(static_cast<gl::GLenum>(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+    glDepthFunc(static_cast<gl::GLenum>(GL_LEQUAL));
 
     #pragma endregion Init
 
@@ -226,6 +256,30 @@ void init_textures_vertices() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     asteroidsSystem.Init();
+    lightSystem.Init();
+    pbrSystem.Init();
+}
+
+void load_enteties(){
+    model.loadModel();
+    ourEntity.transform.setLocalPosition({ 10, 0, 0 });
+    const float scale = 1;
+    ourEntity.transform.setLocalScale({ scale, scale, scale });
+
+    {
+        Entity* lastEntity = &ourEntity;
+
+        for (unsigned int i = 0; i < 2; ++i)
+        {
+            lastEntity->addChild(model);
+            lastEntity = lastEntity->children.back().get();
+
+            //Set transform values
+            lastEntity->transform.setLocalPosition({ 10, 0, 0 });
+            lastEntity->transform.setLocalScale({ scale, scale, scale });
+        }
+    }
+    ourEntity.updateSelfAndChild();
 }
 
 void init_imgui() {
@@ -267,11 +321,29 @@ void update() {
 void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(static_cast<ClearBufferMask>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    
-    camera.UpdateShader(&asteroidsSystem.asteroidShader,display_w,display_h);
-    
-    asteroidsSystem.Draw(deltaTime);
 
+    camera.UpdateShader(&pbrSystem.pbrInstanceShader,display_w,display_h);
+    camera.UpdateShader(&pbrSystem.backgroundShader,display_w,display_h);
+    camera.UpdateShader(&pbrSystem.pbrShader,display_w,display_h);
+    
+    pbrSystem.RenderBackground();
+    pbrSystem.PrebindPBR();
+   asteroidsSystem.Draw(deltaTime);
+
+    pbrSystem.pbrShader.use();
+    // draw our scene graph
+    Entity* lastEntity = &ourEntity;
+    while (lastEntity->children.size())
+    {
+        pbrSystem.pbrShader.setMatrix4("model", false,glm::value_ptr(lastEntity->transform.getModelMatrix()));
+        lastEntity->pModel->Draw(pbrSystem.pbrShader);
+        lastEntity = lastEntity->children.back().get();
+    }
+
+    ourEntity.transform.setLocalRotation({ 0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f });
+    ourEntity.updateSelfAndChild();
+    
+    
 }
 
 void imgui_begin() {

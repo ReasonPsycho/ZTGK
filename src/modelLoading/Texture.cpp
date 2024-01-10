@@ -42,7 +42,7 @@ Texture::Texture(string name , string directory,string type) :name(name),directo
     }
     else
     {
-        spdlog::error( "Failed to load texture");
+        spdlog::error( "Failed to load texture"  + name);
     }
 }
 

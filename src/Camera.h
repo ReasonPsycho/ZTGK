@@ -25,9 +25,11 @@ enum Camera_Movement {
 // Default camera values
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
-const float SPEED       =  2.5f;
+const float SPEED       =  20.0f;
 const float SENSITIVITY =  5.0f;
 const float ZOOM        =  45.0f;
+const float NEARCLIP        =  0.1f;
+const float FARCLIP        =  1000.0f;
 
 
 
@@ -41,6 +43,9 @@ public:
     glm::vec3 Up;
     glm::vec3 Right;
     glm::vec3 WorldUp;
+
+    float nearClip;
+    float farClip;
     // euler Angles
     float Yaw;
     float Pitch;
@@ -50,7 +55,7 @@ public:
     float Zoom;
 
     //Constructors
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH,float nearClip = NEARCLIP, float farClip = FARCLIP);
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
     
     // Returns view matrix calculated using Euler Angles and the LookAt Matrix
