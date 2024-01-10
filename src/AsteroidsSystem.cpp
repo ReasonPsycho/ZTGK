@@ -81,11 +81,6 @@ void AsteroidsSystem::Draw(float deltaTime) {
                                 GL_UNSIGNED_INT, 0, asteroidsData.size());
         glBindVertexArray(0);
     }
-
-   // glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-   // gridLinesShader.use();
 }
 
 void AsteroidsSystem::Init() {

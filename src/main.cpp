@@ -328,7 +328,7 @@ void render() {
     
     pbrSystem.RenderBackground();
     pbrSystem.PrebindPBR();
-   asteroidsSystem.Draw(deltaTime);
+    asteroidsSystem.Draw(deltaTime);
 
     pbrSystem.pbrShader.use();
     // draw our scene graph
@@ -342,8 +342,6 @@ void render() {
 
     ourEntity.transform.setLocalRotation({ 0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f });
     ourEntity.updateSelfAndChild();
-    
-    
 }
 
 void imgui_begin() {
