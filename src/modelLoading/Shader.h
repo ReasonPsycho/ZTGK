@@ -1,7 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glbinding/gl/gl.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -9,8 +8,8 @@
 #include "spdlog/spdlog.h"
 #include "glm/detail/type_vec3.hpp"
 #include "glm/vec3.hpp"
+#include "glad/glad.h"
 
-using namespace gl;
 
 class Shader
 {

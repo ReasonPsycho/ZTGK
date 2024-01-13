@@ -68,10 +68,7 @@ public:
         m_isDirty = true;
     }
 
-    const glm::vec3& getGlobalPosition() const
-    {
-        return m_modelMatrix[3];
-    }
+    const glm::vec3 getGlobalPosition() const { return m_modelMatrix[3]; }
 
     const glm::vec3& getLocalPosition() const
     {

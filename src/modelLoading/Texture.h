@@ -1,14 +1,14 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <glbinding/gl/gl.h>
 #include "stb_image.h"
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include "spdlog/spdlog.h"
-using namespace gl;
+#include "glad/glad.h"
+
 using namespace std;
 
 class Texture{

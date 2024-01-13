@@ -5,14 +5,11 @@
 #ifndef OPENGLGP_MODEL_H
 #define OPENGLGP_MODEL_H
 
-#include <glbinding/glbinding.h>
-#include <glbinding/gl/gl.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-using namespace gl;
 using namespace std;
 
 #include <glm/glm.hpp>

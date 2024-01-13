@@ -5,10 +5,6 @@
 #ifndef OPENGLGP_MESH_H
 #define OPENGLGP_MESH_H
 
-#include <glbinding/glbinding.h>
-#include <glbinding/gl/gl.h>
-
-using namespace gl;
 using namespace std;
 
 #include <glm/glm.hpp>

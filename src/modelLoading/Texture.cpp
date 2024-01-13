@@ -1,6 +1,5 @@
 #include "Texture.h"
 
-using namespace gl;
 
 
 void Texture::use(GLenum GL_TEXTUREX) {

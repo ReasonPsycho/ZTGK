@@ -1,6 +1,13 @@
 
 #pragma region Includes
 
+// Add this block before any includes:
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef NOMINMAX
+#undef WIN32_LEAN_AND_MEAN
+
 #include "imgui.h"
 #include "imgui_impl/imgui_impl_glfw.h"
 #include "imgui_impl/imgui_impl_opengl3.h"
@@ -16,10 +23,6 @@
 
 //#include <glad/glad.h>  // Initialize with gladLoadGL()
 
-#include <glbinding/glbinding.h>
-#include <glbinding/gl/gl.h>
-
-using namespace gl;
 
 //Instancing
 #include <glm/glm.hpp>
@@ -167,9 +170,9 @@ int main(int, char **) {
     spdlog::info("Initialized camera and viewport.");
     
     // configure global opengl state
-    glEnable(static_cast<gl::GLenum>(GL_DEPTH_TEST));
-    glEnable(static_cast<gl::GLenum>(GL_TEXTURE_CUBE_MAP_SEAMLESS));
-    glDepthFunc(static_cast<gl::GLenum>(GL_LEQUAL));
+    glEnable(static_cast<GLenum>(GL_DEPTH_TEST));
+    glEnable(static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+    glDepthFunc(static_cast<GLenum>(GL_LEQUAL));
 
     #pragma endregion Init
 
@@ -237,8 +240,12 @@ bool init() {
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable VSync - fixes FPS at the refresh rate of your screen
-    glbinding::initialize(glfwGetProcAddress);
-    /* was used for glads
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        spdlog::error("Failed to create GLFW Window!");
+        return -1;
+    }
+   /* was used for glads
     bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
     if (err) {
@@ -320,7 +327,8 @@ void update() {
 
 void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    glClear(static_cast<ClearBufferMask>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     camera.UpdateShader(&pbrSystem.pbrInstanceShader,display_w,display_h);
     camera.UpdateShader(&pbrSystem.backgroundShader,display_w,display_h);

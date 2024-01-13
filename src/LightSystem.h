@@ -8,9 +8,7 @@
 
 #include <vector>
 #include "glm/vec4.hpp"
-#include <glbinding/gl/gl.h>
 
-using namespace gl;
 
 struct Light{
     glm::vec4 position;

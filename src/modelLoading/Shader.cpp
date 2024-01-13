@@ -1,6 +1,5 @@
 #include "Shader.h"
 
-using namespace gl;
 
 void Shader::init() {
     // 1. retrieve the vertex/fragment source code from filePath

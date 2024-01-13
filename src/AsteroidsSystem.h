@@ -15,10 +15,8 @@
 #include "modelLoading/ComputeShader.h"
 #include "glm/gtc/random.hpp"
 #include "modelLoading/Model.h"
-#include <glbinding/gl/gl.h>
 #include <random>
 
-using namespace gl;
 
 struct AsteroidData {
     glm::vec4 position;

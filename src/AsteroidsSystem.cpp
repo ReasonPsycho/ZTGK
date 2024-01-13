@@ -87,10 +87,10 @@ void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
 
     const float PI = 3.14159265359;
-    float radius = 10;
+    float radius = 2;
     float span = 2;
     
-    size = 10;
+    size = 1000;
     std::vector<glm::vec3> positions(size);
     std::vector<glm::vec3> rotations(size);
     std::vector<glm::vec3> velocities(size);

@@ -3,6 +3,7 @@
 //
 
 #include "LightSystem.h"
+#include "glad/glad.h"
 
 LightSystem::LightSystem(int size) :size(size){
 
