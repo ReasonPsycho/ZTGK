@@ -25,6 +25,8 @@ struct AsteroidData {
     glm::vec4 velocity;
     glm::vec4 angularVelocity;
     glm::vec4 separationVector;
+    glm::vec4 changeInVelocity;
+    glm::vec4 changeInAngularVelocity;
 };
 
 struct CellData {
@@ -45,10 +47,13 @@ public:
     GLuint ID{};
     float maxScale = 2.0f;
     float minScale = 0.5f;
+    glm::mat4x4 planet;
+    
     
     AsteroidsSystem(int size,Shader* asteroidShader);
     void Init();
-    void Draw(float deltaTime);
+    void Update(float deltaTime);
+    void Draw();
     
     std::vector<AsteroidData> asteroidsData;
     std::vector<std::shared_ptr<Texture>> textures;

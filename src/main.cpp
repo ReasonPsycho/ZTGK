@@ -1,12 +1,6 @@
 
 #pragma region Includes
 
-// Add this block before any includes:
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#undef NOMINMAX
-#undef WIN32_LEAN_AND_MEAN
 
 #include "imgui.h"
 #include "imgui_impl/imgui_impl_glfw.h"
@@ -34,6 +28,7 @@
 
 #include <iostream>
 #include "Enitity.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
 #ifndef ENTITY_H
 #define ENTITY_H
@@ -44,24 +39,24 @@
 class Entity : public Model
 {
 public:
-	list<unique_ptr<Entity>> children;
-	Entity* parent;
+    list<unique_ptr<Entity>> children;
+    Entity* parent;
 };
 #endif
 
 string modelPath = "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\models\\Sphere\\Sphere.obj";
 Model model = Model(&modelPath);
 Entity ourEntity(model);
-
+shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
 #pragma region constants
 
 glm::vec3 pointLightPositions[] = {
-        glm::vec3( 0.7f,  0.2f,  2.0f),
-        glm::vec3( 2.3f, -3.3f, -4.0f),
-        glm::vec3(-4.0f,  2.0f, -12.0f),
-        glm::vec3( 0.0f,  0.0f, -3.0f)
+        glm::vec3(0.7f, 0.2f, 2.0f),
+        glm::vec3(2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f, 2.0f, -12.0f),
+        glm::vec3(0.0f, 0.0f, -3.0f)
 };
 
 #pragma endregion constants
@@ -74,7 +69,7 @@ static void glfw_error_callback(int error, const char *description) {
 
 bool init();
 
-void init_textures_vertices();
+void init_systems();
 
 void load_enteties();
 
@@ -100,9 +95,12 @@ void end_frame();
 
 void cleanup();
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+
 void processInput(GLFWwindow *window);
 
 #pragma endregion Function definitions
@@ -137,68 +135,82 @@ float lastY = 0;
 
 LightSystem lightSystem(1);
 PBRSystem pbrSystem(&camera);
-AsteroidsSystem asteroidsSystem(1024,&pbrSystem.pbrInstanceShader);
+AsteroidsSystem asteroidsSystem(1024, &pbrSystem.pbrInstanceShader);
 
 
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+int timeStep = 1;
 
 #pragma endregion My set up
 
 
 int main(int, char **) {
 
-    #pragma region Init
+#pragma region Init
 
     if (!init()) {
         spdlog::error("Failed to initialize project!");
         return EXIT_FAILURE;
     }
     spdlog::info("Initialized project.");
+    file_logger->info("Initialized project.");
 
-    init_textures_vertices();
+    init_systems();
     spdlog::info("Initialized textures and vertices.");
+    file_logger->info("Initialized textures and vertices.");
 
     load_enteties();
     spdlog::info("Initialized entities.");
+    file_logger->info("Initialized entities.");
 
     init_imgui();
     spdlog::info("Initialized ImGui.");
+    file_logger->info("Initialized ImGui.");
 
     init_camera();
     spdlog::info("Initialized camera and viewport.");
-    
-    // configure global opengl state
-    glEnable(static_cast<GLenum>(GL_DEPTH_TEST));
-    glEnable(static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_SEAMLESS));
-    glDepthFunc(static_cast<GLenum>(GL_LEQUAL));
+    file_logger->info("Initialized camera and viewport.");
 
-    #pragma endregion Init
+    // configure global opengl state
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    glDepthFunc(GL_LEQUAL);
+
+#pragma endregion Init
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. delta time)
+        file_logger->info("Before frame");
         before_frame();
-        
+
         // Process I/O operations here
+        file_logger->info("Input");
         input();
 
         // Update game objects' state here
+        file_logger->info("Update");
         update();
 
         // OpenGL rendering code here
+        file_logger->info("Render");
         render();
 
         // Draw ImGui
+        file_logger->info("Imgui");
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
+
         // End frame and swap buffers (double buffering)
+        file_logger->info("End frame");
         end_frame();
     }
 
+    file_logger->info("Cleanup");
     cleanup();
     // Cleanup
     return 0;
@@ -218,6 +230,33 @@ void cleanup() {
 }
 
 bool init() {
+
+    // Get current date and time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+
+// Convert time to local time
+    std::tm *local_time = std::localtime(&now_time);
+
+// Create a filename with date
+    std::ostringstream filename;
+    filename << "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\logs\\logs_"
+             << (local_time->tm_year + 1900) // Year starts from 1900
+             << "-" << (local_time->tm_mon + 1) // Month starts from 0
+             << "-" << local_time->tm_mday  // Day of month
+             << "-" << local_time->tm_hour  // hour
+             << "-" << local_time->tm_min  // minute
+             << ".txt";
+    try {
+
+        file_logger = spdlog::basic_logger_mt("file_logger", filename.str());
+        file_logger->flush_on(spdlog::level::info);
+        file_logger->info("Init log file");
+    }
+    catch (const spdlog::spdlog_ex &ex) {
+        spdlog::error("Log initialization failed.");
+    }
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit()) {
@@ -238,52 +277,41 @@ bool init() {
         return false;
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); // Enable VSync - fixes FPS at the refresh rate of your screen
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        spdlog::error("Failed to create GLFW Window!");
-        return -1;
-    }
-   /* was used for glads
-    bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
+    glfwMakeContextCurrent(window);
+    bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     if (err) {
         spdlog::error("Failed to initialize OpenGL loader!");
         return false;
     }
-    */
 
     stbi_set_flip_vertically_on_load(true);
     return true;
 }
 
 
-void init_textures_vertices() {
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
+void init_systems() {
     asteroidsSystem.Init();
     lightSystem.Init();
     pbrSystem.Init();
 }
 
-void load_enteties(){
+void load_enteties() {
     model.loadModel();
-    ourEntity.transform.setLocalPosition({ 10, 0, 0 });
+    ourEntity.transform.setLocalPosition({10, 0, 0});
     const float scale = 1;
-    ourEntity.transform.setLocalScale({ scale, scale, scale });
+    ourEntity.transform.setLocalScale({scale, scale, scale});
 
     {
-        Entity* lastEntity = &ourEntity;
+        Entity *lastEntity = &ourEntity;
 
-        for (unsigned int i = 0; i < 2; ++i)
-        {
+        for (unsigned int i = 0; i < 2; ++i) {
             lastEntity->addChild(model);
             lastEntity = lastEntity->children.back().get();
 
             //Set transform values
-            lastEntity->transform.setLocalPosition({ 10, 0, 0 });
-            lastEntity->transform.setLocalScale({ scale, scale, scale });
+            lastEntity->transform.setLocalPosition({10, 0, 0});
+            lastEntity->transform.setLocalScale({scale, scale, scale});
         }
     }
     ourEntity.updateSelfAndChild();
@@ -306,8 +334,7 @@ void init_imgui() {
     //ImGui::StyleColorsClassic();
 }
 
-void before_frame()
-{
+void before_frame() {
     // Setting up delta time
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
@@ -315,41 +342,52 @@ void before_frame()
 };
 
 void input() {
-    processInput(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    processInput(window);
 }
 
 void update() {
+    
+    deltaTime *= (float )timeStep;
+   // Entity *lastEntity = &ourEntity;
+  //  while (lastEntity->children.size()) {
+  //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+  //      lastEntity = lastEntity->children.back().get();
+  //  }
 
+  //  ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f});
+  //  ourEntity.updateSelfAndChild();
+    asteroidsSystem.Update(deltaTime);
 }
 
 void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    camera.UpdateShader(&pbrSystem.pbrInstanceShader,display_w,display_h);
-    camera.UpdateShader(&pbrSystem.backgroundShader,display_w,display_h);
-    camera.UpdateShader(&pbrSystem.pbrShader,display_w,display_h);
+    file_logger->info("Cleared.");
     
+    camera.UpdateShader(&pbrSystem.pbrInstanceShader, display_w, display_h);
+    camera.UpdateShader(&pbrSystem.backgroundShader, display_w, display_h);
+    camera.UpdateShader(&pbrSystem.pbrShader, display_w, display_h);
+    file_logger->info("Updated camera.");
+
     pbrSystem.RenderBackground();
     pbrSystem.PrebindPBR();
-    asteroidsSystem.Draw(deltaTime);
-
+    file_logger->info("Set up PBR.");
+    
     pbrSystem.pbrShader.use();
     // draw our scene graph
-    Entity* lastEntity = &ourEntity;
-    while (lastEntity->children.size())
-    {
-        pbrSystem.pbrShader.setMatrix4("model", false,glm::value_ptr(lastEntity->transform.getModelMatrix()));
-        lastEntity->pModel->Draw(pbrSystem.pbrShader);
-        lastEntity = lastEntity->children.back().get();
-    }
-
-    ourEntity.transform.setLocalRotation({ 0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f });
-    ourEntity.updateSelfAndChild();
+   // Entity *lastEntity = &ourEntity;
+   // while (lastEntity->children.size()) {
+   //     lastEntity->pModel->Draw(pbrSystem.pbrShader);
+   //     lastEntity = lastEntity->children.back().get();
+   // }
+   // file_logger->info("Rendered Entities.");
+    
+   // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+    asteroidsSystem.Draw();
+    file_logger->info("Rendered AsteroidsSystem.");
 }
 
 void imgui_begin() {
@@ -377,11 +415,9 @@ void imgui_end() {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
+void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -390,16 +426,21 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         camera.ProcessKeyboard(UPWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWNWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        if(timeStep == 0){
+            timeStep = 1;
+        }else{
+            timeStep = 0;
+        }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
@@ -410,25 +451,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
+void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
-    
+
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset, true,deltaTime);
+    camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    camera.ProcessMouseScroll(static_cast<float>(yoffset),deltaTime);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
 }
 
 void end_frame() {
@@ -446,7 +485,7 @@ void init_camera() {
     glViewport(0, 0, display_w, display_h);
     lastX = display_w / 2.0f;
     lastY = display_h / 2.0f;
-    
+
     // Capture and lock the mouse to the window
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }

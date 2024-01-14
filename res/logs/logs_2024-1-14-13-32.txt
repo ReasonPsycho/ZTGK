@@ -1,0 +1,957 @@
+[2024-01-14 13:32:39.841] [file_logger] [info] Init log file
+[2024-01-14 13:32:41.088] [file_logger] [info] Initialized project.
+[2024-01-14 13:32:46.789] [file_logger] [info] Initialized textures and vertices.
+[2024-01-14 13:32:46.814] [file_logger] [info] Initialized entities.
+[2024-01-14 13:32:46.817] [file_logger] [info] Initialized ImGui.
+[2024-01-14 13:32:46.818] [file_logger] [info] Initialized camera and viewport.
+[2024-01-14 13:32:46.818] [file_logger] [info] Before frame
+[2024-01-14 13:32:46.818] [file_logger] [info] Input
+[2024-01-14 13:32:46.818] [file_logger] [info] Update
+[2024-01-14 13:32:46.820] [file_logger] [info] Render
+[2024-01-14 13:32:46.820] [file_logger] [info] Cleared.
+[2024-01-14 13:32:46.821] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:46.821] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:46.821] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:46.821] [file_logger] [info] Imgui
+[2024-01-14 13:32:46.829] [file_logger] [info] End frame
+[2024-01-14 13:32:46.847] [file_logger] [info] Before frame
+[2024-01-14 13:32:46.847] [file_logger] [info] Input
+[2024-01-14 13:32:46.847] [file_logger] [info] Update
+[2024-01-14 13:32:47.087] [file_logger] [info] Render
+[2024-01-14 13:32:47.087] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.087] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.087] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.087] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.087] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.087] [file_logger] [info] End frame
+[2024-01-14 13:32:47.088] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.088] [file_logger] [info] Input
+[2024-01-14 13:32:47.089] [file_logger] [info] Update
+[2024-01-14 13:32:47.092] [file_logger] [info] Render
+[2024-01-14 13:32:47.092] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.092] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.092] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.092] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.092] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.092] [file_logger] [info] End frame
+[2024-01-14 13:32:47.092] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.092] [file_logger] [info] Input
+[2024-01-14 13:32:47.093] [file_logger] [info] Update
+[2024-01-14 13:32:47.146] [file_logger] [info] Render
+[2024-01-14 13:32:47.146] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.147] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.147] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.147] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.147] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.147] [file_logger] [info] End frame
+[2024-01-14 13:32:47.147] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.147] [file_logger] [info] Input
+[2024-01-14 13:32:47.147] [file_logger] [info] Update
+[2024-01-14 13:32:47.438] [file_logger] [info] Render
+[2024-01-14 13:32:47.438] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.439] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.439] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.439] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.439] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.439] [file_logger] [info] End frame
+[2024-01-14 13:32:47.439] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.439] [file_logger] [info] Input
+[2024-01-14 13:32:47.439] [file_logger] [info] Update
+[2024-01-14 13:32:47.509] [file_logger] [info] Render
+[2024-01-14 13:32:47.509] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.510] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.510] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.510] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.510] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.510] [file_logger] [info] End frame
+[2024-01-14 13:32:47.511] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.511] [file_logger] [info] Input
+[2024-01-14 13:32:47.511] [file_logger] [info] Update
+[2024-01-14 13:32:47.671] [file_logger] [info] Render
+[2024-01-14 13:32:47.671] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.671] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.671] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.671] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.671] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.672] [file_logger] [info] End frame
+[2024-01-14 13:32:47.673] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.673] [file_logger] [info] Input
+[2024-01-14 13:32:47.673] [file_logger] [info] Update
+[2024-01-14 13:32:47.947] [file_logger] [info] Render
+[2024-01-14 13:32:47.947] [file_logger] [info] Cleared.
+[2024-01-14 13:32:47.947] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:47.948] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:47.948] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:47.948] [file_logger] [info] Imgui
+[2024-01-14 13:32:47.948] [file_logger] [info] End frame
+[2024-01-14 13:32:47.948] [file_logger] [info] Before frame
+[2024-01-14 13:32:47.948] [file_logger] [info] Input
+[2024-01-14 13:32:47.948] [file_logger] [info] Update
+[2024-01-14 13:32:48.018] [file_logger] [info] Render
+[2024-01-14 13:32:48.019] [file_logger] [info] Cleared.
+[2024-01-14 13:32:48.019] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:48.019] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:48.019] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:48.019] [file_logger] [info] Imgui
+[2024-01-14 13:32:48.019] [file_logger] [info] End frame
+[2024-01-14 13:32:48.019] [file_logger] [info] Before frame
+[2024-01-14 13:32:48.019] [file_logger] [info] Input
+[2024-01-14 13:32:48.019] [file_logger] [info] Update
+[2024-01-14 13:32:48.199] [file_logger] [info] Render
+[2024-01-14 13:32:48.199] [file_logger] [info] Cleared.
+[2024-01-14 13:32:48.200] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:48.200] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:48.200] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:48.200] [file_logger] [info] Imgui
+[2024-01-14 13:32:48.200] [file_logger] [info] End frame
+[2024-01-14 13:32:48.207] [file_logger] [info] Before frame
+[2024-01-14 13:32:48.207] [file_logger] [info] Input
+[2024-01-14 13:32:48.207] [file_logger] [info] Update
+[2024-01-14 13:32:48.377] [file_logger] [info] Render
+[2024-01-14 13:32:48.377] [file_logger] [info] Cleared.
+[2024-01-14 13:32:48.377] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:48.377] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:48.377] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:48.377] [file_logger] [info] Imgui
+[2024-01-14 13:32:48.377] [file_logger] [info] End frame
+[2024-01-14 13:32:48.379] [file_logger] [info] Before frame
+[2024-01-14 13:32:48.379] [file_logger] [info] Input
+[2024-01-14 13:32:48.379] [file_logger] [info] Update
+[2024-01-14 13:32:48.657] [file_logger] [info] Render
+[2024-01-14 13:32:48.657] [file_logger] [info] Cleared.
+[2024-01-14 13:32:48.657] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:48.657] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:48.657] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:48.657] [file_logger] [info] Imgui
+[2024-01-14 13:32:48.658] [file_logger] [info] End frame
+[2024-01-14 13:32:48.658] [file_logger] [info] Before frame
+[2024-01-14 13:32:48.658] [file_logger] [info] Input
+[2024-01-14 13:32:48.658] [file_logger] [info] Update
+[2024-01-14 13:32:48.848] [file_logger] [info] Render
+[2024-01-14 13:32:48.848] [file_logger] [info] Cleared.
+[2024-01-14 13:32:48.848] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:48.848] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:48.848] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:48.848] [file_logger] [info] Imgui
+[2024-01-14 13:32:48.848] [file_logger] [info] End frame
+[2024-01-14 13:32:48.849] [file_logger] [info] Before frame
+[2024-01-14 13:32:48.849] [file_logger] [info] Input
+[2024-01-14 13:32:48.849] [file_logger] [info] Update
+[2024-01-14 13:32:48.922] [file_logger] [info] Render
+[2024-01-14 13:32:48.922] [file_logger] [info] Cleared.
+[2024-01-14 13:32:48.922] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:48.922] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:48.922] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:48.922] [file_logger] [info] Imgui
+[2024-01-14 13:32:48.922] [file_logger] [info] End frame
+[2024-01-14 13:32:48.922] [file_logger] [info] Before frame
+[2024-01-14 13:32:48.922] [file_logger] [info] Input
+[2024-01-14 13:32:48.922] [file_logger] [info] Update
+[2024-01-14 13:32:49.078] [file_logger] [info] Render
+[2024-01-14 13:32:49.078] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.078] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.078] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.078] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.078] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.078] [file_logger] [info] End frame
+[2024-01-14 13:32:49.078] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.078] [file_logger] [info] Input
+[2024-01-14 13:32:49.078] [file_logger] [info] Update
+[2024-01-14 13:32:49.264] [file_logger] [info] Render
+[2024-01-14 13:32:49.264] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.265] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.265] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.265] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.265] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.265] [file_logger] [info] End frame
+[2024-01-14 13:32:49.265] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.265] [file_logger] [info] Input
+[2024-01-14 13:32:49.265] [file_logger] [info] Update
+[2024-01-14 13:32:49.352] [file_logger] [info] Render
+[2024-01-14 13:32:49.352] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.352] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.352] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.352] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.352] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.352] [file_logger] [info] End frame
+[2024-01-14 13:32:49.352] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.352] [file_logger] [info] Input
+[2024-01-14 13:32:49.352] [file_logger] [info] Update
+[2024-01-14 13:32:49.559] [file_logger] [info] Render
+[2024-01-14 13:32:49.559] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.559] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.559] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.559] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.559] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.559] [file_logger] [info] End frame
+[2024-01-14 13:32:49.560] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.560] [file_logger] [info] Input
+[2024-01-14 13:32:49.560] [file_logger] [info] Update
+[2024-01-14 13:32:49.752] [file_logger] [info] Render
+[2024-01-14 13:32:49.752] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.752] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.752] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.752] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.752] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.752] [file_logger] [info] End frame
+[2024-01-14 13:32:49.753] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.753] [file_logger] [info] Input
+[2024-01-14 13:32:49.753] [file_logger] [info] Update
+[2024-01-14 13:32:49.813] [file_logger] [info] Render
+[2024-01-14 13:32:49.813] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.813] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.813] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.813] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.813] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.813] [file_logger] [info] End frame
+[2024-01-14 13:32:49.815] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.815] [file_logger] [info] Input
+[2024-01-14 13:32:49.815] [file_logger] [info] Update
+[2024-01-14 13:32:49.933] [file_logger] [info] Render
+[2024-01-14 13:32:49.933] [file_logger] [info] Cleared.
+[2024-01-14 13:32:49.933] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:49.933] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:49.933] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:49.933] [file_logger] [info] Imgui
+[2024-01-14 13:32:49.934] [file_logger] [info] End frame
+[2024-01-14 13:32:49.934] [file_logger] [info] Before frame
+[2024-01-14 13:32:49.934] [file_logger] [info] Input
+[2024-01-14 13:32:49.934] [file_logger] [info] Update
+[2024-01-14 13:32:50.083] [file_logger] [info] Render
+[2024-01-14 13:32:50.083] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.083] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.084] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.084] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.084] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.084] [file_logger] [info] End frame
+[2024-01-14 13:32:50.084] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.084] [file_logger] [info] Input
+[2024-01-14 13:32:50.084] [file_logger] [info] Update
+[2024-01-14 13:32:50.192] [file_logger] [info] Render
+[2024-01-14 13:32:50.192] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.192] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.192] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.192] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.192] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.192] [file_logger] [info] End frame
+[2024-01-14 13:32:50.193] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.193] [file_logger] [info] Input
+[2024-01-14 13:32:50.193] [file_logger] [info] Update
+[2024-01-14 13:32:50.295] [file_logger] [info] Render
+[2024-01-14 13:32:50.295] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.295] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.295] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.295] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.295] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.296] [file_logger] [info] End frame
+[2024-01-14 13:32:50.296] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.296] [file_logger] [info] Input
+[2024-01-14 13:32:50.296] [file_logger] [info] Update
+[2024-01-14 13:32:50.399] [file_logger] [info] Render
+[2024-01-14 13:32:50.399] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.399] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.399] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.399] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.399] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.400] [file_logger] [info] End frame
+[2024-01-14 13:32:50.400] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.400] [file_logger] [info] Input
+[2024-01-14 13:32:50.400] [file_logger] [info] Update
+[2024-01-14 13:32:50.512] [file_logger] [info] Render
+[2024-01-14 13:32:50.512] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.512] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.512] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.512] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.512] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.512] [file_logger] [info] End frame
+[2024-01-14 13:32:50.513] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.513] [file_logger] [info] Input
+[2024-01-14 13:32:50.513] [file_logger] [info] Update
+[2024-01-14 13:32:50.614] [file_logger] [info] Render
+[2024-01-14 13:32:50.614] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.614] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.614] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.614] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.614] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.615] [file_logger] [info] End frame
+[2024-01-14 13:32:50.615] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.615] [file_logger] [info] Input
+[2024-01-14 13:32:50.615] [file_logger] [info] Update
+[2024-01-14 13:32:50.728] [file_logger] [info] Render
+[2024-01-14 13:32:50.728] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.728] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.728] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.729] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.729] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.729] [file_logger] [info] End frame
+[2024-01-14 13:32:50.730] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.730] [file_logger] [info] Input
+[2024-01-14 13:32:50.730] [file_logger] [info] Update
+[2024-01-14 13:32:50.833] [file_logger] [info] Render
+[2024-01-14 13:32:50.833] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.833] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.833] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.833] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.833] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.833] [file_logger] [info] End frame
+[2024-01-14 13:32:50.834] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.834] [file_logger] [info] Input
+[2024-01-14 13:32:50.834] [file_logger] [info] Update
+[2024-01-14 13:32:50.940] [file_logger] [info] Render
+[2024-01-14 13:32:50.940] [file_logger] [info] Cleared.
+[2024-01-14 13:32:50.940] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:50.940] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:50.940] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:50.940] [file_logger] [info] Imgui
+[2024-01-14 13:32:50.940] [file_logger] [info] End frame
+[2024-01-14 13:32:50.941] [file_logger] [info] Before frame
+[2024-01-14 13:32:50.941] [file_logger] [info] Input
+[2024-01-14 13:32:50.941] [file_logger] [info] Update
+[2024-01-14 13:32:51.169] [file_logger] [info] Render
+[2024-01-14 13:32:51.169] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.170] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.170] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.170] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.170] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.170] [file_logger] [info] End frame
+[2024-01-14 13:32:51.171] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.171] [file_logger] [info] Input
+[2024-01-14 13:32:51.171] [file_logger] [info] Update
+[2024-01-14 13:32:51.230] [file_logger] [info] Render
+[2024-01-14 13:32:51.230] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.230] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.230] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.231] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.231] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.231] [file_logger] [info] End frame
+[2024-01-14 13:32:51.231] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.231] [file_logger] [info] Input
+[2024-01-14 13:32:51.231] [file_logger] [info] Update
+[2024-01-14 13:32:51.329] [file_logger] [info] Render
+[2024-01-14 13:32:51.329] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.329] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.329] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.329] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.329] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.330] [file_logger] [info] End frame
+[2024-01-14 13:32:51.331] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.331] [file_logger] [info] Input
+[2024-01-14 13:32:51.331] [file_logger] [info] Update
+[2024-01-14 13:32:51.432] [file_logger] [info] Render
+[2024-01-14 13:32:51.433] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.433] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.433] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.433] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.433] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.434] [file_logger] [info] End frame
+[2024-01-14 13:32:51.437] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.437] [file_logger] [info] Input
+[2024-01-14 13:32:51.437] [file_logger] [info] Update
+[2024-01-14 13:32:51.533] [file_logger] [info] Render
+[2024-01-14 13:32:51.533] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.533] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.533] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.534] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.534] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.535] [file_logger] [info] End frame
+[2024-01-14 13:32:51.535] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.535] [file_logger] [info] Input
+[2024-01-14 13:32:51.535] [file_logger] [info] Update
+[2024-01-14 13:32:51.633] [file_logger] [info] Render
+[2024-01-14 13:32:51.633] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.633] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.633] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.633] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.633] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.633] [file_logger] [info] End frame
+[2024-01-14 13:32:51.635] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.635] [file_logger] [info] Input
+[2024-01-14 13:32:51.635] [file_logger] [info] Update
+[2024-01-14 13:32:51.740] [file_logger] [info] Render
+[2024-01-14 13:32:51.740] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.740] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.740] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.740] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.740] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.741] [file_logger] [info] End frame
+[2024-01-14 13:32:51.742] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.742] [file_logger] [info] Input
+[2024-01-14 13:32:51.742] [file_logger] [info] Update
+[2024-01-14 13:32:51.845] [file_logger] [info] Render
+[2024-01-14 13:32:51.845] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.845] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.845] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.845] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.846] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.846] [file_logger] [info] End frame
+[2024-01-14 13:32:51.848] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.848] [file_logger] [info] Input
+[2024-01-14 13:32:51.848] [file_logger] [info] Update
+[2024-01-14 13:32:51.946] [file_logger] [info] Render
+[2024-01-14 13:32:51.946] [file_logger] [info] Cleared.
+[2024-01-14 13:32:51.946] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:51.946] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:51.946] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:51.946] [file_logger] [info] Imgui
+[2024-01-14 13:32:51.947] [file_logger] [info] End frame
+[2024-01-14 13:32:51.948] [file_logger] [info] Before frame
+[2024-01-14 13:32:51.948] [file_logger] [info] Input
+[2024-01-14 13:32:51.948] [file_logger] [info] Update
+[2024-01-14 13:32:52.066] [file_logger] [info] Render
+[2024-01-14 13:32:52.066] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.066] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.066] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.066] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.066] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.067] [file_logger] [info] End frame
+[2024-01-14 13:32:52.067] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.067] [file_logger] [info] Input
+[2024-01-14 13:32:52.067] [file_logger] [info] Update
+[2024-01-14 13:32:52.169] [file_logger] [info] Render
+[2024-01-14 13:32:52.169] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.169] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.169] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.169] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.169] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.170] [file_logger] [info] End frame
+[2024-01-14 13:32:52.170] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.170] [file_logger] [info] Input
+[2024-01-14 13:32:52.170] [file_logger] [info] Update
+[2024-01-14 13:32:52.274] [file_logger] [info] Render
+[2024-01-14 13:32:52.274] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.274] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.274] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.274] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.274] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.274] [file_logger] [info] End frame
+[2024-01-14 13:32:52.275] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.275] [file_logger] [info] Input
+[2024-01-14 13:32:52.275] [file_logger] [info] Update
+[2024-01-14 13:32:52.377] [file_logger] [info] Render
+[2024-01-14 13:32:52.377] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.377] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.377] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.377] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.377] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.377] [file_logger] [info] End frame
+[2024-01-14 13:32:52.377] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.377] [file_logger] [info] Input
+[2024-01-14 13:32:52.377] [file_logger] [info] Update
+[2024-01-14 13:32:52.484] [file_logger] [info] Render
+[2024-01-14 13:32:52.484] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.484] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.484] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.484] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.484] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.484] [file_logger] [info] End frame
+[2024-01-14 13:32:52.485] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.485] [file_logger] [info] Input
+[2024-01-14 13:32:52.486] [file_logger] [info] Update
+[2024-01-14 13:32:52.586] [file_logger] [info] Render
+[2024-01-14 13:32:52.586] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.586] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.586] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.586] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.586] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.587] [file_logger] [info] End frame
+[2024-01-14 13:32:52.588] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.588] [file_logger] [info] Input
+[2024-01-14 13:32:52.588] [file_logger] [info] Update
+[2024-01-14 13:32:52.695] [file_logger] [info] Render
+[2024-01-14 13:32:52.695] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.695] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.695] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.695] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.695] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.696] [file_logger] [info] End frame
+[2024-01-14 13:32:52.696] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.696] [file_logger] [info] Input
+[2024-01-14 13:32:52.696] [file_logger] [info] Update
+[2024-01-14 13:32:52.806] [file_logger] [info] Render
+[2024-01-14 13:32:52.806] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.806] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.806] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.806] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.806] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.807] [file_logger] [info] End frame
+[2024-01-14 13:32:52.807] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.807] [file_logger] [info] Input
+[2024-01-14 13:32:52.807] [file_logger] [info] Update
+[2024-01-14 13:32:52.910] [file_logger] [info] Render
+[2024-01-14 13:32:52.910] [file_logger] [info] Cleared.
+[2024-01-14 13:32:52.910] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:52.910] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:52.910] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:52.910] [file_logger] [info] Imgui
+[2024-01-14 13:32:52.911] [file_logger] [info] End frame
+[2024-01-14 13:32:52.911] [file_logger] [info] Before frame
+[2024-01-14 13:32:52.911] [file_logger] [info] Input
+[2024-01-14 13:32:52.911] [file_logger] [info] Update
+[2024-01-14 13:32:53.028] [file_logger] [info] Render
+[2024-01-14 13:32:53.028] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.028] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.028] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.028] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.028] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.028] [file_logger] [info] End frame
+[2024-01-14 13:32:53.029] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.029] [file_logger] [info] Input
+[2024-01-14 13:32:53.029] [file_logger] [info] Update
+[2024-01-14 13:32:53.136] [file_logger] [info] Render
+[2024-01-14 13:32:53.136] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.136] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.136] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.136] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.136] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.136] [file_logger] [info] End frame
+[2024-01-14 13:32:53.136] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.136] [file_logger] [info] Input
+[2024-01-14 13:32:53.136] [file_logger] [info] Update
+[2024-01-14 13:32:53.247] [file_logger] [info] Render
+[2024-01-14 13:32:53.247] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.247] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.247] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.248] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.248] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.248] [file_logger] [info] End frame
+[2024-01-14 13:32:53.248] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.248] [file_logger] [info] Input
+[2024-01-14 13:32:53.248] [file_logger] [info] Update
+[2024-01-14 13:32:53.358] [file_logger] [info] Render
+[2024-01-14 13:32:53.358] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.358] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.358] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.358] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.358] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.359] [file_logger] [info] End frame
+[2024-01-14 13:32:53.359] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.359] [file_logger] [info] Input
+[2024-01-14 13:32:53.359] [file_logger] [info] Update
+[2024-01-14 13:32:53.466] [file_logger] [info] Render
+[2024-01-14 13:32:53.466] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.466] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.466] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.466] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.466] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.466] [file_logger] [info] End frame
+[2024-01-14 13:32:53.467] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.467] [file_logger] [info] Input
+[2024-01-14 13:32:53.467] [file_logger] [info] Update
+[2024-01-14 13:32:53.579] [file_logger] [info] Render
+[2024-01-14 13:32:53.579] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.579] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.579] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.579] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.579] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.579] [file_logger] [info] End frame
+[2024-01-14 13:32:53.580] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.580] [file_logger] [info] Input
+[2024-01-14 13:32:53.580] [file_logger] [info] Update
+[2024-01-14 13:32:53.690] [file_logger] [info] Render
+[2024-01-14 13:32:53.690] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.691] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.691] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.691] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.691] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.691] [file_logger] [info] End frame
+[2024-01-14 13:32:53.691] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.691] [file_logger] [info] Input
+[2024-01-14 13:32:53.691] [file_logger] [info] Update
+[2024-01-14 13:32:53.797] [file_logger] [info] Render
+[2024-01-14 13:32:53.797] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.797] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.797] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.797] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.797] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.797] [file_logger] [info] End frame
+[2024-01-14 13:32:53.797] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.797] [file_logger] [info] Input
+[2024-01-14 13:32:53.797] [file_logger] [info] Update
+[2024-01-14 13:32:53.909] [file_logger] [info] Render
+[2024-01-14 13:32:53.909] [file_logger] [info] Cleared.
+[2024-01-14 13:32:53.909] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:53.909] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:53.909] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:53.909] [file_logger] [info] Imgui
+[2024-01-14 13:32:53.910] [file_logger] [info] End frame
+[2024-01-14 13:32:53.910] [file_logger] [info] Before frame
+[2024-01-14 13:32:53.910] [file_logger] [info] Input
+[2024-01-14 13:32:53.910] [file_logger] [info] Update
+[2024-01-14 13:32:54.023] [file_logger] [info] Render
+[2024-01-14 13:32:54.023] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.024] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.024] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.024] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.024] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.024] [file_logger] [info] End frame
+[2024-01-14 13:32:54.024] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.024] [file_logger] [info] Input
+[2024-01-14 13:32:54.024] [file_logger] [info] Update
+[2024-01-14 13:32:54.128] [file_logger] [info] Render
+[2024-01-14 13:32:54.128] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.128] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.128] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.128] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.128] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.129] [file_logger] [info] End frame
+[2024-01-14 13:32:54.129] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.129] [file_logger] [info] Input
+[2024-01-14 13:32:54.129] [file_logger] [info] Update
+[2024-01-14 13:32:54.241] [file_logger] [info] Render
+[2024-01-14 13:32:54.241] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.241] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.241] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.241] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.241] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.241] [file_logger] [info] End frame
+[2024-01-14 13:32:54.242] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.242] [file_logger] [info] Input
+[2024-01-14 13:32:54.242] [file_logger] [info] Update
+[2024-01-14 13:32:54.351] [file_logger] [info] Render
+[2024-01-14 13:32:54.351] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.352] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.352] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.352] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.352] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.352] [file_logger] [info] End frame
+[2024-01-14 13:32:54.352] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.352] [file_logger] [info] Input
+[2024-01-14 13:32:54.352] [file_logger] [info] Update
+[2024-01-14 13:32:54.459] [file_logger] [info] Render
+[2024-01-14 13:32:54.459] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.459] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.460] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.460] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.460] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.460] [file_logger] [info] End frame
+[2024-01-14 13:32:54.460] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.460] [file_logger] [info] Input
+[2024-01-14 13:32:54.460] [file_logger] [info] Update
+[2024-01-14 13:32:54.574] [file_logger] [info] Render
+[2024-01-14 13:32:54.574] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.574] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.574] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.574] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.574] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.574] [file_logger] [info] End frame
+[2024-01-14 13:32:54.574] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.574] [file_logger] [info] Input
+[2024-01-14 13:32:54.574] [file_logger] [info] Update
+[2024-01-14 13:32:54.683] [file_logger] [info] Render
+[2024-01-14 13:32:54.683] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.683] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.683] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.683] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.683] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.683] [file_logger] [info] End frame
+[2024-01-14 13:32:54.684] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.684] [file_logger] [info] Input
+[2024-01-14 13:32:54.684] [file_logger] [info] Update
+[2024-01-14 13:32:54.795] [file_logger] [info] Render
+[2024-01-14 13:32:54.796] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.796] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.796] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.796] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.796] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.796] [file_logger] [info] End frame
+[2024-01-14 13:32:54.796] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.796] [file_logger] [info] Input
+[2024-01-14 13:32:54.796] [file_logger] [info] Update
+[2024-01-14 13:32:54.905] [file_logger] [info] Render
+[2024-01-14 13:32:54.905] [file_logger] [info] Cleared.
+[2024-01-14 13:32:54.905] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:54.905] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:54.905] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:54.905] [file_logger] [info] Imgui
+[2024-01-14 13:32:54.905] [file_logger] [info] End frame
+[2024-01-14 13:32:54.906] [file_logger] [info] Before frame
+[2024-01-14 13:32:54.906] [file_logger] [info] Input
+[2024-01-14 13:32:54.906] [file_logger] [info] Update
+[2024-01-14 13:32:55.013] [file_logger] [info] Render
+[2024-01-14 13:32:55.013] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.013] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.013] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.013] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.013] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.014] [file_logger] [info] End frame
+[2024-01-14 13:32:55.014] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.014] [file_logger] [info] Input
+[2024-01-14 13:32:55.014] [file_logger] [info] Update
+[2024-01-14 13:32:55.125] [file_logger] [info] Render
+[2024-01-14 13:32:55.125] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.125] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.125] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.125] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.125] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.125] [file_logger] [info] End frame
+[2024-01-14 13:32:55.126] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.126] [file_logger] [info] Input
+[2024-01-14 13:32:55.126] [file_logger] [info] Update
+[2024-01-14 13:32:55.237] [file_logger] [info] Render
+[2024-01-14 13:32:55.237] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.238] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.238] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.238] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.238] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.238] [file_logger] [info] End frame
+[2024-01-14 13:32:55.238] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.238] [file_logger] [info] Input
+[2024-01-14 13:32:55.238] [file_logger] [info] Update
+[2024-01-14 13:32:55.348] [file_logger] [info] Render
+[2024-01-14 13:32:55.348] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.348] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.348] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.348] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.348] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.348] [file_logger] [info] End frame
+[2024-01-14 13:32:55.348] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.348] [file_logger] [info] Input
+[2024-01-14 13:32:55.348] [file_logger] [info] Update
+[2024-01-14 13:32:55.459] [file_logger] [info] Render
+[2024-01-14 13:32:55.460] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.460] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.460] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.460] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.460] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.460] [file_logger] [info] End frame
+[2024-01-14 13:32:55.460] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.460] [file_logger] [info] Input
+[2024-01-14 13:32:55.460] [file_logger] [info] Update
+[2024-01-14 13:32:55.576] [file_logger] [info] Render
+[2024-01-14 13:32:55.576] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.576] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.576] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.576] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.576] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.576] [file_logger] [info] End frame
+[2024-01-14 13:32:55.576] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.576] [file_logger] [info] Input
+[2024-01-14 13:32:55.576] [file_logger] [info] Update
+[2024-01-14 13:32:55.682] [file_logger] [info] Render
+[2024-01-14 13:32:55.682] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.682] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.682] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.682] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.682] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.682] [file_logger] [info] End frame
+[2024-01-14 13:32:55.682] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.682] [file_logger] [info] Input
+[2024-01-14 13:32:55.682] [file_logger] [info] Update
+[2024-01-14 13:32:55.789] [file_logger] [info] Render
+[2024-01-14 13:32:55.789] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.789] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.789] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.789] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.789] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.790] [file_logger] [info] End frame
+[2024-01-14 13:32:55.790] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.790] [file_logger] [info] Input
+[2024-01-14 13:32:55.790] [file_logger] [info] Update
+[2024-01-14 13:32:55.900] [file_logger] [info] Render
+[2024-01-14 13:32:55.900] [file_logger] [info] Cleared.
+[2024-01-14 13:32:55.900] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:55.900] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:55.900] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:55.900] [file_logger] [info] Imgui
+[2024-01-14 13:32:55.900] [file_logger] [info] End frame
+[2024-01-14 13:32:55.900] [file_logger] [info] Before frame
+[2024-01-14 13:32:55.900] [file_logger] [info] Input
+[2024-01-14 13:32:55.900] [file_logger] [info] Update
+[2024-01-14 13:32:56.010] [file_logger] [info] Render
+[2024-01-14 13:32:56.010] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.010] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.010] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.010] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.010] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.010] [file_logger] [info] End frame
+[2024-01-14 13:32:56.011] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.011] [file_logger] [info] Input
+[2024-01-14 13:32:56.011] [file_logger] [info] Update
+[2024-01-14 13:32:56.121] [file_logger] [info] Render
+[2024-01-14 13:32:56.121] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.121] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.121] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.121] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.121] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.121] [file_logger] [info] End frame
+[2024-01-14 13:32:56.121] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.122] [file_logger] [info] Input
+[2024-01-14 13:32:56.122] [file_logger] [info] Update
+[2024-01-14 13:32:56.236] [file_logger] [info] Render
+[2024-01-14 13:32:56.236] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.236] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.236] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.236] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.236] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.236] [file_logger] [info] End frame
+[2024-01-14 13:32:56.236] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.236] [file_logger] [info] Input
+[2024-01-14 13:32:56.236] [file_logger] [info] Update
+[2024-01-14 13:32:56.342] [file_logger] [info] Render
+[2024-01-14 13:32:56.342] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.342] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.342] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.342] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.342] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.342] [file_logger] [info] End frame
+[2024-01-14 13:32:56.342] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.342] [file_logger] [info] Input
+[2024-01-14 13:32:56.342] [file_logger] [info] Update
+[2024-01-14 13:32:56.459] [file_logger] [info] Render
+[2024-01-14 13:32:56.459] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.459] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.459] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.459] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.459] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.459] [file_logger] [info] End frame
+[2024-01-14 13:32:56.459] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.459] [file_logger] [info] Input
+[2024-01-14 13:32:56.459] [file_logger] [info] Update
+[2024-01-14 13:32:56.570] [file_logger] [info] Render
+[2024-01-14 13:32:56.570] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.570] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.570] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.570] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.570] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.570] [file_logger] [info] End frame
+[2024-01-14 13:32:56.571] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.571] [file_logger] [info] Input
+[2024-01-14 13:32:56.571] [file_logger] [info] Update
+[2024-01-14 13:32:56.675] [file_logger] [info] Render
+[2024-01-14 13:32:56.675] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.675] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.675] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.675] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.675] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.676] [file_logger] [info] End frame
+[2024-01-14 13:32:56.676] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.676] [file_logger] [info] Input
+[2024-01-14 13:32:56.676] [file_logger] [info] Update
+[2024-01-14 13:32:56.784] [file_logger] [info] Render
+[2024-01-14 13:32:56.784] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.784] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.784] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.784] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.784] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.784] [file_logger] [info] End frame
+[2024-01-14 13:32:56.785] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.785] [file_logger] [info] Input
+[2024-01-14 13:32:56.785] [file_logger] [info] Update
+[2024-01-14 13:32:56.892] [file_logger] [info] Render
+[2024-01-14 13:32:56.892] [file_logger] [info] Cleared.
+[2024-01-14 13:32:56.893] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:56.893] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:56.893] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:56.893] [file_logger] [info] Imgui
+[2024-01-14 13:32:56.893] [file_logger] [info] End frame
+[2024-01-14 13:32:56.893] [file_logger] [info] Before frame
+[2024-01-14 13:32:56.893] [file_logger] [info] Input
+[2024-01-14 13:32:56.893] [file_logger] [info] Update
+[2024-01-14 13:32:57.004] [file_logger] [info] Render
+[2024-01-14 13:32:57.004] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.004] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.004] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.004] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.004] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.004] [file_logger] [info] End frame
+[2024-01-14 13:32:57.004] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.004] [file_logger] [info] Input
+[2024-01-14 13:32:57.004] [file_logger] [info] Update
+[2024-01-14 13:32:57.119] [file_logger] [info] Render
+[2024-01-14 13:32:57.119] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.119] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.119] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.119] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.119] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.120] [file_logger] [info] End frame
+[2024-01-14 13:32:57.120] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.120] [file_logger] [info] Input
+[2024-01-14 13:32:57.120] [file_logger] [info] Update
+[2024-01-14 13:32:57.228] [file_logger] [info] Render
+[2024-01-14 13:32:57.228] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.229] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.229] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.229] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.229] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.229] [file_logger] [info] End frame
+[2024-01-14 13:32:57.229] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.229] [file_logger] [info] Input
+[2024-01-14 13:32:57.229] [file_logger] [info] Update
+[2024-01-14 13:32:57.341] [file_logger] [info] Render
+[2024-01-14 13:32:57.342] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.342] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.342] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.342] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.342] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.342] [file_logger] [info] End frame
+[2024-01-14 13:32:57.342] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.342] [file_logger] [info] Input
+[2024-01-14 13:32:57.342] [file_logger] [info] Update
+[2024-01-14 13:32:57.455] [file_logger] [info] Render
+[2024-01-14 13:32:57.455] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.455] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.455] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.455] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.455] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.455] [file_logger] [info] End frame
+[2024-01-14 13:32:57.455] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.455] [file_logger] [info] Input
+[2024-01-14 13:32:57.455] [file_logger] [info] Update
+[2024-01-14 13:32:57.572] [file_logger] [info] Render
+[2024-01-14 13:32:57.572] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.572] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.572] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.572] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.572] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.572] [file_logger] [info] End frame
+[2024-01-14 13:32:57.573] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.573] [file_logger] [info] Input
+[2024-01-14 13:32:57.573] [file_logger] [info] Update
+[2024-01-14 13:32:57.676] [file_logger] [info] Render
+[2024-01-14 13:32:57.676] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.676] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.676] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.676] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.676] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.677] [file_logger] [info] End frame
+[2024-01-14 13:32:57.677] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.677] [file_logger] [info] Input
+[2024-01-14 13:32:57.677] [file_logger] [info] Update
+[2024-01-14 13:32:57.785] [file_logger] [info] Render
+[2024-01-14 13:32:57.785] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.785] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.785] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.785] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.785] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.785] [file_logger] [info] End frame
+[2024-01-14 13:32:57.785] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.785] [file_logger] [info] Input
+[2024-01-14 13:32:57.785] [file_logger] [info] Update
+[2024-01-14 13:32:57.895] [file_logger] [info] Render
+[2024-01-14 13:32:57.895] [file_logger] [info] Cleared.
+[2024-01-14 13:32:57.896] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:57.896] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:57.896] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:57.896] [file_logger] [info] Imgui
+[2024-01-14 13:32:57.896] [file_logger] [info] End frame
+[2024-01-14 13:32:57.896] [file_logger] [info] Before frame
+[2024-01-14 13:32:57.896] [file_logger] [info] Input
+[2024-01-14 13:32:57.896] [file_logger] [info] Update
+[2024-01-14 13:32:58.004] [file_logger] [info] Render
+[2024-01-14 13:32:58.005] [file_logger] [info] Cleared.
+[2024-01-14 13:32:58.005] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:58.005] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:58.005] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:58.005] [file_logger] [info] Imgui
+[2024-01-14 13:32:58.005] [file_logger] [info] End frame
+[2024-01-14 13:32:58.006] [file_logger] [info] Before frame
+[2024-01-14 13:32:58.006] [file_logger] [info] Input
+[2024-01-14 13:32:58.006] [file_logger] [info] Update
+[2024-01-14 13:32:58.114] [file_logger] [info] Render
+[2024-01-14 13:32:58.115] [file_logger] [info] Cleared.
+[2024-01-14 13:32:58.115] [file_logger] [info] Updated camera.
+[2024-01-14 13:32:58.115] [file_logger] [info] Set up PBR.
+[2024-01-14 13:32:58.115] [file_logger] [info] Rendered AsteroidsSystem.
+[2024-01-14 13:32:58.115] [file_logger] [info] Imgui
+[2024-01-14 13:32:58.115] [file_logger] [info] End frame
+[2024-01-14 13:32:58.115] [file_logger] [info] Cleanup

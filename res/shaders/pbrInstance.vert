@@ -7,14 +7,15 @@ out vec2 TexCoords;
 out vec3 WorldPos;
 out vec3 Normal;
 
-struct AsteroidData
-{
+struct AsteroidData {
     vec4 position;
     vec4 rotation;
     vec4 scale;
     vec4 velocity;
     vec4 angularVelocity;
     vec4 separationVector;
+    vec4 changeInVelocity;
+    vec4 changeInAngularVelocity;
 };
 
 
@@ -24,6 +25,7 @@ layout(std430, binding = 0) buffer AsteroidBuffer {
 
 
 uniform mat4 model;
+uniform mat4 planet;
 uniform mat4 projection;
 uniform mat4 view;
 
@@ -109,13 +111,13 @@ void main()
 {
     uint index = gl_InstanceID;
     mat4 translationMatrix = mat4(1.0);
-    translationMatrix[3] = asteroidsData[index].position;
+    translateMatrix translationMatrix[3] = asteroidsData[index].position;
     mat4 rotaionMatrix = rotateXYZ( asteroidsData[index].rotation.xyz);
     mat4 scaleMatrix = scaleMatrix(asteroidsData[index].scale.xyz);
     translationMatrix *= scaleMatrix * rotaionMatrix;
     
     TexCoords = aTexCoords;
-    WorldPos = vec3(translationMatrix * vec4(aPos, 1.0));
+    WorldPos = vec3(translationMatrix * planet * vec4(aPos, 1.0));
     Normal =  transpose(inverse(mat3(translationMatrix))) * aNormal;
-    gl_Position = projection * view * translationMatrix * vec4(WorldPos, 1.0f);
+    gl_Position = projection * view  * vec4(WorldPos, 1.0f);
 }

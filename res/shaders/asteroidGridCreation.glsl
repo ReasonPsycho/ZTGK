@@ -2,14 +2,15 @@
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-struct AsteroidData
-{
+struct AsteroidData {
     vec4 position;
     vec4 rotation;
     vec4 scale;
     vec4 velocity;
     vec4 angularVelocity;
     vec4 separationVector;
+    vec4 changeInVelocity;
+    vec4 changeInAngularVelocity;
 };
 
 struct CellData {

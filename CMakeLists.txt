@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.4.1)
 project(OpenGLGP VERSION 2.0)
 
 IF (WIN32)

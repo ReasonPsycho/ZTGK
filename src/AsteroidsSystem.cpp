@@ -24,50 +24,9 @@ unsigned int nextPowerOfTwo(unsigned int n) {
     return 1 << count;
 }
 
-void AsteroidsSystem::Draw(float deltaTime) {
-
-    cumputeShaderMovment.use();
-    cumputeShaderMovment.setFloat("deltaTime", deltaTime);
-    glDispatchCompute(asteroidsData.size(), 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-    cumputeShaderGridCreation.use();
-    glDispatchCompute(asteroidsData.size(), 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-    cumputeShaderGridSort.use();
-    int numPairs = nextPowerOfTwo(asteroidsData.size()) / 2;
-    int numStages = (int) glm::log2((float) numPairs * 2);
-    for (int stageIndex = 0; stageIndex < numStages; stageIndex++)
-    {
-        for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++)
-        {
-            // Calculate some pattern stuff
-            int groupWidth = 1 << (stageIndex - stepIndex);
-            int groupHeight = 2 * groupWidth - 1;
-            cumputeShaderGridSort.setInt("groupWidth", groupWidth);
-            cumputeShaderGridSort.setInt("groupHeight", groupHeight);
-            cumputeShaderGridSort.setInt("stepIndex", stepIndex);
-            // Run the sorting step on the GPU
-            glDispatchCompute(numPairs, 1, 1);
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        }
-    }
-
-    cumputeShaderGridCalculateOffset.use();
-    glDispatchCompute(asteroidsData.size(), 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    
-    
-    cumputeShaderCollide.use();
-    glDispatchCompute(asteroidsData.size(), 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-    cumputeShaderSeperation.use();
-    glDispatchCompute(asteroidsData.size(), 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
+void AsteroidsSystem::Draw() {
     asteroidShader->use();
+    asteroidShader->setMatrix4("planet",false,glm::value_ptr(planet));
     
     textures[0]->use(GL_TEXTURE3);
     textures[1]->use(GL_TEXTURE4);
@@ -85,10 +44,10 @@ void AsteroidsSystem::Draw(float deltaTime) {
 
 void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
-
+    planet = glm::mat4x4(1);
     const float PI = 3.14159265359;
-    float radius = 2;
-    float span = 2;
+    float radius = 100;
+    float span = 20;
     
     size = 1000;
     std::vector<glm::vec3> positions(size);
@@ -121,7 +80,7 @@ void AsteroidsSystem::Init() {
 
     // Display generated positions and velocities
     for (int i = 0; i < size; ++i) {
-        asteroidsData.push_back(AsteroidData(glm::vec4 (positions[i],1), glm::vec4 (rotations[i],1), glm::vec4 (scales[i],1), glm::vec4 (velocities[i],1),glm::vec4 (angularVelocites[i],1) ));
+        asteroidsData.push_back(AsteroidData(glm::vec4 (positions[i],1), glm::vec4 (rotations[i],1), glm::vec4 (scales[i],1), glm::vec4 (velocities[i],1),glm::vec4 (angularVelocites[i],1),glm::vec4(0),glm::vec4(0),glm::vec4(0)));
     }
         
 
@@ -219,6 +178,49 @@ void AsteroidsSystem::Init() {
 
     cumputeShaderSeperation.init();
     cumputeShaderSeperation.use();
+}
+
+void AsteroidsSystem::Update(float deltaTime) {
+    cumputeShaderMovment.use();
+    cumputeShaderMovment.setFloat("deltaTime", deltaTime);
+    glDispatchCompute(asteroidsData.size(), 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    cumputeShaderGridCreation.use();
+    glDispatchCompute(asteroidsData.size(), 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    cumputeShaderGridSort.use();
+    int numPairs = nextPowerOfTwo(asteroidsData.size()) / 2;
+    int numStages = (int) glm::log2((float) numPairs * 2);
+    for (int stageIndex = 0; stageIndex < numStages; stageIndex++)
+    {
+        for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++)
+        {
+            // Calculate some pattern stuff
+            int groupWidth = 1 << (stageIndex - stepIndex);
+            int groupHeight = 2 * groupWidth - 1;
+            cumputeShaderGridSort.setInt("groupWidth", groupWidth);
+            cumputeShaderGridSort.setInt("groupHeight", groupHeight);
+            cumputeShaderGridSort.setInt("stepIndex", stepIndex);
+            // Run the sorting step on the GPU
+            glDispatchCompute(numPairs, 1, 1);
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        }
+    }
+
+    cumputeShaderGridCalculateOffset.use();
+    glDispatchCompute(asteroidsData.size(), 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+
+    cumputeShaderCollide.use();
+    glDispatchCompute(asteroidsData.size(), 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    cumputeShaderSeperation.use();
+    glDispatchCompute(asteroidsData.size(), 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 
