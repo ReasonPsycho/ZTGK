@@ -46,10 +46,10 @@ void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
     planet = glm::mat4x4(1);
     const float PI = 3.14159265359;
-    float radius = 100;
-    float span = 20;
+    float radius = 10;
+    float span = 2;
     
-    size = 1000;
+    size = 10;
     std::vector<glm::vec3> positions(size);
     std::vector<glm::vec3> rotations(size);
     std::vector<glm::vec3> velocities(size);
@@ -82,56 +82,26 @@ void AsteroidsSystem::Init() {
     for (int i = 0; i < size; ++i) {
         asteroidsData.push_back(AsteroidData(glm::vec4 (positions[i],1), glm::vec4 (rotations[i],1), glm::vec4 (scales[i],1), glm::vec4 (velocities[i],1),glm::vec4 (angularVelocites[i],1),glm::vec4(0),glm::vec4(0),glm::vec4(0)));
     }
-        
-
-    /*
-    float radius = 40.0;
-    float offset = 20.0f;
-
-    for (unsigned int i = 0; i < size; i++) {
-        glm::mat4 model = glm::mat4(1.0f);
-
-        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
-        float angle = (float) i / (float) size * 360.0f;
-        float displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float x = sin(angle) * radius + displacement;
-        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
-        displacement = (rand() % (int) (2 * offset * 100)) / 100.0f - offset;
-        float z = cos(angle) * radius + displacement;
-
-        glm::vec4 position = glm::vec4(x, y, z, 1);
-        glm::vec4 rotation = glm::vec4(glm::linearRand(glm::vec3(-0.5f), glm::vec3(0.5f)), 1);
-        glm::vec4 scale = glm::vec4(glm::linearRand(glm::vec3(1.0f), glm::vec3(1.0f)), 1);
-        glm::vec4 velocity = glm::vec4(glm::linearRand(glm::vec3(-0.5f), glm::vec3(0.5f)), 1);
-        glm::vec4 angularVelocity = glm::vec4(glm::linearRand(glm::vec3(-0.5f), glm::vec3(0.5f)), 1);
-
-        asteroidsData.push_back(AsteroidData(position, rotation, scale, velocity, angularVelocity));
-    }
-    */
-
-
- 
     
     GLuint currentId;
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
     glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(AsteroidData), asteroidsData.data(),
-                 GL_STATIC_DRAW);
+                 GL_STREAM_DRAW);
     GLuint bindingPoint = 0; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(CellData), asteroidsData.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(CellData), nullptr,
+                 GL_DYNAMIC_DRAW);
     bindingPoint = 1; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(Offsets), asteroidsData.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, asteroidsData.size() * sizeof(Offsets), nullptr,
+                 GL_STREAM_DRAW);
     bindingPoint = 2; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
     

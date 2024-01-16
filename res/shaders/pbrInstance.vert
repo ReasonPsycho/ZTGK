@@ -111,7 +111,7 @@ void main()
 {
     uint index = gl_InstanceID;
     mat4 translationMatrix = mat4(1.0);
-    translateMatrix translationMatrix[3] = asteroidsData[index].position;
+    translationMatrix[3] = asteroidsData[index].position;
     mat4 rotaionMatrix = rotateXYZ( asteroidsData[index].rotation.xyz);
     mat4 scaleMatrix = scaleMatrix(asteroidsData[index].scale.xyz);
     translationMatrix *= scaleMatrix * rotaionMatrix;
@@ -120,4 +120,5 @@ void main()
     WorldPos = vec3(translationMatrix * planet * vec4(aPos, 1.0));
     Normal =  transpose(inverse(mat3(translationMatrix))) * aNormal;
     gl_Position = projection * view  * vec4(WorldPos, 1.0f);
+
 }

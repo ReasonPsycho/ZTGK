@@ -17,13 +17,49 @@ uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
 
-struct Light{
-    vec4 position;
+struct DirLight {
+    vec4  direction;
     vec4 color;
 };
 
-layout(std430, binding = 3) buffer LightsBuffer {
-    Light lights[]; // Array of velocities
+struct PointLight {
+    vec4  position;
+
+    float constant;
+    float linear;
+    float quadratic;
+    float pointlessfloat;
+
+    vec4 color;
+};
+
+struct SpotLight {
+    vec4  position;
+    vec4  direction;
+    float cutOff;
+    float outerCutOff;
+
+    float constant;
+    float linear;
+    float quadratic;
+    
+    float pointlessfloat;
+    float pointlessfloat2;
+    float pointlessfloat3;
+
+vec4 color;
+};
+
+layout(std430, binding = 3) buffer DirLightBuffer {
+    DirLight dirLights[];
+};
+
+layout(std430, binding = 4) buffer PointLightBuffer {
+    PointLight pointLights[];
+};
+
+layout(std430, binding = 5) buffer SpotLightBuffer {
+    SpotLight spotLights[];
 };
 
 uniform vec3 camPos;
@@ -96,6 +132,124 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 // ----------------------------------------------------------------------------
+
+//Lights calculation
+
+// calculates the color when using a directional light.
+vec3 CalcDirLight(DirLight light,vec3 N, vec3 V,float roughness,float metallic,vec3 albedo, vec3 F0)
+{
+    // calculate per-light radiance
+    vec3 L = normalize(-light.direction.xyz);
+    vec3 H = normalize(V + L);
+    vec3 radiance = light.color.xyz  * light.color.w;
+
+    // Cook-Torrance BRDF
+    float NDF = DistributionGGX(N, H, roughness);
+    float G   = GeometrySmith(N, V, L, roughness);
+    vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+    vec3 numerator    = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;// + 0.0001 to prevent divide by zero
+    vec3 specular = numerator / denominator;
+
+    // kS is equal to Fresnel
+    vec3 kS = F;
+    // for energy conservation, the diffuse and specular light can't
+    // be above 1.0 (unless the surface emits light); to preserve this
+    // relationship the diffuse component (kD) should equal 1.0 - kS.
+    vec3 kD = vec3(1.0) - kS;
+    // multiply kD by the inverse metalness such that only non-metals 
+    // have diffuse lighting, or a linear blend if partly metal (pure metals
+    // have no diffuse light).
+    kD *= 1.0 - metallic;
+
+    // scale light by NdotL
+    float NdotL = max(dot(N, L), 0.0);
+
+    // add to outgoing radiance Lo
+    return (kD * albedo / PI + specular) * radiance * NdotL;// note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+}
+
+
+// calculates the color when using a point light.
+vec3 CalcPointLight(PointLight light,vec3 N, vec3 V,float roughness,float metallic,vec3 albedo, vec3 F0)
+{
+    // calculate per-light radiance
+    vec3 L = normalize(light.position.xyz - WorldPos);
+    vec3 H = normalize(V + L);
+    float distance = length(light.position.xyz - WorldPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    vec3 radiance = light.color.xyz * attenuation * light.color.w;
+
+    // Cook-Torrance BRDF
+    float NDF = DistributionGGX(N, H, roughness);
+    float G   = GeometrySmith(N, V, L, roughness);
+    vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+    vec3 numerator    = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+    vec3 specular = numerator / denominator;
+
+    // kS is equal to Fresnel
+    vec3 kS = F;
+    // for energy conservation, the diffuse and specular light can't
+    // be above 1.0 (unless the surface emits light); to preserve this
+    // relationship the diffuse component (kD) should equal 1.0 - kS.
+    vec3 kD = vec3(1.0) - kS;
+    // multiply kD by the inverse metalness such that only non-metals 
+    // have diffuse lighting, or a linear blend if partly metal (pure metals
+    // have no diffuse light).
+    kD *= 1.0 - metallic;
+
+    // scale light by NdotL
+    float NdotL = max(dot(N, L), 0.0);
+
+    // add to outgoing radiance Lo
+    return (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+
+}
+// calculates the color when using a spot light.
+vec3 CalcSpotLight(SpotLight light,vec3 N, vec3 V,float roughness,float metallic,vec3 albedo, vec3 F0)
+{
+    // calculate per-light radiance
+    vec3 L = normalize(light.position.xyz - WorldPos);
+    vec3 H = normalize(V + L);
+    float distance = length(light.position.xyz - WorldPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+    float theta = dot(L, normalize(-light.direction.xyz));
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+    vec3 radiance = light.color.xyz * attenuation * light.color.w;
+    
+    
+    // Cook-Torrance BRDF
+    float NDF = DistributionGGX(N, H, roughness);
+    float G   = GeometrySmith(N, V, L, roughness);
+    vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+    vec3 numerator    = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+    vec3 specular = numerator / denominator;
+
+    // kS is equal to Fresnel
+    vec3 kS = F;
+    // for energy conservation, the diffuse and specular light can't
+    // be above 1.0 (unless the surface emits light); to preserve this
+    // relationship the diffuse component (kD) should equal 1.0 - kS.
+    vec3 kD = vec3(1.0) - kS;
+    // multiply kD by the inverse metalness such that only non-metals 
+    // have diffuse lighting, or a linear blend if partly metal (pure metals
+    // have no diffuse light).
+    kD *= 1.0 - metallic;
+
+    // scale light by NdotL
+    float NdotL = max(dot(N, L), 0.0);
+
+    // add to outgoing radiance Lo
+    return (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+}
 void main()
 {
     // material properties
@@ -116,6 +270,17 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
+    for (int i = 0; i < dirLights.length(); ++i){
+        Lo +=     CalcDirLight(dirLights[i],N, V,roughness,metallic,albedo, F0);
+    }
+    for (int i = 0; i < pointLights.length(); ++i){
+        Lo +=     CalcPointLight(pointLights[i],N, V,roughness,metallic,albedo, F0);
+    }
+    for (int i = 0; i < spotLights.length(); ++i){
+
+        Lo +=    CalcSpotLight(spotLights[i],N, V,roughness,metallic,albedo, F0);
+    }
+    /*
     for(int i = 0; i < lights.length(); ++i)
     {
         // calculate per-light radiance
@@ -151,6 +316,7 @@ void main()
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
+*/
 
     // ambient lighting (we now use IBL as the ambient term)
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
@@ -164,7 +330,7 @@ void main()
 
     // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
@@ -177,5 +343,5 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0/2.2));
 
-    FragColor = vec4(color , 1.0);
+    FragColor = vec4(color, 1.0);
 }

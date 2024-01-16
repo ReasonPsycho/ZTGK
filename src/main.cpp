@@ -133,7 +133,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastX = 0;
 float lastY = 0;
 
-LightSystem lightSystem(1);
+LightSystem lightSystem;
 PBRSystem pbrSystem(&camera);
 AsteroidsSystem asteroidsSystem(1024, &pbrSystem.pbrInstanceShader);
 

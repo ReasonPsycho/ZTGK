@@ -10,18 +10,47 @@
 #include "glm/vec4.hpp"
 
 
-struct Light{
-    glm::vec4 position;
+struct DirLight {
+    glm::vec4  direction;
     glm::vec4 color;
 };
 
+struct PointLight {
+    glm::vec4  position;
+
+    float constant;
+    float linear;
+    float quadratic;
+    float pointlessfloat;
+
+    glm::vec4 color;
+};
+
+struct SpotLight {
+    glm::vec4  position;
+    glm::vec4  direction;
+    float cutOff;
+    float outerCutOff;
+
+    float constant;
+    float linear;
+    float quadratic;
+    float pointlessfloat;
+    float pointlessfloat2;
+    float pointlessfloat3;
+
+    glm::vec4 color;
+};
+
+
 class LightSystem {
 public:
-    LightSystem(int size);
+    LightSystem();
     void Init();
     
-    int size;
-    std::vector<Light> lights;
+    std::vector<DirLight> dirLights;
+    std::vector<PointLight> pointLights;
+    std::vector<SpotLight> spotLights;
 };
 
 
