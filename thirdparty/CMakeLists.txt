@@ -22,28 +22,22 @@ CPMAddPackage("gh:glfw/glfw#3.3.8")
 CPMAddPackage("gh:g-truc/glm#0.9.9.8")
 CPMAddPackage("gh:ocornut/imgui@1.88")
 CPMAddPackage("gh:gabime/spdlog@1.10.0")
-
-set(KHR_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/cmake/KHRplatform)
-set(GLBINDING_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/cmake/glbinding)
-set(GLOBJECTS_DIR ${CMAKE_CURRENT_LIST_DIR}/globjects/cmake/globjects)
-
-set(KHR_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/include/KHR)
-set(GLBINDING_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/glbinding/include/glbinding)
-set(GLOBJECTS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/globjects/include/globjects)
-
-include(${KHR_DIR}/KHRplatform-export.cmake)
-include(${GLBINDING_DIR}/glbinding-export.cmake)
-include(${GLOBJECTS_DIR}/globjects-export.cmake)
-
-include(${GLBINDING_DIR}/glbinding-export-release.cmake)
-include(${GLOBJECTS_DIR}/globjects-export-release.cmake)
+CPMAddPackage("gh:CedricGuillemet/ImGuizmo#1.83")
 
 set(imgui_SOURCE_DIR ${imgui_SOURCE_DIR} CACHE INTERNAL "")
+include_directories(${imgui_SOURCE_DIR})
 add_library(imgui STATIC ${imgui_SOURCE_DIR}/imgui.cpp
         ${imgui_SOURCE_DIR}/imgui_demo.cpp
         ${imgui_SOURCE_DIR}/imgui_draw.cpp
         ${imgui_SOURCE_DIR}/imgui_tables.cpp
         ${imgui_SOURCE_DIR}/imgui_widgets.cpp)
+
+set(ImGuizmo_SOURCE_DIR ${ImGuizmo_SOURCE_DIR} CACHE INTERNAL "")
+add_library(imguizmo STATIC ${ImGuizmo_SOURCE_DIR}/ImGuizmo.cpp
+        ${ImGuizmo_SOURCE_DIR}/GraphEditor.cpp
+        ${ImGuizmo_SOURCE_DIR}/ImCurveEdit.cpp
+        ${ImGuizmo_SOURCE_DIR}/ImGradient.cpp
+        ${ImGuizmo_SOURCE_DIR}/ImSequencer.cpp)
 
 set_target_properties(glad
         stb_image
@@ -51,9 +45,8 @@ set_target_properties(glad
         glfw
         glm
         imgui
+        imguizmo
         spdlog
-        glbinding::glbinding
-        globjects::globjects
         PROPERTIES FOLDER "thirdparty")
 
 if (TARGET zlibstatic)

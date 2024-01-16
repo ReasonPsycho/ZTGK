@@ -9,7 +9,7 @@
 #include "Camera.h"
 #include "modelLoading/Model.h"
 #include "AsteroidsSystem.h"
-#include "LightSystem.h"
+#include "Systems/LightSystem/LightSystem.h"
 #include "PBRSystem.h"
 #include <stdio.h>
 
@@ -44,6 +44,7 @@ public:
 };
 #endif
 
+
 string modelPath = "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\models\\Sphere\\Sphere.obj";
 Model model = Model(&modelPath);
 Entity ourEntity(model);
@@ -51,13 +52,6 @@ shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
 #pragma region constants
-
-glm::vec3 pointLightPositions[] = {
-        glm::vec3(0.7f, 0.2f, 2.0f),
-        glm::vec3(2.3f, -3.3f, -4.0f),
-        glm::vec3(-4.0f, 2.0f, -12.0f),
-        glm::vec3(0.0f, 0.0f, -3.0f)
-};
 
 #pragma endregion constants
 
@@ -119,8 +113,7 @@ constexpr int32_t GL_VERSION_MINOR = 6;
 
 //Not my things but I could probably change them
 
-bool show_demo_window = false;
-bool show_another_window = false;
+
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 #pragma endregion Orginal set up
@@ -137,6 +130,8 @@ LightSystem lightSystem;
 PBRSystem pbrSystem(&camera);
 AsteroidsSystem asteroidsSystem(1024, &pbrSystem.pbrInstanceShader);
 
+
+bool captureMouse = false;
 
 // timing
 float deltaTime = 0.0f;
@@ -292,7 +287,11 @@ bool init() {
 
 void init_systems() {
     asteroidsSystem.Init();
-    lightSystem.Init();
+    lightSystem.AddDirLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0), glm::vec4(255, 255, 255, 0.5f));
+    lightSystem.AddPointLight(glm::vec4(0, 0, 0, 0), 1.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
+    lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f,
+                             glm::vec4(255, 255, 255, 1));
+    lightSystem.PushToSSBO();
     pbrSystem.Init();
 }
 
@@ -322,6 +321,7 @@ void init_imgui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
+    io.MouseDrawCursor = true;
     (void) io;
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
@@ -341,24 +341,32 @@ void before_frame() {
     lastFrame = currentFrame;
 };
 
+
 void input() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
+
+    if(captureMouse){
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        glfwSetCursorPosCallback(window, mouse_callback);
+    }{
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
     glfwSetScrollCallback(window, scroll_callback);
+    
     processInput(window);
 }
 
 void update() {
-    
-    deltaTime *= (float )timeStep;
-   // Entity *lastEntity = &ourEntity;
-  //  while (lastEntity->children.size()) {
-  //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
-  //      lastEntity = lastEntity->children.back().get();
-  //  }
 
-  //  ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f});
-  //  ourEntity.updateSelfAndChild();
+    deltaTime *= (float) timeStep;
+    // Entity *lastEntity = &ourEntity;
+    //  while (lastEntity->children.size()) {
+    //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+    //      lastEntity = lastEntity->children.back().get();
+    //  }
+
+    //  ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f});
+    //  ourEntity.updateSelfAndChild();
     asteroidsSystem.Update(deltaTime);
 }
 
@@ -366,7 +374,7 @@ void render() {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     file_logger->info("Cleared.");
-    
+
     camera.UpdateShader(&pbrSystem.pbrInstanceShader, display_w, display_h);
     camera.UpdateShader(&pbrSystem.backgroundShader, display_w, display_h);
     camera.UpdateShader(&pbrSystem.pbrShader, display_w, display_h);
@@ -375,17 +383,17 @@ void render() {
     pbrSystem.RenderBackground();
     pbrSystem.PrebindPBR();
     file_logger->info("Set up PBR.");
-    
+
     pbrSystem.pbrShader.use();
     // draw our scene graph
-   // Entity *lastEntity = &ourEntity;
-   // while (lastEntity->children.size()) {
-   //     lastEntity->pModel->Draw(pbrSystem.pbrShader);
-   //     lastEntity = lastEntity->children.back().get();
-   // }
-   // file_logger->info("Rendered Entities.");
-    
-   // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+    // Entity *lastEntity = &ourEntity;
+    // while (lastEntity->children.size()) {
+    //     lastEntity->pModel->Draw(pbrSystem.pbrShader);
+    //     lastEntity = lastEntity->children.back().get();
+    // }
+    // file_logger->info("Rendered Entities.");
+
+    // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
     asteroidsSystem.Draw();
     file_logger->info("Rendered AsteroidsSystem.");
 }
@@ -398,14 +406,13 @@ void imgui_begin() {
 }
 
 void imgui_render() {
-    /// Add new ImGui controls here
-    // Show the big demo window
-    char buffer[64];
-    snprintf(buffer, sizeof buffer, "%f", 1 / deltaTime);
-    ImGui::Text(buffer);
+    ImGui::Begin("Debug menu");
+     char buffer[64];
+     snprintf(buffer, sizeof buffer, "%f", 1 / deltaTime);
+     ImGui::Text(buffer);
 
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
+    lightSystem.showLightTree();
+    ImGui::End();
 }
 
 void imgui_end() {
@@ -430,10 +437,17 @@ void processInput(GLFWwindow *window) {
         camera.ProcessKeyboard(UPWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWNWARD, deltaTime);
+
+
+    
+    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
+        captureMouse = !captureMouse;
+    }
+
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        if(timeStep == 0){
+        if (timeStep == 0) {
             timeStep = 1;
-        }else{
+        } else {
             timeStep = 0;
         }
 }
@@ -461,7 +475,11 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
+    if (timeStep != 0) {
+        camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
+    } else {
+        camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
+    }
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
@@ -486,8 +504,7 @@ void init_camera() {
     lastX = display_w / 2.0f;
     lastY = display_h / 2.0f;
 
-    // Capture and lock the mouse to the window
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  
 }
 
 #pragma endregion Functions
