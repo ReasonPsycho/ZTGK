@@ -5,13 +5,18 @@
 #ifndef OPENGLGP_ILIGHT_H
 #define OPENGLGP_ILIGHT_H
 
+#include "Camera.h"
+
 class ILight {
 public:
     ILight(){
         uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
     }
-    virtual void showImGuiDetails() = 0; // Pure virtual function
-    // Other common light functions can also go here.
+
+    glm::mat4x4 model;
+
+    virtual void showImGuiDetails(Camera* camera) = 0; // Pure virtual function
+    virtual void EditLight(Camera* camera) = 0;
     
 private:
     static int nextID; // Static variable to keep track of the next available ID

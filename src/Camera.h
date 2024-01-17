@@ -60,6 +60,7 @@ public:
     
     // Returns view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix();
+    glm::mat4 GetProjectionMatrix();
 
     //InputProcessing added delta time with predefintion of one (for cases where it takes to long to implement it)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime= 1);
@@ -71,6 +72,8 @@ public:
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();
+    float saved_display_w = 1920;
+    float saved_display_h = 1080;
 };
 
 

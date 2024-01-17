@@ -6,13 +6,11 @@
 #include "glad/glad.h"
 #include "imgui.h"
 
-LightSystem::LightSystem() = default;
-
 void LightSystem::PushToSSBO() {
 
 
     std::vector<DirLightData> dirLightDataArray;
-    for (const DirLight& light : dirLights) {
+    for (const DirLight light : dirLights) {
         dirLightDataArray.push_back(light.data);
     }
 
@@ -29,21 +27,21 @@ void LightSystem::PushToSSBO() {
     GLuint currentId;
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, dirLightDataArray.size() * sizeof(DirLight), dirLightDataArray.data(),
+    glBufferData(GL_SHADER_STORAGE_BUFFER, dirLightDataArray.size() * sizeof(DirLightData), dirLightDataArray.data(),
                  GL_STATIC_DRAW);
     int bindingPoint = 3; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, pointLightDataArray.size() * sizeof(PointLight), pointLightDataArray.data(),
+    glBufferData(GL_SHADER_STORAGE_BUFFER, pointLightDataArray.size() * sizeof(PointLightData), pointLightDataArray.data(),
                  GL_STATIC_DRAW);
     bindingPoint = 4; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, spotLightDataArray.size() * sizeof(SpotLight), spotLightDataArray.data(),
+    glBufferData(GL_SHADER_STORAGE_BUFFER, spotLightDataArray.size() * sizeof(SpotLightData), spotLightDataArray.data(),
                  GL_STATIC_DRAW);
     bindingPoint = 5; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
@@ -55,8 +53,12 @@ void LightSystem::PushToSSBO() {
 
 void LightSystem::showLightTree() {
     if (ImGui::TreeNode("LightSystem")) {
-        for (const auto &light: lights) {
-            light->showImGuiDetails();
+        for (auto &light: lights) {
+            light->showImGuiDetails(camera);
+        }
+        if (ImGui::Button("Push light data to SSBO"))
+        {
+            PushToSSBO();
         }
         ImGui::TreePop();
     }
@@ -65,7 +67,7 @@ void LightSystem::showLightTree() {
 //Should have done it cleaner don't care enough to do it
 void LightSystem::AddDirLight(glm::vec4 direction, glm::vec4 color) {
     dirLights.push_back(DirLight(DirLightData(direction, color)));
-    lights.push_back(std::make_shared<DirLight>(dirLights.back()));
+    lights.push_back(&dirLights.back());
 }
 
 void LightSystem::AddPointLight(glm::vec4 position,
@@ -74,7 +76,7 @@ void LightSystem::AddPointLight(glm::vec4 position,
                                 float quadratic,
                                 glm::vec4 color) {
     pointLights.push_back(PointLight(PointLightData(position, constant, linear, quadratic, 0, color)));
-    lights.push_back(std::make_shared<PointLight>(pointLights.back()));
+    lights.push_back(&pointLights.back());
 
 }
 
@@ -92,11 +94,15 @@ void LightSystem::AddSpotLight(glm::vec4  position,
              linear,
              quadratic,0,0,0,
              color)));
-    lights.push_back(std::make_shared<SpotLight>(spotLights.back()));
+    lights.push_back(&spotLights.back());
 }
 
 LightSystem::~LightSystem() {
     dirLights.clear();
     pointLights.clear();
     spotLights.clear();
+}
+
+LightSystem::LightSystem(Camera *camera):camera(camera) {
+
 }

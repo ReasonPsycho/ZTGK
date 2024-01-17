@@ -85,12 +85,18 @@ void Camera::updateCameraVectors() {
 }
 
 void Camera::UpdateShader(Shader* shader,int display_w,int display_h) {
+    saved_display_w = display_w;
+    saved_display_h = display_h;
     shader->use();
     // pass projection matrix to shader 
-    glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)display_w / (float)display_h, nearClip, farClip);
+    glm::mat4 projection = GetProjectionMatrix();
     shader->setMatrix4("projection", false, glm::value_ptr(projection));
 
     // camera/view transformation
     glm::mat4 view = GetViewMatrix();
     shader->setMatrix4("view", false, glm::value_ptr(view));
+}
+
+glm::mat4 Camera::GetProjectionMatrix() {
+    return  glm::perspective(glm::radians(Zoom), (float)saved_display_w / (float)saved_display_h, nearClip, farClip);
 }

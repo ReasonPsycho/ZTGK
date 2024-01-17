@@ -126,17 +126,19 @@ Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastX = 0;
 float lastY = 0;
 
-LightSystem lightSystem;
+LightSystem lightSystem(&camera);
 PBRSystem pbrSystem(&camera);
 AsteroidsSystem asteroidsSystem(1024, &pbrSystem.pbrInstanceShader);
 
 
 bool captureMouse = false;
+bool captureMouseButtonPressed = false;
 
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 int timeStep = 1;
+bool timeStepKeyPressed = false;
 
 #pragma endregion My set up
 
@@ -321,7 +323,6 @@ void init_imgui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    io.MouseDrawCursor = true;
     (void) io;
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
@@ -344,13 +345,9 @@ void before_frame() {
 
 void input() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    if(captureMouse){
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(window, mouse_callback);
-    }{
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
+    
     glfwSetScrollCallback(window, scroll_callback);
     
     processInput(window);
@@ -359,15 +356,17 @@ void input() {
 void update() {
 
     deltaTime *= (float) timeStep;
-    // Entity *lastEntity = &ourEntity;
-    //  while (lastEntity->children.size()) {
-    //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
-    //      lastEntity = lastEntity->children.back().get();
-    //  }
+    if(timeStep != 0){
+        // Entity *lastEntity = &ourEntity;
+        //  while (lastEntity->children.size()) {
+        //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+        //      lastEntity = lastEntity->children.back().get();
+        //  }
 
-    //  ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f});
-    //  ourEntity.updateSelfAndChild();
-    asteroidsSystem.Update(deltaTime);
+        //  ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f});
+        //  ourEntity.updateSelfAndChild();
+        asteroidsSystem.Update(deltaTime);
+    }
 }
 
 void render() {
@@ -400,9 +399,18 @@ void render() {
 
 void imgui_begin() {
     // Start the Dear ImGui frame
+    if(!captureMouse){
+        ImGuiIO &io = ImGui::GetIO();
+        io.MouseDrawCursor = true;
+    } else {
+        ImGuiIO &io = ImGui::GetIO();
+        io.MouseDrawCursor = false;
+    };
+    
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    ImGuizmo::BeginFrame();
 }
 
 void imgui_render() {
@@ -439,17 +447,33 @@ void processInput(GLFWwindow *window) {
         camera.ProcessKeyboard(DOWNWARD, deltaTime);
 
 
-    
+
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
-        captureMouse = !captureMouse;
+        if(!captureMouseButtonPressed){
+            captureMouse = !captureMouse;
+        }
+        captureMouseButtonPressed = true;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        if (timeStep == 0) {
-            timeStep = 1;
-        } else {
-            timeStep = 0;
+    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_RELEASE) {
+        captureMouseButtonPressed = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+        if (!timeStepKeyPressed){
+            if (timeStep == 0) {
+                timeStep = 1;
+            } else {
+                timeStep = 0;
+            }
         }
+        timeStepKeyPressed = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE){
+        timeStepKeyPressed = false;
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -475,11 +499,17 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     lastX = xpos;
     lastY = ypos;
 
-    if (timeStep != 0) {
-        camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
-    } else {
-        camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
+    if(captureMouse){
+        if (timeStep != 0) {
+            camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
+        } else {
+            camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
+        }
     }
+ 
+    
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2(xpos, ypos);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called

@@ -12,12 +12,13 @@
 #include "Systems/LightSystem/Lights/DirLight.h"
 #include "Systems/LightSystem/Lights/PointLight.h"
 #include "Systems/LightSystem/Lights/SpotLight.h"
+#include "Camera.h"
 
 
 class LightSystem {
 public:
     //Setup
-    LightSystem();
+    LightSystem(Camera* camera);
     ~LightSystem();
     void PushToSSBO();
     
@@ -45,7 +46,8 @@ private:
     std::vector<DirLight> dirLights;
     std::vector<PointLight> pointLights;
     std::vector<SpotLight> spotLights;
-    std::vector<std::shared_ptr<ILight>> lights;
+    std::vector<ILight*> lights;
+    Camera* camera;
 };
 
 
