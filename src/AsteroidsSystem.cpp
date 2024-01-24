@@ -49,7 +49,7 @@ void AsteroidsSystem::Init() {
     float radius = 10;
     float span = 2;
     
-    size = 10;
+    size = 100;
     std::vector<glm::vec3> positions(size);
     std::vector<glm::vec3> rotations(size);
     std::vector<glm::vec3> velocities(size);
