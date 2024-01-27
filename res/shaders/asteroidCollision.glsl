@@ -80,18 +80,13 @@ vec3 SeparationVector(vec3 a, vec3 b, float ra, float rb){
     return ((a - b)/length(a - b)) * (ra + rb  - length(a-b));
 }
 
-void CalculateCollisionResponse(in vec3 pos1, in vec3 v1, in float m1,
-in vec3 pos2, in vec3 v2, in float m2,
+void CalculateCollisionResponse(in vec3 n,in vec3 v1, in float m1, in vec3 v2, in float m2,
 out vec3 v1Final, out vec3 deltaAngularVelocity)
 {
-    // Calculate the resultant linear velocity after the collision for the first asteroid
-    v1Final = v1 - (2.0 * m2) / (m1 + m2) * ((dot(v1 - v2, pos1 - pos2)) / (length(pos1 - pos2) * length(pos1 - pos2))) * (pos1 - pos2);
-
-    // Calculate change in angular velocity as a result of the collision
-    vec3 r = pos1 - pos2;// Vector from center of asteroid2 to asteroid1
-    vec3 deltaV = v1Final;// Change in linear velocity
-    vec3 torque = cross(r, deltaV);// Torque
-    deltaAngularVelocity = 5.0/2.0 * torque / (m1 * length(r) * length(r));
+    vec3 v_rel = v1 - v2;
+    vec3 k = (2*v_rel * n)/((1/m1-1/m2) * n * n);
+    v1Final = k * n/m2;
+    deltaAngularVelocity =vec3(0);
 }
 
 float MeanOfScales(vec3 scale) {
@@ -129,17 +124,17 @@ void main() {
             vec3 v1Final = vec3(0);
             vec3 deltaAngularVelocity = vec3(0);
             if (dist != 0){
-                CalculateCollisionResponse(asteroidToCheck.position.xyz,
+                vec3 currentSeparationVector =  SeparationVector(asteroidToCheck.position.xyz, currentAsteroid.position.xyz, collisionRadius * maxScale, collisionRadius * maxScale2);
+                CalculateCollisionResponse(currentSeparationVector,
                 asteroidToCheck.velocity.xyz,
                 meanScale,
-                currentAsteroid.position.xyz,
                 currentAsteroid.velocity.xyz,
                 meanScale2,
                 v1Final,
                 deltaAngularVelocity);
+                sumOfSeperationVectors += currentSeparationVector;
                 sumOfMovementVectors += v1Final;
                 sumOfAnagularMovementVectors += deltaAngularVelocity;
-                sumOfSeperationVectors += SeparationVector(asteroidToCheck.position.xyz, currentAsteroid.position.xyz, collisionRadius * maxScale, collisionRadius * maxScale2);
                 amountOfCollisions++;
             }
           

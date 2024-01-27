@@ -52,3 +52,5 @@ set_target_properties(glad
 if (TARGET zlibstatic)
     set_target_properties(zlibstatic PROPERTIES FOLDER "thirdparty")
 endif ()
+
+file(COPY ${CMAKE_SOURCE_DIR}/thirdparty/dll/ DESTINATION ${CMAKE_BINARY_DIR}/src/)
