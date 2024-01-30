@@ -4,15 +4,14 @@ layout (location = 2) in vec2 aTexCoords;
 
 out vec2 TexCoords;
 
-struct AsteroidData {
+struct AsteroidData
+{
     vec4 position;
     vec4 rotation;
     vec4 scale;
     vec4 velocity;
     vec4 angularVelocity;
     vec4 separationVector;
-    vec4 changeInVelocity;
-    vec4 changeInAngularVelocity;
 };
 
 

@@ -20,7 +20,8 @@ public:
     // constructor reads and builds the shader
     Shader(const char* vertexPath, const char* fragmentPath)
             : vertexPath(vertexPath), fragmentPath(fragmentPath){}
-
+            
+            
     // use/activate the shader
     void use() const;
     void init();

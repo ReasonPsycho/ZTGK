@@ -8,9 +8,6 @@
 
 #include "Camera.h"
 #include "modelLoading/Model.h"
-#include "AsteroidsSystem.h"
-#include "Systems/LightSystem/LightSystem.h"
-#include "PBRSystem.h"
 #include <stdio.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -27,8 +24,14 @@
 #include <spdlog/spdlog.h>
 
 #include <iostream>
-#include "Enitity.h"
+#include "Systems/EntitySystem/Enitity.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "Systems/AsteroidSystem/AsteroidsSystem.h"
+
+#include "../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
+#include "Systems/RenderSystem/PBR/PBRSystem.h"
+#include "Systems/RenderSystem/PostProcessing/BloomSystem/BloomSystem.h"
+#include "Systems/RenderSystem/Lights/LightSystem.h"
 
 #ifndef ENTITY_H
 #define ENTITY_H
@@ -101,8 +104,8 @@ void processInput(GLFWwindow *window);
 
 #pragma region Orginal set up
 
-constexpr int32_t WINDOW_WIDTH = 1920;
-constexpr int32_t WINDOW_HEIGHT = 1080;
+constexpr int32_t WINDOW_WIDTH = 800;
+constexpr int32_t WINDOW_HEIGHT = 800;
 
 GLFWwindow *window = nullptr;
 
@@ -128,6 +131,7 @@ float lastY = 0;
 
 LightSystem lightSystem(&camera);
 PBRSystem pbrSystem(&camera);
+BloomSystem bloomSystem;
 AsteroidsSystem asteroidsSystem(1024, &pbrSystem.pbrInstanceShader);
 
 
@@ -295,6 +299,7 @@ void init_systems() {
                              glm::vec4(255, 255, 255, 1));
     lightSystem.PushToSSBO();
     pbrSystem.Init();
+    bloomSystem.Init(camera.saved_display_w,camera.saved_display_h);
 }
 
 void load_enteties() {
@@ -370,17 +375,14 @@ void update() {
 }
 
 void render() {
+    
+    bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     file_logger->info("Cleared.");
-
-    camera.UpdateShader(&pbrSystem.pbrInstanceShader, display_w, display_h);
-    camera.UpdateShader(&pbrSystem.backgroundShader, display_w, display_h);
-    camera.UpdateShader(&pbrSystem.pbrShader, display_w, display_h);
-    file_logger->info("Updated camera.");
-
+    
+    pbrSystem.PrebindPBR(&camera);
     pbrSystem.RenderBackground();
-    pbrSystem.PrebindPBR();
     file_logger->info("Set up PBR.");
 
     pbrSystem.pbrShader.use();
@@ -395,6 +397,10 @@ void render() {
     // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
     asteroidsSystem.Draw();
     file_logger->info("Rendered AsteroidsSystem.");
+    
+    bloomSystem.BlurBuffer();
+    bloomSystem.Render();
+
 }
 
 void imgui_begin() {
@@ -421,6 +427,10 @@ void imgui_render() {
 
     lightSystem.showLightTree();
     ImGui::End();
+
+
+    bloomSystem.showImguiOptions();
+    
 }
 
 void imgui_end() {
@@ -484,6 +494,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     display_h = height;
     display_w = width;
+    bloomSystem.SetUpBuffers(width,height);
 }
 
 
