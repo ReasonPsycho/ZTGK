@@ -25,7 +25,9 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 # Define the executable
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES} ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES} ${SRC_FILES}
+        Systems/EntitySystem/Transform.cpp
+        Systems/EntitySystem/Transform.h)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_SUFFIX="")

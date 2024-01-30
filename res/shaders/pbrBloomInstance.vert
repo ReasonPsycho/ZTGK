@@ -112,8 +112,9 @@ void main()
     mat4 rotaionMatrix = rotateXYZ(asteroidsData[index].rotation.xyz);
     mat4 scaleMatrix = scaleMatrix(asteroidsData[index].scale.xyz);
     translationMatrix *= scaleMatrix * translateMatrix(asteroidsData[index].position.xyz);
+    translationMatrix *= model;
     Normal = transpose(inverse(mat3(translationMatrix))) * aNormal;
     TexCoords = aTexCoords;
     WorldPos = vec3(translationMatrix * vec4(aPos, 1.0));
-    gl_Position = projection * view * translationMatrix * vec4(WorldPos, 1.0f);
+    gl_Position = projection * view * vec4(WorldPos, 1.0f);
 }

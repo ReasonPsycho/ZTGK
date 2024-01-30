@@ -26,7 +26,7 @@ unsigned int nextPowerOfTwo(unsigned int n) {
 
 void AsteroidsSystem::Draw() {
     asteroidShader->use();
-    asteroidShader->setMatrix4("planet", false, glm::value_ptr(planet));
+    asteroidShader->setMatrix4("model", false, glm::value_ptr(transform.getLocalModelMatrix()));
 
     textures[0]->use(GL_TEXTURE3);
     textures[1]->use(GL_TEXTURE4);

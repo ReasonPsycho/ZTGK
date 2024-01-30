@@ -50,7 +50,8 @@ public:
 
 string modelPath = "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\models\\Sphere\\Sphere.obj";
 Model model = Model(&modelPath);
-Entity ourEntity(model);
+
+Entity ourEntity();
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
@@ -307,6 +308,7 @@ void init_systems() {
 }
 
 void load_enteties() {
+    /*
     model.loadModel();
     ourEntity.transform.setLocalPosition({10, 0, 0});
     const float scale = 1;
@@ -325,6 +327,7 @@ void load_enteties() {
         }
     }
     ourEntity.updateSelfAndChild();
+     */
 }
 
 void init_imgui() {

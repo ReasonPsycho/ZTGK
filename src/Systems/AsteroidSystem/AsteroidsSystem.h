@@ -15,6 +15,7 @@
 #include "modelLoading/ComputeShader.h"
 #include "glm/gtc/random.hpp"
 #include "modelLoading/Model.h"
+#include "Systems/EntitySystem/Enitity.h"
 #include <random>
 
 
@@ -40,12 +41,12 @@ struct Offsets {
 static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/Sphere/Sphere.obj";
 
 
-class AsteroidsSystem {
+class AsteroidsSystem : Entity {
 public:
     GLuint ID{};
     float maxScale = 0.5f;
     float minScale = 2.0f;
-    glm::mat4x4 planet;
+    glm::mat4x4 planet{};
 
 
     AsteroidsSystem(int size, Shader *asteroidShader);
