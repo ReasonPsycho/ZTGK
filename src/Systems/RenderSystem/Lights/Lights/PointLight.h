@@ -8,7 +8,7 @@
 
 #include "glm/vec4.hpp"
 #include "imgui.h"
-#include "../ILight.h"
+#include "ILight.h"
 
 #include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 
@@ -25,11 +25,13 @@ struct PointLightData {
 
 class PointLight : public ILight {
 public:
-    PointLight(PointLightData data) : data(data) {
+    PointLight(Shader *shadowMapShader, PointLightData data) : ILight(shadowMapShader), data(data) {
+        lightType = Point;
         model = glm::mat4x4(1);
         model = glm::translate(model,
                                glm::vec3(data.position.x, data.position.y, data.position.z)); // Rotation around x-axis
     }
+
 
     PointLightData data;
 
@@ -61,6 +63,13 @@ public:
                              nullptr, nullptr);
         data.position = glm::vec4(glm::vec3(model[3]), 1);
     }
+
+    void InnitShadow() override;
+
+    void GenerateShadow(void (*funcPtr)()) override; // Pure virtual function
+
+private:
+    std::vector<glm::mat4> shadowTransforms;
 };
 
 

@@ -8,7 +8,7 @@
 
 void LightSystem::PushToSSBO() {
     std::vector<DirLightData> dirLightDataArray;
-    for (const DirLight light: dirLights) {
+    for (const DirLight &light: dirLights) {
         dirLightDataArray.push_back(light.data);
     }
 
@@ -45,8 +45,9 @@ void LightSystem::PushToSSBO() {
     bindingPoint = 5; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
-    GenerateShadowBuffers(&simpleDepthShader);
 
+    GenerateShadowBuffers();
+    
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
@@ -67,7 +68,7 @@ void LightSystem::showLightTree() {
 
 //Should have done it cleaner don't care enough to do it
 void LightSystem::AddDirLight(glm::vec4 direction, glm::vec4 color) {
-    dirLights.push_back(DirLight(DirLightData(direction, color)));
+    dirLights.push_back(DirLight(&planeDepthShader, DirLightData(direction, color)));
     lights.push_back(&dirLights.back());
 }
 
@@ -76,7 +77,8 @@ void LightSystem::AddPointLight(glm::vec4 position,
                                 float linear,
                                 float quadratic,
                                 glm::vec4 color) {
-    pointLights.push_back(PointLight(PointLightData(position, constant, linear, quadratic, 0, color)));
+    pointLights.push_back(
+            PointLight(&cubeDepthShader, PointLightData(position, constant, linear, quadratic, 0, color)));
     lights.push_back(&pointLights.back());
 
 }
@@ -89,12 +91,12 @@ void LightSystem::AddSpotLight(glm::vec4 position,
                                float linear,
                                float quadratic,
                                glm::vec4 color) {
-    spotLights.push_back(SpotLight(SpotLightData(position, direction, cutOff,
-                                                 outerCutOff,
-                                                 constant,
-                                                 linear,
-                                                 quadratic, 0, 0, 0,
-                                                 color)));
+    spotLights.push_back(SpotLight(&planeDepthShader, SpotLightData(position, direction, cutOff,
+                                                                    outerCutOff,
+                                                                    constant,
+                                                                    linear,
+                                                                    quadratic, 0, 0, 0,
+                                                                    color)));
     lights.push_back(&spotLights.back());
 }
 
@@ -108,35 +110,49 @@ LightSystem::LightSystem(Camera *camera) : camera(camera) {
 
 }
 
-void LightSystem::GenerateShadowBuffers(Shader *shader) {
-    shadows.clear();
+void LightSystem::GenerateShadowBuffers() {
     for (auto &light: lights) {
-        shadows.push_back(std::make_shared<Shadow>(glm::vec3(light->model[3]), shader));
-        shadows.back()->Init();
+        light->InnitShadow();
     }
 }
 
 void LightSystem::GenerateShadows(void (*funcPtr)()) {
-    for (auto &shadow: shadows) {
-        shadow->Generate(funcPtr);
+    for (auto &light: lights) {
+        light->GenerateShadow(funcPtr);
     }
     glViewport(0, 0, camera->saved_display_w, camera->saved_display_h); // Needed after light generation
 }
 
 void LightSystem::Init() {
-    simpleDepthShader.init();
+    planeDepthShader.init();
+    cubeDepthShader.init();
     PushToSSBO();
 }
 
-int TEXTURE_UNITS_OFFSET = 8;
 
-void LightSystem::PushDepthMapsToShader(Shader *shader) {
-    for (int i = 0; i < shadows.size(); ++i) {
-        std::string number = std::to_string(i);
-        glActiveTexture(GL_TEXTURE0 + TEXTURE_UNITS_OFFSET +
-                        i); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
-        glBindTexture(GL_TEXTURE_CUBE_MAP, shadows[i].get()->depthCubemap);
-        glUniform1i(glGetUniformLocation(shader->ID, ("shadowMaps[" + number + "]").c_str()),
-                    TEXTURE_UNITS_OFFSET + i);
+int TEXTURE_UNITS_OFFSET = 8;
+int POINT_SHADOW_OFFSET = TEXTURE_UNITS_OFFSET + 5;
+
+void LightSystem::PushDepthMapsToShader(Shader *shader) { //TODO this should be done throught ILight
+    int planeShadowIndex = 0, cubeShadowIndex = 0;
+    for (auto &light: lights) {
+        if (light->lightType == Point) {
+            std::string number = std::to_string(cubeShadowIndex);
+            glActiveTexture(GL_TEXTURE0 + TEXTURE_UNITS_OFFSET +
+                            cubeShadowIndex); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
+            glBindTexture(GL_TEXTURE_CUBE_MAP, light->depthMap);
+            glUniform1i(glGetUniformLocation(shader->ID, ("cubeShadowMaps[" + number + "]").c_str()),
+                        TEXTURE_UNITS_OFFSET + cubeShadowIndex);
+            cubeShadowIndex++;
+        } else {
+            std::string number = std::to_string(planeShadowIndex);
+            glActiveTexture(GL_TEXTURE0 + POINT_SHADOW_OFFSET +
+                            planeShadowIndex); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
+            glBindTexture(GL_TEXTURE_2D, light->depthMap);
+            glUniform1i(glGetUniformLocation(shader->ID, ("planeShadowMaps[" + number + "]").c_str()),
+                        POINT_SHADOW_OFFSET + planeShadowIndex);
+            planeShadowIndex++;
+        }
+    
     }
 }

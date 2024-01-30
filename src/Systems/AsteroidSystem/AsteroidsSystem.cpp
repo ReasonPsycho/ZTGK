@@ -56,7 +56,7 @@ void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
     planet = glm::mat4x4(1);
     const float PI = 3.14159265359;
-    float radius = 10;
+    float radius = 5;
     float span = 1;
 
     size = 100;

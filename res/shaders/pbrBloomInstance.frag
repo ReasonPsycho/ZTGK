@@ -21,13 +21,16 @@ uniform sampler2D brdfLUT;
 uniform vec3 camPos;
 uniform float far_plane;
 
-#define MAX_LIGHTS 30 // IDKKKK!!!!!
+#define MAX_LIGHTS 5 // IDKKKK!!!!!
 
-uniform samplerCube shadowMaps[MAX_LIGHTS];
+layout (binding = 8) uniform samplerCube cubeShadowMaps[MAX_LIGHTS];
+layout (binding = 8 + 5) uniform sampler2D planeShadowMaps[MAX_LIGHTS];
 
 struct DirLight {
     vec4 direction;
     vec4 color;
+    vec4 position;
+    mat4x4 lightSpaceMatrix;
 };
 
 struct PointLight {
@@ -56,6 +59,7 @@ struct SpotLight {
     float pointlessfloat3;
 
     vec4 color;
+    mat4x4 lightSpaceMatrix;
 };
 
 layout (std430, binding = 3) buffer DirLightBuffer {
@@ -90,7 +94,7 @@ vec3 gridSamplingDisk[20] = vec3[]
     vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 );
 
-float ShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
+float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
 {
     // get vector between fragment position and light position
     vec3 fragToLight = fragPos - lightPos;
@@ -129,7 +133,7 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(shadowMaps[lightIndex], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        float closestDepth = texture(cubeShadowMaps[lightIndex], fragToLight + gridSamplingDisk[i] * diskRadius).r;
         closestDepth *= far_plane;   // undo mapping [0;1]
         if (currentDepth - bias > closestDepth)
         shadow += 1.0;
@@ -138,6 +142,43 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
 
     // display closestDepth as debug (to visualize depth cubemap)
     // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+
+    return shadow;
+}
+
+float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID)
+{
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(lightPos, 1.0);
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(planeShadowMaps[lightID], projCoords.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // calculate bias (based on depth map resolution and slope)
+    vec3 normal = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - WorldPos);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    // check whether current frag pos is in shadow
+    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(planeShadowMaps[lightID], 0);
+    for (int x = -1; x <= 1; ++x)
+    {
+        for (int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(planeShadowMaps[lightID], projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if (projCoords.z > 1.0)
+    shadow = 0.0;
 
     return shadow;
 }
@@ -244,8 +285,11 @@ vec3 CalcDirLight(DirLight light, vec3 N, vec3 V, float roughness, float metalli
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
 
+    float shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+
+
     // add to outgoing radiance Lo
-    return (kD * albedo / PI + specular) * radiance * NdotL;// note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    return (kD * albedo / PI + specular) * radiance * NdotL * shadow;// note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 }
 
 
@@ -281,7 +325,7 @@ vec3 CalcPointLight(PointLight light, vec3 N, vec3 V, float roughness, float met
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
-    float shadow = (1.0 - ShadowCalculation(WorldPos, light.position.xyz, lightIndex));
+    float shadow = (1.0 - CubeShadowCalculation(WorldPos, light.position.xyz, lightIndex));
     // add to outgoing radiance Lo
     return (kD * albedo / PI + specular) * radiance * NdotL * shadow; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 
@@ -324,7 +368,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metal
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
-    float shadow = (1.0 - ShadowCalculation(WorldPos, light.position.xyz, lightIndex));
+    float shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
 
     // add to outgoing radiance Lo
     return (kD * albedo / PI + specular) * radiance * NdotL * shadow; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
@@ -351,17 +395,18 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    int lightIndex = 0;
+    int planeLightIndex = 0;
+    int cubeLightIndex = 0;
 
     for (int i = 0; i < dirLights.length(); ++i) {
-        Lo += CalcDirLight(dirLights[i], N, V, roughness, metallic, albedo, F0, lightIndex++);
+        Lo += CalcDirLight(dirLights[i], N, V, roughness, metallic, albedo, F0, planeLightIndex++);
     }
     for (int i = 0; i < pointLights.length(); ++i) {
-        Lo += CalcPointLight(pointLights[i], N, V, roughness, metallic, albedo, F0, lightIndex++);
+        Lo += CalcPointLight(pointLights[i], N, V, roughness, metallic, albedo, F0, cubeLightIndex++);
     }
     for (int i = 0; i < spotLights.length(); ++i) {
 
-        Lo += CalcSpotLight(spotLights[i], N, V, roughness, metallic, albedo, F0, lightIndex++);
+        Lo += CalcSpotLight(spotLights[i], N, V, roughness, metallic, albedo, F0, planeLightIndex++);
     }
 
     // ambient lighting (we now use IBL as the ambient term)

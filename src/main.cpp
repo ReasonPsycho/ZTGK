@@ -298,9 +298,9 @@ bool init() {
 void init_systems() {
     asteroidsSystem.Init();
     //lightSystem.AddDirLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0), glm::vec4(255, 255, 255, 0.5f));
+
     lightSystem.AddPointLight(glm::vec4(0, 0, 0, 0), 5.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
-    //lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f,
-    //                          glm::vec4(255, 255, 255, 1));
+    // lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
     lightSystem.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -381,7 +381,7 @@ void update() {
 void render() {
 
     lightSystem.GenerateShadows(render_scene_to_depth);
-    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
+    //lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
 
 

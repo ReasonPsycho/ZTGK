@@ -8,7 +8,7 @@
 
 #include "glm/vec4.hpp"
 #include "imgui.h"
-#include "../ILight.h"
+#include "ILight.h"
 #include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 #include "glm/gtx/quaternion.hpp"
 
@@ -26,11 +26,14 @@ struct SpotLightData {
     float pointlessfloat3;
 
     glm::vec4 color;
+    glm::mat4x4 lightSpaceMatrix;
 };
 
 class SpotLight : public ILight {
 public:
-    SpotLight(SpotLightData data) : data(data) {
+    SpotLight(Shader *shadowMapShader, SpotLightData data) : ILight(shadowMapShader), data(data) {
+        lightType = Spot;
+
         model = glm::mat4x4(1);
         model = glm::translate(model,
                                glm::vec3(data.position.x, data.position.y, data.position.z)); // Rotation around x-axis
@@ -39,6 +42,7 @@ public:
         model = glm::rotate(model, data.direction.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Rotation around z-axis    
 
     }
+
 
     SpotLightData data;
 
@@ -50,6 +54,8 @@ public:
             ImGui::InputFloat("Constant", &data.constant);
             ImGui::InputFloat("Linear", &data.linear);
             ImGui::InputFloat("Quadratic", &data.quadratic);
+            ImGui::InputFloat("Cut off", &data.cutOff);
+            ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
             EditLight(camera);
             ImGui::TreePop();
         }
@@ -74,6 +80,7 @@ public:
         ImGui::InputFloat3("Position", glm::value_ptr(data.position));
         ImGui::InputFloat3("Rotation", glm::value_ptr(data.direction));
 
+
         static bool useSnap(false);
         if (ImGui::IsKeyPressed(83))
             useSnap = !useSnap;
@@ -90,6 +97,10 @@ public:
         data.direction = glm::vec4(eulerAngles, 1);
         data.position = glm::vec4(glm::vec3(model[3]), 1);
     }
+
+    void InnitShadow() override;
+
+    void GenerateShadow(void (*funcPtr)()) override; // Pure virtual function
 };
 
 

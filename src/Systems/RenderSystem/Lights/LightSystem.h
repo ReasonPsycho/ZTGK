@@ -9,13 +9,12 @@
 #include <vector>
 #include <memory>
 #include "glm/vec4.hpp"
-#include "ILight.h"
+#include "Lights/ILight.h"
 #include "Lights/DirLight.h"
 #include "Lights/PointLight.h"
 #include "Lights/SpotLight.h"
 #include "Camera.h"
 #include "modelLoading/Texture.h"
-#include "Systems/RenderSystem/Lights/Shadows/Shadow.h"
 
 
 class LightSystem {
@@ -29,7 +28,7 @@ public:
 
     void PushToSSBO();
 
-    void GenerateShadowBuffers(Shader *shader);
+    void GenerateShadowBuffers();
     
     //Add light
     void AddDirLight(glm::vec4 direction, glm::vec4 color);
@@ -62,15 +61,17 @@ private:
     std::vector<PointLight> pointLights;
     std::vector<SpotLight> spotLights;
     std::vector<ILight *> lights;
-    std::vector<std::shared_ptr<Shadow>> shadows;
 
     //Camera
     Camera *camera;
 
     //Shaders
-    Shader simpleDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
+    Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
                                       "res/shaders/Shadows/point_shadows_depth.frag",
                                       "res/shaders/Shadows/point_shadows_depth.geom");
+
+    Shader planeDepthShader = Shader("res/shaders/Shadows/shadows_depth.vert",
+                                     "res/shaders/Shadows/shadows_depth.frag");
 };
 
 

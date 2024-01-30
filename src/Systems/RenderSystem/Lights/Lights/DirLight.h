@@ -8,23 +8,27 @@
 
 #include "glm/vec4.hpp"
 #include "imgui.h"
-#include "../ILight.h"
+#include "ILight.h"
 #include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 #include "glm/gtx/quaternion.hpp"
 
 struct DirLightData {
     glm::vec4 direction;
     glm::vec4 color;
+    glm::vec4 position; // yeah i know but we don't really use it until later
+    glm::mat4x4 lightSpaceMatrix;
 };
 
 class DirLight : public ILight {
 public:
-    DirLight(DirLightData data) : data(data) {
+    DirLight(Shader *shadowMapShader, DirLightData data) : ILight(shadowMapShader), data(data) {
+        lightType = Directional;
         model = glm::mat4x4(1);
         model = glm::rotate(model, data.direction.x, glm::vec3(1.0f, 0.0f, 0.0f)); // Rotation around x-axis
         model = glm::rotate(model, data.direction.y, glm::vec3(0.0f, 1.0f, 0.0f)); // Rotation around y-axis
         model = glm::rotate(model, data.direction.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Rotation around z-axis    
     }
+
 
     DirLightData data;
 
@@ -60,6 +64,11 @@ public:
         data.direction = glm::vec4(eulerAngles, 1);
     }
 
+
+    void InnitShadow() override;
+
+    void GenerateShadow(void (*funcPtr)()) override; // Pure virtual function
+    
 };
 
 #endif //OPENGLGP_DIRLIGHT_H
