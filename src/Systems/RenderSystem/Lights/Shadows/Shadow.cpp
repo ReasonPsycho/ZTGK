@@ -60,6 +60,8 @@ void Shadow::Generate(void (*funcPtr)()) {
                                 glm::value_ptr(shadowTransforms[i]));
     depthShader->setFloat("far_plane", far_plane);
     depthShader->setVec3("lightPos", lightPos);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     funcPtr();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

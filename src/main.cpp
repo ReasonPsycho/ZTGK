@@ -84,6 +84,8 @@ void render();
 
 void render_scene();
 
+void render_scene_to_depth();
+
 void imgui_begin();
 
 void imgui_render();
@@ -378,11 +380,15 @@ void update() {
 
 void render() {
 
-    lightSystem.GenerateShadows(render_scene);
-    
+    lightSystem.GenerateShadows(render_scene_to_depth);
+    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
+    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
+
+
     bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     file_logger->info("Cleared.");
 
     pbrSystem.PrebindPBR(&camera);
@@ -412,6 +418,20 @@ void render_scene() {
 
     // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
     asteroidsSystem.Draw();
+}
+
+
+void render_scene_to_depth() {
+    // draw our scene graph
+    // Entity *lastEntity = &ourEntity;
+    // while (lastEntity->children.size()) {
+    //     lastEntity->pModel->Draw(pbrSystem.pbrShader);
+    //     lastEntity = lastEntity->children.back().get();
+    // }
+    // file_logger->info("Rendered Entities.");
+
+    // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+    asteroidsSystem.DrawToDepthMap();
 }
 
 void imgui_begin() {
@@ -555,8 +575,6 @@ void init_camera() {
     glViewport(0, 0, display_w, display_h);
     lastX = display_w / 2.0f;
     lastY = display_h / 2.0f;
-
-
 }
 
 #pragma endregion Functions

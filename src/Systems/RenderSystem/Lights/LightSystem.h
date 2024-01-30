@@ -53,6 +53,8 @@ public:
     void showLightTree();
 
     void GenerateShadows(void (*funcPtr)());
+
+    void PushDepthMapsToShader(Shader *shader);
     
 private:
     //Vectors

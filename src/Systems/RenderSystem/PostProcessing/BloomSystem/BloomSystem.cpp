@@ -90,9 +90,9 @@ void BloomSystem::Render() {
 }
 
 void BloomSystem::SetUpBuffers(float SCR_WIDTH, float SCR_HEIGHT) {
-    if (initialized) {
-        DeleteGPUData();
-    }
+    // if (initialized) {
+    //     DeleteGPUData();
+    //  }
     // configure (floating point) framebuffers
     // ---------------------------------------
     glGenFramebuffers(1, &hdrFBO);

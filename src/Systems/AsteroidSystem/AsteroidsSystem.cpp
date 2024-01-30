@@ -42,6 +42,16 @@ void AsteroidsSystem::Draw() {
     }
 }
 
+
+void AsteroidsSystem::DrawToDepthMap() {
+    for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++) {
+        glBindVertexArray(asteroidModel.meshes[i].VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(asteroidModel.meshes[i].indices.size()),
+                                GL_UNSIGNED_INT, 0, asteroidsData.size());
+        glBindVertexArray(0);
+    }
+}
+
 void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
     planet = glm::mat4x4(1);

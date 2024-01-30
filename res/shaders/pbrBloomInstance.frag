@@ -21,6 +21,9 @@ uniform sampler2D brdfLUT;
 uniform vec3 camPos;
 uniform float far_plane;
 
+#define MAX_LIGHTS 30 // IDKKKK!!!!!
+
+uniform samplerCube shadowMaps[MAX_LIGHTS];
 
 struct DirLight {
     vec4 direction;
@@ -67,10 +70,9 @@ layout (std430, binding = 5) buffer SpotLightBuffer {
     SpotLight spotLights[];
 };
 
+uniform bool shadows;
 
-#define MAX_LIGHTS 30 // IDKKKK!!!!!
 
-uniform samplerCube depthMaps[MAX_LIGHTS];
 
 const float PI = 3.14159265359;
 
@@ -78,7 +80,6 @@ const float PI = 3.14159265359;
 // Shadows
 // array of offset direction for sampling
 
-uniform bool shadows;
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -128,7 +129,7 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(depthMaps[lightIndex], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        float closestDepth = texture(shadowMaps[lightIndex], fragToLight + gridSamplingDisk[i] * diskRadius).r;
         closestDepth *= far_plane;   // undo mapping [0;1]
         if (currentDepth - bias > closestDepth)
         shadow += 1.0;

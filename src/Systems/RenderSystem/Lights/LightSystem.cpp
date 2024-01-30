@@ -46,7 +46,7 @@ void LightSystem::PushToSSBO() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
     GenerateShadowBuffers(&simpleDepthShader);
-    
+
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
@@ -120,9 +120,23 @@ void LightSystem::GenerateShadows(void (*funcPtr)()) {
     for (auto &shadow: shadows) {
         shadow->Generate(funcPtr);
     }
+    glViewport(0, 0, camera->saved_display_w, camera->saved_display_h); // Needed after light generation
 }
 
 void LightSystem::Init() {
     simpleDepthShader.init();
     PushToSSBO();
+}
+
+int TEXTURE_UNITS_OFFSET = 8;
+
+void LightSystem::PushDepthMapsToShader(Shader *shader) {
+    for (int i = 0; i < shadows.size(); ++i) {
+        std::string number = std::to_string(i);
+        glActiveTexture(GL_TEXTURE0 + TEXTURE_UNITS_OFFSET +
+                        i); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
+        glBindTexture(GL_TEXTURE_CUBE_MAP, shadows[i].get()->depthCubemap);
+        glUniform1i(glGetUniformLocation(shader->ID, ("shadowMaps[" + number + "]").c_str()),
+                    TEXTURE_UNITS_OFFSET + i);
+    }
 }

@@ -56,6 +56,8 @@ public:
 
     void Draw();
 
+    void DrawToDepthMap();
+
     std::vector<AsteroidData> asteroidsData;
     std::vector<std::shared_ptr<Texture>> textures;
     Model asteroidModel = Model(&asteroidModelPath);

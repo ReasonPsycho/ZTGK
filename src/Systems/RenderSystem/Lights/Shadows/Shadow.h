@@ -24,10 +24,12 @@ public:
 
     ~Shadow();
 
+    unsigned int depthCubemap;
+
+    bool isPointLight;
 private:
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     unsigned int depthMapFBO;
-    unsigned int depthCubemap;
 
     float near_plane = 1.0f; //TODO add so it's actually matching how far light reaches
     float far_plane = 25.0f;
