@@ -39,7 +39,6 @@ void renderQuad() {
 
 
 void BloomSystem::Init(float SCR_WIDTH, float SCR_HEIGHT) {
-
     SetUpBuffers(SCR_WIDTH, SCR_HEIGHT);
     // shader configuration
     // --------------------
@@ -50,6 +49,7 @@ void BloomSystem::Init(float SCR_WIDTH, float SCR_HEIGHT) {
     shaderBloomFinal.use();
     shaderBloomFinal.setInt("scene", 0);
     shaderBloomFinal.setInt("bloomBlur", 1);
+    initialized = true;
 }
 
 void BloomSystem::BindBuffer() {
@@ -90,6 +90,9 @@ void BloomSystem::Render() {
 }
 
 void BloomSystem::SetUpBuffers(float SCR_WIDTH, float SCR_HEIGHT) {
+    if (initialized) {
+        DeleteGPUData();
+    }
     // configure (floating point) framebuffers
     // ---------------------------------------
     glGenFramebuffers(1, &hdrFBO);
@@ -143,10 +146,21 @@ void BloomSystem::SetUpBuffers(float SCR_WIDTH, float SCR_HEIGHT) {
 
 void BloomSystem::showImguiOptions() {
     ImGui::Begin("Bloom options");
-    if(ImGui::Button("Switch bloom")){
-        bloom =!bloom;
+    if (ImGui::Button("Switch bloom")) {
+        bloom = !bloom;
     }
     ImGui::End();
 
+}
+
+BloomSystem::~BloomSystem() {
+    DeleteGPUData();
+}
+
+void BloomSystem::DeleteGPUData() {
+    glDeleteFramebuffers(1, &hdrFBO);
+    glDeleteFramebuffers(2, pingpongFBO);
+    glDeleteTextures(2, colorBuffers);
+    glDeleteTextures(2, pingpongColorbuffers);
 }
 

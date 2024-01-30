@@ -8,10 +8,9 @@ void Shader::init() {
     std::ifstream vShaderFile;
     std::ifstream fShaderFile;
     // ensure ifstream objects can throw exceptions:
-    vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    try
-    {
+    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
         // open files
         vShaderFile.open(vertexPath);
         fShaderFile.open(fragmentPath);
@@ -23,15 +22,14 @@ void Shader::init() {
         vShaderFile.close();
         fShaderFile.close();
         // convert stream into string
-        vertexCode   = vShaderStream.str();
+        vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
     }
-    catch (std::ifstream::failure& e)
-    {
-        spdlog::error("FILE_NOT_SUCCESSFULLY_READ:" ,e.what());
+    catch (std::ifstream::failure &e) {
+        spdlog::error("FILE_NOT_SUCCESSFULLY_READ:", e.what());
     }
-    const char* vShaderCode = vertexCode.c_str();
-    const char * fShaderCode = fragmentCode.c_str();
+    const char *vShaderCode = vertexCode.c_str();
+    const char *fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
     unsigned int vertex, fragment;
     // vertex shader
@@ -62,25 +60,29 @@ void Shader::use() const {
 void Shader::setBool(const std::string &name, bool value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
+
 void Shader::setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
+
 void Shader::setFloat(const std::string &name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
+
 void Shader::setGLuint(const std::string &name, GLuint value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
-void Shader::setMatrix4(const std::string &name,bool transpose, const GLfloat *value) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()),1, transpose, value);
+
+void Shader::setMatrix4(const std::string &name, bool transpose, const GLfloat *value) const {
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, transpose, value);
 }
 
 void Shader::setVec3(const std::string &name, float d, float d1, float d2) {
-    glUniform3f(glGetUniformLocation(ID, name.c_str()),d, d1, d2);
+    glUniform3f(glGetUniformLocation(ID, name.c_str()), d, d1, d2);
 }
 
 void Shader::setVec3(const std::string &name, glm::vec3 vec3) {
-    glUniform3f(glGetUniformLocation(ID, name.c_str()),vec3.x, vec3.y, vec3.z);
+    glUniform3f(glGetUniformLocation(ID, name.c_str()), vec3.x, vec3.y, vec3.z);
 
 }
 
@@ -89,22 +91,18 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     std::string stringFragmentPath = fragmentPath;
     std::string stringVertexPath = vertexPath;
     char infoLog[1024];
-    if (type != "PROGRAM")
-    {
+    if (type != "PROGRAM") {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
+        if (!success) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "Shader in path: " + stringFragmentPath + " has compilation error of type: " + type + infoLog);
+            spdlog::error(
+                    "Shader in path: " + stringFragmentPath + " has compilation error of type: " + type + infoLog);
         }
-    }
-    else
-    {
+    } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success)
-        {
+        if (!success) {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error( "Shader in path: " + stringVertexPath + " has compilation error of type: " + type + infoLog);
+            spdlog::error("Shader in path: " + stringVertexPath + " has compilation error of type: " + type + infoLog);
         }
     }
 }

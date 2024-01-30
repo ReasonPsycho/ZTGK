@@ -46,23 +46,32 @@ public:
     float maxScale = 0.5f;
     float minScale = 2.0f;
     glm::mat4x4 planet;
-    
-    
-    AsteroidsSystem(int size,Shader* asteroidShader);
+
+
+    AsteroidsSystem(int size, Shader *asteroidShader);
+
     void Init();
+
     void Update(float deltaTime);
+
     void Draw();
-    
+
     std::vector<AsteroidData> asteroidsData;
     std::vector<std::shared_ptr<Texture>> textures;
     Model asteroidModel = Model(&asteroidModelPath);
-    Shader* asteroidShader;
-    ComputeShader cumputeShaderMovment = ComputeShader("res/shaders/AsteroidSystem/ComputeShaders/asteroidMovment.glsl");
-    ComputeShader cumputeShaderGridCreation = ComputeShader("res/shaders/AsteroidSystem/ComputeShaders/asteroidGridCreation.glsl");
-    ComputeShader cumputeShaderGridSort = ComputeShader("res/shaders/AsteroidSystem/ComputeShaders/asteroidGridSort.glsl");
-    ComputeShader cumputeShaderGridCalculateOffset = ComputeShader("res/shaders/AsteroidSystem/ComputeShaders/asteroidGridCalculateOffset.glsl");
-    ComputeShader cumputeShaderCollide = ComputeShader("res/shaders/AsteroidSystem/ComputeShaders/asteroidCollision.glsl");
-    ComputeShader cumputeShaderSeperation = ComputeShader("res/shaders/AsteroidSystem/ComputeShaders/asteroidSeperation.glsl");
+    Shader *asteroidShader;
+    ComputeShader cumputeShaderMovment = ComputeShader(
+            "res/shaders/AsteroidSystem/ComputeShaders/asteroidMovment.glsl");
+    ComputeShader cumputeShaderGridCreation = ComputeShader(
+            "res/shaders/AsteroidSystem/ComputeShaders/asteroidGridCreation.glsl");
+    ComputeShader cumputeShaderGridSort = ComputeShader(
+            "res/shaders/AsteroidSystem/ComputeShaders/asteroidGridSort.glsl");
+    ComputeShader cumputeShaderGridCalculateOffset = ComputeShader(
+            "res/shaders/AsteroidSystem/ComputeShaders/asteroidGridCalculateOffset.glsl");
+    ComputeShader cumputeShaderCollide = ComputeShader(
+            "res/shaders/AsteroidSystem/ComputeShaders/asteroidCollision.glsl");
+    ComputeShader cumputeShaderSeperation = ComputeShader(
+            "res/shaders/AsteroidSystem/ComputeShaders/asteroidSeperation.glsl");
 private:
     int size;
 };

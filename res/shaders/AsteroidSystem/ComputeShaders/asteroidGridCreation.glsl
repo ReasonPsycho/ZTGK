@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 struct AsteroidData
 {
@@ -37,7 +37,7 @@ uvec3 PositionToCellCoord(vec3 position, float radius) {
     return ivec3(floor(position / radius));
 }
 
-uint HashCell(uvec3 cellCord){
+uint HashCell(uvec3 cellCord) {
     uint a = uint(cellCord.x * 15823);
     uint c = uint(cellCord.y * 9737333);
     uint b = uint(cellCord.z * 440817757);
@@ -49,5 +49,5 @@ uniform float gridRadius;
 void main() {
     uint index = gl_WorkGroupID .x;
     cellData[index].key = int(index);
-    cellData[index].cellHash = int(HashCell(PositionToCellCoord(asteroidsData[index].position.xyz,gridRadius)));
+    cellData[index].cellHash = int(HashCell(PositionToCellCoord(asteroidsData[index].position.xyz, gridRadius)));
 }

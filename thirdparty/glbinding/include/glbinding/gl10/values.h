@@ -6,11 +6,7 @@
 #include <glbinding/gl/values.h>
 
 
-namespace gl10
-{
-
-
-
+namespace gl10 {
 
 
 } // namespace gl10

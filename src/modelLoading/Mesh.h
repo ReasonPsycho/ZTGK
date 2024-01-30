@@ -39,19 +39,21 @@ struct Vertex {
 class Mesh {
 public:
     // mesh Data
-    vector<Vertex>       vertices;
+    vector<Vertex> vertices;
     vector<unsigned int> indices;
-    vector<shared_ptr<Texture>>      textures;
+    vector<shared_ptr<Texture>> textures;
     unsigned int VAO;
 
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<shared_ptr<Texture>> textures);
+
     void setupMesh();
+
     void Draw(Shader &shader);
+
 private:
     // render data 
     unsigned int VBO, EBO;
 };
-
 
 
 #endif //OPENGLGP_MESH_H

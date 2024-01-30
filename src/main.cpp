@@ -293,13 +293,13 @@ bool init() {
 
 void init_systems() {
     asteroidsSystem.Init();
-    lightSystem.AddDirLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0), glm::vec4(255, 255, 255, 0.5f));
-    lightSystem.AddPointLight(glm::vec4(0, 0, 0, 0), 1.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
-    lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f,
-                             glm::vec4(255, 255, 255, 1));
+    //lightSystem.AddDirLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0), glm::vec4(255, 255, 255, 0.5f));
+    lightSystem.AddPointLight(glm::vec4(0, 0, 0, 0), 5.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
+    //lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f,
+    //                          glm::vec4(255, 255, 255, 1));
     lightSystem.PushToSSBO();
     pbrSystem.Init();
-    bloomSystem.Init(camera.saved_display_w,camera.saved_display_h);
+    bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
 }
 
 void load_enteties() {
@@ -350,18 +350,18 @@ void before_frame() {
 
 void input() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetCursorPosCallback(window, mouse_callback);
-    
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
+
     glfwSetScrollCallback(window, scroll_callback);
-    
+
     processInput(window);
 }
 
 void update() {
 
     deltaTime *= (float) timeStep;
-    if(timeStep != 0){
+    if (timeStep != 0) {
         // Entity *lastEntity = &ourEntity;
         //  while (lastEntity->children.size()) {
         //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
@@ -375,12 +375,13 @@ void update() {
 }
 
 void render() {
-    
+
     bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     file_logger->info("Cleared.");
-    
+
+
     pbrSystem.PrebindPBR(&camera);
     pbrSystem.RenderBackground();
     file_logger->info("Set up PBR.");
@@ -397,7 +398,7 @@ void render() {
     // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
     asteroidsSystem.Draw();
     file_logger->info("Rendered AsteroidsSystem.");
-    
+
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
@@ -405,14 +406,14 @@ void render() {
 
 void imgui_begin() {
     // Start the Dear ImGui frame
-    if(!captureMouse){
+    if (!captureMouse) {
         ImGuiIO &io = ImGui::GetIO();
         io.MouseDrawCursor = true;
     } else {
         ImGuiIO &io = ImGui::GetIO();
         io.MouseDrawCursor = false;
     };
-    
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -421,16 +422,16 @@ void imgui_begin() {
 
 void imgui_render() {
     ImGui::Begin("Debug menu");
-     char buffer[64];
-     snprintf(buffer, sizeof buffer, "%f", 1 / deltaTime);
-     ImGui::Text(buffer);
+    char buffer[64];
+    snprintf(buffer, sizeof buffer, "%f", 1 / deltaTime);
+    ImGui::Text(buffer);
 
     lightSystem.showLightTree();
     ImGui::End();
 
 
     bloomSystem.showImguiOptions();
-    
+
 }
 
 void imgui_end() {
@@ -457,9 +458,8 @@ void processInput(GLFWwindow *window) {
         camera.ProcessKeyboard(DOWNWARD, deltaTime);
 
 
-
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
-        if(!captureMouseButtonPressed){
+        if (!captureMouseButtonPressed) {
             captureMouse = !captureMouse;
         }
         captureMouseButtonPressed = true;
@@ -469,8 +469,8 @@ void processInput(GLFWwindow *window) {
         captureMouseButtonPressed = false;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-        if (!timeStepKeyPressed){
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if (!timeStepKeyPressed) {
             if (timeStep == 0) {
                 timeStep = 1;
             } else {
@@ -480,7 +480,7 @@ void processInput(GLFWwindow *window) {
         timeStepKeyPressed = true;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE){
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         timeStepKeyPressed = false;
     }
 
@@ -494,7 +494,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     display_h = height;
     display_w = width;
-    bloomSystem.SetUpBuffers(width,height);
+    bloomSystem.SetUpBuffers(width, height);
 }
 
 
@@ -510,16 +510,16 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     lastX = xpos;
     lastY = ypos;
 
-    if(captureMouse){
+    if (captureMouse) {
         if (timeStep != 0) {
             camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
         } else {
             camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
         }
     }
- 
-    
-    ImGuiIO& io = ImGui::GetIO();
+
+
+    ImGuiIO &io = ImGui::GetIO();
     io.MousePos = ImVec2(xpos, ypos);
 }
 
@@ -545,7 +545,7 @@ void init_camera() {
     lastX = display_w / 2.0f;
     lastY = display_h / 2.0f;
 
-  
+
 }
 
 #pragma endregion Functions

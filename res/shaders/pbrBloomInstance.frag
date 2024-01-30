@@ -1,5 +1,5 @@
 #version 460
-layout (location = 0)  out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
 in vec2 TexCoords;
 in vec3 WorldPos;
@@ -79,14 +79,14 @@ uniform bool shadows;
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
-    vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1),
-    vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
-    vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
-    vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
-    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+    vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+    vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+    vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+    vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+    vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 );
 
-float ShadowCalculation(vec3 fragPos,vec3 lightPos)
+float ShadowCalculation(vec3 fragPos, vec3 lightPos)
 {
     // get vector between fragment position and light position
     vec3 fragToLight = fragPos - lightPos;
@@ -123,11 +123,11 @@ float ShadowCalculation(vec3 fragPos,vec3 lightPos)
     int samples = 20;
     float viewDistance = length(camPos - fragPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
-    for(int i = 0; i < samples; ++i)
+    for (int i = 0; i < samples; ++i)
     {
         float closestDepth = texture(depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
         closestDepth *= far_plane;   // undo mapping [0;1]
-        if(currentDepth - bias > closestDepth)
+        if (currentDepth - bias > closestDepth)
         shadow += 1.0;
     }
     shadow /= float(samples);
@@ -374,23 +374,23 @@ void main()
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao;
-    
+
     vec3 color = ambient + Lo;
 
-    
+
     float brightness = dot(color, vec3(0.5, 0.5, 0.5));
-    if (brightness > 1.0){
+    if (brightness > 1.0) {
         BrightColor = vec4(color, 1.0);
     }
-    else{
+    else {
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
 
 
     // HDR tonemapping
-   // color = color / (color + vec3(1.0)); //Todo exposure
+    // color = color / (color + vec3(1.0)); //Todo exposure
     // gamma correct
-   // color = pow(color, vec3(1.0 / 2.2));  // Todo gamma
+    // color = pow(color, vec3(1.0 / 2.2));  // Todo gamma
 
     FragColor = vec4(color, 1.0);
 }

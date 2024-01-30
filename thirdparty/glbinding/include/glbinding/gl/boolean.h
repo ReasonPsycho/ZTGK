@@ -8,23 +8,23 @@
 #include <glbinding/nogl.h>
 
 
-namespace gl
-{
+namespace gl {
 
 
-using GLboolean = glbinding::Boolean8;
+    using GLboolean = glbinding::Boolean8;
 
 
 } // namespace gl
 
 
-namespace gl
-{
+namespace gl {
 
 // import booleans to namespace
 
-GLBINDING_CONSTEXPR static const GLboolean GL_FALSE = GLboolean(0);
-GLBINDING_CONSTEXPR static const GLboolean GL_TRUE = GLboolean(1);
+    GLBINDING_CONSTEXPR static const GLboolean
+    GL_FALSE = GLboolean(0);
+    GLBINDING_CONSTEXPR static const GLboolean
+    GL_TRUE = GLboolean(1);
 
 
 } // namespace gl

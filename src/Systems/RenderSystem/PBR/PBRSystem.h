@@ -21,9 +21,11 @@ public:
     PBRSystem(Camera *camera);
 
     void Init();
+
     void RenderBackground();
-    void PrebindPBR(Camera* camera);
-    
+
+    void PrebindPBR(Camera *camera);
+
     Shader pbrInstanceShader = Shader("res/shaders/pbrBloomInstance.vert", "res/shaders/pbrBloomInstance.frag");
     Shader pbrShader = Shader("res/shaders/pbr.vert", "res/shaders/pbr.frag");
     Shader equirectangularToCubemapShader = Shader("res/shaders/cubemap.vert",
@@ -48,8 +50,8 @@ private:
 
     unsigned int quadVAO = 0;
     unsigned int quadVBO;
-    
-    Camera * camera;
+
+    Camera *camera;
     unsigned int envCubemap;
     unsigned int irradianceMap;
     unsigned int prefilterMap;

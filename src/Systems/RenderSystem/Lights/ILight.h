@@ -9,15 +9,15 @@
 
 class ILight {
 public:
-    ILight(){
+    ILight() {
         uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
     }
 
     glm::mat4x4 model;
 
-    virtual void showImGuiDetails(Camera* camera) = 0; // Pure virtual function
-    virtual void EditLight(Camera* camera) = 0;
-    
+    virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
+    virtual void EditLight(Camera *camera) = 0;
+
 private:
     static int nextID; // Static variable to keep track of the next available ID
 protected:

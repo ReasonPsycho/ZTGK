@@ -10,20 +10,30 @@
 #include "Camera.h"
 
 class BloomSystem {
-    
-
- 
 public:
-    void Init(float  SCR_WIDTH, float SCR_HEIGHT);
+    ~BloomSystem();
+
+
+    void Init(float SCR_WIDTH, float SCR_HEIGHT);
+
     void BindBuffer();
-    void SetUpBuffers(float  SCR_WIDTH, float SCR_HEIGHT);
+
+    void SetUpBuffers(float SCR_WIDTH, float SCR_HEIGHT);
+
     void BlurBuffer();
+
     void Render();
+
     void showImguiOptions();
 
-    Shader shaderBlur= Shader("res/shaders/BloomSystem/Shaders/blur.vert", "res/shaders/BloomSystem/Shaders/blur.frag");
-    Shader shaderBloomFinal= Shader("res/shaders/BloomSystem/Shaders/bloom_final.vert", "res/shaders/BloomSystem/Shaders/bloom_final.frag");
+    Shader shaderBlur = Shader("res/shaders/BloomSystem/Shaders/blur.vert",
+                               "res/shaders/BloomSystem/Shaders/blur.frag");
+    Shader shaderBloomFinal = Shader("res/shaders/BloomSystem/Shaders/bloom_final.vert",
+                                     "res/shaders/BloomSystem/Shaders/bloom_final.frag");
 private:
+    void DeleteGPUData();
+    
+    bool initialized = false;
     unsigned int hdrFBO;
     unsigned int colorBuffers[2];
     unsigned int pingpongFBO[2];

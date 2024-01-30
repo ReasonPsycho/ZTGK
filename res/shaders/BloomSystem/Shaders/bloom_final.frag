@@ -13,12 +13,12 @@ void main()
     const float gamma = 2.2;
     vec3 hdrColor = texture(scene, TexCoords).rgb;
     vec3 bloomColor = texture(bloomBlur, TexCoords).rgb;
-    if(bloom){
+    if (bloom) {
         hdrColor += bloomColor; // additive blending
     }
 
     //hdrColor = hdrColor / (hdrColor + vec3(1.0));
     //hdrColor = pow(hdrColor, vec3(1.0/2.2));
-    
+
     FragColor = vec4(hdrColor, 1.0);
 }

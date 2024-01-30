@@ -8,13 +8,14 @@
 #include <glbinding/gl/types.h>
 
 
-namespace gl
-{
+namespace gl {
 
 
-GLBINDING_CONSTEXPR static const GLuint GL_INVALID_INDEX = 0xFFFFFFFF;
+    GLBINDING_CONSTEXPR static const GLuint
+    GL_INVALID_INDEX = 0xFFFFFFFF;
 
-GLBINDING_CONSTEXPR static const GLuint64 GL_TIMEOUT_IGNORED = 0xFFFFFFFFFFFFFFFF;
+    GLBINDING_CONSTEXPR static const GLuint64
+    GL_TIMEOUT_IGNORED = 0xFFFFFFFFFFFFFFFF;
 
 
 } // namespace gl

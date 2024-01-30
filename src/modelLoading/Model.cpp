@@ -22,7 +22,7 @@ void Model::loadModel() {
     // check for errors
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
     {
-        spdlog::error( "Assimp error: " + string(importer.GetErrorString()));
+        spdlog::error("Assimp error: " + string(importer.GetErrorString()));
         return;
     }
     // retrieve the directory path of the filepath
@@ -63,17 +63,17 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
         vertex.Position = vector;
-        
-        if(vector.x > glm::abs(futhestLenghtsFromCenter.x)){
-            futhestLenghtsFromCenter.x =  glm::abs(vector.x);
+
+        if (vector.x > glm::abs(futhestLenghtsFromCenter.x)) {
+            futhestLenghtsFromCenter.x = glm::abs(vector.x);
         }
-        
-        if(vector.y >  glm::abs(futhestLenghtsFromCenter.y)){
-            futhestLenghtsFromCenter.y =  glm::abs(vector.y);
+
+        if (vector.y > glm::abs(futhestLenghtsFromCenter.y)) {
+            futhestLenghtsFromCenter.y = glm::abs(vector.y);
         }
-        
-        if(vector.z >  glm::abs(futhestLenghtsFromCenter.z)){
-            futhestLenghtsFromCenter.z =  glm::abs(vector.z);
+
+        if (vector.z > glm::abs(futhestLenghtsFromCenter.z)) {
+            futhestLenghtsFromCenter.z = glm::abs(vector.z);
         }
         // normals
         if (mesh->HasNormals()) {
@@ -126,7 +126,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     vector<shared_ptr<Texture>> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     // 2. specular maps
-    vector<shared_ptr<Texture>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    vector<shared_ptr<Texture>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
+                                                                    "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps
     vector<shared_ptr<Texture>> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
@@ -141,11 +142,11 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
 // the required info is returned as a Texture struct.
-vector<  std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
-    vector<  std::shared_ptr<Texture>> textures;
+vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
+    vector<std::shared_ptr<Texture>> textures;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
-        
+
         mat->GetTexture(type, i, &str);
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
         bool skip = false;
@@ -157,9 +158,11 @@ vector<  std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, 
             }
         }
         if (!skip) {   // if texture hasn't been loaded already, load it
-            shared_ptr<Texture> texture = std::make_shared<Texture>(str.C_Str(),directory, typeName); // CHECK wouldn't that deconstruct that??
+            shared_ptr<Texture> texture = std::make_shared<Texture>(str.C_Str(), directory,
+                                                                    typeName); // CHECK wouldn't that deconstruct that??
             textures.push_back(texture);
-            textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
+            textures_loaded.push_back(
+                    texture);  // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
         }
     }
     return textures;

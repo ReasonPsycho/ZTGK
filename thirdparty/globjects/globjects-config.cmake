@@ -7,23 +7,23 @@
 
 # List of modules
 set(MODULE_NAMES
-    globjects
+        globjects
 )
 
 
 # Macro to search for a specific module
 macro(find_module FILENAME)
-    if(EXISTS "${FILENAME}")
+    if (EXISTS "${FILENAME}")
         set(MODULE_FOUND TRUE)
         include("${FILENAME}")
-    endif()
+    endif ()
 endmacro()
 
 # Macro to search for all modules
 macro(find_modules PREFIX)
-    foreach(module_name ${MODULE_NAMES})
+    foreach (module_name ${MODULE_NAMES})
         find_module("${CMAKE_CURRENT_LIST_DIR}/${PREFIX}/${module_name}/${module_name}-export.cmake")
-    endforeach(module_name)
+    endforeach (module_name)
 endmacro()
 
 
@@ -31,15 +31,15 @@ endmacro()
 set(MODULE_FOUND FALSE)
 find_modules("cmake")
 
-if(MODULE_FOUND)
+if (MODULE_FOUND)
     return()
-endif()
+endif ()
 
 # Try common build locations
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     find_modules("build-debug/cmake")
     find_modules("build/cmake")
-else()
+else ()
     find_modules("build/cmake")
     find_modules("build-debug/cmake")
-endif()
+endif ()

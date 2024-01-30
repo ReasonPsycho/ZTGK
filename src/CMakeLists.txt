@@ -51,6 +51,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         ${CMAKE_SOURCE_DIR}/res
         ${CMAKE_CURRENT_BINARY_DIR}/res)
 
-if(MSVC)
+if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)
-endif()
+endif ()

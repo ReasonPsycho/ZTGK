@@ -26,21 +26,26 @@ using namespace std;
 class Model {
 public:
     // model data 
-    vector<  std::shared_ptr<Texture>> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-    vector<Mesh>    meshes;
+    vector<std::shared_ptr<Texture>> textures_loaded;    // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
 
-    Model(string const *path, bool gamma = false) :path(path), gammaCorrection(gamma) {};
+    Model(string const *path, bool gamma = false) : path(path), gammaCorrection(gamma) {};
+
     void Draw(Shader &shader);
+
     void loadModel();
 
     glm::vec3 futhestLenghtsFromCenter;
 private:
     string const *path;
+
     void processNode(aiNode *node, const aiScene *scene);
+
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-    vector<  std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
+
+    vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
 };
 
 

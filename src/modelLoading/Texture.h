@@ -11,16 +11,18 @@
 
 using namespace std;
 
-class Texture{
+class Texture {
 public:
-    Texture(string name , string directory,string type) ;
+    Texture(string name, string directory, string type);
+
     ~Texture();
+
     // the texture ID
     GLuint ID{}; // TODO add more than one texture on top of it
     string type;
     string name;
     string directory;
-    
+
     // constructor reads and builds the texture
     void use(GLenum GL_TEXTUREX);
 };

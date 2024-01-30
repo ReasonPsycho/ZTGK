@@ -1,5 +1,5 @@
 #version 140
-#extension GL_ARB_explicit_attrib_location : require
+#extension GL_ARB_explicit_attrib_location: require
 
 uniform mat4 modelView;
 uniform mat4 projection;
@@ -14,16 +14,16 @@ out vec4 color;
 
 float getTheta(in vec2 position)
 {
-	if (position.x == 0.0)
-	{
-		return position.y > 0.0 ? PI / 2.0 : (position.y < 0.0 ? -PI / 2.0 : 0.0);
-	}
-	
-	return atan(position.y, position.x);
+    if (position.x == 0.0)
+    {
+        return position.y > 0.0 ? PI / 2.0 : (position.y < 0.0 ? -PI / 2.0 : 0.0);
+    }
+
+    return atan(position.y, position.x);
 }
 
 void main()
 {
-	gl_Position = projection * modelView * in_position;
-	color = in_color;
+    gl_Position = projection * modelView * in_position;
+    color = in_color;
 }

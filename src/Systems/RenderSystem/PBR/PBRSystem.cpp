@@ -6,7 +6,7 @@
 
 #include "PBRSystem.h"
 
-PBRSystem::PBRSystem(Camera *camera):camera(camera) {
+PBRSystem::PBRSystem(Camera *camera) : camera(camera) {
 
 }
 
@@ -22,8 +22,7 @@ void PBRSystem::Init() {
     pbrShader.setInt("metallicMap", 5);
     pbrShader.setInt("roughnessMap", 6);
     pbrShader.setInt("aoMap", 7);
-    
-    
+
     pbrInstanceShader.init();
     pbrInstanceShader.use();
     pbrInstanceShader.setInt("irradianceMap", 0);
@@ -35,7 +34,6 @@ void PBRSystem::Init() {
     pbrInstanceShader.setInt("roughnessMap", 6);
     pbrInstanceShader.setInt("aoMap", 7);
 
-    
     backgroundShader.init();
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
@@ -111,7 +109,7 @@ void PBRSystem::Init() {
     glViewport(0, 0, 512, 512); // don't forget to configure the viewport to the capture dimensions.
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i) {
-        equirectangularToCubemapShader.setMatrix4("view",false, glm::value_ptr(captureViews[i]));
+        equirectangularToCubemapShader.setMatrix4("view", false, glm::value_ptr(captureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -145,7 +143,7 @@ void PBRSystem::Init() {
     irradianceShader.init();
     irradianceShader.use();
     irradianceShader.setInt("environmentMap", 0);
-    irradianceShader.setMatrix4("projection",false, glm::value_ptr(captureProjection));
+    irradianceShader.setMatrix4("projection", false, glm::value_ptr(captureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -236,9 +234,9 @@ void PBRSystem::Init() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    camera->UpdateShader(&pbrInstanceShader,1920,1080); // I don't care just hardcode it
-    camera->UpdateShader(&backgroundShader,1920,1080); // I don't care just hardcode it
-    camera->UpdateShader(&pbrShader,1920,1080); // I don't care just hardcode it
+    camera->UpdateShader(&pbrInstanceShader, 1920, 1080); // I don't care just hardcode it
+    camera->UpdateShader(&backgroundShader, 1920, 1080); // I don't care just hardcode it
+    camera->UpdateShader(&pbrShader, 1920, 1080); // I don't care just hardcode it
 }
 
 void PBRSystem::renderCube() {
@@ -308,17 +306,15 @@ void PBRSystem::renderCube() {
     glBindVertexArray(cubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-
 }
 
 void PBRSystem::renderQuad() {
-    if (quadVAO == 0)
-    {
+    if (quadVAO == 0) {
         float quadVertices[] = {
                 // positions        // texture Coords
-                -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+                -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
                 -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
                 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
         // setup plane VAO
@@ -328,9 +324,9 @@ void PBRSystem::renderQuad() {
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
     }
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -346,7 +342,7 @@ void PBRSystem::RenderBackground() {
     renderCube();
 }
 
-void PBRSystem::PrebindPBR(Camera* camera) {
+void PBRSystem::PrebindPBR(Camera *camera) {
     pbrInstanceShader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
@@ -365,7 +361,7 @@ void PBRSystem::PrebindPBR(Camera* camera) {
 
     glm::mat4 projection = camera->GetProjectionMatrix();
     glm::mat4 view = camera->GetViewMatrix();
-    glm::vec3 cameraPos= camera->Position;
+    glm::vec3 cameraPos = camera->Position;
     float far_plane = camera->farClip;
 
     pbrInstanceShader.use();
@@ -379,7 +375,7 @@ void PBRSystem::PrebindPBR(Camera* camera) {
     pbrShader.setMatrix4("view", false, glm::value_ptr(view));
     pbrShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     pbrShader.setFloat("far_plane", far_plane);
-    
+
     backgroundShader.use();
     backgroundShader.setMatrix4("projection", false, glm::value_ptr(projection));
     backgroundShader.setMatrix4("view", false, glm::value_ptr(view));

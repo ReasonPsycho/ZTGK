@@ -13,7 +13,7 @@
 #include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 
 struct PointLightData {
-    glm::vec4  position;
+    glm::vec4 position;
 
     float constant;
     float linear;
@@ -25,18 +25,21 @@ struct PointLightData {
 
 class PointLight : public ILight {
 public:
-    PointLight(PointLightData data) : data(data){
+    PointLight(PointLightData data) : data(data) {
         model = glm::mat4x4(1);
-        model = glm::translate(model, glm::vec3(data.position.x,data.position.y,data.position.z)); // Rotation around x-axis
+        model = glm::translate(model,
+                               glm::vec3(data.position.x, data.position.y, data.position.z)); // Rotation around x-axis
     }
+
     PointLightData data;
-    void showImGuiDetails(Camera* camera) override {
+
+    void showImGuiDetails(Camera *camera) override {
         ImGui::PushID(uniqueID);
 
         if (ImGui::TreeNode("Point light")) {
-            ImGui::InputFloat4("Color",glm::value_ptr(data.color));
+            ImGui::InputFloat4("Color", glm::value_ptr(data.color));
             ImGui::InputFloat("Constant", &data.constant);
-            ImGui::InputFloat( "Linear", &data.linear);
+            ImGui::InputFloat("Linear", &data.linear);
             ImGui::InputFloat("Quadratic", &data.quadratic);
             EditLight(camera);
             // Display other light properties...
@@ -46,7 +49,7 @@ public:
 
     }
 
-    void EditLight(Camera* camera) override {
+    void EditLight(Camera *camera) override {
         static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
         static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 
@@ -56,7 +59,7 @@ public:
         ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix()),
                              mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(model),
                              nullptr, nullptr);
-        data.position = glm::vec4(glm::vec3(model[3]),1);
+        data.position = glm::vec4(glm::vec3(model[3]), 1);
     }
 };
 

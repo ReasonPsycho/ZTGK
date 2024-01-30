@@ -1,25 +1,23 @@
 #include "Texture.h"
 
 
-
 void Texture::use(GLenum GL_TEXTUREX) {
     glActiveTexture(GL_TEXTUREX);
     glBindTexture(GL_TEXTURE_2D, ID);
 }
 
-Texture::~Texture() { 
-    glDeleteTextures(1,&ID); 
+Texture::~Texture() {
+    glDeleteTextures(1, &ID);
 }
 
-Texture::Texture(string name , string directory,string type) :name(name),directory(directory), type(type){ 
+Texture::Texture(string name, string directory, string type) : name(name), directory(directory), type(type) {
     glGenTextures(1, &ID);
     // set the texture wrapping/filtering options (on the currently bound texture object) //TODO this prob should be in class inputs
     // load and generate the texture
-    string path =  directory + "/" + name;
+    string path = directory + "/" + name;
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
+    if (data) {
         GLenum format;
         if (nrChannels == 1) //nifty 
             format = GL_RED;
@@ -38,10 +36,8 @@ Texture::Texture(string name , string directory,string type) :name(name),directo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
-    }
-    else
-    {
-        spdlog::error( "Failed to load texture"  + name);
+    } else {
+        spdlog::error("Failed to load texture" + name);
     }
 }
 

@@ -2,17 +2,18 @@
 // Created by redkc on 30/01/2024.
 //
 
-#include "ShadowSystem.h"
+#include "Shadow.h"
 #include "glad/glad.h"
 
-void ShadowSystem::Init(float SHADOW_WIDTH, float SHADOW_HEIGHT) {
+void Shadow::Init() {
+
     glGenFramebuffers(1, &depthMapFBO);
     // create depth cubemap texture
-    unsigned int depthCubemap;
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     for (unsigned int i = 0; i < 6; ++i)
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0,
+                     GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -24,4 +25,9 @@ void ShadowSystem::Init(float SHADOW_WIDTH, float SHADOW_HEIGHT) {
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+Shadow::~Shadow() {
+    glDeleteTextures(1, &depthCubemap);
+    glDeleteFramebuffers(1, &depthMapFBO);
 }

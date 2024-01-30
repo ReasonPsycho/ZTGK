@@ -5,9 +5,9 @@
 #include "Camera.h"
 
 
-
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch,float nearClip, float farClip) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM),nearClip(nearClip),farClip(farClip)
-{
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float nearClip, float farClip) : Front(
+        glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM), nearClip(
+        nearClip), farClip(farClip) {
     Position = position;
     WorldUp = up;
     Yaw = yaw;
@@ -15,8 +15,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch,float ne
     updateCameraVectors();
 }
 
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-{
+Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(
+        glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM) {
     Position = glm::vec3(posX, posY, posZ);
     WorldUp = glm::vec3(upX, upY, upZ);
     Yaw = yaw;
@@ -48,12 +48,11 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPi
     xoffset *= MouseSensitivity * deltaTime;
     yoffset *= MouseSensitivity * deltaTime;
 
-    Yaw   += xoffset;
+    Yaw += xoffset;
     Pitch += yoffset;
 
     // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (constrainPitch)
-    {
+    if (constrainPitch) {
         if (Pitch > 89.0f)
             Pitch = 89.0f;
         if (Pitch < -89.0f)
@@ -65,7 +64,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPi
 }
 
 void Camera::ProcessMouseScroll(float yoffset, float deltaTime) {
-    Zoom -= (float)yoffset * deltaTime;
+    Zoom -= (float) yoffset * deltaTime;
     if (Zoom < 1.0f)
         Zoom = 1.0f;
     if (Zoom > 45.0f)
@@ -80,11 +79,12 @@ void Camera::updateCameraVectors() {
     front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     Front = glm::normalize(front);
     // also re-calculate the Right and Up vector
-    Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    Up    = glm::normalize(glm::cross(Right, Front));
+    Right = glm::normalize(glm::cross(Front,
+                                      WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    Up = glm::normalize(glm::cross(Right, Front));
 }
 
-void Camera::UpdateShader(Shader* shader,int display_w,int display_h) {
+void Camera::UpdateShader(Shader *shader, int display_w, int display_h) {
     saved_display_w = display_w;
     saved_display_h = display_h;
     shader->use();
@@ -98,5 +98,5 @@ void Camera::UpdateShader(Shader* shader,int display_w,int display_h) {
 }
 
 glm::mat4 Camera::GetProjectionMatrix() {
-    return  glm::perspective(glm::radians(Zoom), (float)saved_display_w / (float)saved_display_h, nearClip, farClip);
+    return glm::perspective(glm::radians(Zoom), (float) saved_display_w / (float) saved_display_h, nearClip, farClip);
 }

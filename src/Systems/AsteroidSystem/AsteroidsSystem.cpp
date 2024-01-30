@@ -4,7 +4,7 @@
 
 #include "AsteroidsSystem.h"
 
-AsteroidsSystem::AsteroidsSystem(int size, Shader *asteroidShader):size(size),asteroidShader(asteroidShader){
+AsteroidsSystem::AsteroidsSystem(int size, Shader *asteroidShader) : size(size), asteroidShader(asteroidShader) {
 
 }
 
@@ -26,8 +26,8 @@ unsigned int nextPowerOfTwo(unsigned int n) {
 
 void AsteroidsSystem::Draw() {
     asteroidShader->use();
-    asteroidShader->setMatrix4("planet",false,glm::value_ptr(planet));
-    
+    asteroidShader->setMatrix4("planet", false, glm::value_ptr(planet));
+
     textures[0]->use(GL_TEXTURE3);
     textures[1]->use(GL_TEXTURE4);
     textures[2]->use(GL_TEXTURE5);
@@ -48,26 +48,26 @@ void AsteroidsSystem::Init() {
     const float PI = 3.14159265359;
     float radius = 100;
     float span = 1;
-    
-    size = 1000;   
+
+    size = 1000;
     std::vector<glm::vec3> positions(size);
     std::vector<glm::vec3> rotations(size);
     std::vector<glm::vec3> velocities(size);
     std::vector<glm::vec3> angularVelocites(size);
     std::vector<glm::vec3> scales(size);
-    
-    
+
+
     for (int i = 0; i < size; ++i) {
         // Generate random positions
-        float angle = glm::linearRand(0.0f,2 * PI);
-        float distance = glm::linearRand(radius - span,radius + span);
+        float angle = glm::linearRand(0.0f, 2 * PI);
+        float distance = glm::linearRand(radius - span, radius + span);
 
         float asteroidX = distance * sin(angle);
-        float asteroidZ = distance * cos(angle) ;
-        float asteroidY =  glm::linearRand(-span,span);
-        
+        float asteroidZ = distance * cos(angle);
+        float asteroidY = glm::linearRand(-span, span);
 
-        positions[i] = glm::vec3(asteroidX,asteroidY,asteroidZ);
+
+        positions[i] = glm::vec3(asteroidX, asteroidY, asteroidZ);
         rotations[i] = glm::vec3(glm::linearRand(0.0f, 2 * PI));
         scales[i] = glm::vec3(glm::linearRand(minScale, maxScale));
         velocities[i] = glm::linearRand(glm::vec3(-0.5f), glm::vec3(0.5f));
@@ -77,9 +77,11 @@ void AsteroidsSystem::Init() {
 
     // Display generated positions and velocities
     for (int i = 0; i < size; ++i) {
-        asteroidsData.push_back(AsteroidData(glm::vec4 (positions[i],1), glm::vec4 (rotations[i],1), glm::vec4 (scales[i],1), glm::vec4 (velocities[i],1),glm::vec4 (angularVelocites[i],1),glm::vec4 (0)));
+        asteroidsData.push_back(
+                AsteroidData(glm::vec4(positions[i], 1), glm::vec4(rotations[i], 1), glm::vec4(scales[i], 1),
+                             glm::vec4(velocities[i], 1), glm::vec4(angularVelocites[i], 1), glm::vec4(0)));
     }
-    
+
     GLuint currentId;
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
@@ -101,21 +103,26 @@ void AsteroidsSystem::Init() {
                  GL_STREAM_DRAW);
     bindingPoint = 2; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
-    
-   shared_ptr<Texture> albedoMap = std::make_shared<Texture>( "ocean-rock_albedo.png","res/textures/ocean-rock-bl", "texture_albedo");
-    textures.insert(textures.end(),albedoMap);
 
-    shared_ptr<Texture> normalMap = std::make_shared<Texture>( "ocean-rock_normal-ogl.png","res/textures/ocean-rock-bl", "texture_albedo");
-    textures.insert(textures.end(),normalMap);
-    
-    shared_ptr<Texture> metallicMap = std::make_shared<Texture>( "ocean-rock_metallic.png","res/textures/ocean-rock-bl", "texture_albedo");
-    textures.insert(textures.end(),metallicMap);
+    shared_ptr<Texture> albedoMap = std::make_shared<Texture>("ocean-rock_albedo.png", "res/textures/ocean-rock-bl",
+                                                              "texture_albedo");
+    textures.insert(textures.end(), albedoMap);
 
-    shared_ptr<Texture> roughnessMap = std::make_shared<Texture>( "ocean-rock_roughness.png","res/textures/ocean-rock-bl", "texture_albedo");
-    textures.insert(textures.end(),roughnessMap);
+    shared_ptr<Texture> normalMap = std::make_shared<Texture>("ocean-rock_normal-ogl.png", "res/textures/ocean-rock-bl",
+                                                              "texture_albedo");
+    textures.insert(textures.end(), normalMap);
 
-    shared_ptr<Texture> aoMap = std::make_shared<Texture>("ocean-rock_ao.png","res/textures/ocean-rock-bl", "texture_albedo");
-    textures.insert(textures.end(),aoMap);
+    shared_ptr<Texture> metallicMap = std::make_shared<Texture>("ocean-rock_metallic.png", "res/textures/ocean-rock-bl",
+                                                                "texture_albedo");
+    textures.insert(textures.end(), metallicMap);
+
+    shared_ptr<Texture> roughnessMap = std::make_shared<Texture>("ocean-rock_roughness.png",
+                                                                 "res/textures/ocean-rock-bl", "texture_albedo");
+    textures.insert(textures.end(), roughnessMap);
+
+    shared_ptr<Texture> aoMap = std::make_shared<Texture>("ocean-rock_ao.png", "res/textures/ocean-rock-bl",
+                                                          "texture_albedo");
+    textures.insert(textures.end(), aoMap);
 
     textures[0]->use(GL_TEXTURE3);
     textures[1]->use(GL_TEXTURE4);
@@ -123,15 +130,14 @@ void AsteroidsSystem::Init() {
     textures[3]->use(GL_TEXTURE6);
     textures[4]->use(GL_TEXTURE7);
 
-                  
-                  
+
     cumputeShaderMovment.init();
     cumputeShaderGridCreation.init();
     cumputeShaderGridCreation.use();
     float furthestPoint = (asteroidModel.futhestLenghtsFromCenter.x + asteroidModel.futhestLenghtsFromCenter.y +
                            asteroidModel.futhestLenghtsFromCenter.z) / 3;
-    cumputeShaderGridCreation.setFloat("gridRadius", maxScale * furthestPoint *2.0f);
-    
+    cumputeShaderGridCreation.setFloat("gridRadius", maxScale * furthestPoint * 2.0f);
+
     cumputeShaderGridSort.init();
     cumputeShaderGridSort.use();
 
@@ -141,7 +147,7 @@ void AsteroidsSystem::Init() {
     cumputeShaderCollide.init();
     cumputeShaderCollide.use();
     cumputeShaderCollide.setFloat("collisionRadius", furthestPoint);
-    cumputeShaderCollide.setFloat("gridRadius", maxScale * furthestPoint  *2.0f);
+    cumputeShaderCollide.setFloat("gridRadius", maxScale * furthestPoint * 2.0f);
 
     cumputeShaderSeperation.init();
     cumputeShaderSeperation.use();
@@ -160,10 +166,8 @@ void AsteroidsSystem::Update(float deltaTime) {
     cumputeShaderGridSort.use();
     int numPairs = nextPowerOfTwo(asteroidsData.size()) / 2;
     int numStages = (int) glm::log2((float) numPairs * 2);
-    for (int stageIndex = 0; stageIndex < numStages; stageIndex++)
-    {
-        for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++)
-        {
+    for (int stageIndex = 0; stageIndex < numStages; stageIndex++) {
+        for (int stepIndex = 0; stepIndex < stageIndex + 1; stepIndex++) {
             // Calculate some pattern stuff
             int groupWidth = 1 << (stageIndex - stepIndex);
             int groupHeight = 2 * groupWidth - 1;

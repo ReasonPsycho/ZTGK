@@ -21,24 +21,34 @@ public:
     GLuint ID{};
 
     // constructor reads and builds the shader
-    ComputeShader(const char* shaderPath);
+    ComputeShader(const char *shaderPath);
 
     // use/activate the shader
     void use() const;
+
     void init();
-    void setLayout(int localSizeX,int localSizeY,int localSizeZ);
+
+    void setLayout(int localSizeX, int localSizeY, int localSizeZ);
+
     // utility uniform functions
     void setBool(const std::string &name, bool value) const;
+
     void setInt(const std::string &name, int value) const;
+
     void setFloat(const std::string &name, float value) const;
+
     void setGLuint(const std::string &name, GLuint value) const;
+
     void setMatrix4(const std::string &name, bool transpose, const GLfloat *value) const;
 
     void setVec3(const std::string &name, float d, float d1, float d2);
+
     void setVec3(const std::string &name, glm::vec3 vec3);
+
 private:
     std::string shaderCode;
     std::string computeShaderPath;
+
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
     void checkCompileErrors(unsigned int shader, std::string type);

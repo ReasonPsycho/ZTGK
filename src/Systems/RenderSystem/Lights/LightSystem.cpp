@@ -7,20 +7,18 @@
 #include "imgui.h"
 
 void LightSystem::PushToSSBO() {
-
-
     std::vector<DirLightData> dirLightDataArray;
-    for (const DirLight light : dirLights) {
+    for (const DirLight light: dirLights) {
         dirLightDataArray.push_back(light.data);
     }
 
     std::vector<SpotLightData> spotLightDataArray;
-    for (const SpotLight& light : spotLights) {
+    for (const SpotLight &light: spotLights) {
         spotLightDataArray.push_back(light.data);
     }
-    
+
     std::vector<PointLightData> pointLightDataArray;
-    for (const PointLight& light : pointLights) {
+    for (const PointLight &light: pointLights) {
         pointLightDataArray.push_back(light.data);
     }
 
@@ -34,7 +32,8 @@ void LightSystem::PushToSSBO() {
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, pointLightDataArray.size() * sizeof(PointLightData), pointLightDataArray.data(),
+    glBufferData(GL_SHADER_STORAGE_BUFFER, pointLightDataArray.size() * sizeof(PointLightData),
+                 pointLightDataArray.data(),
                  GL_STATIC_DRAW);
     bindingPoint = 4; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
@@ -46,18 +45,27 @@ void LightSystem::PushToSSBO() {
     bindingPoint = 5; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
+
+    glGenBuffers(1, &currentId);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, spotLightDataArray.size() * sizeof(SpotLightData), spotLightDataArray.data(),
+                 GL_STATIC_DRAW);
+    bindingPoint = 6; // Choose a binding point
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
+
+
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
 }
+
 
 void LightSystem::showLightTree() {
     if (ImGui::TreeNode("Lights")) {
         for (auto &light: lights) {
             light->showImGuiDetails(camera);
         }
-        if (ImGui::Button("Push light data to SSBO"))
-        {
+        if (ImGui::Button("Push light data to SSBO")) {
             PushToSSBO();
         }
         ImGui::TreePop();
@@ -80,20 +88,20 @@ void LightSystem::AddPointLight(glm::vec4 position,
 
 }
 
-void LightSystem::AddSpotLight(glm::vec4  position,
-                               glm::vec4  direction,
+void LightSystem::AddSpotLight(glm::vec4 position,
+                               glm::vec4 direction,
                                float cutOff,
                                float outerCutOff,
                                float constant,
                                float linear,
                                float quadratic,
                                glm::vec4 color) {
-    spotLights.push_back(SpotLight(SpotLightData(position,direction, cutOff,
-             outerCutOff,
-             constant,
-             linear,
-             quadratic,0,0,0,
-             color)));
+    spotLights.push_back(SpotLight(SpotLightData(position, direction, cutOff,
+                                                 outerCutOff,
+                                                 constant,
+                                                 linear,
+                                                 quadratic, 0, 0, 0,
+                                                 color)));
     lights.push_back(&spotLights.back());
 }
 
@@ -103,6 +111,6 @@ LightSystem::~LightSystem() {
     spotLights.clear();
 }
 
-LightSystem::LightSystem(Camera *camera):camera(camera) {
+LightSystem::LightSystem(Camera *camera) : camera(camera) {
 
 }

@@ -12,7 +12,8 @@ using namespace std;
 
 
 // constructor
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<shared_ptr<Texture>> textures) : vertices(vertices),indices(indices),textures(textures) {
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<shared_ptr<Texture>> textures) : vertices(
+        vertices), indices(indices), textures(textures) {
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
