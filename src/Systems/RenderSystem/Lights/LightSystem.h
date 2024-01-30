@@ -25,8 +25,12 @@ public:
 
     ~LightSystem();
 
+    void Init();
+
     void PushToSSBO();
 
+    void GenerateShadowBuffers(Shader *shader);
+    
     //Add light
     void AddDirLight(glm::vec4 direction, glm::vec4 color);
 
@@ -48,6 +52,8 @@ public:
     //Imgui
     void showLightTree();
 
+    void GenerateShadows(void (*funcPtr)());
+    
 private:
     //Vectors
     std::vector<DirLight> dirLights;
@@ -55,7 +61,14 @@ private:
     std::vector<SpotLight> spotLights;
     std::vector<ILight *> lights;
     std::vector<std::shared_ptr<Shadow>> shadows;
+
+    //Camera
     Camera *camera;
+
+    //Shaders
+    Shader simpleDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
+                                      "res/shaders/Shadows/point_shadows_depth.frag",
+                                      "res/shaders/Shadows/point_shadows_depth.geom");
 };
 
 

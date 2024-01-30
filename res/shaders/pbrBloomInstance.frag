@@ -20,7 +20,6 @@ uniform sampler2D brdfLUT;
 //Lighting and shadows
 uniform vec3 camPos;
 uniform float far_plane;
-uniform samplerCube depthMap;
 
 
 struct DirLight {
@@ -69,6 +68,10 @@ layout (std430, binding = 5) buffer SpotLightBuffer {
 };
 
 
+#define MAX_LIGHTS 30 // IDKKKK!!!!!
+
+uniform samplerCube depthMaps[MAX_LIGHTS];
+
 const float PI = 3.14159265359;
 
 // ----------------------------------------------------------------------------
@@ -86,7 +89,7 @@ vec3 gridSamplingDisk[20] = vec3[]
     vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 );
 
-float ShadowCalculation(vec3 fragPos, vec3 lightPos)
+float ShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
 {
     // get vector between fragment position and light position
     vec3 fragToLight = fragPos - lightPos;
@@ -125,7 +128,7 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos)
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        float closestDepth = texture(depthMaps[lightIndex], fragToLight + gridSamplingDisk[i] * diskRadius).r;
         closestDepth *= far_plane;   // undo mapping [0;1]
         if (currentDepth - bias > closestDepth)
         shadow += 1.0;
@@ -210,7 +213,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 //Lights calculation
 
 // calculates the color when using a directional light.
-vec3 CalcDirLight(DirLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0)
+vec3 CalcDirLight(DirLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0, int lightIndex)
 {
     // calculate per-light radiance
     vec3 L = normalize(-light.direction.xyz);
@@ -246,7 +249,7 @@ vec3 CalcDirLight(DirLight light, vec3 N, vec3 V, float roughness, float metalli
 
 
 // calculates the color when using a point light.
-vec3 CalcPointLight(PointLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0)
+vec3 CalcPointLight(PointLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0, int lightIndex)
 {
     // calculate per-light radiance
     vec3 L = normalize(light.position.xyz - WorldPos);
@@ -277,13 +280,13 @@ vec3 CalcPointLight(PointLight light, vec3 N, vec3 V, float roughness, float met
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
-
+    float shadow = (1.0 - ShadowCalculation(WorldPos, light.position.xyz, lightIndex));
     // add to outgoing radiance Lo
-    return (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    return (kD * albedo / PI + specular) * radiance * NdotL * shadow; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 
 }
 // calculates the color when using a spot light.
-vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0)
+vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0, int lightIndex)
 {
     // calculate per-light radiance
     vec3 L = normalize(light.position.xyz - WorldPos);
@@ -320,9 +323,10 @@ vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metal
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
+    float shadow = (1.0 - ShadowCalculation(WorldPos, light.position.xyz, lightIndex));
 
     // add to outgoing radiance Lo
-    return (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    return (kD * albedo / PI + specular) * radiance * NdotL * shadow; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 }
 
 
@@ -346,15 +350,17 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
+    int lightIndex = 0;
+
     for (int i = 0; i < dirLights.length(); ++i) {
-        Lo += CalcDirLight(dirLights[i], N, V, roughness, metallic, albedo, F0);
+        Lo += CalcDirLight(dirLights[i], N, V, roughness, metallic, albedo, F0, lightIndex++);
     }
     for (int i = 0; i < pointLights.length(); ++i) {
-        Lo += CalcPointLight(pointLights[i], N, V, roughness, metallic, albedo, F0);
+        Lo += CalcPointLight(pointLights[i], N, V, roughness, metallic, albedo, F0, lightIndex++);
     }
     for (int i = 0; i < spotLights.length(); ++i) {
 
-        Lo += CalcSpotLight(spotLights[i], N, V, roughness, metallic, albedo, F0);
+        Lo += CalcSpotLight(spotLights[i], N, V, roughness, metallic, albedo, F0, lightIndex++);
     }
 
     // ambient lighting (we now use IBL as the ambient term)

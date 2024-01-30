@@ -113,11 +113,6 @@ void main()
     mat4 rotaionMatrix = rotateXYZ(asteroidsData[index].rotation.xyz);
     mat4 scaleMatrix = scaleMatrix(asteroidsData[index].scale.xyz);
     translationMatrix *= scaleMatrix * rotaionMatrix;
-
-
-
-
-
     TexCoords = aTexCoords;
     WorldPos = vec3(translationMatrix * vec4(aPos, 1.0));
     Normal = transpose(inverse(mat3(translationMatrix))) * aNormal;

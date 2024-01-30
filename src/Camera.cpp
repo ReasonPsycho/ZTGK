@@ -100,3 +100,8 @@ void Camera::UpdateShader(Shader *shader, int display_w, int display_h) {
 glm::mat4 Camera::GetProjectionMatrix() {
     return glm::perspective(glm::radians(Zoom), (float) saved_display_w / (float) saved_display_h, nearClip, farClip);
 }
+
+void Camera::UpdateCamera(int display_w, int display_h) {
+    saved_display_w = display_w;
+    saved_display_h = display_h;
+}

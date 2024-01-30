@@ -21,10 +21,15 @@ public:
             : vertexPath(vertexPath), fragmentPath(fragmentPath) {}
 
 
+    Shader(const char *vertexPath, const char *fragmentPath, const char *geometryPath)
+            : vertexPath(vertexPath), fragmentPath(fragmentPath), geometryPath(geometryPath) {}
+
     // use/activate the shader
     void use() const;
 
     void init();
+
+    void initWithGeometry();
 
     // utility uniform functions
     void setBool(const std::string &name, bool value) const;
@@ -44,6 +49,7 @@ public:
 private:
     const char *vertexPath{};
     const char *fragmentPath{};
+    const char *geometryPath{};
 
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------

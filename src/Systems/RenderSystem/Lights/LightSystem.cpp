@@ -45,15 +45,8 @@ void LightSystem::PushToSSBO() {
     bindingPoint = 5; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
-
-    glGenBuffers(1, &currentId);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, spotLightDataArray.size() * sizeof(SpotLightData), spotLightDataArray.data(),
-                 GL_STATIC_DRAW);
-    bindingPoint = 6; // Choose a binding point
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
-
-
+    GenerateShadowBuffers(&simpleDepthShader);
+    
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
@@ -113,4 +106,23 @@ LightSystem::~LightSystem() {
 
 LightSystem::LightSystem(Camera *camera) : camera(camera) {
 
+}
+
+void LightSystem::GenerateShadowBuffers(Shader *shader) {
+    shadows.clear();
+    for (auto &light: lights) {
+        shadows.push_back(std::make_shared<Shadow>(glm::vec3(light->model[3]), shader));
+        shadows.back()->Init();
+    }
+}
+
+void LightSystem::GenerateShadows(void (*funcPtr)()) {
+    for (auto &shadow: shadows) {
+        shadow->Generate(funcPtr);
+    }
+}
+
+void LightSystem::Init() {
+    simpleDepthShader.init();
+    PushToSSBO();
 }

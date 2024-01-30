@@ -82,6 +82,8 @@ void update();
 
 void render();
 
+void render_scene();
+
 void imgui_begin();
 
 void imgui_render();
@@ -104,8 +106,8 @@ void processInput(GLFWwindow *window);
 
 #pragma region Orginal set up
 
-constexpr int32_t WINDOW_WIDTH = 800;
-constexpr int32_t WINDOW_HEIGHT = 800;
+constexpr int32_t WINDOW_WIDTH = 1920;
+constexpr int32_t WINDOW_HEIGHT = 1080;
 
 GLFWwindow *window = nullptr;
 
@@ -297,7 +299,7 @@ void init_systems() {
     lightSystem.AddPointLight(glm::vec4(0, 0, 0, 0), 5.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
     //lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f,
     //                          glm::vec4(255, 255, 255, 1));
-    lightSystem.PushToSSBO();
+    lightSystem.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
 }
@@ -376,17 +378,30 @@ void update() {
 
 void render() {
 
+    lightSystem.GenerateShadows(render_scene);
+    
     bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     file_logger->info("Cleared.");
-
 
     pbrSystem.PrebindPBR(&camera);
     pbrSystem.RenderBackground();
     file_logger->info("Set up PBR.");
 
     pbrSystem.pbrShader.use();
+
+    render_scene();
+    
+    file_logger->info("Rendered AsteroidsSystem.");
+
+    bloomSystem.BlurBuffer();
+    bloomSystem.Render();
+
+}
+
+
+void render_scene() {
     // draw our scene graph
     // Entity *lastEntity = &ourEntity;
     // while (lastEntity->children.size()) {
@@ -397,11 +412,6 @@ void render() {
 
     // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
     asteroidsSystem.Draw();
-    file_logger->info("Rendered AsteroidsSystem.");
-
-    bloomSystem.BlurBuffer();
-    bloomSystem.Render();
-
 }
 
 void imgui_begin() {
@@ -494,6 +504,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     display_h = height;
     display_w = width;
+    camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
 }
 

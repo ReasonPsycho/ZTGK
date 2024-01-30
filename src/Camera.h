@@ -73,6 +73,8 @@ public:
     //updates shader values
     void UpdateShader(Shader *shader, int display_w, int display_h);
 
+    void UpdateCamera(int display_w, int display_h);
+
     float saved_display_w = 1920;
     float saved_display_h = 1080;
 private:
