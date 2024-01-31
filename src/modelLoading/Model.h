@@ -38,6 +38,9 @@ public:
     void loadModel();
 
     glm::vec3 futhestLenghtsFromCenter;
+
+    void SimpleDraw(Shader &shader);
+
 private:
     string const *path;
 
@@ -46,6 +49,7 @@ private:
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
     vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
+
 };
 
 

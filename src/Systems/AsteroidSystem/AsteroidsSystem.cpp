@@ -4,7 +4,7 @@
 
 #include "AsteroidsSystem.h"
 
-AsteroidsSystem::AsteroidsSystem(int size, Shader *asteroidShader) : size(size), asteroidShader(asteroidShader) {
+AsteroidsSystem::AsteroidsSystem(Shader *asteroidShader) : asteroidShader(asteroidShader) {
 
 }
 
@@ -43,8 +43,10 @@ void AsteroidsSystem::Draw(glm::mat4x4 transformationMatrix) {
 }
 
 
-void AsteroidsSystem::DrawToDepthMap(glm::mat4x4 transformationMatrix) {
-    asteroidShader->setMatrix4("model", false, glm::value_ptr(transformationMatrix));
+void AsteroidsSystem::DrawToDepthMap(Shader *shader, glm::mat4x4 transformationMatrix) {
+    shader->use();
+    shader->setMatrix4("model", false, glm::value_ptr(transformationMatrix));
+
     for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++) {
         glBindVertexArray(asteroidModel.meshes[i].VAO);
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(asteroidModel.meshes[i].indices.size()),
@@ -204,5 +206,3 @@ void AsteroidsSystem::Update(float deltaTime) {
     glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
-
-

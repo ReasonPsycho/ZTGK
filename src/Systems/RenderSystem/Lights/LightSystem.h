@@ -51,16 +51,24 @@ public:
     //Imgui
     void showLightTree();
 
-    void GenerateShadows(void (*funcPtr)());
+    void GenerateShadows(void (*funcPtr)(), ShaderType shaderType);
 
     void PushDepthMapsToShader(Shader *shader);
-    
+
+
+    Shader instanceCubeDepthShader = Shader("res/shaders/Shadows/instance_point_shadows_depth.vert",
+                                            "res/shaders/Shadows/point_shadows_depth.frag",
+                                            "res/shaders/Shadows/point_shadows_depth.geom");
+
+    Shader instancePlaneDepthShader = Shader("res/shaders/Shadows/instance_shadows_depth.vert",
+                                             "res/shaders/Shadows/shadows_depth.frag");
+
+    std::vector<ILight *> lights;
 private:
     //Vectors
     std::vector<DirLight> dirLights;
     std::vector<PointLight> pointLights;
     std::vector<SpotLight> spotLights;
-    std::vector<ILight *> lights;
 
     //Camera
     Camera *camera;
@@ -68,10 +76,14 @@ private:
     //Shaders
     Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
                                       "res/shaders/Shadows/point_shadows_depth.frag",
-                                      "res/shaders/Shadows/point_shadows_depth.geom");
+                                    "res/shaders/Shadows/point_shadows_depth.geom");   
+    
 
+    
     Shader planeDepthShader = Shader("res/shaders/Shadows/shadows_depth.vert",
                                      "res/shaders/Shadows/shadows_depth.frag");
+
+
 };
 
 

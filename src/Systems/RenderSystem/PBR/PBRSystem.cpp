@@ -362,19 +362,22 @@ void PBRSystem::PrebindPBR(Camera *camera) {
     glm::mat4 projection = camera->GetProjectionMatrix();
     glm::mat4 view = camera->GetViewMatrix();
     glm::vec3 cameraPos = camera->Position;
-    float far_plane = camera->farClip;
+    // float far_plane = camera->farClip;
 
     pbrInstanceShader.use();
+
+    pbrInstanceShader.setBool("shadows", true);
     pbrInstanceShader.setMatrix4("projection", false, glm::value_ptr(projection));
     pbrInstanceShader.setMatrix4("view", false, glm::value_ptr(view));
     pbrInstanceShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    pbrInstanceShader.setFloat("far_plane", far_plane);
+    pbrInstanceShader.setFloat("far_plane", 25.0f);
 
     pbrShader.use();
+    pbrShader.setBool("shadows", true);
     pbrShader.setMatrix4("projection", false, glm::value_ptr(projection));
     pbrShader.setMatrix4("view", false, glm::value_ptr(view));
     pbrShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    pbrShader.setFloat("far_plane", far_plane);
+    pbrShader.setFloat("far_plane", 25.0f);
 
     backgroundShader.use();
     backgroundShader.setMatrix4("projection", false, glm::value_ptr(projection));

@@ -45,6 +45,8 @@ public:
     void draw(Shader &ourShader);
 
     void drawSelfAndChild(Shader &ourShader, unsigned int &display, unsigned int &total);
+
+    void simpleDraw(Shader *ourShader);
 };
 
 

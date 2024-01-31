@@ -18,6 +18,13 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<shared_
     setupMesh();
 }
 
+
+void Mesh::SimpleDraw(Shader &shader) {
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 // render the mesh
 void Mesh::Draw(Shader &shader) {
     // bind appropriate textures

@@ -26,31 +26,44 @@ void DirLight::InnitShadow() {
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glm::mat4 lightProjection, lightView;
+    float near_plane = 1.0f, far_plane = 2000.0f;
+    lightProjection = glm::ortho(-750.0f, 750.0f, -750.0f, 750.0f, near_plane, far_plane);
+
+    float scale_factor = 1000.0f;
+// assume data.direction contains Euler angles (yaw, pitch, roll)
+    glm::vec3 eulerAngles = data.direction;
+    glm::vec3 direction = glm::vec3(
+            cos(eulerAngles.x) * cos(eulerAngles.y), // dx
+            sin(eulerAngles.y), // dy
+            sin(eulerAngles.x) * cos(eulerAngles.y) // dz
+    );
+    glm::vec3 translatedPos = -scale_factor * direction; //adjust the sign and scale
+    lightView = glm::lookAt(translatedPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    data.position = glm::vec4(translatedPos, 1.0f);
+    data.lightSpaceMatrix = lightProjection * lightView;
+    
     initializedShadow = true;
 }
 
-void DirLight::GenerateShadow(void (*funcPtr)()) {
-    glm::mat4 lightProjection, lightView;
-    float near_plane = 1.0f, far_plane = 100.0f;
-    //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat) SHADOW_WIDTH / (GLfloat) SHADOW_HEIGHT,
-    // near_plane,
-    //   far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
-    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    float scale_factor = 10.0f;
-    glm::vec3 translatedPox = -scale_factor * glm::vec3(data.direction.x, data.direction.y, data.direction.z);
-    lightView = glm::lookAt(translatedPox, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-    data.position = glm::vec4(translatedPox, 1.0f);
-    data.lightSpaceMatrix = lightProjection * lightView;
-    // render scene from light's point of view
-    shadowMapShader->use();
-    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-
+void DirLight::SetUpShadowBuffer(ShaderType shaderType) {
+    if (shaderType == Normal) {
+        shadowMapShader->use();
+        shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    } else {
+        instanceShadowMapShader->use();
+        instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    }
+    
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
-    funcPtr();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 }
+
+
 

@@ -42,3 +42,8 @@ void Entity::draw(Shader &ourShader) {
     ourShader.setMatrix4("model", false, glm::value_ptr(transform.getModelMatrix()));
     pModel->Draw(ourShader);
 }
+
+void Entity::simpleDraw(Shader *ourShader) {
+    ourShader->setMatrix4("model", false, glm::value_ptr(transform.getModelMatrix()));
+    pModel->SimpleDraw(reinterpret_cast<Shader &>(ourShader));
+}

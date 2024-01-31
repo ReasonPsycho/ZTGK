@@ -50,9 +50,12 @@ public:
 
     void Draw(Shader &shader);
 
+    void SimpleDraw(Shader &shader);
+
 private:
     // render data 
     unsigned int VBO, EBO;
+
 };
 
 

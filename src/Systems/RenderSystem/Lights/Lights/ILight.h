@@ -13,9 +13,16 @@ enum LightType {
     Point,
 };
 
+enum ShaderType {
+    Instance,
+    Normal,
+};
+
 class ILight {
 public:
-    ILight(Shader *shadowMapShader) : shadowMapShader(shadowMapShader) {
+    ILight(Shader *shadowMapShader, Shader *instanceShadowMapShader) : shadowMapShader(shadowMapShader),
+                                                                       instanceShadowMapShader(
+                                                                               instanceShadowMapShader) {
         uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
     }
 
@@ -27,12 +34,15 @@ public:
     virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
     virtual void EditLight(Camera *camera) = 0;
 
-    virtual void GenerateShadow(void (*funcPtr)()) = 0; // Pure virtual function
+    virtual void SetUpShadowBuffer(ShaderType shaderType) = 0; // Pure virtual function
     virtual void InnitShadow() = 0;
 
     void DeleteShadow();
 
     unsigned int depthMap{};
+
+    Shader *instanceShadowMapShader;
+    Shader *shadowMapShader;
 private:
     static int nextID; // Static variable to keep track of the next available ID
 protected:
@@ -41,8 +51,7 @@ protected:
     //For shadows
     bool initializedShadow = false;
     unsigned int depthMapFBO{};
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-    Shader *shadowMapShader;
+    const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
     glm::mat4 shadowProj{};
 };
 

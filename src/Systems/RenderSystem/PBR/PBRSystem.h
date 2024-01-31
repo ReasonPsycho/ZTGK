@@ -27,7 +27,7 @@ public:
     void PrebindPBR(Camera *camera);
 
     Shader pbrInstanceShader = Shader("res/shaders/pbrBloomInstance.vert", "res/shaders/pbrBloomInstance.frag");
-    Shader pbrShader = Shader("res/shaders/pbr.vert", "res/shaders/pbr.frag");
+    Shader pbrShader = Shader("res/shaders/pbr.vert", "res/shaders/pbrBloomInstance.frag");
     Shader equirectangularToCubemapShader = Shader("res/shaders/cubemap.vert",
                                                    "res/shaders/equirectangular_to_cubemap.frag");
     Shader irradianceShader = Shader("res/shaders/cubemap.vert", "res/shaders/irradiance_convolution.frag");

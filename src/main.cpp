@@ -87,6 +87,7 @@ void render_scene();
 
 void render_scene_to_depth();
 
+
 void imgui_begin();
 
 void imgui_render();
@@ -137,7 +138,7 @@ float lastY = 0;
 LightSystem lightSystem(&camera);
 PBRSystem pbrSystem(&camera);
 BloomSystem bloomSystem;
-AsteroidsSystem asteroidsSystem(1024, &pbrSystem.pbrInstanceShader);
+AsteroidsSystem asteroidsSystem(&pbrSystem.pbrInstanceShader);
 
 
 bool captureMouse = false;
@@ -382,11 +383,12 @@ void update() {
 }
 
 void render() {
-
-    lightSystem.GenerateShadows(render_scene_to_depth);
+    render_scene_to_depth();
+    
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
 
+    glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
     bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
@@ -425,14 +427,19 @@ void render_scene() {
 
 
 void render_scene_to_depth() {
-    // draw our scene graph
-    Entity *lastEntity = &ourEntity;
-    while (lastEntity->children.size()) {
-        lastEntity->draw(bloomSystem.shaderBlur);
-        lastEntity = lastEntity->children.back().get();
+
+    for (auto &light: lightSystem.lights) {
+        light->SetUpShadowBuffer(Normal);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        Entity *lastEntity = &ourEntity;
+        while (lastEntity->children.size()) {
+            lastEntity->simpleDraw(light->shadowMapShader);
+            lastEntity = lastEntity->children.back().get();
+        }
+        light->SetUpShadowBuffer(Instance);
+        asteroidsSystem.DrawToDepthMap(light->instanceShadowMapShader, lastEntity->transform.getModelMatrix());
     }
-    file_logger->info("Rendered Entities.");
-    asteroidsSystem.DrawToDepthMap(lastEntity->transform.getModelMatrix());
 }
 
 void imgui_begin() {

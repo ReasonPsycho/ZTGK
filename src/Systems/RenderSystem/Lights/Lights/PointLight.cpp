@@ -58,22 +58,32 @@ void PointLight::InnitShadow() {
     initializedShadow = true;
 }
 
-void PointLight::GenerateShadow(void (*funcPtr)()) {
+void PointLight::SetUpShadowBuffer(ShaderType shaderType) {
     // 1. render scene to depth cubemap
     // --------------------------------
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
     shadowMapShader->use();
     for (unsigned int i = 0; i < 6; ++i)
         shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
                                     glm::value_ptr(shadowTransforms[i]));
-    shadowMapShader->setFloat("far_plane", 25.0);
-    shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+
+
+    if (shaderType == Normal) {
+        shadowMapShader->setFloat("far_plane", 25.0);
+        shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+    } else {
+        instanceShadowMapShader->setFloat("far_plane", 25.0);
+        instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+    }
+
+   
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
-    funcPtr();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+
 }
 
 

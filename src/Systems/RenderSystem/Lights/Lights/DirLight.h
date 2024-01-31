@@ -21,7 +21,9 @@ struct DirLightData {
 
 class DirLight : public ILight {
 public:
-    DirLight(Shader *shadowMapShader, DirLightData data) : ILight(shadowMapShader), data(data) {
+    DirLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, DirLightData data) : ILight(shadowMapShader,
+                                                                                                   instanceShadowMapShader),
+                                                                                            data(data) {
         lightType = Directional;
         model = glm::mat4x4(1);
         model = glm::rotate(model, data.direction.x, glm::vec3(1.0f, 0.0f, 0.0f)); // Rotation around x-axis
@@ -67,7 +69,7 @@ public:
 
     void InnitShadow() override;
 
-    void GenerateShadow(void (*funcPtr)()) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType) override; // Pure virtual function
     
 };
 

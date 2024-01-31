@@ -31,7 +31,9 @@ struct SpotLightData {
 
 class SpotLight : public ILight {
 public:
-    SpotLight(Shader *shadowMapShader, SpotLightData data) : ILight(shadowMapShader), data(data) {
+    SpotLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, SpotLightData data) : ILight(shadowMapShader,
+                                                                                                     instanceShadowMapShader),
+                                                                                              data(data) {
         lightType = Spot;
 
         model = glm::mat4x4(1);
@@ -100,7 +102,7 @@ public:
 
     void InnitShadow() override;
 
-    void GenerateShadow(void (*funcPtr)()) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType) override; // Pure virtual function
 };
 
 

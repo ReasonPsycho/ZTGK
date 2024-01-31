@@ -4,6 +4,10 @@
 
 #include "Model.h"
 
+void Model::SimpleDraw(Shader &shader) {
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].SimpleDraw(shader);
+}
 
 // draws the model, and thus all its meshes
 void Model::Draw(Shader &shader) {

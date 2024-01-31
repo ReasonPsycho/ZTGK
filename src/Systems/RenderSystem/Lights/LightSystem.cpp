@@ -7,6 +7,10 @@
 #include "imgui.h"
 
 void LightSystem::PushToSSBO() {
+
+
+    GenerateShadowBuffers();
+    
     std::vector<DirLightData> dirLightDataArray;
     for (const DirLight &light: dirLights) {
         dirLightDataArray.push_back(light.data);
@@ -21,6 +25,7 @@ void LightSystem::PushToSSBO() {
     for (const PointLight &light: pointLights) {
         pointLightDataArray.push_back(light.data);
     }
+
 
     GLuint currentId;
     glGenBuffers(1, &currentId);
@@ -46,7 +51,6 @@ void LightSystem::PushToSSBO() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
 
-    GenerateShadowBuffers();
     
     dirLightDataArray.clear();
     pointLightDataArray.clear();
@@ -68,7 +72,7 @@ void LightSystem::showLightTree() {
 
 //Should have done it cleaner don't care enough to do it
 void LightSystem::AddDirLight(glm::vec4 direction, glm::vec4 color) {
-    dirLights.push_back(DirLight(&planeDepthShader, DirLightData(direction, color)));
+    dirLights.push_back(DirLight(&planeDepthShader, &instancePlaneDepthShader, DirLightData(direction, color)));
     lights.push_back(&dirLights.back());
 }
 
@@ -78,7 +82,8 @@ void LightSystem::AddPointLight(glm::vec4 position,
                                 float quadratic,
                                 glm::vec4 color) {
     pointLights.push_back(
-            PointLight(&cubeDepthShader, PointLightData(position, constant, linear, quadratic, 0, color)));
+            PointLight(&cubeDepthShader, &instanceCubeDepthShader,
+                       PointLightData(position, constant, linear, quadratic, 0, color)));
     lights.push_back(&pointLights.back());
 
 }
@@ -91,7 +96,8 @@ void LightSystem::AddSpotLight(glm::vec4 position,
                                float linear,
                                float quadratic,
                                glm::vec4 color) {
-    spotLights.push_back(SpotLight(&planeDepthShader, SpotLightData(position, direction, cutOff,
+    spotLights.push_back(
+            SpotLight(&planeDepthShader, &instancePlaneDepthShader, SpotLightData(position, direction, cutOff,
                                                                     outerCutOff,
                                                                     constant,
                                                                     linear,
@@ -116,9 +122,9 @@ void LightSystem::GenerateShadowBuffers() {
     }
 }
 
-void LightSystem::GenerateShadows(void (*funcPtr)()) {
+void LightSystem::GenerateShadows(void (*funcPtr)(), ShaderType shaderType) {
     for (auto &light: lights) {
-        light->GenerateShadow(funcPtr);
+        light->SetUpShadowBuffer(shaderType);
     }
     glViewport(0, 0, camera->saved_display_w, camera->saved_display_h); // Needed after light generation
 }
@@ -126,6 +132,9 @@ void LightSystem::GenerateShadows(void (*funcPtr)()) {
 void LightSystem::Init() {
     planeDepthShader.init();
     cubeDepthShader.init();
+
+    instancePlaneDepthShader.init();
+    instanceCubeDepthShader.init();
     PushToSSBO();
 }
 

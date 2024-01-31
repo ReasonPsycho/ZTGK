@@ -148,7 +148,7 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
 
 float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID)
 {
-    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(lightPos, 1.0);
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0);
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // transform to [0,1] range
@@ -285,7 +285,10 @@ vec3 CalcDirLight(DirLight light, vec3 N, vec3 V, float roughness, float metalli
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
 
-    float shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+    float shadow = 1;
+    if (shadows) {
+        shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+    }
 
 
     // add to outgoing radiance Lo
@@ -325,7 +328,14 @@ vec3 CalcPointLight(PointLight light, vec3 N, vec3 V, float roughness, float met
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
-    float shadow = (1.0 - CubeShadowCalculation(WorldPos, light.position.xyz, lightIndex));
+
+
+
+    float shadow = 1;
+    if (shadows) {
+        shadow = (1.0 - CubeShadowCalculation(WorldPos, light.position.xyz, lightIndex));
+    }
+
     // add to outgoing radiance Lo
     return (kD * albedo / PI + specular) * radiance * NdotL * shadow; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 
@@ -368,7 +378,11 @@ vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metal
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
-    float shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+
+    float shadow = 1;
+    if (shadows) {
+        shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+    }
 
     // add to outgoing radiance Lo
     return (kD * albedo / PI + specular) * radiance * NdotL * shadow; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again

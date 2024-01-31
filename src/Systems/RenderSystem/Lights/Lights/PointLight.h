@@ -25,7 +25,9 @@ struct PointLightData {
 
 class PointLight : public ILight {
 public:
-    PointLight(Shader *shadowMapShader, PointLightData data) : ILight(shadowMapShader), data(data) {
+    PointLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, PointLightData data) : ILight(shadowMapShader,
+                                                                                                       instanceShadowMapShader),
+                                                                                                data(data) {
         lightType = Point;
         model = glm::mat4x4(1);
         model = glm::translate(model,
@@ -66,7 +68,7 @@ public:
 
     void InnitShadow() override;
 
-    void GenerateShadow(void (*funcPtr)()) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType) override; // Pure virtual function
 
 private:
     std::vector<glm::mat4> shadowTransforms;

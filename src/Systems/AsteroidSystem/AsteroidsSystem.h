@@ -49,7 +49,7 @@ public:
     glm::mat4x4 planet{};
 
 
-    AsteroidsSystem(int size, Shader *asteroidShader);
+    AsteroidsSystem(Shader *asteroidShader);
 
     void Init();
 
@@ -57,12 +57,13 @@ public:
 
     void Draw(glm::mat4x4 transformationMatrix);
 
-    void DrawToDepthMap(glm::mat4x4 transformationMatrix);
+    void DrawToDepthMap(Shader *shader, glm::mat4x4 transformationMatrix);
 
     std::vector<AsteroidData> asteroidsData;
     std::vector<std::shared_ptr<Texture>> textures;
     Model asteroidModel = Model(&asteroidModelPath);
     Shader *asteroidShader;
+
     ComputeShader cumputeShaderMovment = ComputeShader(
             "res/shaders/AsteroidSystem/ComputeShaders/asteroidMovment.glsl");
     ComputeShader cumputeShaderGridCreation = ComputeShader(
