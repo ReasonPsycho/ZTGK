@@ -51,7 +51,7 @@ public:
 string modelPath = "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\models\\Sphere\\Sphere.obj";
 Model model = Model(&modelPath);
 
-Entity ourEntity();
+Entity ourEntity(&model);
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
@@ -130,7 +130,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
+Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
 float lastX = 0;
 float lastY = 0;
 
@@ -298,36 +298,36 @@ bool init() {
 
 void init_systems() {
     asteroidsSystem.Init();
-    //lightSystem.AddDirLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0), glm::vec4(255, 255, 255, 0.5f));
-
-    lightSystem.AddPointLight(glm::vec4(0, 0, 0, 0), 5.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
-    // lightSystem.AddSpotLight(glm::vec4(0, 0, 20.0f, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f, 0.032f, glm::vec4(255, 255, 255, 1));
+    lightSystem.AddDirLight(glm::vec4(-1.5f, 0, 0.0f, 0), glm::vec4(255, 255, 255, 0.5f));
+    lightSystem.AddPointLight(glm::vec4(-120.0f, 40.0f, 0, 0), 5.0f, 0.09f, 0.032f, glm::vec4(255, 0, 0, 1));
+    lightSystem.AddSpotLight(glm::vec4(-120.0f, -40.0f, 0, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f,
+                             0.032f, glm::vec4(0, 255, 0, 1));
     lightSystem.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
 }
 
 void load_enteties() {
-    /*
+
     model.loadModel();
-    ourEntity.transform.setLocalPosition({10, 0, 0});
-    const float scale = 1;
+    ourEntity.transform.setLocalPosition({-0, 0, 0});
+    const float scale = 100;
     ourEntity.transform.setLocalScale({scale, scale, scale});
 
     {
         Entity *lastEntity = &ourEntity;
 
         for (unsigned int i = 0; i < 2; ++i) {
-            lastEntity->addChild(model);
+            lastEntity->addChild(std::make_unique<Entity>(&model));
             lastEntity = lastEntity->children.back().get();
 
             //Set transform values
-            lastEntity->transform.setLocalPosition({10, 0, 0});
-            lastEntity->transform.setLocalScale({scale, scale, scale});
+            lastEntity->transform.setLocalPosition({5, 0, 0});
+            lastEntity->transform.setLocalScale({0.2f, 0.2f, 0.2f});
         }
     }
     ourEntity.updateSelfAndChild();
-     */
+
 }
 
 void init_imgui() {
@@ -369,14 +369,14 @@ void update() {
 
     deltaTime *= (float) timeStep;
     if (timeStep != 0) {
-        // Entity *lastEntity = &ourEntity;
-        //  while (lastEntity->children.size()) {
-        //      pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
-        //      lastEntity = lastEntity->children.back().get();
-        //  }
+        Entity *lastEntity = &ourEntity;
+        while (lastEntity->children.size()) {
+            pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
+            lastEntity = lastEntity->children.back().get();
+        }
 
-        //  ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 20 * deltaTime, 0.f});
-        //  ourEntity.updateSelfAndChild();
+        ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 0.5f * deltaTime, 0.f});
+        ourEntity.updateSelfAndChild();
         asteroidsSystem.Update(deltaTime);
     }
 }
@@ -384,7 +384,7 @@ void update() {
 void render() {
 
     lightSystem.GenerateShadows(render_scene_to_depth);
-    //lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
+    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
 
 
@@ -401,7 +401,7 @@ void render() {
     pbrSystem.pbrShader.use();
 
     render_scene();
-    
+
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -412,29 +412,27 @@ void render() {
 
 void render_scene() {
     // draw our scene graph
-    // Entity *lastEntity = &ourEntity;
-    // while (lastEntity->children.size()) {
-    //     lastEntity->pModel->Draw(pbrSystem.pbrShader);
-    //     lastEntity = lastEntity->children.back().get();
-    // }
-    // file_logger->info("Rendered Entities.");
+    Entity *lastEntity = &ourEntity;
+    while (lastEntity->children.size()) {
+        lastEntity->draw(pbrSystem.pbrShader);
+        lastEntity = lastEntity->children.back().get();
+    }
+    file_logger->info("Rendered Entities.");
 
-    // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
-    asteroidsSystem.Draw();
+
+    asteroidsSystem.Draw(lastEntity->transform.getModelMatrix());
 }
 
 
 void render_scene_to_depth() {
     // draw our scene graph
-    // Entity *lastEntity = &ourEntity;
-    // while (lastEntity->children.size()) {
-    //     lastEntity->pModel->Draw(pbrSystem.pbrShader);
-    //     lastEntity = lastEntity->children.back().get();
-    // }
-    // file_logger->info("Rendered Entities.");
-
-    // asteroidsSystem.asteroidShader->setMatrix4("planet", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
-    asteroidsSystem.DrawToDepthMap();
+    Entity *lastEntity = &ourEntity;
+    while (lastEntity->children.size()) {
+        lastEntity->draw(bloomSystem.shaderBlur);
+        lastEntity = lastEntity->children.back().get();
+    }
+    file_logger->info("Rendered Entities.");
+    asteroidsSystem.DrawToDepthMap(lastEntity->transform.getModelMatrix());
 }
 
 void imgui_begin() {

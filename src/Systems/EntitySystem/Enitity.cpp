@@ -3,15 +3,11 @@
 //
 #include "Enitity.h"
 
-template<typename... TArgs>
-void Entity::addChild(TArgs &... args) {
-    children.emplace_back(std::make_unique<Entity>(args...));
-    children.back()->parent = this;
-}
+
 
 void Entity::drawSelfAndChild(Shader &ourShader, unsigned int &display, unsigned int &total) {
     ourShader.setMatrix4("model", false, glm::value_ptr(transform.getModelMatrix()));
-    pModel->Draw(ourShader);
+    draw(ourShader);
     display++;
     total++;
 
@@ -40,4 +36,9 @@ void Entity::updateSelfAndChild() {
     for (auto &&child: children) {
         child->updateSelfAndChild();
     }
+}
+
+void Entity::draw(Shader &ourShader) {
+    ourShader.setMatrix4("model", false, glm::value_ptr(transform.getModelMatrix()));
+    pModel->Draw(ourShader);
 }

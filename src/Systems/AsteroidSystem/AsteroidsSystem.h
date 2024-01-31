@@ -41,11 +41,11 @@ struct Offsets {
 static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/Sphere/Sphere.obj";
 
 
-class AsteroidsSystem : Entity {
+class AsteroidsSystem {
 public:
     GLuint ID{};
     float maxScale = 0.5f;
-    float minScale = 2.0f;
+    float minScale = 0.1f;
     glm::mat4x4 planet{};
 
 
@@ -55,9 +55,9 @@ public:
 
     void Update(float deltaTime);
 
-    void Draw();
+    void Draw(glm::mat4x4 transformationMatrix);
 
-    void DrawToDepthMap();
+    void DrawToDepthMap(glm::mat4x4 transformationMatrix);
 
     std::vector<AsteroidData> asteroidsData;
     std::vector<std::shared_ptr<Texture>> textures;

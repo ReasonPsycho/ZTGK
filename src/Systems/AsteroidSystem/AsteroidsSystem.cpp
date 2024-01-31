@@ -24,9 +24,9 @@ unsigned int nextPowerOfTwo(unsigned int n) {
     return 1 << count;
 }
 
-void AsteroidsSystem::Draw() {
+void AsteroidsSystem::Draw(glm::mat4x4 transformationMatrix) {
     asteroidShader->use();
-    asteroidShader->setMatrix4("model", false, glm::value_ptr(transform.getLocalModelMatrix()));
+    asteroidShader->setMatrix4("model", false, glm::value_ptr(transformationMatrix));
 
     textures[0]->use(GL_TEXTURE3);
     textures[1]->use(GL_TEXTURE4);
@@ -43,7 +43,8 @@ void AsteroidsSystem::Draw() {
 }
 
 
-void AsteroidsSystem::DrawToDepthMap() {
+void AsteroidsSystem::DrawToDepthMap(glm::mat4x4 transformationMatrix) {
+    asteroidShader->setMatrix4("model", false, glm::value_ptr(transformationMatrix));
     for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++) {
         glBindVertexArray(asteroidModel.meshes[i].VAO);
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(asteroidModel.meshes[i].indices.size()),
@@ -56,10 +57,10 @@ void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
     planet = glm::mat4x4(1);
     const float PI = 3.14159265359;
-    float radius = 5;
-    float span = 1;
+    float radius = 300;
+    float span = 10;
 
-    size = 100;
+    size = 3000;
     std::vector<glm::vec3> positions(size);
     std::vector<glm::vec3> rotations(size);
     std::vector<glm::vec3> velocities(size);
@@ -70,11 +71,11 @@ void AsteroidsSystem::Init() {
     for (int i = 0; i < size; ++i) {
         // Generate random positions
         float angle = glm::linearRand(0.0f, 2 * PI);
-        float distance = glm::linearRand(radius - span, radius + span);
-
+        float distance = glm::linearRand(radius, radius + span);
+        
         float asteroidX = distance * sin(angle);
         float asteroidZ = distance * cos(angle);
-        float asteroidY = glm::linearRand(-span, span);
+        float asteroidY = glm::linearRand(-span * 5, span * 5);
 
 
         positions[i] = glm::vec3(asteroidX, asteroidY, asteroidZ);

@@ -63,6 +63,10 @@ public:
     bool isDirty() const;
 
     glm::mat4 getLocalModelMatrix();
+
+    glm::mat4 getLocalTranslationMatrix();
+
+    glm::mat4 getLocalToChildMatrix(Transform &childTransform);
 };
 
 

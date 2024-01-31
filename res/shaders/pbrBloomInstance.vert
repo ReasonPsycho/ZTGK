@@ -105,6 +105,12 @@ mat4 scaleMatrix(vec3 scale) {
     );
 }
 
+mat3 extractRotationMatrix(mat4 model) {
+    mat3 rotationMatrix = mat3(model);
+    return rotationMatrix;
+}
+
+
 void main()
 {
     uint index = gl_InstanceID;
@@ -112,7 +118,10 @@ void main()
     mat4 rotaionMatrix = rotateXYZ(asteroidsData[index].rotation.xyz);
     mat4 scaleMatrix = scaleMatrix(asteroidsData[index].scale.xyz);
     translationMatrix *= scaleMatrix * translateMatrix(asteroidsData[index].position.xyz);
-    translationMatrix *= model;
+
+    translationMatrix += translateMatrix(vec3(model[3])) * 0.835f;
+
+    translationMatrix *= rotaionMatrix;
     Normal = transpose(inverse(mat3(translationMatrix))) * aNormal;
     TexCoords = aTexCoords;
     WorldPos = vec3(translationMatrix * vec4(aPos, 1.0));
