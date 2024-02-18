@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.4.1)
 project(ReasonableGL)
 set(CMAKE_CXX_STANDARD 23)
 
-
 IF (WIN32)
     message(NOTICE "\n")
     message(NOTICE "********************** IMPORTANT NOTICE ****************************\n")
@@ -12,14 +11,21 @@ IF (WIN32)
     message(NOTICE "\n")
 ENDIF ()
 
+if (!MSVC)
+    message(NOTICE "\n")
+    message(NOTICE "********************** IMPORTANT NOTICE ****************************\n")
+    message(NOTICE "It's highly recommended to use MSVC as compiler!")
+    message(NOTICE "\n********************************************************************")
+    message(NOTICE "\n")
+endif ()
+
+
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
     include(${CMAKE_TOOLCHAIN_FILE})
 endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake")
-
-message("Using CMake version: ${CMAKE_VERSION}")
 
 
 set(OpenGL_GL_PREFERENCE GLVND) # this might be helpfull for linux IDK
@@ -78,5 +84,3 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)
 endif ()
-
-

@@ -12,6 +12,8 @@
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #define STB_IMAGE_IMPLEMENTATION
+#define GLM_ENABLE_EXPERIMENTAL //this is so github workflow passes
+
 
 //#include <glad/glad.h>  // Initialize with gladLoadGL()
 
