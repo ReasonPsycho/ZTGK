@@ -24,13 +24,13 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
     include(${CMAKE_TOOLCHAIN_FILE})
 endif()
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake")
 
 
 set(OpenGL_GL_PREFERENCE GLVND) # this might be helpfull for linux IDK
 cmake_policy(SET CMP0072 NEW) # for GLVND
 
+add_definitions(-D GLM_ENABLE_EXPERIMENTAL)
 
 # ---- Main project's files ----
 # Add source files
