@@ -166,7 +166,7 @@ void AsteroidsSystem::Init() {
     cumputeShaderSeperation.use();
 }
 
-void AsteroidsSystem::Update(float deltaTime) {
+void AsteroidsSystem::Update(double deltaTime) {
     cumputeShaderMovment.use();
     cumputeShaderMovment.setFloat("deltaTime", deltaTime);
     glDispatchCompute(asteroidsData.size(), 1, 1);

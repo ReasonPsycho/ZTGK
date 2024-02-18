@@ -144,8 +144,8 @@ bool captureMouse = false;
 bool captureMouseButtonPressed = false;
 
 // timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+double deltaTime = 0;
+double lastFrame = 0;
 int timeStep = 1;
 bool timeStepKeyPressed = false;
 
@@ -349,7 +349,7 @@ void init_imgui() {
 
 void before_frame() {
     // Setting up delta time
-    float currentFrame = glfwGetTime();
+    double currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 };
@@ -367,7 +367,7 @@ void input() {
 
 void update() {
 
-    deltaTime *= (float) timeStep;
+    deltaTime *= (double) timeStep;
     if (timeStep != 0) {
         Entity *lastEntity = &ourEntity;
         while (lastEntity->children.size()) {
@@ -460,7 +460,7 @@ void imgui_begin() {
 void imgui_render() {
     ImGui::Begin("Debug menu");
     char buffer[64];
-    snprintf(buffer, sizeof buffer, "%f", 1 / deltaTime);
+    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
     ImGui::Text(buffer);
 
     lightSystem.showLightTree();

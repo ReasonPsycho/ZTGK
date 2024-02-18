@@ -14,11 +14,11 @@ public:
     ~BloomSystem();
 
 
-    void Init(float SCR_WIDTH, float SCR_HEIGHT);
+    void Init(int SCR_WIDTH, int SCR_HEIGHT);
 
     void BindBuffer();
 
-    void SetUpBuffers(float SCR_WIDTH, float SCR_HEIGHT);
+    void SetUpBuffers(int SCR_WIDTH, int SCR_HEIGHT);
 
     void BlurBuffer();
 

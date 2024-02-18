@@ -52,7 +52,7 @@ public:
 
     void Init();
 
-    void Update(float deltaTime);
+    void Update(double deltaTime);
 
     void Draw(glm::mat4x4 transformationMatrix);
 

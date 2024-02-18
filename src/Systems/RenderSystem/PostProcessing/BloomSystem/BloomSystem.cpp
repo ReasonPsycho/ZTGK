@@ -38,7 +38,7 @@ void renderQuad() {
 }
 
 
-void BloomSystem::Init(float SCR_WIDTH, float SCR_HEIGHT) {
+void BloomSystem::Init(int SCR_WIDTH, int SCR_HEIGHT) {
     SetUpBuffers(SCR_WIDTH, SCR_HEIGHT);
     // shader configuration
     // --------------------
@@ -89,7 +89,7 @@ void BloomSystem::Render() {
     renderQuad();
 }
 
-void BloomSystem::SetUpBuffers(float SCR_WIDTH, float SCR_HEIGHT) {
+void BloomSystem::SetUpBuffers(int SCR_WIDTH, int SCR_HEIGHT) {
     // if (initialized) {
     //     DeleteGPUData();
     //  }
