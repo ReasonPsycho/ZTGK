@@ -6,6 +6,9 @@
 #define OPENGLGP_LIGHTSYSTEM_H
 
 
+#include "imgui.h"
+#include <ImGuizmo.h>
+#include "glad/glad.h"
 #include <vector>
 #include <memory>
 #include "glm/vec4.hpp"

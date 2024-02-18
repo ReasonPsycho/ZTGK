@@ -3,14 +3,15 @@
 
 
 #include "imgui.h"
-#include "imgui_impl/imgui_impl_glfw.h"
-#include "imgui_impl/imgui_impl_opengl3.h"
-
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_glfw.h"
+#include <ImGuizmo.h>
 #include "Camera.h"
 #include "modelLoading/Model.h"
-#include <stdio.h>
+#include <cstdio>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
+#define STB_IMAGE_IMPLEMENTATION
 
 //#include <glad/glad.h>  // Initialize with gladLoadGL()
 
@@ -28,7 +29,6 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "Systems/AsteroidSystem/AsteroidsSystem.h"
 
-#include "../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 #include "Systems/RenderSystem/PBR/PBRSystem.h"
 #include "Systems/RenderSystem/PostProcessing/BloomSystem/BloomSystem.h"
 #include "Systems/RenderSystem/Lights/LightSystem.h"
@@ -48,7 +48,7 @@ public:
 #endif
 
 
-string modelPath = "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\models\\Sphere\\Sphere.obj";
+string modelPath = "res/models/Sphere/Sphere.obj";
 Model model = Model(&modelPath);
 
 Entity ourEntity(&model);
@@ -247,7 +247,7 @@ bool init() {
 
 // Create a filename with date
     std::ostringstream filename;
-    filename << "C:\\Users\\redkc\\CLionProjects\\assignment-x-the-project-ReasonPsycho\\res\\logs\\logs_"
+    filename << "res/logs/logs_"
              << (local_time->tm_year + 1900) // Year starts from 1900
              << "-" << (local_time->tm_mon + 1) // Month starts from 0
              << "-" << local_time->tm_mday  // Day of month

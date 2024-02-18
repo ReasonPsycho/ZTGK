@@ -2,9 +2,8 @@
 // Created by redkc on 09/01/2024.
 //
 
+
 #include "LightSystem.h"
-#include "glad/glad.h"
-#include "imgui.h"
 
 void LightSystem::PushToSSBO() {
 

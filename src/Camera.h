@@ -76,8 +76,8 @@ public:
     void UpdateShader(Shader *shader);
     void UpdateCamera(int display_w, int display_h);
 
-    float saved_display_w = 1920;
-    float saved_display_h = 1080;
+    int saved_display_w = 1920;
+    int saved_display_h = 1080;
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();

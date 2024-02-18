@@ -50,7 +50,7 @@ void PBRSystem::Init() {
     // ---------------------------------
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
-    std::string hdrPath("C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/hdr/nebula.hdr");
+    std::string hdrPath("res/hdr/nebula.hdr");
     float *data = stbi_loadf(hdrPath.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         glGenTextures(1, &hdrTexture);
