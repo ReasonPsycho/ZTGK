@@ -2,4 +2,4 @@
 
 # Reasonable2D
 
-Originally a project created at course called "Programowanie Aplikacji Graficznych" (Programming graphic applications) at Lodz University of Technology. It is now my passion project.
+An OpenGL game engine. Originally a project created at course called "Programowanie Aplikacji Graficznych" (Programming graphic applications) at Lodz University of Technology. It is now my passion project.
