@@ -5,6 +5,7 @@
 #ifndef OPENGLGP_TRANSFORM_H
 #define OPENGLGP_TRANSFORM_H
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp> //glm::mat4
 #include <list> //std::list
 #include <array> //std::array

@@ -12,15 +12,12 @@
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #define STB_IMAGE_IMPLEMENTATION
-#define GLM_ENABLE_EXPERIMENTAL //this is so github workflow passes
 
 
 //#include <glad/glad.h>  // Initialize with gladLoadGL()
 
 
 //Instancing
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
