@@ -1,0 +1,27 @@
+{
+  "name" : "reasonablegl",
+  "version-string" : "1.0.0",
+  "dependencies" : [ {
+    "name" : "opengl"
+  }, {
+    "name" : "stb"
+  }, {
+    "name" : "assimp"
+  }, {
+    "name" : "glfw3"
+  }, {
+    "name" : "imgui",
+    "features": [
+      "opengl3-binding",
+      "glfw-binding"
+    ]
+  }, {
+    "name" : "imguizmo"
+  }, {
+    "name" : "spdlog"
+  }, {
+    "name" : "glm"
+  }, {
+    "name" : "glad"
+  } ]
+}

@@ -6,10 +6,10 @@
 #define OPENGLGP_SPOTLIGHT_H
 
 
-#include "glm/vec4.hpp"
 #include "imgui.h"
+#include <ImGuizmo.h>
+#include "glm/vec4.hpp"
 #include "ILight.h"
-#include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 #include "glm/gtx/quaternion.hpp"
 
 struct SpotLightData {
@@ -68,9 +68,9 @@ public:
     void EditLight(Camera *camera) override {
         static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
         static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
-        if (ImGui::IsKeyPressed(90))
+        if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(90)))
             mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-        if (ImGui::IsKeyPressed(69))
+        if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(69)))
             mCurrentGizmoOperation = ImGuizmo::ROTATE;
 
         if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -84,7 +84,7 @@ public:
 
 
         static bool useSnap(false);
-        if (ImGui::IsKeyPressed(83))
+        if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(83)))
             useSnap = !useSnap;
 
         ImGuiIO &io = ImGui::GetIO();

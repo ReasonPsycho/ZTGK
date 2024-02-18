@@ -38,8 +38,7 @@ struct Offsets {
 };
 
 
-static string asteroidModelPath = "C:/Users/redkc/CLionProjects/assignment-x-the-project-ReasonPsycho/res/models/Sphere/Sphere.obj";
-
+static string asteroidModelPath = "res/models/Sphere/Sphere.obj";
 
 class AsteroidsSystem {
 public:

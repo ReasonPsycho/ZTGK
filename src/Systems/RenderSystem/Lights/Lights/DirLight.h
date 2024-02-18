@@ -6,10 +6,11 @@
 #define OPENGLGP_DIRLIGHT_H
 
 
+#include "imgui.h"
+#include <ImGuizmo.h>
 #include "glm/vec4.hpp"
 #include "imgui.h"
 #include "ILight.h"
-#include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 #include "glm/gtx/quaternion.hpp"
 
 struct DirLightData {

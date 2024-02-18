@@ -6,11 +6,13 @@
 #define OPENGLGP_POINTLIGHT_H
 
 
+
+#include <imgui.h>
+#include <ImGuizmo.h>
 #include "glm/vec4.hpp"
 #include "imgui.h"
 #include "ILight.h"
 
-#include "../../../../cmake-build-debug/_deps/imguizmo-src/ImGuizmo.h"
 
 struct PointLightData {
     glm::vec4 position;

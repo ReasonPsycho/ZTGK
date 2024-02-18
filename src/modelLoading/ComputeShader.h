@@ -5,7 +5,7 @@
 #ifndef OPENGLGP_COMPUTESHADER_H
 #define OPENGLGP_COMPUTESHADER_H
 
-#include <string>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <iostream>
