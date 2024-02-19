@@ -24,13 +24,14 @@
 #include <spdlog/spdlog.h>
 
 #include <iostream>
-#include "Systems/EntitySystem/Enitity.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "Systems/AsteroidSystem/AsteroidsSystem.h"
 
 #include "Systems/RenderSystem/PBR/PBRSystem.h"
 #include "Systems/RenderSystem/PostProcessing/BloomSystem/BloomSystem.h"
 #include "Systems/RenderSystem/Lights/LightSystem.h"
+#include "Systems/EntitySystem/Enitities/ModelEntity.h"
+#include "Systems/EntitySystem/Scene.h"
 
 #ifndef ENTITY_H
 #define ENTITY_H
@@ -46,11 +47,11 @@ public:
 };
 #endif
 
-
+Scene scene;
 string modelPath = "res/models/Sphere/Sphere.obj";
 Model model = Model(&modelPath);
 
-Entity ourEntity(&model);
+ModelEntity ourEntity(&model);
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
@@ -137,7 +138,7 @@ float lastY = 0;
 LightSystem lightSystem(&camera);
 PBRSystem pbrSystem(&camera);
 BloomSystem bloomSystem;
-AsteroidsSystem asteroidsSystem(&pbrSystem.pbrInstanceShader);
+AsteroidsSystem asteroidsSystem;
 
 
 bool captureMouse = false;
@@ -310,24 +311,22 @@ void init_systems() {
 void load_enteties() {
 
     model.loadModel();
+    scene.addChild(std::make_shared<Entity>(&ourEntity));
     ourEntity.transform.setLocalPosition({-0, 0, 0});
     const float scale = 100;
     ourEntity.transform.setLocalScale({scale, scale, scale});
+    Entity *lastEntity = scene.children[0].get();
+    for (unsigned int i = 0; i < 2; ++i) {
+        ModelEntity modelEntity = ModelEntity(&model);
+        lastEntity->addChild(std::make_shared<Entity>(&modelEntity));
+        lastEntity = lastEntity->children.back().get();
 
-    {
-        Entity *lastEntity = &ourEntity;
-
-        for (unsigned int i = 0; i < 2; ++i) {
-            lastEntity->addChild(std::make_unique<Entity>(&model));
-            lastEntity = lastEntity->children.back().get();
-
-            //Set transform values
-            lastEntity->transform.setLocalPosition({5, 0, 0});
-            lastEntity->transform.setLocalScale({0.2f, 0.2f, 0.2f});
-        }
+        //Set transform values
+        lastEntity->transform.setLocalPosition({5, 0, 0});
+        lastEntity->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
     ourEntity.updateSelfAndChild();
-
+    lastEntity->addChild(std::make_shared<Entity>(&asteroidsSystem));
 }
 
 void init_imgui() {
@@ -375,15 +374,15 @@ void update() {
             lastEntity = lastEntity->children.back().get();
         }
 
-        ourEntity.transform.setLocalRotation({0.f, ourEntity.transform.getLocalRotation().y + 0.5f * deltaTime, 0.f});
-        ourEntity.updateSelfAndChild();
+        ourEntity.transform.setLocalRotation(glm::rotation(glm::vec3(0,1,0),glm::vec3(0,0.01f,0)));
+        scene.updateScene();
         asteroidsSystem.Update(deltaTime);
     }
 }
 
 void render() {
     render_scene_to_depth();
-    
+
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
 
@@ -412,33 +411,17 @@ void render() {
 
 
 void render_scene() {
-    // draw our scene graph
-    Entity *lastEntity = &ourEntity;
-    while (lastEntity->children.size()) {
-        lastEntity->draw(pbrSystem.pbrShader);
-        lastEntity = lastEntity->children.back().get();
-    }
+    scene.drawScene(pbrSystem.pbrShader,pbrSystem.pbrInstanceShader);
     file_logger->info("Rendered Entities.");
-
-
-    asteroidsSystem.Draw(lastEntity->transform.getModelMatrix());
 }
 
 
 void render_scene_to_depth() {
-
     for (auto &light: lightSystem.lights) {
         light->SetUpShadowBuffer(Normal);
         glClear(GL_DEPTH_BUFFER_BIT);
-
-        Entity *lastEntity = &ourEntity;
-        while (lastEntity->children.size()) {
-            lastEntity->simpleDraw(light->shadowMapShader);
-            lastEntity = lastEntity->children.back().get();
-        }
-        light->SetUpShadowBuffer(Instance);
-        asteroidsSystem.DrawToDepthMap(light->instanceShadowMapShader, lastEntity->transform.getModelMatrix());
-    }
+        scene.drawScene(*light->shadowMapShader,*light->instanceShadowMapShader);
+  }
 }
 
 void imgui_begin() {

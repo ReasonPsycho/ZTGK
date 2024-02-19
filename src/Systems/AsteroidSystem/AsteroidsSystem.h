@@ -15,7 +15,7 @@
 #include "modelLoading/ComputeShader.h"
 #include "glm/gtc/random.hpp"
 #include "modelLoading/Model.h"
-#include "Systems/EntitySystem/Enitity.h"
+#include "Systems/EntitySystem/Enitities/Enitity.h"
 #include <random>
 
 
@@ -40,7 +40,7 @@ struct Offsets {
 
 static string asteroidModelPath = "res/models/Sphere/Sphere.obj";
 
-class AsteroidsSystem {
+class AsteroidsSystem : public Entity {
 public:
     GLuint ID{};
     float maxScale = 0.5f;
@@ -48,16 +48,16 @@ public:
     glm::mat4x4 planet{};
 
 
-    AsteroidsSystem(Shader *asteroidShader);
+    AsteroidsSystem() = default;
 
     void Init();
 
     void Update(double deltaTime);
 
-    void Draw(glm::mat4x4 transformationMatrix);
 
-    void DrawToDepthMap(Shader *shader, glm::mat4x4 transformationMatrix);
-
+    void draw(Shader &regularShader,Shader &instancedShader) override;
+    
+    
     std::vector<AsteroidData> asteroidsData;
     std::vector<std::shared_ptr<Texture>> textures;
     Model asteroidModel = Model(&asteroidModelPath);

@@ -18,7 +18,7 @@ class Transform {
 protected:
     //Local space information
     glm::vec3 m_pos = {0.0f, 0.0f, 0.0f};
-    glm::vec3 m_eulerRot = {0.0f, 0.0f, 0.0f}; //In degrees
+    glm::quat m_quaternion = glm::quat(); //In degrees
     glm::vec3 m_scale = {1.0f, 1.0f, 1.0f};
 
     //Global space information concatenate in matrix
@@ -35,7 +35,7 @@ public:
 
     void setLocalPosition(const glm::vec3 &newPosition);
 
-    void setLocalRotation(const glm::vec3 &newRotation);
+    void setLocalRotation(const glm::quat &newRotation);
 
     void setLocalScale(const glm::vec3 &newScale);
 
@@ -43,7 +43,7 @@ public:
 
     const glm::vec3 &getLocalPosition() const;
 
-    const glm::vec3 &getLocalRotation() const;
+    const glm::quat &getLocalRotation() const;
 
     const glm::vec3 &getLocalScale() const;
 

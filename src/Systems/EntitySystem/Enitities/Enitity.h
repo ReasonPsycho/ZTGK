@@ -8,32 +8,27 @@
 #include "modelLoading/Model.h"
 #include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "Transform.h"
+#include "Systems/EntitySystem/Transform.h"
 
 
 class Entity {
 public:
 
-    explicit Entity(Model *pModel) : pModel(pModel) {}
-
-    Entity() = default;
+    explicit Entity() = default;
     
+    explicit Entity(Entity* parent);
+
     //Scene graph
-    std::list<std::unique_ptr<Entity>> children;
+    std::vector<std::shared_ptr<Entity>> children;
     Entity *parent = nullptr;
 
     //Space information
     Transform transform;
 
-    Model *pModel = nullptr;
-
-    // constructor, expects a filepath to a 3D model.
-
-
     //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
-    void addChild(std::unique_ptr<Entity> child) {
+    void addChild(std::shared_ptr<Entity> child) {
         child->parent = this;
-        children.push_back(std::move(child));
+        children.push_back(child);
     }
 
     //Update transform if it was changed
@@ -42,11 +37,13 @@ public:
     //Force update of transform even if local space don't change
     void forceUpdateSelfAndChild();
 
-    void draw(Shader &ourShader);
-
-    void drawSelfAndChild(Shader &ourShader, unsigned int &display, unsigned int &total);
-
-    void simpleDraw(Shader *ourShader);
+    virtual void draw(Shader &regularShader){};
+    virtual void draw(Shader &regularShader,Shader &instancedShader){
+        
+    };
+    
+    void drawSelfAndChild(Shader &ourShader);
+    void drawSelfAndChild(Shader &regularShader,Shader &instancedShader);
 };
 
 

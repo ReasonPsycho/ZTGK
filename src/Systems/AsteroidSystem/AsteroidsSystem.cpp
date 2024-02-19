@@ -4,9 +4,6 @@
 
 #include "AsteroidsSystem.h"
 
-AsteroidsSystem::AsteroidsSystem(Shader *asteroidShader) : asteroidShader(asteroidShader) {
-
-}
 
 unsigned int nextPowerOfTwo(unsigned int n) {
     // If n is already a power of two, return it
@@ -24,28 +21,15 @@ unsigned int nextPowerOfTwo(unsigned int n) {
     return 1 << count;
 }
 
-void AsteroidsSystem::Draw(glm::mat4x4 transformationMatrix) {
-    asteroidShader->use();
-    asteroidShader->setMatrix4("model", false, glm::value_ptr(transformationMatrix));
+void AsteroidsSystem::draw(Shader &regularShader,Shader &instancedShader) {
+    instancedShader.use();
+    instancedShader.setMatrix4("model", false, glm::value_ptr(transform.getModelMatrix()));
 
     textures[0]->use(GL_TEXTURE3);
     textures[1]->use(GL_TEXTURE4);
     textures[2]->use(GL_TEXTURE5);
     textures[3]->use(GL_TEXTURE6);
     textures[4]->use(GL_TEXTURE7);
-
-    for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++) {
-        glBindVertexArray(asteroidModel.meshes[i].VAO);
-        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(asteroidModel.meshes[i].indices.size()),
-                                GL_UNSIGNED_INT, 0, asteroidsData.size());
-        glBindVertexArray(0);
-    }
-}
-
-
-void AsteroidsSystem::DrawToDepthMap(Shader *shader, glm::mat4x4 transformationMatrix) {
-    shader->use();
-    shader->setMatrix4("model", false, glm::value_ptr(transformationMatrix));
 
     for (unsigned int i = 0; i < asteroidModel.meshes.size(); i++) {
         glBindVertexArray(asteroidModel.meshes[i].VAO);
@@ -206,3 +190,4 @@ void AsteroidsSystem::Update(double deltaTime) {
     glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
+
