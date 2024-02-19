@@ -191,3 +191,7 @@ void AsteroidsSystem::Update(double deltaTime) {
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
+void AsteroidsSystem::draw(Shader &regularShader) {
+    //Cannot implement that
+}
+

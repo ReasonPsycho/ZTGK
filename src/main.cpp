@@ -311,14 +311,14 @@ void init_systems() {
 void load_enteties() {
 
     model.loadModel();
-    scene.addChild(std::make_shared<Entity>(&ourEntity));
+    scene.addChild(std::make_shared<ModelEntity>(ourEntity));
     ourEntity.transform.setLocalPosition({-0, 0, 0});
     const float scale = 100;
     ourEntity.transform.setLocalScale({scale, scale, scale});
     Entity *lastEntity = scene.children[0].get();
     for (unsigned int i = 0; i < 2; ++i) {
         ModelEntity modelEntity = ModelEntity(&model);
-        lastEntity->addChild(std::make_shared<Entity>(&modelEntity));
+        lastEntity->addChild(std::make_shared<ModelEntity>(ourEntity));
         lastEntity = lastEntity->children.back().get();
 
         //Set transform values
@@ -326,7 +326,7 @@ void load_enteties() {
         lastEntity->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
     ourEntity.updateSelfAndChild();
-    lastEntity->addChild(std::make_shared<Entity>(&asteroidsSystem));
+    lastEntity->addChild(std::make_shared<AsteroidsSystem>(asteroidsSystem));
 }
 
 void init_imgui() {

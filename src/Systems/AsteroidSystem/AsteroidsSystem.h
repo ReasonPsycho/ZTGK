@@ -42,6 +42,7 @@ static string asteroidModelPath = "res/models/Sphere/Sphere.obj";
 
 class AsteroidsSystem : public Entity {
 public:
+
     GLuint ID{};
     float maxScale = 0.5f;
     float minScale = 0.1f;
@@ -56,6 +57,7 @@ public:
 
 
     void draw(Shader &regularShader,Shader &instancedShader) override;
+    void draw(Shader &regularShader) override;
     
     
     std::vector<AsteroidData> asteroidsData;
