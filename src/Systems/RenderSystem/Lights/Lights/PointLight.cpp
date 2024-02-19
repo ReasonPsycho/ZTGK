@@ -86,4 +86,42 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType) {
 
 }
 
+PointLight::PointLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, PointLightData data) : ILight(shadowMapShader,
+                                                                                                               instanceShadowMapShader),
+                                                                                                        data(data) {
+    lightType = Point;
+    model = glm::mat4x4(1);
+    model = glm::translate(model,
+                           glm::vec3(data.position.x, data.position.y, data.position.z)); // Rotation around x-axis
+}
+
+void PointLight::showImGuiDetails(Camera *camera) {
+    ImGui::PushID(uniqueID);
+
+    if (ImGui::TreeNode("Point light")) {
+        ImGui::InputFloat4("Color", glm::value_ptr(data.color));
+        ImGui::InputFloat("Constant", &data.constant);
+        ImGui::InputFloat("Linear", &data.linear);
+        ImGui::InputFloat("Quadratic", &data.quadratic);
+        EditLight(camera);
+        // Display other light properties...
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+
+}
+
+void PointLight::EditLight(Camera *camera) {
+    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
+    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+
+    ImGui::InputFloat4("Position", glm::value_ptr(data.position));
+    ImGuiIO &io = ImGui::GetIO();
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+    ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix()),
+                         mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(model),
+                         nullptr, nullptr);
+    data.position = glm::vec4(glm::vec3(model[3]), 1);
+}
+
 

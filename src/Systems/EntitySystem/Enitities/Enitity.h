@@ -37,10 +37,8 @@ public:
     //Force update of transform even if local space don't change
     void forceUpdateSelfAndChild();
 
-    virtual void draw(Shader &regularShader){};
-    virtual void draw(Shader &regularShader,Shader &instancedShader){
-        
-    };
+    virtual void draw(Shader &regularShader){}; //TODO split this logic to some render stuff
+    virtual void draw(Shader &regularShader,Shader &instancedShader){};
     
     void drawSelfAndChild(Shader &ourShader);
     void drawSelfAndChild(Shader &regularShader,Shader &instancedShader);

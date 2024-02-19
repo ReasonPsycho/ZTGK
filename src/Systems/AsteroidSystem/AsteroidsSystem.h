@@ -46,7 +46,6 @@ public:
     GLuint ID{};
     float maxScale = 0.5f;
     float minScale = 0.1f;
-    glm::mat4x4 planet{};
 
 
     AsteroidsSystem() = default;
@@ -57,7 +56,6 @@ public:
 
 
     void draw(Shader &regularShader,Shader &instancedShader) override;
-    void draw(Shader &regularShader) override;
     
     
     std::vector<AsteroidData> asteroidsData;

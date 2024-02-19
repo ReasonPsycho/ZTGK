@@ -20,11 +20,7 @@ enum ShaderType {
 
 class ILight {
 public:
-    ILight(Shader *shadowMapShader, Shader *instanceShadowMapShader) : shadowMapShader(shadowMapShader),
-                                                                       instanceShadowMapShader(
-                                                                               instanceShadowMapShader) {
-        uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
-    }
+    ILight(Shader *shadowMapShader, Shader *instanceShadowMapShader);
 
     ~ILight();
 

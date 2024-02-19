@@ -41,7 +41,6 @@ void AsteroidsSystem::draw(Shader &regularShader,Shader &instancedShader) {
 
 void AsteroidsSystem::Init() {
     asteroidModel.loadModel();
-    planet = glm::mat4x4(1);
     const float PI = 3.14159265359;
     float radius = 300;
     float span = 10;
@@ -189,9 +188,5 @@ void AsteroidsSystem::Update(double deltaTime) {
     cumputeShaderSeperation.use();
     glDispatchCompute(asteroidsData.size(), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-}
-
-void AsteroidsSystem::draw(Shader &regularShader) {
-    //Cannot implement that
 }
 
