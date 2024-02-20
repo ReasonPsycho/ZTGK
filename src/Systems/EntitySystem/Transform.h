@@ -12,7 +12,9 @@
 #include "modelLoading/Model.h"
 #include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
-
+#include "glm/gtx/quaternion.hpp"
+#include "imgui.h"
+#include "ImGuizmo.h"
 
 class Transform {
 protected:
@@ -28,7 +30,7 @@ protected:
     bool m_isDirty = true;
 
 public:
-
+    virtual void ManipulateModelMatrix(Camera* camera);
     void computeModelMatrix();
 
     void computeModelMatrix(const glm::mat4 &parentGlobalModelMatrix);

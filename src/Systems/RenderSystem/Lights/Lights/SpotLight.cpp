@@ -75,17 +75,8 @@ void SpotLight::SetUpShadowBuffer(ShaderType shaderType) {
 }
 
 SpotLight::SpotLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, SpotLightData data) : ILight(shadowMapShader,
-                                                                                                            instanceShadowMapShader),
-                                                                                                     data(data) {
+                                                                                                            instanceShadowMapShader),data(data) {
     lightType = Spot;
-
-    model = glm::mat4x4(1);
-    model = glm::translate(model,
-                           glm::vec3(data.position.x, data.position.y, data.position.z)); // Rotation around x-axis
-    model = glm::rotate(model, data.direction.x, glm::vec3(1.0f, 0.0f, 0.0f)); // Rotation around x-axis
-    model = glm::rotate(model, data.direction.y, glm::vec3(0.0f, 1.0f, 0.0f)); // Rotation around y-axis
-    model = glm::rotate(model, data.direction.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Rotation around z-axis    
-
 }
 
 void SpotLight::showImGuiDetails(Camera *camera) {
@@ -129,14 +120,13 @@ void SpotLight::EditLight(Camera *camera) {
 
     ImGuiIO &io = ImGui::GetIO();
     ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-    ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix()),
-                         mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(model),
-                         nullptr, nullptr);
+    transform.ManipulateModelMatrix(camera);
+
     // Extract the rotation as a quaternion
-    glm::quat q = glm::toQuat(model);
+    glm::quat q = glm::toQuat(transform.getModelMatrix());
     // Convert the quaternion to Euler angles
     glm::vec3 eulerAngles = glm::eulerAngles(q);
     data.direction = glm::vec4(eulerAngles, 1);
-    data.position = glm::vec4(glm::vec3(model[3]), 1);
+    data.position = glm::vec4(transform.getGlobalPosition(), 1);
 }
 

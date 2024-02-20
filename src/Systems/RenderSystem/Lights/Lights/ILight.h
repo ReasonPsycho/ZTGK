@@ -6,6 +6,7 @@
 #define OPENGLGP_ILIGHT_H
 
 #include "Camera.h"
+#include "Systems/EntitySystem/Enitities/Enitity.h"
 
 enum LightType {
     Directional,
@@ -18,15 +19,14 @@ enum ShaderType {
     Normal,
 };
 
-class ILight {
+class ILight : public Entity {
 public:
     ILight(Shader *shadowMapShader, Shader *instanceShadowMapShader);
 
     ~ILight();
 
     enum LightType lightType;
-    glm::mat4x4 model{};
-
+    
     virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
     virtual void EditLight(Camera *camera) = 0;
 
