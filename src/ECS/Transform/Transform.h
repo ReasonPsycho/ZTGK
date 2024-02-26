@@ -30,6 +30,7 @@ protected:
     bool m_isDirty = true;
 
 public:
+    Transform() = default;
     virtual void ManipulateModelMatrix(Camera* camera);
     void computeModelMatrix();
 

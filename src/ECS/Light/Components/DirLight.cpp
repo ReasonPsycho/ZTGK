@@ -2,8 +2,8 @@
 // Created by redkc on 16/01/2024.
 //
 
+#include "ECS/Entity.h"
 #include "DirLight.h"
-
 void DirLight::InnitShadow() {
     if (initializedShadow) {
         DeleteShadow();
@@ -43,11 +43,11 @@ void DirLight::InnitShadow() {
     lightView = glm::lookAt(translatedPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     data.position = glm::vec4(translatedPos, 1.0f);
     data.lightSpaceMatrix = lightProjection * lightView;
-    
+
     initializedShadow = true;
 }
 
-void DirLight::SetUpShadowBuffer(ShaderType shaderType) {
+void DirLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) {
     if (shaderType == Normal) {
         shadowMapShader->use();
         shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
@@ -55,7 +55,7 @@ void DirLight::SetUpShadowBuffer(ShaderType shaderType) {
         instanceShadowMapShader->use();
         instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
     }
-    
+
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glActiveTexture(GL_TEXTURE0);
@@ -65,9 +65,8 @@ void DirLight::SetUpShadowBuffer(ShaderType shaderType) {
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 }
 
-DirLight::DirLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, DirLightData data) : ILight(shadowMapShader,
-                                                                                                         instanceShadowMapShader),
-                                                                                                  data(data) {
+DirLight::DirLight(DirLightData data) :
+        data(data) {
     lightType = Directional;
 }
 
@@ -83,23 +82,17 @@ void DirLight::showImGuiDetails(Camera *camera) {
 }
 
 void DirLight::EditLight(Camera *camera) {
-    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
-    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 
-    ImGui::InputFloat3("Direction", glm::value_ptr(data.direction));
-
-    ImGuiIO &io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-
-    transform.ManipulateModelMatrix(camera);
+    getEntity()->transform.ManipulateModelMatrix(camera);
 
 // Extract the rotation as a quaternion
-    glm::quat q = glm::toQuat(transform.getModelMatrix());
+    glm::quat q = glm::toQuat(getEntity()->transform.getModelMatrix());
 
 // Convert the quaternion to Euler angles
     glm::vec3 eulerAngles = glm::eulerAngles(q);
     data.direction = glm::vec4(eulerAngles, 1);
 }
+
 
 
 

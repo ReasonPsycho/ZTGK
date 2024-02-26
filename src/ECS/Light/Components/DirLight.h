@@ -9,7 +9,6 @@
 #include "imgui.h"
 #include <ImGuizmo.h>
 #include "glm/vec4.hpp"
-#include "imgui.h"
 #include "ILight.h"
 #include "glm/gtx/quaternion.hpp"
 
@@ -22,8 +21,8 @@ struct DirLightData {
 
 class DirLight : public ILight {
 public:
-    DirLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, DirLightData data);
-
+    DirLight( DirLightData data);
+    
 
     DirLightData data;
 
@@ -33,7 +32,7 @@ public:
     
     void InnitShadow() override;
 
-    void SetUpShadowBuffer(ShaderType shaderType) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
     
 };
 

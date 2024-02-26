@@ -2,6 +2,7 @@
 // Created by redkc on 16/01/2024.
 //
 
+#include "ECS/Entity.h"
 #include "PointLight.h"
 
 void PointLight::InnitShadow() {
@@ -58,7 +59,7 @@ void PointLight::InnitShadow() {
     initializedShadow = true;
 }
 
-void PointLight::SetUpShadowBuffer(ShaderType shaderType) {
+void PointLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) {
     // 1. render scene to depth cubemap
     // --------------------------------
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -86,9 +87,8 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType) {
 
 }
 
-PointLight::PointLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, PointLightData data) : ILight(shadowMapShader,
-                                                                                                               instanceShadowMapShader),
-                                                                                                        data(data) {
+PointLight::PointLight(PointLightData data):
+                                                                    data(data) {
     lightType = Point;
 }
 
@@ -109,15 +109,9 @@ void PointLight::showImGuiDetails(Camera *camera) {
 }
 
 void PointLight::EditLight(Camera *camera) {
-    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
-    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+    getEntity()->transform.ManipulateModelMatrix(camera);
 
-    ImGui::InputFloat4("Position", glm::value_ptr(data.position));
-    ImGuiIO &io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-    transform.ManipulateModelMatrix(camera);
-
-    data.position = glm::vec4(transform.getGlobalPosition(), 1);
+    data.position = glm::vec4(getEntity()->transform.getGlobalPosition(), 1);
 }
 
 

@@ -5,21 +5,23 @@
 #ifndef REASONABLEGL_SCENE_H
 #define REASONABLEGL_SCENE_H
 
-
-#include "Systems/EntitySystem/Enitities/Enitity.h"
+#include "../SystemManager.h"
+#include "modelLoading/Shader.h"
+#include "ECS/Entity.h"
 
 class Scene {
 public:
-    std::vector<std::shared_ptr<Entity>> children;
-    void drawScene(Shader &regularShader);
-    void drawScene(Shader &regularShader,Shader &instancedShader);
-    void updateScene();
-
-    void addChild(std::shared_ptr<Entity> child) {
-        children.push_back(child);
-    }
-    
     Scene() = default;
+
+    Entity* addGameObject();
+    Entity* addGameObject(Entity* parent);
+    
+    void updateScene();
+    
+    SystemManager systemManager;
+    
+private:
+    std::vector<std::unique_ptr<Entity>> children;
 };
 
 

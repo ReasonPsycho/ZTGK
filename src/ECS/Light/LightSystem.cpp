@@ -9,20 +9,20 @@ void LightSystem::PushToSSBO() {
 
 
     GenerateShadowBuffers();
-    
+
     std::vector<DirLightData> dirLightDataArray;
-    for (const DirLight &light: dirLights) {
-        dirLightDataArray.push_back(light.data);
+    for (const DirLight *light: dirLights) {
+        dirLightDataArray.push_back(light->data);
     }
 
     std::vector<SpotLightData> spotLightDataArray;
-    for (const SpotLight &light: spotLights) {
-        spotLightDataArray.push_back(light.data);
+    for (const SpotLight *light: spotLights) {
+        spotLightDataArray.push_back(light->data);
     }
 
     std::vector<PointLightData> pointLightDataArray;
-    for (const PointLight &light: pointLights) {
-        pointLightDataArray.push_back(light.data);
+    for (const PointLight *light: pointLights) {
+        pointLightDataArray.push_back(light->data);
     }
 
 
@@ -31,26 +31,22 @@ void LightSystem::PushToSSBO() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
     glBufferData(GL_SHADER_STORAGE_BUFFER, dirLightDataArray.size() * sizeof(DirLightData), dirLightDataArray.data(),
                  GL_STATIC_DRAW);
-    int bindingPoint = 3; // Choose a binding point
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, dirLightBufferId, currentId);
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
     glBufferData(GL_SHADER_STORAGE_BUFFER, pointLightDataArray.size() * sizeof(PointLightData),
                  pointLightDataArray.data(),
                  GL_STATIC_DRAW);
-    bindingPoint = 4; // Choose a binding point
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, pointLightBufferId, currentId);
 
     glGenBuffers(1, &currentId);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentId);
     glBufferData(GL_SHADER_STORAGE_BUFFER, spotLightDataArray.size() * sizeof(SpotLightData), spotLightDataArray.data(),
                  GL_STATIC_DRAW);
-    bindingPoint = 5; // Choose a binding point
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, spotLightBufferId, currentId);
 
 
-    
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
@@ -69,42 +65,6 @@ void LightSystem::showLightTree() {
     }
 }
 
-//Should have done it cleaner don't care enough to do it
-void LightSystem::AddDirLight(glm::vec4 direction, glm::vec4 color) {
-    dirLights.push_back(DirLight(&planeDepthShader, &instancePlaneDepthShader, DirLightData(direction, color)));
-    lights.push_back(&dirLights.back());
-}
-
-void LightSystem::AddPointLight(glm::vec4 position,
-                                float constant,
-                                float linear,
-                                float quadratic,
-                                glm::vec4 color) {
-    pointLights.push_back(
-            PointLight(&cubeDepthShader, &instanceCubeDepthShader,
-                       PointLightData(position, constant, linear, quadratic, 0, color)));
-    lights.push_back(&pointLights.back());
-
-}
-
-void LightSystem::AddSpotLight(glm::vec4 position,
-                               glm::vec4 direction,
-                               float cutOff,
-                               float outerCutOff,
-                               float constant,
-                               float linear,
-                               float quadratic,
-                               glm::vec4 color) {
-    spotLights.push_back(
-            SpotLight(&planeDepthShader, &instancePlaneDepthShader, SpotLightData(position, direction, cutOff,
-                                                                    outerCutOff,
-                                                                    constant,
-                                                                    linear,
-                                                                    quadratic, 0, 0, 0,
-                                                                    color)));
-    lights.push_back(&spotLights.back());
-}
-
 LightSystem::~LightSystem() {
     dirLights.clear();
     pointLights.clear();
@@ -119,13 +79,6 @@ void LightSystem::GenerateShadowBuffers() {
     for (auto &light: lights) {
         light->InnitShadow();
     }
-}
-
-void LightSystem::GenerateShadows(void (*funcPtr)(), ShaderType shaderType) {
-    for (auto &light: lights) {
-        light->SetUpShadowBuffer(shaderType);
-    }
-    glViewport(0, 0, camera->saved_display_w, camera->saved_display_h); // Needed after light generation
 }
 
 void LightSystem::Init() {
@@ -161,6 +114,53 @@ void LightSystem::PushDepthMapsToShader(Shader *shader) { //TODO this should be 
                         POINT_SHADOW_OFFSET + planeShadowIndex);
             planeShadowIndex++;
         }
-    
+
     }
+}
+
+void LightSystem::Update(double deltaTime) {
+    int offset = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
+    for (auto &light: dirLights) {
+        if (light->getIsDirty()) {  // Only push it if it's dirty
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(light->data), &light->data);
+        }
+        offset += sizeof(light->data);
+    }
+
+    offset = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
+    for (auto &light: pointLights) {
+
+        if (light->getIsDirty()) {  // Only push it if it's dirty
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(light->data), &light->data);
+        }
+        offset += sizeof(light->data);
+    }
+
+    offset = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
+    for (auto &light: spotLights) {
+        if (light->getIsDirty()) {  // Only push it if it's dirty
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(light->data), &light->data);
+        }
+        offset += sizeof(light->data);
+    }
+}
+
+void LightSystem::addComponent(void *component) {
+    ILight *light = static_cast<ILight *>(component);
+
+    switch (light->lightType) {
+        case Point:
+            pointLights.push_back(reinterpret_cast<PointLight *>(&light));
+            break;
+        case Directional:
+            dirLights.push_back(reinterpret_cast<DirLight *>(&light));
+            break;
+        case Spot:
+            spotLights.push_back(reinterpret_cast<SpotLight *>(&light));
+            break;
+    }
+    lights.push_back(light);
 }

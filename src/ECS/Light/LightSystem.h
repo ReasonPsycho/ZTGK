@@ -12,15 +12,17 @@
 #include <vector>
 #include <memory>
 #include "glm/vec4.hpp"
-#include "Lights/ILight.h"
-#include "Lights/DirLight.h"
-#include "Lights/PointLight.h"
-#include "Lights/SpotLight.h"
+#include "Components/ILight.h"
+#include "Components/DirLight.h"
+#include "Components/PointLight.h"
+#include "Components/SpotLight.h"
 #include "Camera.h"
 #include "modelLoading/Texture.h"
+#include "../System.h"
+#include "../Component.h"
 
 
-class LightSystem {
+class LightSystem : public System {
 public:
     //Setup
     LightSystem(Camera *camera);
@@ -30,34 +32,21 @@ public:
     void Init();
 
     void PushToSSBO();
+    void Update(double deltaTime);
 
     void GenerateShadowBuffers();
+
+
+    const std::type_index* getComponentTypes() override {return reinterpret_cast<const type_index *>(&componentTypes); };
+    int getNumComponentTypes() override { return 4;};
+
+
+    void addComponent(void* component) override;
     
-    //Add light
-    void AddDirLight(glm::vec4 direction, glm::vec4 color);
-
-    void AddPointLight(glm::vec4 position,
-                       float constant,
-                       float linear,
-                       float quadratic,
-                       glm::vec4 color);
-
-    void AddSpotLight(glm::vec4 position,
-                      glm::vec4 direction,
-                      float cutOff,
-                      float outerCutOff,
-                      float constant,
-                      float linear,
-                      float quadratic,
-                      glm::vec4 color);
-
     //Imgui
     void showLightTree();
-
-    void GenerateShadows(void (*funcPtr)(), ShaderType shaderType);
-
+    
     void PushDepthMapsToShader(Shader *shader);
-
 
     Shader instanceCubeDepthShader = Shader("res/shaders/Shadows/instance_point_shadows_depth.vert",
                                             "res/shaders/Shadows/point_shadows_depth.frag",
@@ -66,12 +55,15 @@ public:
     Shader instancePlaneDepthShader = Shader("res/shaders/Shadows/instance_shadows_depth.vert",
                                              "res/shaders/Shadows/shadows_depth.frag");
 
-    std::vector<ILight *> lights;
-private:
     //Vectors
-    std::vector<DirLight> dirLights;
-    std::vector<PointLight> pointLights;
-    std::vector<SpotLight> spotLights;
+    std::vector<ILight *> lights;
+    std::vector<DirLight*> dirLights;
+    std::vector<PointLight*> pointLights;
+    std::vector<SpotLight*> spotLights;
+
+
+private:
+
 
     //Camera
     Camera *camera;
@@ -86,7 +78,16 @@ private:
     Shader planeDepthShader = Shader("res/shaders/Shadows/shadows_depth.vert",
                                      "res/shaders/Shadows/shadows_depth.frag");
 
-
+    
+    GLuint dirLightBufferId = 3;
+    GLuint pointLightBufferId = 4;
+    GLuint spotLightBufferId = 5;
+    std::array<std::type_index, 4> componentTypes = {
+            std::type_index(typeid(ILight)),
+            std::type_index(typeid(DirLight)),
+            std::type_index(typeid(PointLight)),
+            std::type_index(typeid(SpotLight))
+    };
 };
 
 

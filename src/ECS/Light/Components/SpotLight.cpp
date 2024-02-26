@@ -2,6 +2,7 @@
 // Created by redkc on 16/01/2024.
 //
 
+#include "ECS/Entity.h"
 #include "SpotLight.h"
 
 void SpotLight::InnitShadow() {
@@ -55,7 +56,7 @@ void SpotLight::InnitShadow() {
     initializedShadow = true;
 }
 
-void SpotLight::SetUpShadowBuffer(ShaderType shaderType) {
+void SpotLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) {
 
     if (shaderType == Normal) {
         shadowMapShader->use();
@@ -74,8 +75,7 @@ void SpotLight::SetUpShadowBuffer(ShaderType shaderType) {
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 }
 
-SpotLight::SpotLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, SpotLightData data) : ILight(shadowMapShader,
-                                                                                                            instanceShadowMapShader),data(data) {
+SpotLight::SpotLight(SpotLightData data) : data(data) {
     lightType = Spot;
 }
 
@@ -97,36 +97,13 @@ void SpotLight::showImGuiDetails(Camera *camera) {
 }
 
 void SpotLight::EditLight(Camera *camera) {
-    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
-    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
-    if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(90)))
-        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(69)))
-        mCurrentGizmoOperation = ImGuizmo::ROTATE;
-
-    if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    ImGui::SameLine();
-    if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-        mCurrentGizmoOperation = ImGuizmo::ROTATE;
-
-    ImGui::InputFloat3("Position", glm::value_ptr(data.position));
-    ImGui::InputFloat3("Rotation", glm::value_ptr(data.direction));
-
-
-    static bool useSnap(false);
-    if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(83)))
-        useSnap = !useSnap;
-
-    ImGuiIO &io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-    transform.ManipulateModelMatrix(camera);
+    getEntity()->transform.ManipulateModelMatrix(camera);
 
     // Extract the rotation as a quaternion
-    glm::quat q = glm::toQuat(transform.getModelMatrix());
+    glm::quat q = glm::toQuat( getEntity()->transform.getModelMatrix());
     // Convert the quaternion to Euler angles
     glm::vec3 eulerAngles = glm::eulerAngles(q);
     data.direction = glm::vec4(eulerAngles, 1);
-    data.position = glm::vec4(transform.getGlobalPosition(), 1);
+    data.position = glm::vec4( getEntity()->transform.getGlobalPosition(), 1);
 }
 

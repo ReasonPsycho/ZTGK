@@ -15,7 +15,7 @@
 #include "modelLoading/ComputeShader.h"
 #include "glm/gtc/random.hpp"
 #include "modelLoading/Model.h"
-#include "Systems/EntitySystem/Enitities/Enitity.h"
+#include "ECS/Entity.h"
 #include <random>
 
 
@@ -55,7 +55,7 @@ public:
     void Update(double deltaTime);
 
 
-    void draw(Shader &regularShader,Shader &instancedShader) override;
+    void draw(Shader &regularShader,Shader &instancedShader);
     
     
     std::vector<AsteroidData> asteroidsData;

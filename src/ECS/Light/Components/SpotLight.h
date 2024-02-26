@@ -31,7 +31,8 @@ struct SpotLightData {
 
 class SpotLight : public ILight {
 public:
-    SpotLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, SpotLightData data);
+    SpotLight(SpotLightData data);
+
 
 
     SpotLightData data;
@@ -42,7 +43,7 @@ public:
 
     void InnitShadow() override;
 
-    void SetUpShadowBuffer(ShaderType shaderType) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
 };
 
 

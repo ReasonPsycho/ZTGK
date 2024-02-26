@@ -25,13 +25,13 @@
 
 #include <iostream>
 #include "spdlog/sinks/basic_file_sink.h"
-#include "Systems/AsteroidSystem/AsteroidsSystem.h"
 
 #include "Systems/RenderSystem/PBR/PBRSystem.h"
 #include "Systems/RenderSystem/PostProcessing/BloomSystem/BloomSystem.h"
-#include "Systems/RenderSystem/Lights/LightSystem.h"
-#include "Systems/EntitySystem/Enitities/ModelEntity.h"
+#include "ECS/Light/LightSystem.h"
+#include "ECS/Render/RenderSystem.h"
 #include "Systems/EntitySystem/Scene.h"
+#include "ECS/Render/Components/Render.h"
 
 #ifndef ENTITY_H
 #define ENTITY_H
@@ -51,7 +51,6 @@ Scene scene;
 string modelPath = "res/models/Sphere/Sphere.obj";
 Model model = Model(&modelPath);
 
-ModelEntity ourEntity(&model);
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
@@ -137,8 +136,8 @@ float lastY = 0;
 
 LightSystem lightSystem(&camera);
 PBRSystem pbrSystem(&camera);
+RenderSystem renderSystem;
 BloomSystem bloomSystem;
-AsteroidsSystem asteroidsSystem;
 
 
 bool captureMouse = false;
@@ -298,35 +297,34 @@ bool init() {
 
 
 void init_systems() {
-    asteroidsSystem.Init();
-    lightSystem.AddDirLight(glm::vec4(-1.5f, 0, 0.0f, 0), glm::vec4(255, 255, 255, 0.5f));
-    lightSystem.AddPointLight(glm::vec4(-120.0f, 40.0f, 0, 0), 5.0f, 0.09f, 0.032f, glm::vec4(255, 0, 0, 1));
-    lightSystem.AddSpotLight(glm::vec4(-120.0f, -40.0f, 0, 0), glm::vec4(0, 0, -1.0f, 0), 12.5f, 15.0f, 1.0f, 0.09f,
-                             0.032f, glm::vec4(0, 255, 0, 1));
     lightSystem.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
+    scene.systemManager.addSystem(&lightSystem);
+    scene.systemManager.addSystem(&renderSystem);
 }
 
 void load_enteties() {
-
     model.loadModel();
-    scene.addChild(std::make_shared<ModelEntity>(ourEntity));
-    ourEntity.transform.setLocalPosition({-0, 0, 0});
+    Entity *gameObject = scene.addGameObject();
+    gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 100;
-    ourEntity.transform.setLocalScale({scale, scale, scale});
-    Entity *lastEntity = scene.children[0].get();
+    gameObject->transform.setLocalScale({scale, scale, scale});
+    gameObject->addComponent(new Render(&model));
     for (unsigned int i = 0; i < 2; ++i) {
-        ModelEntity modelEntity = ModelEntity(&model);
-        lastEntity->addChild(std::make_shared<ModelEntity>(ourEntity));
-        lastEntity = lastEntity->children.back().get();
-
-        //Set transform values
-        lastEntity->transform.setLocalPosition({5, 0, 0});
-        lastEntity->transform.setLocalScale({0.2f, 0.2f, 0.2f});
+        gameObject = scene.addGameObject(gameObject);
+        gameObject->addComponent(new Render(&model));
+        gameObject->transform.setLocalScale({scale, scale, scale});
+        gameObject->transform.setLocalPosition({5, 0, 0});
+        gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-    ourEntity.updateSelfAndChild();
-    lastEntity->addChild(std::make_shared<AsteroidsSystem>(asteroidsSystem));
+    gameObject = scene.addGameObject();
+    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(1), glm::vec4(1), glm::mat4x4(1))));
+    gameObject = scene.addGameObject();
+    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(1))));
+    gameObject = scene.addGameObject();
+    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f)));
+    lightSystem.PushToSSBO();
 }
 
 void init_imgui() {
@@ -365,19 +363,9 @@ void input() {
 }
 
 void update() {
-
-    deltaTime *= (double) timeStep;
-    if (timeStep != 0) {
-        Entity *lastEntity = &ourEntity;
-        while (lastEntity->children.size()) {
-            pbrSystem.pbrShader.setMatrix4("model", false, glm::value_ptr(lastEntity->transform.getModelMatrix()));
-            lastEntity = lastEntity->children.back().get();
-        }
-
-        ourEntity.transform.setLocalRotation(glm::rotation(glm::vec3(0,1,0),glm::vec3(0,0.01f,0)));
-        scene.updateScene();
-        asteroidsSystem.Update(deltaTime);
-    }
+    scene.updateScene();
+    lightSystem.Update(deltaTime);
+    
 }
 
 void render() {
@@ -411,17 +399,17 @@ void render() {
 
 
 void render_scene() {
-    scene.drawScene(pbrSystem.pbrShader,pbrSystem.pbrInstanceShader);
+    renderSystem.DrawScene(&pbrSystem.pbrShader);
     file_logger->info("Rendered Entities.");
 }
 
 
 void render_scene_to_depth() {
-    for (auto &light: lightSystem.lights) {
-        light->SetUpShadowBuffer(Normal);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        scene.drawScene(*light->shadowMapShader,*light->instanceShadowMapShader);
-  }
+    // for (auto &light: lightSystem.lights) {
+    //    light->SetUpShadowBuffer(Normal);
+    //    glClear(GL_DEPTH_BUFFER_BIT);
+    //    scene.drawScene(*light->shadowMapShader,*light->instanceShadowMapShader);
+    //}
 }
 
 void imgui_begin() {

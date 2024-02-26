@@ -27,10 +27,10 @@ struct PointLightData {
 
 class PointLight : public ILight {
 public:
-    PointLight(Shader *shadowMapShader, Shader *instanceShadowMapShader, PointLightData data);
-
-
+    PointLight(PointLightData data);
+    
     PointLightData data;
+
 
     void showImGuiDetails(Camera *camera) override;
 
@@ -38,7 +38,7 @@ public:
 
     void InnitShadow() override;
 
-    void SetUpShadowBuffer(ShaderType shaderType) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
 
 private:
     std::vector<glm::mat4> shadowTransforms;

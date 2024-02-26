@@ -6,7 +6,8 @@
 #define OPENGLGP_ILIGHT_H
 
 #include "Camera.h"
-#include "Systems/EntitySystem/Enitities/Enitity.h"
+#include "ECS/Component.h"
+
 
 enum LightType {
     Directional,
@@ -19,28 +20,26 @@ enum ShaderType {
     Normal,
 };
 
-class ILight : public Entity {
+class ILight : public Component {
 public:
-    ILight(Shader *shadowMapShader, Shader *instanceShadowMapShader);
+    ILight();
 
     ~ILight();
 
     enum LightType lightType;
-    
+
+
     virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
     virtual void EditLight(Camera *camera) = 0;
 
-    virtual void SetUpShadowBuffer(ShaderType shaderType) = 0; // Pure virtual function
+    virtual void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader,
+                                   Shader *instanceShadowMapShader) = 0; // Pure virtual function
     virtual void InnitShadow() = 0;
 
     void DeleteShadow();
 
     unsigned int depthMap{};
-
-    Shader *instanceShadowMapShader;
-    Shader *shadowMapShader;
-private:
-    static int nextID; // Static variable to keep track of the next available ID
+    
 protected:
     int uniqueID;     // Instance variable to store the unique ID for each object
 
