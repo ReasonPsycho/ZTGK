@@ -60,7 +60,7 @@ void BloomSystem::BlurBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     horizontal = true;
     first_iteration = true;
-    amount = 10;
+    amount = 0;
     shaderBlur.use();
     glActiveTexture(GL_TEXTURE0);
     for (unsigned int i = 0; i < amount; i++) {

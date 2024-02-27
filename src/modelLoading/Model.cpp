@@ -36,6 +36,14 @@ void Model::loadModel() {
     processNode(scene->mRootNode, scene);
 }
 
+void replaceAll(string &str, const string &from, const string &to) {
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+}
+
 // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
 void Model::processNode(aiNode *node, const aiScene *scene) {
     // process each mesh located at the current node
@@ -126,20 +134,29 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     // specular: texture_specularN
     // normal: texture_normalN
 
-    // 1. diffuse maps
-    vector<shared_ptr<Texture>> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    // 2. specular maps
-    vector<shared_ptr<Texture>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
-                                                                    "texture_specular");
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    // 3. normal maps
-    vector<shared_ptr<Texture>> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+// 1. albedo maps
+    vector<shared_ptr<Texture>> albedoMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo");
+    textures.insert(textures.end(), albedoMaps.begin(), albedoMaps.end());
+// 2. normal maps
+    vector<shared_ptr<Texture>> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    // 4. height maps
-    vector<shared_ptr<Texture>> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+// 3. metallic maps
+    vector<shared_ptr<Texture>> metallicMaps = loadMaterialTextures(material, aiTextureType_METALNESS,
+                                                                    "texture_metallic");
+    textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
+// 4. roughness maps
+    vector<shared_ptr<Texture>> roughnessMaps = loadMaterialTextures(material, aiTextureType_SHININESS,
+                                                                     "texture_roughness");
+    textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
+// 5. ambient occlusion maps
 
+    string albedoPath = albedoMaps.back().get()->path;
+    string aoPath = albedoPath.substr(0, albedoPath.find_last_of('_')) + "_ao.png";
+
+    vector<shared_ptr<Texture>> aoMaps = forceLoadMaterialTexture(aoPath, aiTextureType_AMBIENT_OCCLUSION,
+                                                                  "texture_ao");
+
+    textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
 }
@@ -155,19 +172,41 @@ vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, ai
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
         bool skip = false;
         for (unsigned int j = 0; j < textures_loaded.size(); j++) {
-            if (std::strcmp(textures_loaded[j]->name.c_str(), str.C_Str()) == 0) {
+            if (std::strcmp(textures_loaded[j]->path.c_str(), str.C_Str()) == 0) {
                 textures.push_back(textures_loaded[j]);
                 skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
                 break;
             }
         }
         if (!skip) {   // if texture hasn't been loaded already, load it
-            shared_ptr<Texture> texture = std::make_shared<Texture>(str.C_Str(), directory,
-                                                                    typeName); // CHECK wouldn't that deconstruct that??
+            directory = path->substr(0, path->find_last_of('/'));
+            string texturePath = string("\\" + directory + "\\" + str.C_Str());
+            replaceAll(texturePath, "/", "\\");
+            shared_ptr<Texture> texture = std::make_shared<Texture>(texturePath, typeName);
             textures.push_back(texture);
             textures_loaded.push_back(
                     texture);  // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
         }
+    }
+    return textures;
+}
+
+vector<std::shared_ptr<Texture>> Model::forceLoadMaterialTexture(string path, aiTextureType type, string typeName) {
+    vector<std::shared_ptr<Texture>> textures;
+    // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
+    bool skip = false;
+    for (unsigned int j = 0; j < textures_loaded.size(); j++) {
+        if (std::strcmp(textures_loaded[j]->path.c_str(), path.c_str()) == 0) {
+            textures.push_back(textures_loaded[j]);
+            skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
+            break;
+        }
+    }
+    if (!skip) {   // if texture hasn't been loaded already, load it
+        shared_ptr<Texture> texture = std::make_shared<Texture>(path, typeName);
+        textures.push_back(texture);
+        textures_loaded.push_back(
+                texture);  // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
     }
     return textures;
 }

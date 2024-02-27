@@ -100,6 +100,7 @@ void AsteroidsSystem::Init() {
     bindingPoint = 2; // Choose a binding point
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPoint, currentId);
 
+    /*
     shared_ptr<Texture> albedoMap = std::make_shared<Texture>("ocean-rock_albedo.png", "res/textures/ocean-rock-bl",
                                                               "texture_albedo");
     textures.insert(textures.end(), albedoMap);
@@ -125,7 +126,7 @@ void AsteroidsSystem::Init() {
     textures[2]->use(GL_TEXTURE5);
     textures[3]->use(GL_TEXTURE6);
     textures[4]->use(GL_TEXTURE7);
-
+*/
 
     cumputeShaderMovment.init();
     cumputeShaderGridCreation.init();

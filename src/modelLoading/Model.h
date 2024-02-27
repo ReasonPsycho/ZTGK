@@ -21,6 +21,8 @@ using namespace std;
 #include "Shader.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include <direct.h>
+#include <iostream>
 
 
 class Model {
@@ -49,6 +51,8 @@ private:
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
     vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
+
+    vector<std::shared_ptr<Texture>> forceLoadMaterialTexture(string path, aiTextureType type, string typeName);
 
 };
 

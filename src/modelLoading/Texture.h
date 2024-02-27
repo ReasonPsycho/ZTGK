@@ -12,17 +12,19 @@
 
 using namespace std;
 
+
+
 class Texture {
 public:
-    Texture(string name, string directory, string type);
+    Texture(string path, string type); //TODO change this to enum
 
     ~Texture();
 
     // the texture ID
     GLuint ID{}; // TODO add more than one texture on top of it
+    string path;
     string type;
     string name;
-    string directory;
 
     // constructor reads and builds the texture
     void use(GLenum GL_TEXTUREX);

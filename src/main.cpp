@@ -39,16 +39,10 @@
 #include <list> //std::list
 #include <memory> //std::unique_ptr
 
-class Entity : public Model
-{
-public:
-    list<unique_ptr<Entity>> children;
-    Entity* parent;
-};
 #endif
 
 Scene scene;
-string modelPath = "res/models/Sphere/Sphere.obj";
+string modelPath = "res/models/asteroid/Asteroid.fbx";
 Model model = Model(&modelPath);
 
 shared_ptr<spdlog::logger> file_logger;
@@ -308,7 +302,7 @@ void load_enteties() {
     model.loadModel();
     Entity *gameObject = scene.addGameObject();
     gameObject->transform.setLocalPosition({-0, 0, 0});
-    const float scale = 100;
+    const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(new Render(&model));
     for (unsigned int i = 0; i < 2; ++i) {

@@ -10,11 +10,10 @@ Texture::~Texture() {
     glDeleteTextures(1, &ID);
 }
 
-Texture::Texture(string name, string directory, string type) : name(name), directory(directory), type(type) {
+Texture::Texture(string path, string type) {
     glGenTextures(1, &ID);
     // set the texture wrapping/filtering options (on the currently bound texture object) //TODO this prob should be in class inputs
     // load and generate the texture
-    string path = directory + "/" + name;
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data) {
@@ -36,8 +35,12 @@ Texture::Texture(string name, string directory, string type) : name(name), direc
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
+        name = path.substr(path.find_last_of('/') + 1);
+        this->path = path;
+        this->type = type;
     } else {
-        spdlog::error("Failed to load texture" + name);
+        spdlog::error("Failed to load texture: " + path);
+        std::string filename = path.substr(path.find_last_of('/') + 1);
+        spdlog::error("Failed to load texture: " + filename);
     }
 }
-
