@@ -28,7 +28,6 @@ public:
 
     void showImGuiDetails(Camera *camera) override;
 
-    void EditLight(Camera *camera) override;
     
     void InnitShadow() override;
 

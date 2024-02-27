@@ -81,7 +81,6 @@ SpotLight::SpotLight(SpotLightData data) : data(data) {
 
 void SpotLight::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
-
     if (ImGui::TreeNode("Spot light")) {
         ImGui::InputFloat4("Color", glm::value_ptr(data.color));
         ImGui::InputFloat("Constant", &data.constant);
@@ -89,21 +88,8 @@ void SpotLight::showImGuiDetails(Camera *camera) {
         ImGui::InputFloat("Quadratic", &data.quadratic);
         ImGui::InputFloat("Cut off", &data.cutOff);
         ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
-        EditLight(camera);
         ImGui::TreePop();
     }
     ImGui::PopID();
 
 }
-
-void SpotLight::EditLight(Camera *camera) {
-    getEntity()->transform.ManipulateModelMatrix(camera);
-
-    // Extract the rotation as a quaternion
-    glm::quat q = glm::toQuat( getEntity()->transform.getModelMatrix());
-    // Convert the quaternion to Euler angles
-    glm::vec3 eulerAngles = glm::eulerAngles(q);
-    data.direction = glm::vec4(eulerAngles, 1);
-    data.position = glm::vec4( getEntity()->transform.getGlobalPosition(), 1);
-}
-

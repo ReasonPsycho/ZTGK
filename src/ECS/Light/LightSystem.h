@@ -79,9 +79,16 @@ private:
                                      "res/shaders/Shadows/shadows_depth.frag");
 
     
-    GLuint dirLightBufferId = 3;
-    GLuint pointLightBufferId = 4;
-    GLuint spotLightBufferId = 5;
+    GLuint dirLightBufferBindingPoint = 3;
+    GLuint pointLightBufferBindingPoint = 4;
+    GLuint spotLightBufferBindingPoint = 5;
+
+
+
+    GLuint dirLightBufferId;
+    GLuint pointLightBufferId;
+    GLuint spotLightBufferId;
+    
     std::array<std::type_index, 4> componentTypes = {
             std::type_index(typeid(ILight)),
             std::type_index(typeid(DirLight)),

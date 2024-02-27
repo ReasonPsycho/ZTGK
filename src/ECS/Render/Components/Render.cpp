@@ -13,3 +13,12 @@ void Render::draw(Shader &regularShader) {
     regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
     pModel->Draw(regularShader);
 }
+
+void Render::showImGuiDetails(Camera *camera) {
+    ImGui::PushID(uniqueID);
+    if (ImGui::TreeNode("Render")) {
+        // Display other light properties...
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+}

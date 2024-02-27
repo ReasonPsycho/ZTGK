@@ -20,14 +20,16 @@
 class Entity {
 public:
 
-    explicit Entity(SystemManager* systemManager);
+    Entity(SystemManager* systemManager,string name);
     
+    string name;
     //Scene graph
     const Entity *parent = nullptr;
     
     //Space information
     Transform transform = Transform();
 
+    
     //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
     Entity* addChild(std::unique_ptr<Entity> child);
     
@@ -37,8 +39,6 @@ public:
     //Force update of transform even if local space don't change
     void forceUpdateSelfAndChild();
 
-    void drawSelfAndChild(Shader &ourShader);
-    void drawSelfAndChild(Shader &regularShader,Shader &instancedShader);
 
 
     template <typename T>
@@ -60,11 +60,19 @@ public:
         // Component of type T doesn't exist for the entity - handle this case appropriately
         return nullptr; // This is just an example, you could also assert(false) or throw an exception
     }
+
+    void showImGuiDetails(Camera *camera);
     
+protected:
+    int uniqueID;     // Instance variable to store the unique ID for each object
+
 private:
+    static int nextID; // Static variable to keep track of the next available ID
     std::unordered_map<std::type_index, Component*> components;
     std::vector<std::unique_ptr<Entity>> children;
     SystemManager *systemManager;
+    bool isSelected = false;
+    
 };
 
 

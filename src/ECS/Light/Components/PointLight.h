@@ -33,9 +33,7 @@ public:
 
 
     void showImGuiDetails(Camera *camera) override;
-
-    void EditLight(Camera *camera) override;
-
+    
     void InnitShadow() override;
 
     void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function

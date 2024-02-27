@@ -13,6 +13,8 @@ class Render : public Component {
 public:
     explicit Render(Model *pModel);
     void draw(Shader &regularShader);
+    void showImGuiDetails(Camera *camera) override;
+
 private:
     Model *pModel{};
 };

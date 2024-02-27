@@ -300,23 +300,23 @@ void init_systems() {
 
 void load_enteties() {
     model.loadModel();
-    Entity *gameObject = scene.addGameObject();
+    Entity *gameObject = scene.addGameObject("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(new Render(&model));
     for (unsigned int i = 0; i < 2; ++i) {
-        gameObject = scene.addGameObject(gameObject);
+        gameObject = scene.addGameObject(gameObject, "asteroid");
         gameObject->addComponent(new Render(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-    gameObject = scene.addGameObject();
-    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(1), glm::vec4(1), glm::mat4x4(1))));
-    gameObject = scene.addGameObject();
+    gameObject = scene.addGameObject("Dir light");
+    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(255.0f,255.0f,255.0f,1.0f), glm::vec4(1), glm::mat4x4(1))));
+    gameObject = scene.addGameObject("Dir light");
     gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(1))));
-    gameObject = scene.addGameObject();
+    gameObject = scene.addGameObject("Dir light");
     gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f)));
     lightSystem.PushToSSBO();
 }
@@ -358,7 +358,7 @@ void input() {
 
 void update() {
     scene.updateScene();
-    lightSystem.Update(deltaTime);
+  //  lightSystem.Update(deltaTime);
     
 }
 
@@ -428,9 +428,9 @@ void imgui_render() {
     snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
     ImGui::Text(buffer);
 
-    lightSystem.showLightTree();
+    //lightSystem.showLightTree();
     ImGui::End();
-
+    scene.showImGuiDetails(&camera);
 
     bloomSystem.showImguiOptions();
 

@@ -104,12 +104,6 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
     ImGui::SameLine();
     if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
         mCurrentGizmoOperation = ImGuizmo::SCALE;
-    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(m_modelMatrix), matrixTranslation, matrixRotation, matrixScale);
-    ImGui::InputFloat3("Tr", matrixTranslation);
-    ImGui::InputFloat3("Rt", matrixRotation);
-    ImGui::InputFloat3("Sc", matrixScale);
-    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, glm::value_ptr(m_modelMatrix));
 
     if (mCurrentGizmoOperation != ImGuizmo::SCALE)
     {
@@ -119,6 +113,7 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
         if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
             mCurrentGizmoMode = ImGuizmo::WORLD;
     }
+
     /* Maby someday I will implement snap
     static bool useSnap(false);
     if (ImGui::IsKeyPressed(ImGuiKey_LeftCtrl))
@@ -146,6 +141,13 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
     ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
     glm::mat4 deltaMatrix = glm::mat4(0);
     ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix()), mCurrentGizmoOperation, mCurrentGizmoMode,glm::value_ptr(m_modelMatrix),glm::value_ptr(deltaMatrix),  NULL);
+    float matrixRotation[3];
+    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(m_modelMatrix), glm::value_ptr(m_pos), matrixRotation, glm::value_ptr(m_scale));
+    ImGui::InputFloat3("Tr", glm::value_ptr(m_pos));
+    ImGui::InputFloat3("Rt", matrixRotation);
+    ImGui::InputFloat3("Sc", glm::value_ptr(m_scale));
+    ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(m_pos), matrixRotation, glm::value_ptr(m_scale), glm::value_ptr(m_modelMatrix));
+
     if (deltaMatrix != glm::mat4(0)){
         m_isDirty = true;
     }

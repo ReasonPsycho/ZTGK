@@ -31,7 +31,7 @@ protected:
 
 public:
     Transform() = default;
-    virtual void ManipulateModelMatrix(Camera* camera);
+    void ManipulateModelMatrix(Camera* camera);
     void computeModelMatrix();
 
     void computeModelMatrix(const glm::mat4 &parentGlobalModelMatrix);

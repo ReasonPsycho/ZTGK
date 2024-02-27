@@ -13,12 +13,14 @@ class Scene {
 public:
     Scene() = default;
 
-    Entity* addGameObject();
-    Entity* addGameObject(Entity* parent);
+    Entity *addGameObject(string name);
+    Entity *addGameObject(Entity *parent, string name);
     
     void updateScene();
     
     SystemManager systemManager;
+
+    void showImGuiDetails(Camera *camera);
     
 private:
     std::vector<std::unique_ptr<Entity>> children;

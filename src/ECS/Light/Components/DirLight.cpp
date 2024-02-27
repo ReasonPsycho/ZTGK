@@ -74,25 +74,9 @@ void DirLight::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
     if (ImGui::TreeNode("Directional light")) {
         ImGui::InputFloat4("Color", glm::value_ptr(data.color));
-        EditLight(camera);
         // Display other light properties...
         ImGui::TreePop();
     }
     ImGui::PopID();
 }
-
-void DirLight::EditLight(Camera *camera) {
-
-    getEntity()->transform.ManipulateModelMatrix(camera);
-
-// Extract the rotation as a quaternion
-    glm::quat q = glm::toQuat(getEntity()->transform.getModelMatrix());
-
-// Convert the quaternion to Euler angles
-    glm::vec3 eulerAngles = glm::eulerAngles(q);
-    data.direction = glm::vec4(eulerAngles, 1);
-}
-
-
-
 

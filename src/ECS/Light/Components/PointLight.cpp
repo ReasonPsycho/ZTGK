@@ -100,18 +100,9 @@ void PointLight::showImGuiDetails(Camera *camera) {
         ImGui::InputFloat("Constant", &data.constant);
         ImGui::InputFloat("Linear", &data.linear);
         ImGui::InputFloat("Quadratic", &data.quadratic);
-        EditLight(camera);
         // Display other light properties...
         ImGui::TreePop();
     }
     ImGui::PopID();
 
 }
-
-void PointLight::EditLight(Camera *camera) {
-    getEntity()->transform.ManipulateModelMatrix(camera);
-
-    data.position = glm::vec4(getEntity()->transform.getGlobalPosition(), 1);
-}
-
-

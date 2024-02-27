@@ -30,7 +30,6 @@ public:
 
 
     virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
-    virtual void EditLight(Camera *camera) = 0;
 
     virtual void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader,
                                    Shader *instanceShadowMapShader) = 0; // Pure virtual function
