@@ -25,7 +25,7 @@ protected:
 
     //Global space information concatenate in matrix
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
-
+    glm::mat4 m_parentMatrix = glm::mat4(1.0f);
     //Dirty flag
     bool m_isDirty = true;
 

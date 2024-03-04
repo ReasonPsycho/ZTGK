@@ -59,8 +59,8 @@ find_package(glad CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(imguizmo CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED) #TODO remove on build compilation
+find_package(imguizmo CONFIG REQUIRED) #TODO remove on build compilation
 find_package(spdlog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 

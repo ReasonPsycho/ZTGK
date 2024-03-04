@@ -27,6 +27,7 @@ void Transform::computeModelMatrix() {
 
 void Transform::computeModelMatrix(const glm::mat4 &parentGlobalModelMatrix) {
     m_modelMatrix = parentGlobalModelMatrix * getLocalModelMatrix();
+    m_parentMatrix = parentGlobalModelMatrix;
     m_isDirty = false;
 }
 
@@ -104,7 +105,9 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
     ImGui::SameLine();
     if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
         mCurrentGizmoOperation = ImGuizmo::SCALE;
-
+    
+    mCurrentGizmoMode = ImGuizmo::WORLD;
+    /* This is confusing for now maby to imolement later
     if (mCurrentGizmoOperation != ImGuizmo::SCALE)
     {
         if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
@@ -113,7 +116,7 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
         if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
             mCurrentGizmoMode = ImGuizmo::WORLD;
     }
-
+    */
     /* Maby someday I will implement snap
     static bool useSnap(false);
     if (ImGui::IsKeyPressed(ImGuiKey_LeftCtrl))
@@ -139,17 +142,34 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
      */
     ImGuiIO& io = ImGui::GetIO();
     ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-    glm::mat4 deltaMatrix = glm::mat4(0);
-    ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix()), mCurrentGizmoOperation, mCurrentGizmoMode,glm::value_ptr(m_modelMatrix),glm::value_ptr(deltaMatrix),  NULL);
-    float matrixRotation[3];
-    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(m_modelMatrix), glm::value_ptr(m_pos), matrixRotation, glm::value_ptr(m_scale));
-    ImGui::InputFloat3("Tr", glm::value_ptr(m_pos));
-    ImGui::InputFloat3("Rt", matrixRotation);
-    ImGui::InputFloat3("Sc", glm::value_ptr(m_scale));
-    ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(m_pos), matrixRotation, glm::value_ptr(m_scale), glm::value_ptr(m_modelMatrix));
 
-    if (deltaMatrix != glm::mat4(0)){
+
+    glm::mat4 tmp_matrix = getModelMatrix();
+    glm::mat4 deltaMatrix = glm::mat4(1.0f);
+
+    ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix()), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(tmp_matrix), glm::value_ptr(deltaMatrix), NULL);
+    glm::vec3 outTranslation;
+    glm::vec3 outRotation;
+    glm::vec3 outScale;
+
+    tmp_matrix = glm::inverse(m_parentMatrix) * tmp_matrix;
+    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(tmp_matrix), glm::value_ptr(outTranslation), glm::value_ptr(outRotation), glm::value_ptr(outScale));
+
+    ImGui::InputFloat3("Tr", glm::value_ptr(outTranslation));
+    ImGui::InputFloat3("Rt", glm::value_ptr(outRotation));
+    ImGui::InputFloat3("Sc", glm::value_ptr(outScale));
+
+    if (deltaMatrix != glm::mat4(1.0f)) {
+        // Decompose modified local matrix back to translation, rotation, scale components
+        
+        // Set the new local transform components
+        m_pos = outTranslation;
+        m_quaternion = glm::quat(glm::radians(outRotation)); // assuming outRotation is in degrees
+        m_scale = outScale;
+
         m_isDirty = true;
     }
+    
+    
 }
 
