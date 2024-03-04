@@ -159,8 +159,7 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
     ImGui::InputFloat3("Rt", glm::value_ptr(outRotation));
     ImGui::InputFloat3("Sc", glm::value_ptr(outScale));
 
-    if (deltaMatrix != glm::mat4(1.0f)) {
-        // Decompose modified local matrix back to translation, rotation, scale components
+    if (deltaMatrix != glm::mat4(1.0f)  || m_pos != outTranslation || m_quaternion !=glm::quat(glm::radians(outRotation)) || m_scale != outScale) {
         
         // Set the new local transform components
         m_pos = outTranslation;
@@ -169,7 +168,5 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
 
         m_isDirty = true;
     }
-    
-    
 }
 
