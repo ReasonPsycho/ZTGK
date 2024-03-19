@@ -88,6 +88,9 @@ void SpotLight::showImGuiDetails(Camera *camera) {
         ImGui::InputFloat("Quadratic", &data.quadratic);
         ImGui::InputFloat("Cut off", &data.cutOff);
         ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
+        data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
+        data.direction = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
+        this->setIsDirty(true); //Just assume is dirty even when I just show it. Lol
         ImGui::TreePop();
     }
     ImGui::PopID();

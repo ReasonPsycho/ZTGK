@@ -16,7 +16,7 @@ void Entity::forceUpdateSelfAndChild() {
         transform.computeModelMatrix(parent->transform.getModelMatrix());
     else
         transform.computeModelMatrix();
-    
+
     for(auto& pair : components) {
         pair.second->setIsDirty(true);
     }    
@@ -57,6 +57,10 @@ void Entity::showImGuiDetails(Camera *camera) {
         if (isSelected){
             ImGui::Begin(name.c_str());
             transform.ManipulateModelMatrix(camera);
+            
+            for (const auto &component: components) {
+                component.second->showImGuiDetails(camera);
+            }
             ImGui::End();
         }
         for (const auto &child: children) {

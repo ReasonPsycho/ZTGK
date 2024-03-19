@@ -73,8 +73,9 @@ DirLight::DirLight(DirLightData data) :
 void DirLight::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
     if (ImGui::TreeNode("Directional light")) {
-        ImGui::InputFloat4("Color", glm::value_ptr(data.color));
-        // Display other light properties...
+        if(ImGui::InputFloat4("Color", glm::value_ptr(data.color)))
+        data.direction = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
+        this->setIsDirty(true); //Just assume is dirty even when I just show it. Lol
         ImGui::TreePop();
     }
     ImGui::PopID();

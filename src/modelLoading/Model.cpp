@@ -180,7 +180,7 @@ vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, ai
         }
         if (!skip) {   // if texture hasn't been loaded already, load it
             directory = path->substr(0, path->find_last_of('/'));
-            string texturePath = string("\\" + directory + "\\" + str.C_Str());
+            string texturePath = string(directory + "\\" + str.C_Str());
             replaceAll(texturePath, "/", "\\");
             shared_ptr<Texture> texture = std::make_shared<Texture>(texturePath, typeName);
             textures.push_back(texture);
