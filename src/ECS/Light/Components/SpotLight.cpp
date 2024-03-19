@@ -40,14 +40,11 @@ void SpotLight::InnitShadow() {
 
 
     glm::vec3 eulerAngles = data.direction;
-    glm::vec3 direction = glm::vec3(
-            cos(eulerAngles.x) * cos(eulerAngles.y), // dx
-            sin(eulerAngles.y), // dy
-            sin(eulerAngles.x) * cos(eulerAngles.y) // dz
-    );
+    glm::vec3 direction = glm::vec3(0, 0, 0);
     direction = glm::normalize(direction); // Normalize vector
 
-    lightView = glm::lookAt(lightPos, lightPos + direction, glm::vec3(0.0, 1.0, 0.0));
+    lightView = glm::lookAt(lightPos, lightPos + direction, glm::vec3(0.0, 1.0,
+                                                                      0.0)); //TODO when shadows gonna be here change that to appropriate things
 // Take in mind that glm::lookAt requires a position where the camera is located, a target where it should look at
 // and an up vector to decide where is your top. Most likely, that it should be glm::vec3(0.0f, 1.0f, 0.0f)
     data.lightSpaceMatrix = lightProjection * lightView;
@@ -56,7 +53,7 @@ void SpotLight::InnitShadow() {
     initializedShadow = true;
 }
 
-void SpotLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) {
+void SpotLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader) {
 
     if (shaderType == Normal) {
         shadowMapShader->use();
@@ -65,7 +62,7 @@ void SpotLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,
         instanceShadowMapShader->use();
         instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
     }
-    
+
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glActiveTexture(GL_TEXTURE0);
@@ -88,11 +85,14 @@ void SpotLight::showImGuiDetails(Camera *camera) {
         ImGui::InputFloat("Quadratic", &data.quadratic);
         ImGui::InputFloat("Cut off", &data.cutOff);
         ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
-        data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
-        data.direction = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
-        this->setIsDirty(true); //Just assume is dirty even when I just show it. Lol
         ImGui::TreePop();
     }
     ImGui::PopID();
 
+}
+
+void SpotLight::UpdateData() {
+    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), 0);
+    data.direction = glm::vec4(glm::eulerAngles(this->getEntity()->transform.getLocalRotation()),1);
+    this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }

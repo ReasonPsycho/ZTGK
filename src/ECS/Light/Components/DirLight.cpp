@@ -4,6 +4,7 @@
 
 #include "ECS/Entity.h"
 #include "DirLight.h"
+
 void DirLight::InnitShadow() {
     if (initializedShadow) {
         DeleteShadow();
@@ -47,7 +48,7 @@ void DirLight::InnitShadow() {
     initializedShadow = true;
 }
 
-void DirLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) {
+void DirLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader) {
     if (shaderType == Normal) {
         shadowMapShader->use();
         shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
@@ -73,11 +74,18 @@ DirLight::DirLight(DirLightData data) :
 void DirLight::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
     if (ImGui::TreeNode("Directional light")) {
-        if(ImGui::InputFloat4("Color", glm::value_ptr(data.color)))
-        data.direction = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
-        this->setIsDirty(true); //Just assume is dirty even when I just show it. Lol
+        ImGui::InputFloat4("Color", glm::value_ptr(data.color));
         ImGui::TreePop();
     }
     ImGui::PopID();
+}
+
+void DirLight::UpdateData() {
+    
+    glm::vec3 eulerAngles = glm::eulerAngles(this->getEntity()->transform.getLocalRotation());
+    
+    glm::vec3 forward = glm::vec3(0,0,1);
+    data.direction =  glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward),1);
+    this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
 

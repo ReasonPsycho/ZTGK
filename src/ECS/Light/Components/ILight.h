@@ -34,6 +34,7 @@ public:
     virtual void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader,
                                    Shader *instanceShadowMapShader) = 0; // Pure virtual function
     virtual void InnitShadow() = 0;
+    virtual void UpdateData() = 0;
 
     void DeleteShadow();
 

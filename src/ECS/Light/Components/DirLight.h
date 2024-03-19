@@ -32,7 +32,9 @@ public:
     void InnitShadow() override;
 
     void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
-    
+
+
+    void UpdateData() override;
 };
 
 #endif //OPENGLGP_DIRLIGHT_H

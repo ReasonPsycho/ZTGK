@@ -100,10 +100,13 @@ void PointLight::showImGuiDetails(Camera *camera) {
         ImGui::InputFloat("Constant", &data.constant);
         ImGui::InputFloat("Linear", &data.linear);
         ImGui::InputFloat("Quadratic", &data.quadratic);
-        data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
-        this->setIsDirty(true); //Just assume is dirty even when I just show it. Lol
-        ImGui::TreePop();
+     ImGui::TreePop();
     }
     ImGui::PopID();
 
+}
+
+void PointLight::UpdateData() {
+    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
+    this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }

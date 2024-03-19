@@ -136,7 +136,7 @@ void LightSystem::Update(double deltaTime) {
         //TODO render them
         if (light->getIsDirty()) {  // Only push it if it's dirty
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,sizeof(DirLightData), &light->data);
-            light->setIsDirty(false);
+            light->UpdateData();
         }
         offset += sizeof(light->data);
     }
@@ -149,6 +149,7 @@ void LightSystem::Update(double deltaTime) {
         if (light->getIsDirty()) {  // Only push it if it's dirty
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
             light->setIsDirty(false);
+            light->UpdateData();
         }
         offset += sizeof(light->data);
     }
@@ -162,6 +163,7 @@ void LightSystem::Update(double deltaTime) {
         if (light->getIsDirty()) {  // Only push it if it's dirty
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,  sizeof(SpotLightData), &light->data);
             light->setIsDirty(false);
+            light->UpdateData();
         }
         offset += sizeof(light->data);
     }
