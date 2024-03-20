@@ -7,7 +7,7 @@
 #define REASONABLEGL_COMPONENT_H
 
 #include <typeindex>
-
+#include "Camera.h"
 class Entity;
 
 /**

@@ -10,6 +10,7 @@
 #include "Tile.h"
 #include "ECS/Component.h"
 #include "VectorUtils.h"
+#include "Camera.h"
 
 
 class Grid : public Component{
@@ -31,6 +32,7 @@ public:
     // Destructor
     ~Grid() override;
 
+    void showImGuiDetails(Camera *camera) override;
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);
@@ -41,7 +43,7 @@ public:
 
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
 
-    void showImGuiDetails(int *camera) override;
+
 
 private:
     float offsetX = 0;
