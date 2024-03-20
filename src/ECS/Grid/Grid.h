@@ -41,6 +41,8 @@ public:
 
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
 
+    void showImGuiDetails(int *camera) override;
+
 private:
     float offsetX = 0;
     float offsetZ = 0;
