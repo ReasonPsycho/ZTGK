@@ -11,10 +11,7 @@
     "name" : "glfw3"
   }, {
     "name" : "imgui",
-    "features": [
-      "opengl3-binding",
-      "glfw-binding"
-    ]
+    "features" : [ "opengl3-binding", "glfw-binding" ]
   }, {
     "name" : "imguizmo"
   }, {
