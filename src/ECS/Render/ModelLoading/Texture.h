@@ -18,7 +18,7 @@ using Color = GLubyte[4];
 class Texture {
 public:
     Texture(string path, string type); //TODO change this to enum
-    Texture( const Color& color = {255, 255, 255, 255}); 
+    Texture( const Color& color = {0, 0, 0, 0}); 
 
     ~Texture();
 

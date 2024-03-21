@@ -111,12 +111,15 @@ Material::Material(aiMaterial *material, Model *model) {
      glBindTexture(GL_TEXTURE_2D, aoMap->ID);
  }
 
+Color normalColor = {128, 128, 255, 255};  // Normal map neutral
+Color metallicColor = {0, 0, 0, 255};  // Black, no metallic
+Color roughnessColor = {128, 128, 128, 255};  // 50% gray
+Color aoColor = {255, 255, 255, 255};  // White
+
 Material::Material(GLubyte *color) {
-    Color defaultColor = {255, 255, 255, 255};
-    Color& colorToUse = color ? (*reinterpret_cast<Color*>(color)) : defaultColor;
-    albedoMap = make_shared<Texture>(colorToUse);
-    normalMap = make_shared<Texture>();
-    metallicMap = make_shared<Texture>();
-    roughnessMap = make_shared<Texture>();
-    aoMap = make_shared<Texture>();
+    albedoMap = make_shared<Texture>(*reinterpret_cast<Color*>(color));
+    normalMap = make_shared<Texture>(*reinterpret_cast<Color*>(normalColor));
+    metallicMap = make_shared<Texture>(*reinterpret_cast<Color*>(metallicColor));
+    roughnessMap = make_shared<Texture>(*reinterpret_cast<Color*>(roughnessColor));
+    aoMap = make_shared<Texture>(*reinterpret_cast<Color*>(aoColor));
 }
