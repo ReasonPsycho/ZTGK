@@ -39,10 +39,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
       - name: Create Symbolic Link To Resources
         run: New-Item -ItemType SymbolicLink -Path "${{github.workspace}}/build/Debug/res" -Target "${{github.workspace}}/res"
 
