@@ -32,18 +32,12 @@ jobs:
       - name: Build
         # Build your program with the given configuration
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}     
-          
-  post_build:
-    name: Post Test build
-    needs: [build]
-    runs-on: windows-latest
-
-    steps:
+      
       - name: Create Symbolic Link To Resources
         run: New-Item -ItemType SymbolicLink -Path "${{github.workspace}}/build/Debug/res" -Target "${{github.workspace}}/res"
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v2
         with:
-            name: compiled-application
-            path: ${{github.workspace}}/build/
+          name: compiled-application
+          path: ${{github.workspace}}/build/
