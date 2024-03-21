@@ -15,8 +15,6 @@
 #include <list> //std::list
 #include <array> //std::array
 #include <memory> //std::unique_ptr
-#include "modelLoading/Model.h"
-#include "Camera.h"
 
 
 class System {

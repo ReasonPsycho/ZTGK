@@ -2,7 +2,7 @@
 // Created by redkc on 29/01/2024.
 //
 
-#include "BloomSystem.h"
+#include "BloomPostProcess.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "imgui.h"
 
@@ -38,7 +38,7 @@ void renderQuad() {
 }
 
 
-void BloomSystem::Init(int SCR_WIDTH, int SCR_HEIGHT) {
+void BloomPostProcess::Init(int SCR_WIDTH, int SCR_HEIGHT) {
     SetUpBuffers(SCR_WIDTH, SCR_HEIGHT);
     // shader configuration
     // --------------------
@@ -52,11 +52,11 @@ void BloomSystem::Init(int SCR_WIDTH, int SCR_HEIGHT) {
     initialized = true;
 }
 
-void BloomSystem::BindBuffer() {
+void BloomPostProcess::BindBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
 }
 
-void BloomSystem::BlurBuffer() {
+void BloomPostProcess::BlurBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     horizontal = true;
     first_iteration = true;
@@ -76,7 +76,7 @@ void BloomSystem::BlurBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void BloomSystem::Render() {
+void BloomPostProcess::Render() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shaderBloomFinal.use();
@@ -89,7 +89,7 @@ void BloomSystem::Render() {
     renderQuad();
 }
 
-void BloomSystem::SetUpBuffers(int SCR_WIDTH, int SCR_HEIGHT) {
+void BloomPostProcess::SetUpBuffers(int SCR_WIDTH, int SCR_HEIGHT) {
     // if (initialized) {
     //     DeleteGPUData();
     //  }
@@ -144,7 +144,7 @@ void BloomSystem::SetUpBuffers(int SCR_WIDTH, int SCR_HEIGHT) {
 
 }
 
-void BloomSystem::showImguiOptions() {
+void BloomPostProcess::showImguiOptions() {
     ImGui::Begin("Bloom options");
     if (ImGui::Button("Switch bloom")) {
         bloom = !bloom;
@@ -153,11 +153,11 @@ void BloomSystem::showImguiOptions() {
 
 }
 
-BloomSystem::~BloomSystem() {
+BloomPostProcess::~BloomPostProcess() {
     DeleteGPUData();
 }
 
-void BloomSystem::DeleteGPUData() {
+void BloomPostProcess::DeleteGPUData() {
     glDeleteFramebuffers(1, &hdrFBO);
     glDeleteFramebuffers(2, pingpongFBO);
     glDeleteTextures(2, colorBuffers);

@@ -11,11 +11,10 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "modelLoading/Shader.h"
-#include "modelLoading/ComputeShader.h"
 #include "glm/gtc/random.hpp"
-#include "modelLoading/Model.h"
 #include "ECS/Entity.h"
+#include "ECS/Render/ModelLoading/ComputeShader.h"
+#include "ECS/Render/ModelLoading/Model.h"
 #include <random>
 
 

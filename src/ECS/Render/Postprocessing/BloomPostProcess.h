@@ -6,12 +6,11 @@
 #define OPENGLGP_BLOOMSYSTEM_H
 
 
-#include "modelLoading/Shader.h"
-#include "Camera.h"
+#include "ECS/Render/ModelLoading/Shader.h"
 
-class BloomSystem {
+class BloomPostProcess {
 public:
-    ~BloomSystem();
+    ~BloomPostProcess();
 
 
     void Init(int SCR_WIDTH, int SCR_HEIGHT);

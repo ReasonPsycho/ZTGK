@@ -5,17 +5,15 @@
 #ifndef REASONABLEGL_SCENE_H
 #define REASONABLEGL_SCENE_H
 
-#include "../SystemManager.h"
-#include "modelLoading/Shader.h"
 #include "ECS/Entity.h"
 
 class Scene {
 public:
     Scene() = default;
 
-    Entity *addEntity(string name);
+    Entity *addEntity(std::string name);
     
-    Entity *addEntity(Entity *parent, string name);
+    Entity *addEntity(Entity *parent, std::string name);
     
     void updateScene();
     

@@ -11,7 +11,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "modelLoading/Shader.h"
+#include "ECS/Render/ModelLoading/Shader.h"
 
 enum Camera_Movement {
     FORWARD,

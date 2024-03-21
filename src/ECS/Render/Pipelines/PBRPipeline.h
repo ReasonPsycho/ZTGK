@@ -6,8 +6,6 @@
 #define OPENGLGP_PBRSYSTEM_H
 
 
-#include "modelLoading/Shader.h"
-#include "Camera.h"
 #include <string>
 #include "stb_image.h"
 #include "glm/fwd.hpp"
@@ -15,10 +13,14 @@
 #include "glm/trigonometric.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "ECS/Render/Camera/Camera.h"
 
-class PBRSystem {
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+#define STB_IMAGE_IMPLEMENTATION
+
+class PBRPipeline {
 public:
-    PBRSystem(Camera *camera);
+    PBRPipeline(Camera *camera);
 
     void Init();
 

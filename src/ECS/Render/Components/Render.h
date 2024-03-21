@@ -6,8 +6,7 @@
 #define REASONABLEGL_RENDER_H
 
 #include "ECS/Component.h"
-#include "modelLoading/Model.h"
-#include "modelLoading/Shader.h"
+#include "ECS/Render/ModelLoading/Model.h"
 
 class Render : public Component {
 public:
