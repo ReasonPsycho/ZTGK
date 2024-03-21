@@ -26,3 +26,16 @@ Signal::Signal() : sid(id<ID_POOL_SIGNAL>()) {}
 Signal::Signal(unsigned int signalType, long long ttl, unsigned int receiverId, const std::function<void()> &callback)
         : sid(id<ID_POOL_SIGNAL>()), time_to_live(ttl), receiver_id(receiverId), stype(signalType),
           callback(callback) {}
+
+std::string Signal::to_string() const {
+    std::ostringstream oss;
+    oss << "{"
+        << "type:" << stype << ","
+        << "id:" << sid << ","
+        << "message:\"" << message << "\","
+        << "ttl:" << time_to_live << ","
+        << "receiver_id:" << receiver_id
+        << "}";
+    return oss.str();
+}
+

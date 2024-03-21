@@ -48,4 +48,6 @@ struct Signal {
                     const std::function<void()> &callback = []() {});
 
     ~Signal() = default;
+
+    [[nodiscard]] std::string to_string() const;
 };

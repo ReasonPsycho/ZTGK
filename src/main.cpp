@@ -471,7 +471,9 @@ void imgui_render() {
     ImGui::SameLine();
     if (ImGui::Button("Print")) {
         try {
-            signalQueue.process_all();
+            log_console.push_back("Current queue:");
+            for (const auto &item: signalQueue.queue)
+                log_console.push_back("\t" + item.to_string());
         } catch (std::exception & ex) {
             std::cerr << ex.what() << std::endl;
             spdlog::error(ex.what());
