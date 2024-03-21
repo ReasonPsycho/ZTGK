@@ -12,49 +12,17 @@ using namespace std;
 
 
 // constructor
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<shared_ptr<Texture>> textures) : vertices(
-        vertices), indices(indices), textures(textures) {
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material) : vertices(
+        vertices), indices(indices), material(material) {
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
 
 
-void Mesh::SimpleDraw(Shader &shader) {
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-}
-
 // render the mesh
 void Mesh::Draw(Shader &shader) {
-    // bind appropriate textures
-    unsigned int albedoNr = 1;
-    unsigned int normalNr = 1;
-    unsigned int metalicNr = 1;
-    unsigned int heightNr = 1;
-    unsigned int aoNr = 1;
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE3 + i); // active proper texture unit before binding
-        // retrieve texture number (the N in diffuse_textureN)
-        string number;
-        string name = textures[i]->type;
-        if (name == "texture_albedo")
-            number = std::to_string(albedoNr++);
-        else if (name == "texture_normal")
-            number = std::to_string(normalNr++); // transfer unsigned int to string
-        else if (name == "texture_metallic")
-            number = std::to_string(metalicNr++); // transfer unsigned int to string
-        else if (name == "texture_height")
-            number = std::to_string(heightNr++); // transfer unsigned int to string
-        else if (name == "texture_ao")
-            number = std::to_string(aoNr++); // transfer unsigned int to string
-
-        // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-        // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i]->ID);
     
-    }
+    material.loadMaterial(&shader);
 
     // draw mesh
     glBindVertexArray(VAO);
@@ -108,5 +76,10 @@ void Mesh::setupMesh() {
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, m_Weights));
     glBindVertexArray(0);
 }
+
+Mesh::Mesh(unsigned int VAO, Material material, vector<unsigned int> indices):VAO(VAO), material(material),indices(indices) {
+
+}
+
 
 #endif

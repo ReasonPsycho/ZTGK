@@ -15,6 +15,7 @@ using namespace std;
 
 #include "Shader.h"
 #include "Texture.h"
+#include "Material.h"
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -40,16 +41,15 @@ public:
     // mesh Data
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    vector<shared_ptr<Texture>> textures;
+    Material material;
     unsigned int VAO;
 
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<shared_ptr<Texture>> textures);
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material);
+    Mesh(unsigned int VAO, Material material,vector<unsigned int> indices);
 
     void setupMesh();
 
     void Draw(Shader &shader);
-
-    void SimpleDraw(Shader &shader);
 
 private:
     // render data 

@@ -5,7 +5,7 @@
 #ifndef OPENGLGP_PBRSYSTEM_H
 #define OPENGLGP_PBRSYSTEM_H
 
-
+#include "ECS/Render/Primitives/Primitives.h"
 #include <string>
 #include "stb_image.h"
 #include "glm/fwd.hpp"
@@ -15,12 +15,9 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "ECS/Render/Camera/Camera.h"
 
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
-#define STB_IMAGE_IMPLEMENTATION
-
 class PBRPipeline {
 public:
-    PBRPipeline(Camera *camera);
+    PBRPipeline(Camera *camera,Primitives* primitives);
 
     void Init();
 
@@ -40,19 +37,9 @@ public:
 private:
     unsigned int captureFBO;
     unsigned int captureRBO;
-
-    //Cube stuff
-    void renderCube();
-
-    unsigned int cubeVAO = 0;
-    unsigned int cubeVBO = 0;
-
-    //Quad stuff
-    void renderQuad();
-
-    unsigned int quadVAO = 0;
-    unsigned int quadVBO;
-
+    
+    
+    Primitives*  primitives;
     Camera *camera;
     unsigned int envCubemap;
     unsigned int irradianceMap;
