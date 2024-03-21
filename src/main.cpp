@@ -346,7 +346,7 @@ void before_frame() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 };
-
+jyjytjtyj7
 
 void input() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
