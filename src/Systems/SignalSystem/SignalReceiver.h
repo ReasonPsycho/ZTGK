@@ -4,22 +4,22 @@
 
 #pragma once
 
+#include "ECS/Component.h"
+#include <functional>
 struct Signal;
+class Camera;
 
-//todo unsure about this
-struct SignalReceiver /*: Component*/ {
-
+struct SignalReceiver : Component {
     unsigned uid;
+
     unsigned receive_type_mask = 0;
-
-    //todo virtual if override, if component, no
-     virtual void receive(const Signal& signal) {
-
-    }
+    std::function<void(const Signal&)> receive{};
 
     SignalReceiver();
-    explicit SignalReceiver(unsigned int receiveTypeMask);
+    SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal &)> onSignal);
     virtual ~SignalReceiver() = default;
+
+    void showImGuiDetails(Camera *camera) override;
 };
 
 

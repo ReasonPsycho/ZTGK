@@ -37,6 +37,7 @@ struct Signal {
     // leave 0 if message is general, to be processed by any receiver listening to this signal type
     unsigned receiver_id = 0;
     // data cargo, type inferred from stype and manually any_cast; check presence with std::any::has_value
+    //todo void * or union this instead, inspired by sdl event types but the union would need to be edited every time there's a new type
     std::any data = std::any();
     // optional callback for the signal to function as a timed event on its own, see std::bind to enqueue param-taking lambdas, default assignment avoids null check
     std::function<void()> callback = []() {};

@@ -9,6 +9,7 @@
 #include <typeindex>
 
 class Entity;
+class Camera;
 
 /**
  * Abstract base class for a Component.

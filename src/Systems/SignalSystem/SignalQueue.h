@@ -11,7 +11,7 @@
 #include "SignalReceiver.h"
 #include "ECS/System.h"
 
-class SignalQueue : System {
+class SignalQueue : public System {
 public:
     long long timestamp = 0;
     std::deque<Signal> queue = std::deque<Signal>();

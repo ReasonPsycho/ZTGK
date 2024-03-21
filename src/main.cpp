@@ -152,16 +152,6 @@ bool timeStepKeyPressed = false;
 
 auto log_console = std::vector<std::string>(5);
 SignalQueue signalQueue = SignalQueue();
-struct s_temp : SignalReceiver {
-    s_temp() {
-        receive_type_mask = Signal::signal_types.test_signal;
-        signalQueue += this;
-    }
-
-    void receive(const Signal &signal) override {
-        log_console.push_back(std::format("Received signal {}({}) @ {} : {}", signal.sid, signal.stype, ztgk_util::time(), signal.message));
-    }
-} recv;
 float signalDeferTime = 0;
 
 #pragma endregion
@@ -318,6 +308,7 @@ void init_systems() {
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
+    scene.systemManager.addSystem(&signalQueue);
 }
 
 void load_enteties() {
@@ -341,6 +332,8 @@ void load_enteties() {
     gameObject = scene.addGameObject("Spot Light");
     gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
     lightSystem.Init();
+    gameObject = scene.addGameObject("Signal Receiver Mockup #1");
+    gameObject->addComponent(new SignalReceiver(Signal::signal_types.test_signal, [](const Signal& signal) {log_console.push_back(std::format("Received signal {}({}) @ {} : {}", signal.sid, signal.stype, ztgk_util::time(), signal.message));}));
 }
 
 void init_imgui() {
@@ -365,7 +358,7 @@ void before_frame() {
     double currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
-};
+}
 
 
 void input() {
@@ -467,15 +460,16 @@ void imgui_render() {
         Signal defer(Signal::signal_types.test_signal);
         defer.time_to_live = signalDeferTime * 1000;
         defer.message = std::format("Enqueued defer @ {}" , ztgk_util::time());
+        defer.callback = [defer](){ log_console.push_back(std::format("Defer callback - signal {}", defer.sid)); };
 
         Signal immediate(Signal::signal_types.test_signal);
-        immediate.message = std::format("NQ defer for {} @ {}", defer.time_to_live, ztgk_util::time());
+        immediate.message = std::format("Awaiting defer for {} @ {}", defer.time_to_live, ztgk_util::time());
 
-        signalQueue += defer;
         signalQueue += immediate;
+        signalQueue += defer;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Process")) {
+    if (ImGui::Button("Print")) {
         try {
             signalQueue.process_all();
         } catch (std::exception & ex) {
