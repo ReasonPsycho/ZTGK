@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "modelLoading/Model.h"
 #include <cstdio>
+#include "Systems/SignalSystem/SignalQueue.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #define STB_IMAGE_IMPLEMENTATION
@@ -31,7 +32,9 @@
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
 #include "Systems/EntitySystem/Scene.h"
+#include "Systems/SignalSystem/SignalQueue.h"
 #include "ECS/Render/Components/Render.h"
+#include "Systems/Util.h"
 
 #ifndef ENTITY_H
 #define ENTITY_H
@@ -145,6 +148,24 @@ bool timeStepKeyPressed = false;
 
 #pragma endregion My set up
 
+#pragma region ZTGK-Global
+
+auto log_console = std::vector<std::string>(5);
+SignalQueue signalQueue = SignalQueue();
+struct s_temp : SignalReceiver {
+    s_temp() {
+        receive_type_mask = Signal::signal_types.test_signal;
+        signalQueue += this;
+    }
+
+    void receive(const Signal &signal) override {
+        log_console.push_back(std::format("Received signal {}({}) @ {} : {}", signal.sid, signal.stype, ztgk_util::time(), signal.message));
+    }
+} recv;
+float signalDeferTime = 0;
+
+#pragma endregion
+
 
 int main(int, char **) {
 
@@ -178,13 +199,15 @@ int main(int, char **) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
 
+    signalQueue.init();
 #pragma endregion Init
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        //Setting up things for the rest of functionalities (ex. delta time)
+        //Setting up things for the rest of functionalities (ex. update_delta time)
         file_logger->info("Before frame");
         before_frame();
+        signalQueue.update();
 
         // Process I/O operations here
         file_logger->info("Input");
@@ -338,7 +361,7 @@ void init_imgui() {
 }
 
 void before_frame() {
-    // Setting up delta time
+    // Setting up update_delta time
     double currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
@@ -431,6 +454,42 @@ void imgui_render() {
     scene.showImGuiDetails(&camera);
 
     bloomSystem.showImguiOptions();
+
+    ImGui::Begin("Queue control");
+    ImGui::InputFloat("Defer time (sec)", &signalDeferTime);
+    if (ImGui::Button("Immediate")) {
+        Signal signal(Signal::signal_types.test_signal);
+        signal.message = std::format("Enqueued immediate @ {}" , ztgk_util::time());
+        signalQueue += signal;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Defer")) {
+        Signal defer(Signal::signal_types.test_signal);
+        defer.time_to_live = signalDeferTime * 1000;
+        defer.message = std::format("Enqueued defer @ {}" , ztgk_util::time());
+
+        Signal immediate(Signal::signal_types.test_signal);
+        immediate.message = std::format("NQ defer for {} @ {}", defer.time_to_live, ztgk_util::time());
+
+        signalQueue += defer;
+        signalQueue += immediate;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Process")) {
+        try {
+            signalQueue.process_all();
+        } catch (std::exception & ex) {
+            std::cerr << ex.what() << std::endl;
+            spdlog::error(ex.what());
+        }
+    }
+    ImGui::Text("dt: %lld", signalQueue.get_delta());
+    ImGui::End();
+    ImGui::Begin("Queue log");
+    for(auto & line : log_console) {
+        ImGui::Text("%s", line.c_str());
+    }
+    ImGui::End();
 
 }
 
