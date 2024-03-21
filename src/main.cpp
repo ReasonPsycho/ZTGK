@@ -30,11 +30,11 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
-string planeModelPath = "res/models/plane/Plane.fbx";
 Model model = Model(&modelPath);
-Model planeModel = Model(&planeModelPath);
+Model* cubeModel;
+Model* quadModel;
 shared_ptr<spdlog::logger> file_logger;
-
+const Color& white = {0, 0, 0, 0};
 #pragma endregion constants
 
 #pragma region Function definitions
@@ -112,8 +112,9 @@ Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
 float lastX = 0;
 float lastY = 0;
 
+Primitives primitives;
 LightSystem lightSystem(&camera);
-PBRPipeline pbrSystem(&camera);
+PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 BloomPostProcess bloomSystem;
 
@@ -275,20 +276,25 @@ bool init() {
 
 
 void init_systems() {
+    primitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
+    Color myColor = {255, 32, 21, 0};  // This defines your color.
+
+    Material whiteMaterial = Material(myColor);
+    cubeModel = new Model(primitives.cubeVAO, whiteMaterial,vector<GLuint>(primitives.cubeIndices,primitives.cubeIndices + 36));
+   quadModel = new Model(primitives.quadVAO,whiteMaterial,vector<GLuint>(primitives.quadIndices,primitives.quadIndices + 6));
 }
 
 void load_enteties() {
     model.loadModel();
-    planeModel.loadModel();
     Entity *gameObject = scene.addEntity("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(new Render(&planeModel));
+    gameObject->addComponent(new Render(cubeModel));
     for (unsigned int i = 0; i < 2; ++i) {
         gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(new Render(&model));
