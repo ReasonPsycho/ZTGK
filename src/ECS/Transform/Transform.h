@@ -9,12 +9,11 @@
 #include <list> //std::list
 #include <array> //std::array
 #include <memory> //std::unique_ptr
-#include "modelLoading/Model.h"
-#include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/quaternion.hpp"
 #include "imgui.h"
 #include "ImGuizmo.h"
+#include "ECS/Render/Camera/Camera.h"
 
 class Transform {
 protected:

@@ -5,7 +5,7 @@
 
 int Entity::nextID = 0;
 
-Entity::Entity(SystemManager *systemManager, string name): systemManager(systemManager) , name(name){
+Entity::Entity(SystemManager *systemManager, std::string name): systemManager(systemManager) , name(name){
     uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
 }
 

@@ -4,13 +4,13 @@
 
 
 
-#include "PBRSystem.h"
+#include "PBRPipeline.h"
 
-PBRSystem::PBRSystem(Camera *camera) : camera(camera) {
+PBRPipeline::PBRPipeline(Camera *camera) : camera(camera) {
 
 }
 
-void PBRSystem::Init() {
+void PBRPipeline::Init() {
 
     pbrShader.init();
     pbrShader.use();
@@ -239,7 +239,7 @@ void PBRSystem::Init() {
     camera->UpdateShader(&pbrShader, 1920, 1080); // I don't care just hardcode it
 }
 
-void PBRSystem::renderCube() {
+void PBRPipeline::renderCube() {
     // initialize (if necessary)
     if (cubeVAO == 0) {
         float vertices[] = {
@@ -308,7 +308,7 @@ void PBRSystem::renderCube() {
     glBindVertexArray(0);
 }
 
-void PBRSystem::renderQuad() {
+void PBRPipeline::renderQuad() {
     if (quadVAO == 0) {
         float quadVertices[] = {
                 // positions        // texture Coords
@@ -333,7 +333,7 @@ void PBRSystem::renderQuad() {
     glBindVertexArray(0);
 }
 
-void PBRSystem::RenderBackground() {
+void PBRPipeline::RenderBackground() {
     backgroundShader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
@@ -342,7 +342,7 @@ void PBRSystem::RenderBackground() {
     renderCube();
 }
 
-void PBRSystem::PrebindPBR(Camera *camera) {
+void PBRPipeline::PrebindPBR(Camera *camera) {
     pbrInstanceShader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);

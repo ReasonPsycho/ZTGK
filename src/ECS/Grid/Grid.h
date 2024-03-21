@@ -10,7 +10,6 @@
 #include "Tile.h"
 #include "ECS/Component.h"
 #include "VectorUtils.h"
-#include "Camera.h"
 
 
 class Grid : public Component{

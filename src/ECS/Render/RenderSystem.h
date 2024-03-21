@@ -8,6 +8,7 @@
 
 #include "ECS/System.h"
 #include "Components/Render.h"
+#include "ECS/Render/ModelLoading/Shader.h"
 
 class RenderSystem : public System  {
 

@@ -1,56 +1,39 @@
 
 #pragma region Includes
-
-
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
 #include <ImGuizmo.h>
-#include "Camera.h"
-#include "modelLoading/Model.h"
 #include <cstdio>
-
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
-#define STB_IMAGE_IMPLEMENTATION
-
-
-//#include <glad/glad.h>  // Initialize with gladLoadGL()
-
-
-//Instancing
-#include <glm/gtc/type_ptr.hpp>
-
+#include <glad/glad.h>
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
-
 #include <iostream>
 #include "spdlog/sinks/basic_file_sink.h"
-
-#include "Systems/RenderSystem/PBR/PBRSystem.h"
-#include "Systems/RenderSystem/PostProcessing/BloomSystem/BloomSystem.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
-#include "Systems/EntitySystem/Scene.h"
 #include "ECS/Render/Components/Render.h"
+#include "ECS/Scene.h"
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
+#define STB_IMAGE_IMPLEMENTATION
 
-#include <list> //std::list
-#include <memory> //std::unique_ptr
+#include "ECS/Render/Pipelines/PBRPipeline.h"
+#include "ECS/Render/Postprocessing/BloomPostProcess.h"
+#include "ECS/Render/ModelLoading/Model.h"
 
-#endif
+
+
+#pragma endregion Includes
+
+#pragma region constants
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
 string planeModelPath = "res/models/plane/Plane.fbx";
 Model model = Model(&modelPath);
 Model planeModel = Model(&planeModelPath);
-
 shared_ptr<spdlog::logger> file_logger;
-#pragma endregion Includes
-
-#pragma region constants
 
 #pragma endregion constants
 
@@ -117,7 +100,6 @@ constexpr int32_t GL_VERSION_MINOR = 6;
 
 //Not my things but I could probably change them
 
-
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 #pragma endregion Orginal set up
@@ -131,9 +113,9 @@ float lastX = 0;
 float lastY = 0;
 
 LightSystem lightSystem(&camera);
-PBRSystem pbrSystem(&camera);
+PBRPipeline pbrSystem(&camera);
 RenderSystem renderSystem;
-BloomSystem bloomSystem;
+BloomPostProcess bloomSystem;
 
 
 bool captureMouse = false;

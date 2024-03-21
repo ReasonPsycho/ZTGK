@@ -16,8 +16,6 @@
 #include "Components/DirLight.h"
 #include "Components/PointLight.h"
 #include "Components/SpotLight.h"
-#include "Camera.h"
-#include "modelLoading/Texture.h"
 #include "../System.h"
 #include "../Component.h"
 
@@ -37,7 +35,7 @@ public:
     void GenerateShadowBuffers();
 
 
-    const std::type_index* getComponentTypes() override {return reinterpret_cast<const type_index *>(&componentTypes); };
+    const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
     int getNumComponentTypes() override { return 4;};
 
 
