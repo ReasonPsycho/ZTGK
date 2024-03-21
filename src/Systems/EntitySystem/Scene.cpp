@@ -10,12 +10,12 @@ void Scene::updateScene() {
     }
 }
 
-Entity * Scene::addGameObject(string name) {
+Entity * Scene::addEntity(string name) {
     children.push_back(make_unique<Entity>(&systemManager,name));
     return children.back().get();
 }
 
-Entity * Scene::addGameObject(Entity *parent, string name) {
+Entity * Scene::addEntity(Entity *parent, string name) {
     return parent->addChild(make_unique<Entity>(&systemManager,name));
 }
 

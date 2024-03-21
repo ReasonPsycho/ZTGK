@@ -34,13 +34,9 @@ void DirLight::InnitShadow() {
 
     float scale_factor = 1000.0f;
 // assume data.direction contains Euler angles (yaw, pitch, roll)
-    glm::vec3 eulerAngles = data.direction;
-    glm::vec3 direction = glm::vec3(
-            cos(eulerAngles.x) * cos(eulerAngles.y), // dx
-            sin(eulerAngles.y), // dy
-            sin(eulerAngles.x) * cos(eulerAngles.y) // dz
-    );
-    glm::vec3 translatedPos = -scale_factor * direction; //adjust the sign and scale
+    glm::vec3 forward = glm::vec3(0,0,1);
+    data.direction =  glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward),1);
+    glm::vec3 translatedPos = -scale_factor * data.direction; //adjust the sign and scale
     lightView = glm::lookAt(translatedPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     data.position = glm::vec4(translatedPos, 1.0f);
     data.lightSpaceMatrix = lightProjection * lightView;

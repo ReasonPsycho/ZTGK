@@ -13,8 +13,9 @@ class Scene {
 public:
     Scene() = default;
 
-    Entity *addGameObject(string name);
-    Entity *addGameObject(Entity *parent, string name);
+    Entity *addEntity(string name);
+    
+    Entity *addEntity(Entity *parent, string name);
     
     void updateScene();
     

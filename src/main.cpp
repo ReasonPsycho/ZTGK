@@ -43,7 +43,9 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
+string planeModelPath = "res/models/plane/Plane.fbx";
 Model model = Model(&modelPath);
+Model planeModel = Model(&planeModelPath);
 
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
@@ -299,23 +301,24 @@ void init_systems() {
 
 void load_enteties() {
     model.loadModel();
-    Entity *gameObject = scene.addGameObject("asteroid");
+    planeModel.loadModel();
+    Entity *gameObject = scene.addEntity("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(new Render(&model));
+    gameObject->addComponent(new Render(&planeModel));
     for (unsigned int i = 0; i < 2; ++i) {
-        gameObject = scene.addGameObject(gameObject, "asteroid");
+        gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(new Render(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-    gameObject = scene.addGameObject("Dir light");
+    gameObject = scene.addEntity("Dir light");
     gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(255.0f,255.0f,255.0f,1.0f), glm::vec4(1), glm::mat4x4(1))));
-    gameObject = scene.addGameObject("Point Light");
+    gameObject = scene.addEntity("Point Light");
     gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255),1))));
-    gameObject = scene.addGameObject("Spot Light");
+    gameObject = scene.addEntity("Spot Light");
     gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
     lightSystem.Init();
 }
