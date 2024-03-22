@@ -6,7 +6,7 @@
 #define ZTGK_UNIT_H
 #include "ECS/Grid/Grid.h"
 #include "Utils/AstarPathfinding.h"
-
+#include "UnitAI/StateMachine/StateManager.h"
 
 struct UnitStats{
     float health;
@@ -16,18 +16,27 @@ struct UnitStats{
     float range;
 };
 
+enum TargetType{
+    NONE,
+    ENEMY,
+    MINING,
+    GROUND
+};
 
 
 class Unit {
 public:
     UnitStats stats;
     Vector2Int gridPosition;
+    TargetType targetType;
+    State* currentState;
 
 
 
 private:
     Grid* grid;
     AstarPathfinding pathfinding;
+
 };
 
 

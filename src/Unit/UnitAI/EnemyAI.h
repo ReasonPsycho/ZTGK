@@ -6,7 +6,11 @@
 #define ZTGK_ENEMYAI_H
 
 
-class EnemyAI {
+#include "ECS/Component.h"
+
+class EnemyAI : public Component{
+public:
+    
 
 };
 

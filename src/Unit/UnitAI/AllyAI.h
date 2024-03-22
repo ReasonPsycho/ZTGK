@@ -6,7 +6,10 @@
 #define ZTGK_ALLYAI_H
 
 
-class AllyAI {
+#include "ECS/Component.h"
+
+class AllyAI : public Component{
+
 
 };
 

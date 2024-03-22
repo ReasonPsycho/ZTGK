@@ -4,6 +4,7 @@
 
 #include "StateManager.h"
 
+//This should be in an Update function
 void StateManager::RunStateMachine() {
     if (currentState != nullptr) {
         State *nextState = currentState->RunCurrentState();
