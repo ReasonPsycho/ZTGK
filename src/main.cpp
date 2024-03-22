@@ -578,11 +578,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
         ImGuiIO &io = ImGui::GetIO();
         io.MousePos = ImVec2(uixpos, uiypos);
     }
-
-    ImGuiIO &io = ImGui::GetIO();
-    io.MousePos = ImVec2(xpos, ypos);
-
-    ImGui_ImplGlfw_CursorPosCallback(window, xposIn, yposIn);
+    
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
