@@ -36,8 +36,24 @@ jobs:
       - name: Create Symbolic Link To Resources
         run: New-Item -ItemType SymbolicLink -Path "${{github.workspace}}/build/Debug/res" -Target "${{github.workspace}}/res"
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
         with:
-          name: compiled-application
-          path: ${{github.workspace}}/build/
+          tag_name: automatic-release-${{ github.run_number }}
+          release_name: Automatic release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{github.workspace}}/build/Debug/
+          asset_name: build-artifacts
+          asset_content_type: application/octet-stream
