@@ -54,6 +54,9 @@ add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
 # Treat asset files as headers (prevents them from being compiled)
 set_source_files_properties(${ASSETS_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE)
+set(ASSIMP_BUILD_FBX_IMPORTER TRUE)
+
 find_package(OpenGL  REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(Stb REQUIRED)
