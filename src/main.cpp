@@ -21,7 +21,7 @@
 #include "ECS/Render/Pipelines/PBRPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
-
+#include "ECS/Grid/Grid.h"
 
 
 #pragma endregion Includes
@@ -30,9 +30,14 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
+string tileModelPath = "res/models/Tile/Tile.fbx";
+Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
+Entity *gridEntity;
+
+
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
 #pragma endregion constants
@@ -309,6 +314,15 @@ void load_enteties() {
     gameObject = scene.addEntity("Spot Light");
     gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
     lightSystem.Init();
+
+    Entity* tileEntity = scene.addEntity("Tile");
+    tileEntity->transform.setLocalPosition({1,1,1});
+    tileEntity->addComponent(new Render(&tileModel));
+//    gridEntity = scene.addEntity("Grid");
+//    Grid grid = Grid(10, 10, 1.0f, gridEntity);
+//    gridEntity->addComponent(&grid);
+//    Grid* pGrid = gridEntity->getComponent<Grid>();
+//    pGrid->RenderTiles(&scene, 1.0f, &tileModel);
 }
 
 void init_imgui() {
