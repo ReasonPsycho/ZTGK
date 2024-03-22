@@ -138,6 +138,13 @@ public:
     static Vector3 GlmVec3ToVector3(const glm::vec3 &vector) {
         return {vector.x, vector.y, vector.z};
     }
+
+    static float Distance(Vector2Int a, Vector2Int b) {
+        return sqrt(pow(a.x - b.x, 2) + pow(a.z - b.z, 2));
+    }
+    static float Distance(Vector3 a, Vector3 b) {
+        return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+    }
 };
 
 #endif //ZTGK_VECTORUTILS_H
