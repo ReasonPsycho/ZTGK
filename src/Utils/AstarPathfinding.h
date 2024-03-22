@@ -6,7 +6,7 @@
 #define ZTGK_ASTARPATHFINDING_H
 
 #include <vector>
-#include "ECS/Utils/VectorUtils.h"
+#include "VectorUtils.h"
 #include "ECS/Grid/Grid.h"
 #include <unordered_set>
 

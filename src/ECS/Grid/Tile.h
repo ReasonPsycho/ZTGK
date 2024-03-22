@@ -1,7 +1,7 @@
 #ifndef ZTGK_TILE_H
 #define ZTGK_TILE_H
 
-#include "ECS/Utils/VectorUtils.h"
+#include "Utils/VectorUtils.h"
 
 class Tile {
 public:

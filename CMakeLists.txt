@@ -49,9 +49,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES} ${HEADER_FIL
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${ASSETS_FILES})
 
 # Define the startup executable for the project
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES}
-        src/ECS/Utils/AstarPathfinding.cpp
-        src/ECS/Utils/AstarPathfinding.h)
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
 
 # Treat asset files as headers (prevents them from being compiled)
 set_source_files_properties(${ASSETS_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
