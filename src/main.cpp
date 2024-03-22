@@ -295,6 +295,7 @@ void init_systems() {
 
 void load_enteties() {
     model.loadModel();
+    tileModel.loadModel();
     Entity *gameObject = scene.addEntity("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
@@ -489,6 +490,10 @@ void processInput(GLFWwindow *window) {
         timeStepKeyPressed = false;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+        ImGui::GetIO().MousePos = ImVec2(0,0);
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -510,6 +515,9 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
+    static float uixpos{ xpos };
+    static float uiypos{ ypos };
+
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
@@ -522,11 +530,13 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
         } else {
             camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
         }
+    } else {
+        uixpos += xoffset;
+        uiypos -= yoffset;
+        ImGuiIO &io = ImGui::GetIO();
+        io.MousePos = ImVec2(uixpos, uiypos);
     }
 
-
-    ImGuiIO &io = ImGui::GetIO();
-    io.MousePos = ImVec2(xpos, ypos);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
