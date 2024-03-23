@@ -36,11 +36,14 @@ std::string Signal::to_string() const {
         << "id=" << sid << ","
         << "created=" << created << ","
         << "ttl=" << time_to_live << ","
+        << "consume=" << consume << ","
         << "receiver_id=" << receiver_id << ","
-        << "data=" << data->to_string()
+        << "data=" << data->to_string() << ","
+        << "hasCallback=" << bool(callback)
         << "}";
     return oss.str();
 }
 
-Signal::Signal(unsigned int signalType, const std::shared_ptr<SignalData> & data) : Signal(signalType, 0, 0, data, []() {}) {}
+Signal::Signal(unsigned int signalType, const std::shared_ptr<SignalData> & data) : Signal(signalType, 0, 0, data,
+                                                                                           nullptr) {}
 

@@ -41,5 +41,36 @@ public:
     const type_index *getComponentTypes() override { return reinterpret_cast<const type_index *>(&component_types); };
     int getNumComponentTypes() override { return 1; };
 
+
+    // editor
+    struct editor_s_new_signal_config {
+        int choice{0};
+        bool enablelog{false};
+        SignalReceiver * logger;
+        std::vector<std::string> log{};
+
+        const static int message_size = 100;
+
+        float defertime{0};
+        unsigned receiver{0};
+        bool consume{false};
+        char message[message_size]{"Spoofed event."};
+
+        int nsignals{1};
+        // keypress
+        int key{0}, scancode{0}, kaction{0}, kmods{0};
+        // scroll
+        double xoff{0}, yoff{0};
+        // mouse move
+        double xnew{0}, ynew{0}, xold{0}, yold{0};
+        // mouse button
+        int button{0}, maction{0}, mmods{0};
+        // audio
+        char soundpath[message_size]{};
+
+        static SignalReceiver * new_logger();
+    };
+    static editor_s_new_signal_config editor_new_signal_config;
+    void editor_control_window();
 };
 

@@ -42,12 +42,12 @@ struct Signal {
     //todo void * or union this instead, inspired by sdl event types but the union would need to be edited every time there's a new type
     std::shared_ptr<SignalData> data;
     // optional callback for the signal to function as a timed event on its own, see std::bind to enqueue param-taking lambdas, default assignment avoids null check
-    std::function<void()> callback = []() {};
+    std::function<void()> callback = nullptr;
 
     Signal();
 
     explicit Signal(unsigned int signalType, long long ttl = 0, unsigned int receiverId = 0, const std::shared_ptr<SignalData> & data = std::make_shared<SignalData>(),
-                    const std::function<void()> &callback = []() {});
+                    const std::function<void()> &callback = nullptr);
 
     Signal(unsigned int signalType, const std::shared_ptr<SignalData> & data);
 
