@@ -4,9 +4,10 @@
 
 #ifndef ZTGK_IDLESTATE_H
 #define ZTGK_IDLESTATE_H
+
+
 #include "../State.h"
-#include "MovementState.h"
-#include "CombatState.h"
+
 
 class IdleState : public State{
 public:
@@ -14,7 +15,7 @@ public:
 
     MovementState* MoveState;
     CombatState* CombatState;
-    bool canSeeUnitTarget;
+    MiningState* MiningState;
 };
 
 

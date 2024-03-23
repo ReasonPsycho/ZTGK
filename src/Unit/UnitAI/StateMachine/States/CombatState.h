@@ -4,16 +4,17 @@
 
 #ifndef ZTGK_COMBATSTATE_H
 #define ZTGK_COMBATSTATE_H
-#include "../State.h"
-#include "MovementState.h"
 
+
+#include "../State.h"
 
 class CombatState : public State{
 public:
     State* RunCurrentState() override;
-    MovementState* MoveState;
 
-    bool isAttackTargetInRange;
+    MovementState *MoveState;
+    MiningState* MiningState;
+    IdleState* IdleState;
 };
 
 

@@ -9,6 +9,10 @@
 class MiningState : public State{
 public:
     State* RunCurrentState() override;
+
+    MovementState* MoveState;
+    CombatState* CombatState;
+    IdleState* IdleState;
 };
 
 

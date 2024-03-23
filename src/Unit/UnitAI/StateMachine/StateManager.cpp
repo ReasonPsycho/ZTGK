@@ -4,6 +4,12 @@
 
 #include "StateManager.h"
 
+StateManager::StateManager(Unit *unit) {
+    this->unit = unit;
+    currentState = nullptr;
+
+}
+
 //This should be in an Update function
 void StateManager::RunStateMachine() {
     if (currentState != nullptr) {
@@ -18,3 +24,5 @@ void StateManager::RunStateMachine() {
 void StateManager::SwitchToTheNextState(State *nextState) {
     currentState = nextState;
 }
+
+

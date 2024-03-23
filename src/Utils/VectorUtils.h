@@ -7,6 +7,7 @@
 
 
 #include "glm/vec3.hpp"
+#include <cmath>
 
 struct Vector2Int {
     int x;

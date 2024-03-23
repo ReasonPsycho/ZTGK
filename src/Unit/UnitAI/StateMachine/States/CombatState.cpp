@@ -5,9 +5,20 @@
 #include "CombatState.h"
 
 State *CombatState::RunCurrentState() {
-    if(isAttackTargetInRange){
-        return this;
-    } else {
+    //from Combat to Idle
+    if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
+        return IdleState;
+    }
+
+    //from Combat to Movement
+    if (unit->hasMovementTarget) {
         return MoveState;
     }
+
+    //from Combat to Mining
+    if (!unit->hasMovementTarget && !unit->hasCombatTarget && unit->hasMiningTarget && unit->isTargetInRange) {
+        return MiningState;
+    }
+
+    return this;
 }

@@ -5,9 +5,21 @@
 #include "IdleState.h"
 
 State *IdleState::RunCurrentState() {
-    if(canSeeUnitTarget){
+
+    //from Idle to Movement
+    if(unit->hasMovementTarget){
         return MoveState;
-    } else {
-        return this;
     }
+    //from Idle to Combat
+    if(!unit->hasMovementTarget && unit->hasCombatTarget && unit->isTargetInRange){
+        return CombatState;
+    }
+
+    //from Idle to Mining
+    if(!unit->hasMovementTarget && !unit->hasCombatTarget && unit->hasMiningTarget && unit->isTargetInRange){
+        return MiningState;
+    }
+
+    return this;
+
 }
