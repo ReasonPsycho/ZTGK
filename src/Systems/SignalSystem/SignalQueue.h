@@ -31,8 +31,8 @@ public:
     void cancel(unsigned signalId);
     std::vector<Signal> peek(unsigned signal_type = 0);
 
-    SignalQueue &operator+=(Signal &signal);
-    SignalQueue &operator-=(Signal &signal);
+    SignalQueue &operator+=(const Signal& signal);
+    SignalQueue &operator-=(const Signal& signal);
     SignalQueue &operator+=(SignalReceiver *receiver);
     SignalQueue &operator-=(SignalReceiver *receiver);
 

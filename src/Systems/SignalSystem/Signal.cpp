@@ -15,29 +15,32 @@ s_signal_types::s_signal_types() {
     mouse_move_signal = mask_id<MASK_ID_POOL_SIGNAL_TYPE>();
     mouse_scroll_signal = mask_id<MASK_ID_POOL_SIGNAL_TYPE>();
     audio_signal = mask_id<MASK_ID_POOL_SIGNAL_TYPE>();
+
+    all_mouse = mouse_scroll_signal | mouse_move_signal | mouse_button_signal;
+    all = test_signal | keyboard_signal | all_mouse | audio_signal;
 }
 
 s_signal_types Signal::signal_types{};
 
-struct SignalData {
-    long long timestamp = time();
-};
+Signal::Signal() : sid(id<ID_POOL_SIGNAL>()), created(time()) {}
 
-Signal::Signal() : sid(id<ID_POOL_SIGNAL>()) {}
-
-Signal::Signal(unsigned int signalType, long long ttl, unsigned int receiverId, const std::function<void()> &callback, const std::string &message)
-        : sid(id<ID_POOL_SIGNAL>()), time_to_live(ttl), receiver_id(receiverId), stype(signalType),
-          callback(callback), message(message) {}
+Signal::Signal(unsigned int signalType, long long ttl, unsigned int receiverId, const std::shared_ptr<SignalData> & data,
+               const std::function<void()> &callback)
+        : sid(id<ID_POOL_SIGNAL>()), created(time()), time_to_live(ttl), receiver_id(receiverId), stype(signalType),
+          data(data), callback(callback) {}
 
 std::string Signal::to_string() const {
     std::ostringstream oss;
     oss << "{"
-        << "type:" << stype << ","
-        << "id:" << sid << ","
-        << "message:\"" << message << "\","
-        << "ttl:" << time_to_live << ","
-        << "receiver_id:" << receiver_id
+        << "type=" << stype << ","
+        << "id=" << sid << ","
+        << "created=" << created << ","
+        << "ttl=" << time_to_live << ","
+        << "receiver_id=" << receiver_id << ","
+        << "data=" << data->to_string()
         << "}";
     return oss.str();
 }
+
+Signal::Signal(unsigned int signalType, const std::shared_ptr<SignalData> & data) : Signal(signalType, 0, 0, data, []() {}) {}
 

@@ -3,3 +3,10 @@
 //
 
 #include "MouseMoveSignalData.h"
+#include "Systems/SignalSystem/Signal.h"
+
+MouseMoveSignalData::MouseMoveSignalData(Vec2<double> pos, Vec2<double> prev, const std::string & message) : SignalData(message), pos(pos), prev(prev) {}
+
+Signal MouseMoveSignalData::signal(Vec2<double> pos, Vec2<double> prev, const std::string & message) {
+    return {Signal::signal_types.mouse_move_signal, std::make_shared<MouseMoveSignalData>(pos, prev, message)};
+}

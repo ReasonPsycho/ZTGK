@@ -10,6 +10,10 @@
 #include "modelLoading/Model.h"
 #include <cstdio>
 #include "Systems/SignalSystem/SignalQueue.h"
+#include "Systems/SignalSystem/DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "Systems/SignalSystem/DataCargo/MouseEvents/MouseScrollSignalData.h"
+#include "Systems/SignalSystem/DataCargo/MouseEvents/MouseButtonSignalData.h"
+#include "Systems/SignalSystem/DataCargo/KeySignalData.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #define STB_IMAGE_IMPLEMENTATION
@@ -99,6 +103,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 void processInput(GLFWwindow *window);
 
@@ -326,14 +334,24 @@ void load_enteties() {
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
     gameObject = scene.addGameObject("Dir light");
-    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(255.0f,255.0f,255.0f,1.0f), glm::vec4(1), glm::mat4x4(1))));
+    gameObject->addComponent(new DirLight(
+            DirLightData(glm::vec4(1), glm::vec4(255.0f, 255.0f, 255.0f, 1.0f), glm::vec4(1), glm::mat4x4(1))));
     gameObject = scene.addGameObject("Point Light");
-    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255),1))));
+    gameObject->addComponent(
+            new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255), 1))));
     gameObject = scene.addGameObject("Spot Light");
-    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
+    gameObject->addComponent(new SpotLight(
+            SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+                          glm::vec4(255, 255, 255, 1))));
     lightSystem.Init();
     gameObject = scene.addGameObject("Signal Receiver Mockup #1");
-    gameObject->addComponent(new SignalReceiver(Signal::signal_types.test_signal, [](const Signal& signal) {log_console.push_back(std::format("Received signal {}({}) @ {} : {}", signal.sid, signal.stype, ztgk_util::time(), signal.message));}));
+    gameObject->addComponent(new SignalReceiver(
+            Signal::signal_types.all,
+            [](const Signal &signal) {
+                log_console.push_back(
+                        std::format("Received signal {}({}) @ {} : {}", signal.sid, signal.stype, ztgk_util::time(),
+                                    signal.data->message));
+            }));
 }
 
 void init_imgui() {
@@ -367,6 +385,8 @@ void input() {
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     processInput(window);
 }
@@ -452,18 +472,18 @@ void imgui_render() {
     ImGui::InputFloat("Defer time (sec)", &signalDeferTime);
     if (ImGui::Button("Immediate")) {
         Signal signal(Signal::signal_types.test_signal);
-        signal.message = std::format("Enqueued immediate @ {}" , ztgk_util::time());
+        signal.data->message = std::format("Enqueued immediate @ {}", ztgk_util::time());
         signalQueue += signal;
     }
     ImGui::SameLine();
     if (ImGui::Button("Defer")) {
         Signal defer(Signal::signal_types.test_signal);
         defer.time_to_live = signalDeferTime * 1000;
-        defer.message = std::format("Enqueued defer @ {}" , ztgk_util::time());
-        defer.callback = [defer](){ log_console.push_back(std::format("Defer callback - signal {}", defer.sid)); };
+        defer.data->message = std::format("Enqueued defer @ {}", ztgk_util::time());
+        defer.callback = [defer]() { log_console.push_back(std::format("Defer callback - signal {}", defer.sid)); };
 
         Signal immediate(Signal::signal_types.test_signal);
-        immediate.message = std::format("Awaiting defer for {} @ {}", defer.time_to_live, ztgk_util::time());
+        immediate.data->message = std::format("Awaiting defer for {} @ {}", defer.time_to_live, ztgk_util::time());
 
         signalQueue += immediate;
         signalQueue += defer;
@@ -474,7 +494,7 @@ void imgui_render() {
             log_console.push_back("Current queue:");
             for (const auto &item: signalQueue.queue)
                 log_console.push_back("\t" + item.to_string());
-        } catch (std::exception & ex) {
+        } catch (std::exception &ex) {
             std::cerr << ex.what() << std::endl;
             spdlog::error(ex.what());
         }
@@ -482,9 +502,11 @@ void imgui_render() {
     ImGui::Text("dt: %lld", signalQueue.get_delta());
     ImGui::End();
     ImGui::Begin("Queue log");
-    for(auto & line : log_console) {
+    for (auto &line: log_console) {
         ImGui::Text("%s", line.c_str());
     }
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
     ImGui::End();
 
 }
@@ -557,6 +579,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
+    signalQueue += MouseMoveSignalData::signal(
+            {xposIn, yposIn}, {lastX, lastY},
+            "Forwarding GLFW event."
+    );
+
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -577,12 +604,27 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 
     ImGuiIO &io = ImGui::GetIO();
     io.MousePos = ImVec2(xpos, ypos);
+
+    ImGui_ImplGlfw_CursorPosCallback(window, xposIn, yposIn);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
+
     camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
 
 void end_frame() {

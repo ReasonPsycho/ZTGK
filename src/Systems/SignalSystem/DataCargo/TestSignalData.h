@@ -5,8 +5,11 @@
 #pragma once
 
 
-class TestSignalData {
-    long long timestamp;
+#include "SignalData.h"
 
-    TestSignalData();
+struct TestSignalData : public SignalData {
+    TestSignalData() = default;
+    explicit TestSignalData(const std::string & message) : SignalData(message) {}
+
+    static Signal signal();
 };

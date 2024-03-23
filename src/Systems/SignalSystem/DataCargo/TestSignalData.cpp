@@ -3,8 +3,8 @@
 //
 
 #include "TestSignalData.h"
-#include "Systems/Util.h"
+#include "Systems/SignalSystem/Signal.h"
 
-TestSignalData::TestSignalData() {
-    timestamp = ztgk_util::time();
+Signal TestSignalData::signal() {
+    return {};
 }

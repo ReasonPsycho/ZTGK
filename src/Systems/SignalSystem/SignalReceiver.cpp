@@ -11,28 +11,28 @@
 
 using namespace ztgk_util;
 
-std::unordered_map<unsigned, std::pair<SignalReceiver*, std::vector<std::string>>> SignalReceiver::debugClones{};
+std::unordered_map<unsigned, std::pair<SignalReceiver *, std::vector<std::string>>> SignalReceiver::debugClones{};
 
-SignalReceiver::SignalReceiver() : SignalReceiver(0, [](const Signal&){}) {}
+SignalReceiver::SignalReceiver() : SignalReceiver(0, [](const Signal &) {}) {}
 
-SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal&)> onSignal)
+SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal &)> onSignal)
         : uid(id<ID_POOL_COMPONENT>()), receive_type_mask(receiveTypeMask), receive(onSignal) {}
 
 void SignalReceiver::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
     if (ImGui::TreeNode("Signal Receiver")) {
         ImGui::Text("ID: %d", uid);
-        ImGui::Text("Types: %d", receive_type_mask);
+        ImGui::Text("Typemask: %d", receive_type_mask);
         ImGui::Text("Has callback: %d", bool(receive));
 
         if (ImGui::Button("Subscribe debug clone")) {
             if (debugClones.contains(uid)) {
                 (this->parentEntity->systemManager->getSystem<SignalQueue>())->post(Signal(
-                    0,
-                    0,
-                    debugClones[uid].first->uid,
-                    [](){},
-                    "Debug print clone already exists!"
+                        0,
+                        0,
+                        debugClones[uid].first->uid,
+                        std::make_shared<SignalData>("Debug print clone already exists!"),
+                        []() {}
                 ));
                 ImGui::SetWindowFocus(std::format("Debug print of receiver {}({})", uid, receive_type_mask).c_str());
             } else {
@@ -60,6 +60,8 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
             ImGui::Begin(std::format("Debug print of receiver {}({})", uid, receive_type_mask).c_str());
             for (const auto &log_line: debugClones[uid].second)
                 ImGui::Text("%s", log_line.c_str());
+            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+                ImGui::SetScrollHereY(1.0f);
             ImGui::End();
         }
         ImGui::TreePop();

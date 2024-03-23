@@ -6,9 +6,16 @@
 
 
 #include "ECS/Grid/VectorUtils.h"
+#include "Systems/SignalSystem/DataCargo/SignalData.h"
 
-class MouseScrollSignalData {
-    long long timestamp;
-
+struct MouseScrollSignalData : SignalData {
     Vec2<double> offset;
+
+    MouseScrollSignalData(Vec2<double> offset, const std::string & message = "");
+
+    [[nodiscard]] std::string to_string() const override {
+        return std::format("{{message=\"{}\", offset=({}, {})}}", message, offset.x, offset.y);
+    }
+
+    static Signal signal(Vec2<double> offset, const std::string & message = "");
 };

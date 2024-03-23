@@ -65,12 +65,12 @@ std::vector<Signal> SignalQueue::peek(unsigned int signal_type) {
     return ret;
 }
 
-SignalQueue &SignalQueue::operator+=(Signal &signal) {
+SignalQueue &SignalQueue::operator+=(const Signal& signal) {
     post(signal);
     return *this;
 }
 
-SignalQueue &SignalQueue::operator-=(Signal &signal) {
+SignalQueue &SignalQueue::operator-=(const Signal& signal) {
     cancel(signal.sid);
     return *this;
 }
