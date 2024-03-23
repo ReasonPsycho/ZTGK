@@ -11,7 +11,9 @@
 struct s_signal_types {
     unsigned test_signal;
     unsigned keyboard_signal;
-    unsigned mouse_signal;
+    unsigned mouse_button_signal;
+    unsigned mouse_move_signal;
+    unsigned mouse_scroll_signal;
     unsigned audio_signal;
 
     s_signal_types();
@@ -44,8 +46,8 @@ struct Signal {
 
     Signal();
 
-    explicit Signal(unsigned int signalType, long long ttl = 0, unsigned int receiverId = 0,
-                    const std::function<void()> &callback = []() {});
+    Signal(unsigned int signalType, long long ttl = 0, unsigned int receiverId = 0,
+                    const std::function<void()> &callback = []() {}, const std::string & message = "");
 
     ~Signal() = default;
 

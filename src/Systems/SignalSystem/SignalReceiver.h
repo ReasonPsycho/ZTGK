@@ -6,10 +6,13 @@
 
 #include "ECS/Component.h"
 #include <functional>
+#include <string>
 struct Signal;
 class Camera;
 
 struct SignalReceiver : Component {
+    static std::unordered_map<unsigned, std::pair<SignalReceiver*, std::vector<std::string>>> debugClones;
+
     unsigned uid;
 
     unsigned receive_type_mask = 0;

@@ -63,15 +63,15 @@ public:
 
     void showImGuiDetails(Camera *camera);
     
-protected:
+//protected:
     int uniqueID;     // Instance variable to store the unique ID for each object
-
-private:
-    static int nextID; // Static variable to keep track of the next available ID
     std::unordered_map<std::type_index, Component*> components;
     std::vector<std::unique_ptr<Entity>> children;
     SystemManager *systemManager;
     bool isSelected = false;
+
+private:
+    static int nextID; // Static variable to keep track of the next available ID
     
 };
 
