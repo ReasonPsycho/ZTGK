@@ -21,7 +21,8 @@
 #include "ECS/Render/Pipelines/PBRPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
-
+#include "ECS/Render/Primitives/PBRPrimitives.h"
+#include "ECS/Render/Primitives/Primitives.h"
 
 
 #pragma endregion Includes
@@ -113,6 +114,7 @@ float lastX = 0;
 float lastY = 0;
 
 Primitives primitives;
+PBRPrimitives PBRPrimitives;
 LightSystem lightSystem(&camera);
 PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
@@ -277,6 +279,7 @@ bool init() {
 
 void init_systems() {
     primitives.Init();
+    PBRPrimitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     scene.systemManager.addSystem(&lightSystem);
@@ -284,8 +287,8 @@ void init_systems() {
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
     Material whiteMaterial = Material(myColor);
-    cubeModel = new Model(primitives.cubeVAO, whiteMaterial,vector<GLuint>(primitives.cubeIndices,primitives.cubeIndices + 36));
-   quadModel = new Model(primitives.quadVAO,whiteMaterial,vector<GLuint>(primitives.quadIndices,primitives.quadIndices + 6));
+    cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
+   quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
 }
 
 void load_enteties() {

@@ -4,6 +4,12 @@
 #include "Model.h"
 #include "Material.h"
 
+
+Color normalColor = {128, 128, 255, 255};  // Normal map neutral
+Color metallicColor = {0, 0, 0, 255};  // Black, no metallic
+Color roughnessColor = {128, 128, 128, 255};  // 50% gray
+Color aoColor = {255, 255, 255, 255};  // White
+
 void replaceAll(string &str, const string &from, const string &to) {
     size_t start_pos = 0;
     while ((start_pos = str.find(from, start_pos)) != string::npos) {
@@ -39,11 +45,6 @@ Material::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeN
                     texture);  // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
         }
     }
-    
-    if(!texture){
-        spdlog::warn(texturePath + "Texture dosn't exist replacing it with black pixel");
-        texture = make_shared<Texture>();
-    }
     return texture;
 }
 
@@ -64,12 +65,6 @@ Material::forceLoadMaterialTexture(string path, aiTextureType type, string typeN
         model->textureCatalogue.push_back(
                 texture);  // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
     }
-    
-    if(!texture){
-        spdlog::warn(path + " Texture doesn't exist replacing it with black pixel");
-        texture = make_shared<Texture>();
-    }
-    
     return texture;
 }
 
@@ -78,15 +73,42 @@ Material::Material(aiMaterial *material, Model *model) {
 // 1. albedo maps
     albedoMap = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", model);
 // 2. normal maps
+    if(!albedoMap){
+        spdlog::warn("AlbedoMap doesn't exist replacing it with white !");
+        albedoMap = make_shared<Texture>();
+    }
+
     normalMap = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", model);
 // 3. metallic maps
+
+    if(!normalMap){
+        spdlog::warn("normalMap doesn't exist replacing it with default normal color!");
+        normalMap = make_shared<Texture>(normalColor);
+    }
+
     metallicMap = loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", model);
 // 4. roughness maps
+
+    if(!metallicMap){
+        spdlog::warn("MetallicMap doesn't exist replacing it with default metallic color!");
+        metallicMap = make_shared<Texture>(metallicColor);
+    }
+
     roughnessMap = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_roughness", model);
 
+    if(!roughnessMap){
+        spdlog::warn("RoughnessMap doesn't exist replacing it with default roughness color!");
+        roughnessMap = make_shared<Texture>(roughnessColor);
+    }
+    
     string albedoPath = albedoMap->path;
     string aoPath = albedoPath.substr(0, albedoPath.find_last_of('_')) + "_ao.png";
     aoMap = forceLoadMaterialTexture(aoPath, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", model);
+
+    if(!aoMap){
+        spdlog::warn("AoMap doesn't exist replacing it with default ao color!");
+        aoMap = make_shared<Texture>(aoColor);
+    }
 }
 
  void Material::loadMaterial(Shader* shader) {
@@ -111,10 +133,6 @@ Material::Material(aiMaterial *material, Model *model) {
      glBindTexture(GL_TEXTURE_2D, aoMap->ID);
  }
 
-Color normalColor = {128, 128, 255, 255};  // Normal map neutral
-Color metallicColor = {0, 0, 0, 255};  // Black, no metallic
-Color roughnessColor = {128, 128, 128, 255};  // 50% gray
-Color aoColor = {255, 255, 255, 255};  // White
 
 Material::Material(GLubyte *color) {
     albedoMap = make_shared<Texture>(*reinterpret_cast<Color*>(color));
