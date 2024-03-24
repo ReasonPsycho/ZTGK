@@ -20,6 +20,9 @@ public:
 
     bool hasCombatTarget{};
     bool isAttackTargetInRange{};
+
+private:
+    void MoveOnPath();
 };
 
 

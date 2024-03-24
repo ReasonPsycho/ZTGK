@@ -7,7 +7,6 @@
 #include "ECS/Grid/Grid.h"
 #include "Utils/AstarPathfinding.h"
 #include "UnitAI/StateMachine/StateManager.h"
-#include "ECS/Component.h"
 
 struct UnitStats{
     float health;
@@ -22,20 +21,25 @@ class Unit : public Entity {
 public:
     UnitStats stats;
     Vector2Int gridPosition;
+    Vector3 worldPosition;
+
     State* currentState;
+    AstarPathfinding pathfinding;
+    Grid* grid;
 
     bool hasMovementTarget = false;
     bool hasCombatTarget = false;
     bool hasMiningTarget = false;
     bool isTargetInRange = false;
 
+    Vector2Int target;
 
     Unit(SystemManager *systemManager, std::string name, Grid *grid, Vector2Int gridPosition);
 
 
 private:
-    Grid* grid;
-    AstarPathfinding pathfinding;
+
+
 };
 
 

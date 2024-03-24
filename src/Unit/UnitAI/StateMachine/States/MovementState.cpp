@@ -10,6 +10,10 @@
 
 
 State *MovementState::RunCurrentState() {
+
+    MoveOnPath();
+
+
     //from Movement to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
         return IdleState;
@@ -26,4 +30,28 @@ State *MovementState::RunCurrentState() {
     }
 
     return this;
+}
+
+void MovementState::MoveOnPath() {
+    if (unit->pathfinding.path.size() == 0 && !unit->hasMovementTarget) {
+        return;
+    }
+
+    if(unit->pathfinding.path.size() == 0 && unit->hasMovementTarget){
+        unit->pathfinding.FindPath(unit->gridPosition, unit->target);
+    }
+    if (unit->pathfinding.path.size() > 0) {
+        Vector2Int nextTile = unit->pathfinding.path[0];
+        Vector3 nextTileWorldPosition = unit->grid->GridToWorldPosition(nextTile);
+        if(unit->worldPosition == nextTileWorldPosition){
+            unit->pathfinding.path.erase(unit->pathfinding.path.begin());
+            if (unit->pathfinding.path.size() == 0) {
+                unit->hasMovementTarget = false;
+                return;
+            }
+        }
+        else{                                                                                                                                       //TODO: vvv Time.DeltaTime or sth
+            unit->worldPosition = VectorUtils::MoveTowards(unit->worldPosition, nextTileWorldPosition, unit->stats.movementSpeed * 1.0f/60.0f);
+        }
+    }
 }

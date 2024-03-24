@@ -7,9 +7,18 @@
 
 
 #include "ECS/Component.h"
+#include "Unit/Unit.h"
 
 class AllyAI : public Component{
+public:
+    AllyAI(Unit* pUnit, StateManager* pStateManager);
+    ~AllyAI();
 
+    void Update() override;
+
+    private:
+    Unit* unit;
+    StateManager* stateManager;
 
 };
 

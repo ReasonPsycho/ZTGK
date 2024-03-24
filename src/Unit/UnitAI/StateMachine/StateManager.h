@@ -10,11 +10,9 @@ public:
     StateManager(Unit *pUnit);
 
     Unit* unit;
-
-private:
     State* currentState;
-
     void RunStateMachine();
+private:
     void SwitchToTheNextState(State* nextState);
 };
 

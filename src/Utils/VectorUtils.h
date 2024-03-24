@@ -146,6 +146,17 @@ public:
     static float Distance(Vector3 a, Vector3 b) {
         return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
     }
+
+
+    static Vector3 MoveTowards(Vector3 current, Vector3 target, float maxDistanceDelta) {
+        Vector3 a = target - current;
+        float magnitude = a.x * a.x + a.y * a.y + a.z * a.z;
+        if (magnitude <= maxDistanceDelta || magnitude == 0.0f) {
+            return target;
+        }
+        float num = sqrt(magnitude);
+        return current + a / num * maxDistanceDelta;
+    }
 };
 
 #endif //ZTGK_VECTORUTILS_H
