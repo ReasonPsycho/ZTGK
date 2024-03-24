@@ -6,11 +6,11 @@
 #include <ImGuizmo.h>
 #include <cstdio>
 
-#include "ECS/SignalSystem/SignalQueue.h"
-#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseMoveSignalData.h"
-#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseScrollSignalData.h"
-#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseButtonSignalData.h"
-#include "ECS/SignalSystem/DataCargo/KeySignalData.h"
+#include "ECS/SignalQueue/SignalQueue.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
+#include "ECS/SignalQueue/DataCargo/KeySignalData.h"
 
 //Instancing
 #include <glm/gtc/type_ptr.hpp>

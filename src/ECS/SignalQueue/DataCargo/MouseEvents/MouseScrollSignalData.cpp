@@ -3,7 +3,7 @@
 //
 
 #include "MouseScrollSignalData.h"
-#include "ECS/SignalSystem/Signal.h"
+#include "ECS/SignalQueue/Signal.h"
 #include "ECS/Util.h"
 
 using namespace ztgk;

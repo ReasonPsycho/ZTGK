@@ -2,7 +2,7 @@
 // Created by cheily on 21.03.2024.
 //
 #include "SignalData.h"
-#include "ECS/SignalSystem/Signal.h"
+#include "../Signal.h"
 
 
 SignalData::SignalData(const std::string &message) : message(message) {}
