@@ -1,6 +1,7 @@
 #version 330 core
-float near = 1;
-float far = 2000.0;
+
+uniform float near;
+uniform float far;
 
 float LinearizeDepth(float depth)
 {

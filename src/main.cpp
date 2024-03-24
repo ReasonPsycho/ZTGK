@@ -62,11 +62,6 @@ void update();
 
 void render();
 
-void render_scene();
-
-void render_scene_to_depth();
-
-
 void imgui_begin();
 
 void imgui_render();
@@ -115,7 +110,7 @@ float lastY = 0;
 
 Primitives primitives;
 PBRPrimitives PBRPrimitives;
-LightSystem lightSystem(&camera);
+LightSystem lightSystem(&camera,&scene);
 PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 BloomPostProcess bloomSystem;
@@ -278,12 +273,13 @@ bool init() {
 
 
 void init_systems() {
+    scene.systemManager.addSystem(&lightSystem);
+    scene.systemManager.addSystem(&renderSystem);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    scene.systemManager.addSystem(&lightSystem);
-    scene.systemManager.addSystem(&renderSystem);
+
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
     Material whiteMaterial = Material(myColor);
@@ -305,12 +301,12 @@ void load_enteties() {
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-    gameObject = scene.addEntity("Dir light");
-    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(255.0f,255.0f,255.0f,1.0f), glm::vec4(1), glm::mat4x4(1))));
+  //  gameObject = scene.addEntity("Dir light");
+   // gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");
-    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255),1))));
-    gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
+    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+   // gameObject = scene.addEntity("Spot Light");
+   // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
 }
 
@@ -355,7 +351,6 @@ void update() {
 }
 
 void render() {
-    render_scene_to_depth();
 
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
@@ -374,7 +369,7 @@ void render() {
 
     pbrSystem.pbrShader.use();
 
-    render_scene();
+    renderSystem.DrawScene(&pbrSystem.pbrShader);
 
     file_logger->info("Rendered AsteroidsSystem.");
 
@@ -384,19 +379,8 @@ void render() {
 }
 
 
-void render_scene() {
-    renderSystem.DrawScene(&pbrSystem.pbrShader);
-    file_logger->info("Rendered Entities.");
-}
 
 
-void render_scene_to_depth() {
-    // for (auto &light: lightSystem.lights) {
-    //    light->SetUpShadowBuffer(Normal);
-    //    glClear(GL_DEPTH_BUFFER_BIT);
-    //    scene.drawScene(*light->shadowMapShader,*light->instanceShadowMapShader);
-    //}
-}
 
 void imgui_begin() {
     // Start the Dear ImGui frame

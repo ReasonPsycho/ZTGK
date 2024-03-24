@@ -18,12 +18,13 @@
 #include "Components/SpotLight.h"
 #include "../System.h"
 #include "../Component.h"
+#include "ECS/Scene.h"
 
 
 class LightSystem : public System {
 public:
     //Setup
-    LightSystem(Camera *camera);
+    LightSystem(Camera *camera,Scene* scene);
 
     ~LightSystem();
 
@@ -41,9 +42,6 @@ public:
 
     void addComponent(void* component) override;
     
-    //Imgui
-    void showLightTree();
-    
     void PushDepthMapsToShader(Shader *shader);
 
 
@@ -60,6 +58,7 @@ private:
 
     //Camera
     Camera *camera;
+    Scene *scene;
 
     //Shaders
     Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
