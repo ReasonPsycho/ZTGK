@@ -32,6 +32,16 @@ void Mesh::Draw(Shader &shader) {
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
 }
+void Mesh::SimpleDraw(Shader &shader) {
+    
+    // draw mesh
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    // always good practice to set everything back to defaults once configured.
+    glActiveTexture(GL_TEXTURE0);
+}
 
 // initializes all the buffer objects/arrays
 void Mesh::setupMesh() {

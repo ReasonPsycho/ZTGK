@@ -15,14 +15,26 @@
 
 
 struct PointLightData {
+    glm::vec4 color;
     glm::vec4 position;
-
     float constant;
     float linear;
     float quadratic;
     float pointlessfloat;
 
-    glm::vec4 color;
+    //Default constructor
+    PointLightData(  glm::vec4 color = glm::vec4(glm::vec3 (255.0f),1),
+    glm::vec4 position = glm::vec4(0.0f),
+    float constant = 1,
+    float linear = 1,
+    float quadratic = 1)
+            : color(color),
+              position(position),
+              constant(constant),
+              linear(linear),
+              quadratic(quadratic),
+              pointlessfloat(0.0f)
+    {}
 };
 
 class PointLight : public ILight {

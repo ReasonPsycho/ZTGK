@@ -29,7 +29,6 @@ void SpotLight::InnitShadow() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glm::mat4 lightProjection, lightView;
-    float near_plane = 1.0f, far_plane = 50.0f;
     lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat) SHADOW_WIDTH / (GLfloat) SHADOW_HEIGHT,
                                        near_plane,
                                        far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
@@ -58,9 +57,13 @@ void SpotLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader
     if (shaderType == Normal) {
         shadowMapShader->use();
         shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+        shadowMapShader->setFloat("near", near_plane);
+        shadowMapShader->setFloat("far",far_plane);
     } else {
         instanceShadowMapShader->use();
         instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+        shadowMapShader->setFloat("near", near_plane);
+        shadowMapShader->setFloat("far",far_plane);
     }
 
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -92,7 +95,25 @@ void SpotLight::showImGuiDetails(Camera *camera) {
 }
 
 void SpotLight::UpdateData() {
-    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), 0);
-    data.direction = glm::vec4(glm::eulerAngles(this->getEntity()->transform.getLocalRotation()),1);
+    glm::mat4 lightProjection, lightView;
+    lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat) SHADOW_WIDTH / (GLfloat) SHADOW_HEIGHT,
+                                       near_plane,
+                                       far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
+    //lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+
+    glm::vec3 lightPos = glm::vec3(data.position.x, data.position.y, data.position.z);
+
+
+    glm::vec3 eulerAngles = data.direction;
+    glm::vec3 direction = glm::vec3(0, 0, 0);
+    direction = glm::normalize(direction); // Normalize vector
+
+    lightView = glm::lookAt(lightPos, lightPos + direction, glm::vec3(0.0, 1.0,
+                                                                      0.0)); //TODO when shadows gonna be here change that to appropriate things
+// Take in mind that glm::lookAt requires a position where the camera is located, a target where it should look at
+// and an up vector to decide where is your top. Most likely, that it should be glm::vec3(0.0f, 1.0f, 0.0f)
+    data.lightSpaceMatrix = lightProjection * lightView;
+    // render scene from light's point of view
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }

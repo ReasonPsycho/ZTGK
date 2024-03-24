@@ -13,3 +13,9 @@ void RenderSystem::DrawScene(Shader *regularShader) {
         renderComponent->draw(*regularShader);
     }
 }
+
+void RenderSystem::SimpleDrawScene(Shader *regularShader) {
+    for (auto &renderComponent: renderComponents) {
+        renderComponent->simpleDraw(*regularShader);
+    }
+}
