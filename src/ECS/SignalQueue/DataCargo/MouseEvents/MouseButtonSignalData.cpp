@@ -3,7 +3,7 @@
 //
 
 #include "MouseButtonSignalData.h"
-#include "ECS/SignalSystem/Signal.h"
+#include "../../Signal.h"
 
 MouseButtonSignalData::MouseButtonSignalData(int button, int action, int mods, const std::string &message)
         : SignalData(message), button(button), action(action), mods(mods) {}
