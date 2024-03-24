@@ -136,4 +136,3 @@ void Grid::showImGuiDetails(Camera *camera) {
     ImGui::PopID();
 
 }
-

@@ -42,8 +42,6 @@ public:
 
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
 
-
-
 private:
     float offsetX = 0;
     float offsetZ = 0;

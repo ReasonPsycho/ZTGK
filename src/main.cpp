@@ -5,6 +5,16 @@
 #include "imgui_impl_glfw.h"
 #include <ImGuizmo.h>
 #include <cstdio>
+
+#include "ECS/SignalSystem/SignalQueue.h"
+#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseScrollSignalData.h"
+#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseButtonSignalData.h"
+#include "ECS/SignalSystem/DataCargo/KeySignalData.h"
+
+//Instancing
+#include <glm/gtc/type_ptr.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
@@ -12,6 +22,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
+#include "ECS/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
 
@@ -78,6 +89,10 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+
 void processInput(GLFWwindow *window);
 
 #pragma endregion Function definitions
@@ -127,6 +142,12 @@ bool timeStepKeyPressed = false;
 
 #pragma endregion My set up
 
+#pragma region ZTGK-Global
+
+SignalQueue signalQueue = SignalQueue();
+
+#pragma endregion
+
 
 int main(int, char **) {
 
@@ -160,13 +181,15 @@ int main(int, char **) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
 
+    signalQueue.init();
 #pragma endregion Init
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        //Setting up things for the rest of functionalities (ex. delta time)
+        //Setting up things for the rest of functionalities (ex. update_delta time)
         file_logger->info("Before frame");
         before_frame();
+        signalQueue.update();
 
         // Process I/O operations here
         file_logger->info("Input");
@@ -275,6 +298,7 @@ bool init() {
 void init_systems() {
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
+    scene.systemManager.addSystem(&signalQueue);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
@@ -308,6 +332,10 @@ void load_enteties() {
    // gameObject = scene.addEntity("Spot Light");
    // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
+    gameObject = scene.addEntity("Signal Receiver DEMO");
+    gameObject->addComponent(new SignalReceiver(
+            Signal::signal_types.test_signal,
+            [](const Signal &signal) {}));
 }
 
 void init_imgui() {
@@ -328,11 +356,11 @@ void init_imgui() {
 }
 
 void before_frame() {
-    // Setting up delta time
+    // Setting up update_delta time
     double currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
-};
+}
 
 
 void input() {
@@ -341,6 +369,8 @@ void input() {
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     processInput(window);
 }
@@ -410,6 +440,8 @@ void imgui_render() {
 
     bloomSystem.showImguiOptions();
 
+    signalQueue.editor_control_window();
+
 }
 
 void imgui_end() {
@@ -417,6 +449,7 @@ void imgui_end() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+// put things here that need continuous input handling and cannot work with events; otherwise use the SignalQueue
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
@@ -480,6 +513,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
+    signalQueue += MouseMoveSignalData::signal(
+            {xposIn, yposIn}, {lastX, lastY},
+            "Forwarding GLFW event."
+    );
+
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -500,12 +538,27 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 
     ImGuiIO &io = ImGui::GetIO();
     io.MousePos = ImVec2(xpos, ypos);
+
+    ImGui_ImplGlfw_CursorPosCallback(window, xposIn, yposIn);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
+
     camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
 
 void end_frame() {
