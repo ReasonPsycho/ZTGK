@@ -20,6 +20,7 @@ public:
     void addComponent(void* component) override;
     
     void DrawScene(Shader* regularShader);
+    void SimpleDrawScene(Shader* regularShader);
 
 private:
     std::vector<Render *> renderComponents;

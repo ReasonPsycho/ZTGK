@@ -13,10 +13,20 @@
 #include "glm/gtx/quaternion.hpp"
 
 struct DirLightData {
-    glm::vec4 direction;
     glm::vec4 color;
-    glm::vec4 position; // yeah i know but we don't really use it until later
+    glm::vec4 position;
+    glm::vec4 direction;
     glm::mat4x4 lightSpaceMatrix;
+
+    DirLightData(glm::vec4 color= glm::vec4(glm::vec3 (255.0f),1),
+                 glm::vec4 position = glm::vec4(0.0f),
+    glm::vec4 direction = glm::vec4(1.0f),
+    glm::mat4x4 lightSpaceMatrix = glm::mat4x4(1.0f))
+            : color(color),
+             position(position),
+              direction(direction),
+              lightSpaceMatrix(lightSpaceMatrix) // set to identity matrix
+    {}
 };
 
 class DirLight : public ILight {
@@ -35,6 +45,11 @@ public:
 
 
     void UpdateData() override;
+    
+    
+private:
+    float near_plane = 1.0f, far_plane = 50.0f;
+    
 };
 
 #endif //OPENGLGP_DIRLIGHT_H

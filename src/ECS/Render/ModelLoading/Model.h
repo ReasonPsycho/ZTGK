@@ -36,6 +36,7 @@ public:
     Model(unsigned int VAO, Material material,vector<unsigned int> indices);
     
     void Draw(Shader &shader);
+    void SimpleDraw(Shader &shader);
 
     void loadModel();
     

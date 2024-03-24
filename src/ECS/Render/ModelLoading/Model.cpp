@@ -9,6 +9,10 @@ void Model::Draw(Shader &shader) {
     for (unsigned int i = 0; i < meshes.size(); i++)
         meshes[i].Draw(shader);
 }
+void Model::SimpleDraw(Shader &shader) {
+    for (unsigned int i = 0; i < meshes.size(); i++)
+        meshes[i].SimpleDraw(shader);
+}
 
 //private:
 // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
