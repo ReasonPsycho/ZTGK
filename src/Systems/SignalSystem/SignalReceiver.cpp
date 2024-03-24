@@ -53,8 +53,8 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
                             std::format("Debug print of receiver {}({})", uid, receive_type_mask).c_str());
                 } else {
                     auto clone = new SignalReceiver(*this);
-                    clone->receive = [original = this](const Signal &signal) {
-                        debugClones[original->uid].second.push_back(std::format(
+                    clone->receive = [oguid = uid](const Signal &signal) {
+                        debugClones[oguid].second.push_back(std::format(
                                 "[{}] received signal {}",
                                 ztgk_util::time(), signal.to_string()
                         ));

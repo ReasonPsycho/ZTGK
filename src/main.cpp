@@ -158,9 +158,7 @@ bool timeStepKeyPressed = false;
 
 #pragma region ZTGK-Global
 
-auto log_console = std::vector<std::string>(5);
 SignalQueue signalQueue = SignalQueue();
-float signalDeferTime = 0;
 
 #pragma endregion
 
@@ -346,12 +344,8 @@ void load_enteties() {
     lightSystem.Init();
     gameObject = scene.addGameObject("Signal Receiver Mockup #1");
     gameObject->addComponent(new SignalReceiver(
-            Signal::signal_types.all,
-            [](const Signal &signal) {
-                log_console.push_back(
-                        std::format("Received signal {}({}) @ {} : {}", signal.sid, signal.stype, ztgk_util::time(),
-                                    signal.data->message));
-            }));
+            Signal::signal_types.test_signal,
+            [](const Signal &signal) {}));
 }
 
 void init_imgui() {
@@ -518,6 +512,7 @@ void imgui_end() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+// put things here that need continuous input handling and cannot work with events; otherwise use the SignalQueue
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {

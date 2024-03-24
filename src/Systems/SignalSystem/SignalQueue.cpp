@@ -36,7 +36,9 @@ void SignalQueue::process_one(long long deltatime) {
     }
 
     auto filtered = receivers | std::views::filter([signal](SignalReceiver *receiver) {
-        return (signal.receiver_id == receiver->uid || (signal.stype & receiver->receive_type_mask) != 0);
+        if (signal.receiver_id != 0)
+            return signal.receiver_id == receiver->uid;
+        else return (signal.stype & receiver->receive_type_mask) != 0;
     });
 
     for (auto &receiver: filtered) {
