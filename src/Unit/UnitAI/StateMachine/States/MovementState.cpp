@@ -3,6 +3,11 @@
 //
 
 #include "MovementState.h"
+#include "Unit/Unit.h"
+#include "Unit/UnitAI/StateMachine/States/CombatState.h"
+#include "Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "Unit/UnitAI/StateMachine/States/MiningState.h"
+
 
 State *MovementState::RunCurrentState() {
     //from Movement to Idle

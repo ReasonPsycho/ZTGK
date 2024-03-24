@@ -10,17 +10,8 @@
 #include "ECS/Grid/Grid.h"
 #include <unordered_set>
 
-template<> struct hash<Vector2Int>{
-    std::size_t operator()(const Vector2Int& k) const
-    {
-        using std::size_t;
-        using std::hash;
+using namespace std;
 
-        return ((hash<int>()(k.x)
-                 ^ (hash<int>()(k.z) << 1)) >> 1);
-    }
-
-};
 
 
 class AstarPathfinding {
@@ -46,5 +37,16 @@ private:
     std::vector<Vector2Int> GetNeighbours(Vector2Int current, bool simple = false);
 };
 
+template<> struct std::hash<Vector2Int>{
+    std::size_t operator()(const Vector2Int& k) const
+    {
+        using std::size_t;
+        using std::hash;
+
+        return ((hash<int>()(k.x)
+                 ^ (hash<int>()(k.z) << 1)) >> 1);
+    }
+
+};
 
 #endif //ZTGK_ASTARPATHFINDING_H

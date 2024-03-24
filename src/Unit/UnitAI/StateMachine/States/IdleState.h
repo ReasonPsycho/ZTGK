@@ -1,15 +1,14 @@
-//
-// Created by igork on 22.03.2024.
-//
-
 #ifndef ZTGK_IDLESTATE_H
 #define ZTGK_IDLESTATE_H
 
+#include "Unit/UnitAI/StateMachine/State.h"
 
-#include "../State.h"
+class MovementState;
+class CombatState;
+class MiningState;
 
 
-class IdleState : public State{
+class IdleState : public State {
 public:
     State* RunCurrentState() override;
 
@@ -17,6 +16,5 @@ public:
     CombatState* CombatState;
     MiningState* MiningState;
 };
-
 
 #endif //ZTGK_IDLESTATE_H

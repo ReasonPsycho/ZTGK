@@ -3,6 +3,7 @@
 //
 
 #include "StateManager.h"
+#include "Unit/UnitAI/StateMachine/State.h"
 
 StateManager::StateManager(Unit *unit) {
     this->unit = unit;

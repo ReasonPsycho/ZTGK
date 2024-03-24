@@ -4,8 +4,10 @@
 
 #ifndef ZTGK_MININGSTATE_H
 #define ZTGK_MININGSTATE_H
-#include "../State.h"
-
+#include "Unit/UnitAI/StateMachine/State.h"
+class MovementState;
+class CombatState;
+class IdleState;
 class MiningState : public State{
 public:
     State* RunCurrentState() override;

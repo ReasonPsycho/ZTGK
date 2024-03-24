@@ -4,14 +4,20 @@
 
 #ifndef ZTGK_MOVEMENTSTATE_H
 #define ZTGK_MOVEMENTSTATE_H
-#include "../State.h"
+#include "Unit/UnitAI/StateMachine/State.h"
+class CombatState;
+class MiningState;
+class IdleState;
 
 class MovementState : public State{
 
 public:
     State* RunCurrentState() override;
 
-    CombatState* CombatState{};
+    CombatState* CombatState;
+    MiningState* MiningState;
+    IdleState* IdleState;
+
     bool hasCombatTarget{};
     bool isAttackTargetInRange{};
 };

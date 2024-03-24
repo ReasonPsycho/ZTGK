@@ -20,9 +20,9 @@ struct UnitStats{
 
 class Unit : public Entity {
 public:
-    UnitStats stats{};
-    Vector2Int gridPosition{};
-    State* currentState{};
+    UnitStats stats;
+    Vector2Int gridPosition;
+    State* currentState;
 
     bool hasMovementTarget = false;
     bool hasCombatTarget = false;

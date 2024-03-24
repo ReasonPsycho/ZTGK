@@ -2,7 +2,13 @@
 // Created by igork on 22.03.2024.
 //
 
+
 #include "CombatState.h"
+#include "Unit/Unit.h"
+#include "Unit/UnitAI/StateMachine/State.h"
+#include "Unit/UnitAI/StateMachine/States/MovementState.h"
+#include "Unit/UnitAI/StateMachine/States/MiningState.h"
+#include "Unit/UnitAI/StateMachine/States/IdleState.h"
 
 State *CombatState::RunCurrentState() {
     //from Combat to Idle

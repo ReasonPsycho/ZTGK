@@ -5,8 +5,10 @@
 #ifndef ZTGK_COMBATSTATE_H
 #define ZTGK_COMBATSTATE_H
 
-
-#include "../State.h"
+#include "Unit/UnitAI/StateMachine/State.h"
+class MovementState;
+class MiningState;
+class IdleState;
 
 class CombatState : public State{
 public:

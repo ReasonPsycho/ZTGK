@@ -4,6 +4,13 @@
 
 #include "MiningState.h"
 
+#include "Unit/Unit.h"
+#include "Unit/UnitAI/StateMachine/State.h"
+#include "Unit/UnitAI/StateMachine/States/MovementState.h"
+#include "Unit/UnitAI/StateMachine/States/CombatState.h"
+#include "Unit/UnitAI/StateMachine/States/IdleState.h"
+
+
 State *MiningState::RunCurrentState() {
 
     //from Mining to Idle

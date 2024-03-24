@@ -6,16 +6,13 @@
 #define ZTGK_STATE_H
 
 
-#include "Unit/Unit.h"
-#include "States/IdleState.h"
-#include "States/CombatState.h"
-#include "States/MiningState.h"
-#include "States/MovementState.h"
+class Unit;
 
 class State {
 public:
+
      Unit* unit;
-     virtual State* RunCurrentState();
+     virtual State* RunCurrentState() = 0;
 };
 
 
