@@ -174,7 +174,9 @@ void SignalQueue::editor_control_window() {
     ImGui::Checkbox("Single-use", &cfg.consume);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
-                "The signal will be consumed after the first receiver handles it (unless it explicitly sets the flag otherwise).");
+                "The signal will be consumed after the first receiver handles it (unless it explicitly sets the flag otherwise)."
+                "\nThat is the first event in order of subscription that matches the typemask or id."
+                "\nThis also means any log will only print this signal if no other receiver caught it.");
     }
     const char *types[] = {"Test", "Keyboard", "Mouse Button", "Mouse Move", "Mouse Scroll", "Audio"};
     ImGui::Combo("Type", &cfg.choice, types, 6);

@@ -342,7 +342,7 @@ void load_enteties() {
             SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
                           glm::vec4(255, 255, 255, 1))));
     lightSystem.Init();
-    gameObject = scene.addGameObject("Signal Receiver Mockup #1");
+    gameObject = scene.addGameObject("Signal Receiver DEMO");
     gameObject->addComponent(new SignalReceiver(
             Signal::signal_types.test_signal,
             [](const Signal &signal) {}));
@@ -463,47 +463,6 @@ void imgui_render() {
     bloomSystem.showImguiOptions();
 
     signalQueue.editor_control_window();
-
-//    ImGui::Begin("Queue control");
-//    ImGui::InputFloat("Defer time (sec)", &signalDeferTime);
-//    if (ImGui::Button("Immediate")) {
-//        Signal signal(Signal::signal_types.test_signal);
-//        signal.data->message = std::format("Enqueued immediate @ {}", ztgk_util::time());
-//        signalQueue += signal;
-//    }
-//    ImGui::SameLine();
-//    if (ImGui::Button("Defer")) {
-//        Signal defer(Signal::signal_types.test_signal);
-//        defer.time_to_live = signalDeferTime * 1000;
-//        defer.data->message = std::format("Enqueued defer @ {}", ztgk_util::time());
-//        defer.callback = [defer]() { log_console.push_back(std::format("Defer callback - signal {}", defer.sid)); };
-//
-//        Signal immediate(Signal::signal_types.test_signal);
-//        immediate.data->message = std::format("Awaiting defer for {} @ {}", defer.time_to_live, ztgk_util::time());
-//
-//        signalQueue += immediate;
-//        signalQueue += defer;
-//    }
-//    ImGui::SameLine();
-//    if (ImGui::Button("Print")) {
-//        try {
-//            log_console.push_back("Current queue:");
-//            for (const auto &item: signalQueue.queue)
-//                log_console.push_back("\t" + item.to_string());
-//        } catch (std::exception &ex) {
-//            std::cerr << ex.what() << std::endl;
-//            spdlog::error(ex.what());
-//        }
-//    }
-//    ImGui::Text("dt: %lld", signalQueue.get_delta());
-//    ImGui::End();
-//    ImGui::Begin("Queue log");
-//    for (auto &line: log_console) {
-//        ImGui::Text("%s", line.c_str());
-//    }
-//    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-//        ImGui::SetScrollHereY(1.0f);
-//    ImGui::End();
 
 }
 

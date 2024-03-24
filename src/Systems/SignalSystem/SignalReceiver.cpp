@@ -15,7 +15,7 @@ std::unordered_map<unsigned, std::pair<SignalReceiver *, std::vector<std::string
 
 SignalReceiver::SignalReceiver() : SignalReceiver(0, [](const Signal &) {}) {}
 
-SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal &)> onSignal)
+SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal & signal)> onSignal)
         : uid(id<ID_POOL_COMPONENT>()), receive_type_mask(receiveTypeMask), receive(onSignal) {}
 
 void SignalReceiver::showImGuiDetails(Camera *camera) {
