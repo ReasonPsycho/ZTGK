@@ -7,7 +7,7 @@
 #include <functional>
 #include <any>
 #include <chrono>
-#include "Systems/SignalSystem/DataCargo/SignalData.h"
+#include "DataCargo/SignalData.h"
 
 struct s_signal_types {
     unsigned test_signal;

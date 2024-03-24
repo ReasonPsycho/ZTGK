@@ -3,13 +3,13 @@
 //
 
 #include "SignalReceiver.h"
-#include "Systems/Util.h"
-#include "Camera.h"
+#include "ECS/Util.h"
+#include "ECS/Render/Camera/Camera.h"
 #include "imgui_impl_opengl3.h"
 #include "SignalQueue.h"
 #include "ECS/Entity.h"
 
-using namespace ztgk_util;
+using namespace ztgk;
 
 std::unordered_map<unsigned, std::pair<SignalReceiver *, std::vector<std::string>>> SignalReceiver::debugClones{};
 
@@ -56,7 +56,7 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
                     clone->receive = [oguid = uid](const Signal &signal) {
                         debugClones[oguid].second.push_back(std::format(
                                 "[{}] received signal {}",
-                                ztgk_util::time(), signal.to_string()
+                                ztgk::time(), signal.to_string()
                         ));
                     };
 

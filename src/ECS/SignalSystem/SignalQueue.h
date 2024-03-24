@@ -38,7 +38,7 @@ public:
 
     std::array<std::type_index, 1> component_types = {std::type_index(typeid(SignalReceiver))};
     void addComponent(void *component) override;
-    const type_index *getComponentTypes() override { return reinterpret_cast<const type_index *>(&component_types); };
+    const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&component_types); };
     int getNumComponentTypes() override { return 1; };
 
 

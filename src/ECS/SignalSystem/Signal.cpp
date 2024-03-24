@@ -3,9 +3,9 @@
 //
 
 #include "Signal.h"
-#include "Systems/Util.h"
+#include "ECS/Util.h"
 
-using namespace ztgk_util;
+using namespace ztgk;
 
 
 s_signal_types::s_signal_types() {

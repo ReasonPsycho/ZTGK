@@ -3,7 +3,7 @@
 //
 
 #include "TestSignalData.h"
-#include "Systems/SignalSystem/Signal.h"
+#include "ECS/SignalSystem/Signal.h"
 
 Signal TestSignalData::signal() {
     return {};

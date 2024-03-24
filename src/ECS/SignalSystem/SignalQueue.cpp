@@ -1,7 +1,7 @@
 //
 
 #include "SignalQueue.h"
-#include "Systems/Util.h"
+#include "ECS/Util.h"
 #include "imgui.h"
 #include "DataCargo/KeySignalData.h"
 #include "DataCargo/AudioSignalData.h"
@@ -10,6 +10,7 @@
 #include "DataCargo/MouseEvents/MouseScrollSignalData.h"
 #include "DataCargo/MouseEvents/MouseMoveSignalData.h"
 
+using namespace ztgk;
 //
 // Created by cheily on 20.03.2024.
 void SignalQueue::init() {
@@ -17,12 +18,12 @@ void SignalQueue::init() {
 }
 
 long long SignalQueue::get_delta() {
-    return ztgk_util::time() - timestamp;
+    return ztgk::time() - timestamp;
 }
 
 long long SignalQueue::update_delta() {
     auto t = timestamp;
-    timestamp = ztgk_util::time();
+    timestamp = ztgk::time();
     return timestamp - t;
 }
 
@@ -225,7 +226,7 @@ SignalReceiver *SignalQueue::editor_s_new_signal_config::new_logger() {
             [](const Signal &signal) {
                 editor_new_signal_config.log.emplace_back(std::format(
                         "[{}] received signal {}",
-                        ztgk_util::time(), signal.to_string()
+                        ztgk::time(), signal.to_string()
                 ).c_str());
             });
 }

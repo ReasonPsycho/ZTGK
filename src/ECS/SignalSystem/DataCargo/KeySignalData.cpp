@@ -3,7 +3,7 @@
 //
 
 #include "KeySignalData.h"
-#include "Systems/SignalSystem/Signal.h"
+#include "ECS/SignalSystem/Signal.h"
 
 KeySignalData::KeySignalData(int key, int scancode, int action, int mods, const std::string &message)
         : SignalData(message), key(key), scancode(scancode), action(action), mods(mods) {}

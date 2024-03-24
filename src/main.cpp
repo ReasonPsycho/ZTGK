@@ -12,9 +12,6 @@
 #include "ECS/SignalSystem/DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "ECS/SignalSystem/DataCargo/KeySignalData.h"
 
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
-#define STB_IMAGE_IMPLEMENTATION
-
 //Instancing
 #include <glm/gtc/type_ptr.hpp>
 
@@ -335,7 +332,7 @@ void load_enteties() {
    // gameObject = scene.addEntity("Spot Light");
    // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
-    gameObject = scene.addGameObject("Signal Receiver DEMO");
+    gameObject = scene.addEntity("Signal Receiver DEMO");
     gameObject->addComponent(new SignalReceiver(
             Signal::signal_types.test_signal,
             [](const Signal &signal) {}));

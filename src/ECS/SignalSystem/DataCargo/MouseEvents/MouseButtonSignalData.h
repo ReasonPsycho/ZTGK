@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include "Systems/SignalSystem/DataCargo/SignalData.h"
+#include "ECS/SignalSystem/DataCargo/SignalData.h"
 
 struct MouseButtonSignalData : public SignalData {
     int button;

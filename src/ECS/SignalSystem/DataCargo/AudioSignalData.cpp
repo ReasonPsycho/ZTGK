@@ -3,7 +3,7 @@
 //
 
 #include "AudioSignalData.h"
-#include "Systems/SignalSystem/Signal.h"
+#include "ECS/SignalSystem/Signal.h"
 
 AudioSignalData::AudioSignalData(const std::string &filepath, const std::string & message) : SignalData(message), filepath(filepath) {}
 

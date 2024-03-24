@@ -3,7 +3,10 @@
 //
 
 #include "MouseMoveSignalData.h"
-#include "Systems/SignalSystem/Signal.h"
+#include "ECS/SignalSystem/Signal.h"
+#include "ECS/Util.h"
+
+using namespace ztgk;
 
 MouseMoveSignalData::MouseMoveSignalData(Vec2<double> pos, Vec2<double> prev, const std::string & message) : SignalData(message), pos(pos), prev(prev) {}
 

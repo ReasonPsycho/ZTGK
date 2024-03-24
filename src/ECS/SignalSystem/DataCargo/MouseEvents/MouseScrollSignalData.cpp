@@ -3,7 +3,10 @@
 //
 
 #include "MouseScrollSignalData.h"
-#include "Systems/SignalSystem/Signal.h"
+#include "ECS/SignalSystem/Signal.h"
+#include "ECS/Util.h"
+
+using namespace ztgk;
 
 MouseScrollSignalData::MouseScrollSignalData(Vec2<double> offset, const std::string & message) : SignalData(message), offset(offset) {}
 
