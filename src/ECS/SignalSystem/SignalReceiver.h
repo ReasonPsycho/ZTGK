@@ -13,7 +13,7 @@ class Camera;
 struct SignalReceiver : Component {
     static std::unordered_map<unsigned, std::pair<SignalReceiver*, std::vector<std::string>>> debugClones;
 
-    unsigned uid;
+    unsigned receiver_uid;
 
     unsigned receive_type_mask = 0;
     std::function<void(const Signal&)> receive{};

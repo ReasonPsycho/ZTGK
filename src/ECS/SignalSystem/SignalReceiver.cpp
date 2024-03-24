@@ -16,14 +16,14 @@ std::unordered_map<unsigned, std::pair<SignalReceiver *, std::vector<std::string
 SignalReceiver::SignalReceiver() : SignalReceiver(0, [](const Signal &) {}) {}
 
 SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal & signal)> onSignal)
-        : uid(id<ID_POOL_COMPONENT>()), receive_type_mask(receiveTypeMask), receive(onSignal) {}
+        : receiver_uid(id<ID_POOL_SIGNAL_RECEIVER>()), receive_type_mask(receiveTypeMask), receive(onSignal) {}
 
 void SignalReceiver::showImGuiDetails(Camera *camera) {
 
     ImGui::PushID(uniqueID);
     if (ImGui::TreeNode("Signal Receiver")) {
         ImGui::Text("UID: ");
-        ImGui::SameLine(); ImGui::InputInt("", reinterpret_cast<int *>(&uid));
+        ImGui::SameLine(); ImGui::InputInt("", reinterpret_cast<int *>(&receiver_uid));
         ImGui::Text("Typemask: %d", receive_type_mask);
         ImGui::Text("Has callback: %d", bool(receive));
         ImGui::Text("Has parent entity: %d", bool(parentEntity));
@@ -41,40 +41,40 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
         // The signal queue is required to subscribe a clone receiver, constructed with the same parameters as this receiver, that will print
         if (parentEntity != nullptr) {
             if (ImGui::Button("Subscribe debug clone")) {
-                if (debugClones.contains(uid)) {
+                if (debugClones.contains(receiver_uid)) {
                     (this->parentEntity->systemManager->getSystem<SignalQueue>())->post(Signal(
                             0,
                             0,
-                            debugClones[uid].first->uid,
+                            debugClones[receiver_uid].first->receiver_uid,
                             std::make_shared<SignalData>("Debug print clone already exists!"),
                             []() {}
                     ));
                     ImGui::SetWindowFocus(
-                            std::format("Debug print of receiver {}({})", uid, receive_type_mask).c_str());
+                            std::format("Debug print of receiver {}({})", receiver_uid, receive_type_mask).c_str());
                 } else {
                     auto clone = new SignalReceiver(*this);
-                    clone->receive = [oguid = uid](const Signal &signal) {
+                    clone->receive = [oguid = receiver_uid](const Signal &signal) {
                         debugClones[oguid].second.push_back(std::format(
                                 "[{}] received signal {}",
                                 ztgk::time(), signal.to_string()
                         ));
                     };
 
-                    debugClones[uid] = std::make_pair(
+                    debugClones[receiver_uid] = std::make_pair(
                             clone, std::vector<std::string>()
                     );
                     *(this->parentEntity->systemManager->getSystem<SignalQueue>()) += clone;
                 }
             }
             if (ImGui::Button("Remove debug clones")) {
-                *(this->parentEntity->systemManager->getSystem<SignalQueue>()) -= debugClones[uid].first;
-                delete debugClones[uid].first;
-                debugClones.erase(uid);
+                *(this->parentEntity->systemManager->getSystem<SignalQueue>()) -= debugClones[receiver_uid].first;
+                delete debugClones[receiver_uid].first;
+                debugClones.erase(receiver_uid);
             }
 
-            if (debugClones.contains(uid)) {
-                ImGui::Begin(std::format("Debug print of receiver {}({})", uid, receive_type_mask).c_str());
-                for (const auto &log_line: debugClones[uid].second)
+            if (debugClones.contains(receiver_uid)) {
+                ImGui::Begin(std::format("Debug print of receiver {}({})", receiver_uid, receive_type_mask).c_str());
+                for (const auto &log_line: debugClones[receiver_uid].second)
                     ImGui::Text("%s", log_line.c_str());
                 if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
                     ImGui::SetScrollHereY(1.0f);

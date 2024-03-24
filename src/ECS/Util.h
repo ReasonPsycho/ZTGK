@@ -8,9 +8,11 @@
 #include <chrono>
 
 namespace ztgk {
+    // entity i component aktualnie używają własnej generacji, jak krzychu zrobił tak narazie zostawiam
     static constexpr short ID_POOL_ENTITY = 0;
     static constexpr short ID_POOL_COMPONENT = 1;
-    static constexpr short ID_POOL_SIGNAL = 2;
+    static constexpr short ID_POOL_SIGNAL_RECEIVER = 2;
+    static constexpr short ID_POOL_SIGNAL = 3;
 
     template<int POOL>
     constexpr unsigned id() {
