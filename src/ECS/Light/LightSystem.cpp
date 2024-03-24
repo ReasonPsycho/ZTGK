@@ -76,10 +76,10 @@ void LightSystem::GenerateShadowBuffers() {
 
 void LightSystem::Init() {
     planeDepthShader.init();
-    cubeDepthShader.init();
+    cubeDepthShader.initWithGeometry();
 
     instancePlaneDepthShader.init();
-    instanceCubeDepthShader.init();
+    instanceCubeDepthShader.initWithGeometry();
 
     glGenBuffers(1, &dirLightBufferId);
     glGenBuffers(1, &pointLightBufferId);

@@ -66,14 +66,17 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     shadowMapShader->use();
     for (unsigned int i = 0; i < 6; ++i)
-        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                    glm::value_ptr(shadowTransforms[i]));
+      
 
 
     if (shaderType == Normal) {
+        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                    glm::value_ptr(shadowTransforms[i]));
         shadowMapShader->setFloat("far_plane", 25.0);
         shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     } else {
+        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                    glm::value_ptr(shadowTransforms[i]));
         instanceShadowMapShader->setFloat("far_plane", 25.0);
         instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     }
