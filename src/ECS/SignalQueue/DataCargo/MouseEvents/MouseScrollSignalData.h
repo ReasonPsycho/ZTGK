@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include "ECS/SignalSystem/DataCargo/SignalData.h"
+#include "../SignalData.h"
 #include "ECS/Util.h"
 
 struct MouseScrollSignalData : SignalData {

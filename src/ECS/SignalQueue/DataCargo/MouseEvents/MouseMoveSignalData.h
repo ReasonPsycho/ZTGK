@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ECS/Grid/VectorUtils.h"
-#include "ECS/SignalSystem/DataCargo/SignalData.h"
+#include "../SignalData.h"
 #include "ECS/Util.h"
 
 struct MouseMoveSignalData : public SignalData {
