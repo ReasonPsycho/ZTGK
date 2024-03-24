@@ -29,7 +29,6 @@ void DirLight::InnitShadow() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glm::mat4 lightProjection, lightView;
-    float near_plane = 1.0f, far_plane = 50.0f;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 
     float scale_factor = 25.0f;
@@ -47,9 +46,13 @@ void DirLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader,
     if (shaderType == Normal) {
         shadowMapShader->use();
         shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+        shadowMapShader->setFloat("near", near_plane);
+        shadowMapShader->setFloat("far",far_plane);
     } else {
         instanceShadowMapShader->use();
         instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+        shadowMapShader->setFloat("near", near_plane);
+        shadowMapShader->setFloat("far",far_plane);
     }
 
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -78,7 +81,6 @@ void DirLight::showImGuiDetails(Camera *camera) {
 void DirLight::UpdateData() {
 
     glm::mat4 lightProjection, lightView;
-    float near_plane = 1.0f, far_plane = 50.0f;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 
     float scale_factor = 25.0f;

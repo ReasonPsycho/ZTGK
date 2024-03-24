@@ -52,6 +52,9 @@ struct SpotLightData {
 };
 
 class SpotLight : public ILight {
+private:
+    float near_plane = 1.0f, far_plane = 50.0f;
+
 public:
     SpotLight(SpotLightData data);
 

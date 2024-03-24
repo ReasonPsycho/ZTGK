@@ -45,6 +45,11 @@ public:
 
 
     void UpdateData() override;
+    
+    
+private:
+    float near_plane = 1.0f, far_plane = 50.0f;
+    
 };
 
 #endif //OPENGLGP_DIRLIGHT_H
