@@ -115,7 +115,7 @@ float lastY = 0;
 
 Primitives primitives;
 PBRPrimitives PBRPrimitives;
-LightSystem lightSystem(&camera);
+LightSystem lightSystem(&camera,&scene);
 PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 BloomPostProcess bloomSystem;
@@ -278,12 +278,13 @@ bool init() {
 
 
 void init_systems() {
+    scene.systemManager.addSystem(&lightSystem);
+    scene.systemManager.addSystem(&renderSystem);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    scene.systemManager.addSystem(&lightSystem);
-    scene.systemManager.addSystem(&renderSystem);
+
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
     Material whiteMaterial = Material(myColor);
@@ -306,11 +307,11 @@ void load_enteties() {
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
     gameObject = scene.addEntity("Dir light");
-    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(255.0f,255.0f,255.0f,1.0f), glm::vec4(1), glm::mat4x4(1))));
-    gameObject = scene.addEntity("Point Light");
-    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255),1))));
-    gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
+    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
+  //  gameObject = scene.addEntity("Point Light");
+   // gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+   // gameObject = scene.addEntity("Spot Light");
+   // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
 }
 

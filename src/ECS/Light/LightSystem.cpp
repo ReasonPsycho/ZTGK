@@ -4,6 +4,7 @@
 
 
 #include "LightSystem.h"
+#include "ECS/Render/RenderSystem.h"
 
 void LightSystem::PushToSSBO() {
     GLenum err;
@@ -56,17 +57,6 @@ void LightSystem::PushToSSBO() {
 }
 
 
-void LightSystem::showLightTree() {
-    if (ImGui::TreeNode("Lights")) {
-        for (auto &light: lights) {
-            light->showImGuiDetails(camera);
-        }
-        if (ImGui::Button("Push light data to SSBO")) {
-            PushToSSBO();
-        }
-        ImGui::TreePop();
-    }
-}
 
 LightSystem::~LightSystem() {
     dirLights.clear();
@@ -74,7 +64,7 @@ LightSystem::~LightSystem() {
     spotLights.clear();
 }
 
-LightSystem::LightSystem(Camera *camera) : camera(camera) {
+LightSystem::LightSystem(Camera *camera,Scene* scene) : camera(camera),scene(scene) {
 
 }
 
@@ -129,11 +119,12 @@ void LightSystem::PushDepthMapsToShader(Shader *shader) {
 void LightSystem::Update(double deltaTime) {
     GLenum err;
     int offset = 0;
+    RenderSystem* renderSystem = scene->systemManager.getSystem<RenderSystem>();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
         light->SetUpShadowBuffer(Normal, &planeDepthShader,&instancePlaneDepthShader);
         glClear(GL_DEPTH_BUFFER_BIT);
-        //TODO render them
+        renderSystem->SimpleDrawScene(&planeDepthShader);
         if (light->getIsDirty()) {  // Only push it if it's dirty
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,sizeof(DirLightData), &light->data);
             light->UpdateData();
@@ -146,6 +137,8 @@ void LightSystem::Update(double deltaTime) {
     for (auto &light: pointLights) {
         light->SetUpShadowBuffer(Normal, &planeDepthShader,&instancePlaneDepthShader);
         glClear(GL_DEPTH_BUFFER_BIT);
+        renderSystem->SimpleDrawScene(&planeDepthShader);
+        
         if (light->getIsDirty()) {  // Only push it if it's dirty
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
             light->setIsDirty(false);
@@ -159,7 +152,7 @@ void LightSystem::Update(double deltaTime) {
     for (auto &light: spotLights) {
         light->SetUpShadowBuffer(Normal, &cubeDepthShader,&instanceCubeDepthShader);
         glClear(GL_DEPTH_BUFFER_BIT);
-        //TODO render them
+        renderSystem->SimpleDrawScene(&cubeDepthShader);
         if (light->getIsDirty()) {  // Only push it if it's dirty
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,  sizeof(SpotLightData), &light->data);
             light->setIsDirty(false);

@@ -22,3 +22,8 @@ void Render::showImGuiDetails(Camera *camera) {
     }
     ImGui::PopID();
 }
+
+void Render::simpleDraw(Shader &regularShader) {
+    regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
+    pModel->SimpleDraw(regularShader);
+}
