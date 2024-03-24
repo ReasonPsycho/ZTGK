@@ -332,10 +332,6 @@ void load_enteties() {
    // gameObject = scene.addEntity("Spot Light");
    // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
-    gameObject = scene.addEntity("Signal Receiver DEMO");
-    gameObject->addComponent(new SignalReceiver(
-            Signal::signal_types.test_signal,
-            [](const Signal &signal) {}));
 }
 
 void init_imgui() {
