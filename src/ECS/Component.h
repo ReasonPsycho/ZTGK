@@ -10,6 +10,7 @@
 #include "ECS/Render/Camera/Camera.h"
 
 class Entity;
+class Camera;
 
 /**
  * Abstract base class for a Component.
@@ -33,9 +34,10 @@ public:
 
 protected:
     int uniqueID;     // Instance variable to store the unique ID for each object
+    Entity *parentEntity = nullptr;
+
 private:
     static int nextID; // Static variable to keep track of the next available ID
-    Entity *parentEntity = nullptr;
     bool isDirty = false;
 };
 

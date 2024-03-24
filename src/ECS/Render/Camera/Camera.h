@@ -63,7 +63,7 @@ public:
 
     glm::mat4 GetProjectionMatrix();
 
-    //InputProcessing added delta time with predefintion of one (for cases where it takes to long to implement it)
+    //InputProcessing added update_delta time with predefintion of one (for cases where it takes to long to implement it)
     void ProcessKeyboard(Camera_Movement direction, double deltaTime = 1);
 
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true, double deltaTime = 1);
