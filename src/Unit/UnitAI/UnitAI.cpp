@@ -1,6 +1,6 @@
-#include "AllyAI.h"
+#include "UnitAI.h"
 
-AllyAI::AllyAI(Unit *pUnit, StateManager *pStateManager) {
+UnitAI::UnitAI(Unit *pUnit, StateManager *pStateManager) {
     unit = pUnit;
     stateManager = pStateManager;
 
@@ -10,12 +10,12 @@ AllyAI::AllyAI(Unit *pUnit, StateManager *pStateManager) {
     unit->currentState = stateManager->currentState;
 }
 
-AllyAI::~AllyAI() {
+UnitAI::~UnitAI() {
     delete unit;
     delete stateManager;
 }
 
-void AllyAI::Update() {
+void UnitAI::Update() {
     stateManager->RunStateMachine();
     unit->currentState = stateManager->currentState;
 }

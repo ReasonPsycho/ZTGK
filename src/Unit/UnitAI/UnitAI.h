@@ -9,10 +9,10 @@
 #include "ECS/Component.h"
 #include "Unit/Unit.h"
 
-class AllyAI : public Component{
+class UnitAI : public Component{
 public:
-    AllyAI(Unit* pUnit, StateManager* pStateManager);
-    ~AllyAI();
+    UnitAI(Unit* pUnit, StateManager* pStateManager);
+    ~UnitAI();
 
     void Update() override;
 

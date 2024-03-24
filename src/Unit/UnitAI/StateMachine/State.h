@@ -13,6 +13,7 @@ public:
 
      Unit* unit;
      virtual State* RunCurrentState() = 0;
+     virtual bool isTargetInRange() = 0;
 };
 
 

@@ -12,6 +12,8 @@
 
 
 State *MiningState::RunCurrentState() {
+    isTargetInRange();
+    Mine();
 
     //from Mining to Idle
     if(!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget){
@@ -30,3 +32,30 @@ State *MiningState::RunCurrentState() {
 
     return this;
 }
+
+bool MiningState::isTargetInRange() {
+    if(unit->miningTarget == nullptr){
+        unit->hasMiningTarget = false;
+        unit->isTargetInRange = false;
+        return false;
+    }
+    if(unit->miningTarget != nullptr && VectorUtils::Distance(unit->worldPosition, unit->miningTarget->worldPosition) <= unit->stats.range){
+        unit->isTargetInRange = true;
+        return true;
+    }
+}
+
+void MiningState::Mine() {
+    if(unit->miningTarget == nullptr){
+        unit->hasMiningTarget = false;
+        return;
+    }
+    if(!unit->isTargetInRange){
+        unit->hasMovementTarget = true;
+        //TODO: unit->movementTarget = unit->miningTarget->gridPosition;
+        return;
+    }
+
+    unit->miningTarget->Mine();
+}
+

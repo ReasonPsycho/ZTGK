@@ -11,6 +11,10 @@
 #include "Unit/UnitAI/StateMachine/States/IdleState.h"
 
 State *CombatState::RunCurrentState() {
+
+    isTargetInRange();
+    AttackTarget();
+
     //from Combat to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
         return IdleState;
@@ -27,4 +31,30 @@ State *CombatState::RunCurrentState() {
     }
 
     return this;
+}
+
+bool CombatState::isTargetInRange() {
+    if(unit->combatTarget == nullptr){
+        unit->hasCombatTarget = false;
+        return false;
+    }
+    if(unit->combatTarget != nullptr && VectorUtils::Distance(unit->worldPosition, unit->combatTarget->worldPosition) <= unit->stats.range){
+        unit->isTargetInRange = true;
+        return true;
+    }
+    return false;
+}
+
+void CombatState::AttackTarget() {
+    if (unit-> combatTarget == nullptr) {
+        unit->hasCombatTarget = false;
+        return;
+    }
+    if(!unit->isTargetInRange){
+        unit->hasMovementTarget = true;
+        unit->movementTarget = unit->combatTarget->gridPosition;
+        return;
+    }
+    //TODO: attack target
+    return;
 }

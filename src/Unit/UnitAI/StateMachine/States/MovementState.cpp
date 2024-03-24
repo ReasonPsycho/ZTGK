@@ -38,7 +38,7 @@ void MovementState::MoveOnPath() {
     }
 
     if(unit->pathfinding.path.size() == 0 && unit->hasMovementTarget){
-        unit->pathfinding.FindPath(unit->gridPosition, unit->target);
+        unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget);
     }
     if (unit->pathfinding.path.size() > 0) {
         Vector2Int nextTile = unit->pathfinding.path[0];
