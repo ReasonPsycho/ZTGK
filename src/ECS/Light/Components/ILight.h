@@ -5,8 +5,9 @@
 #ifndef OPENGLGP_ILIGHT_H
 #define OPENGLGP_ILIGHT_H
 
-#include "Camera.h"
 #include "ECS/Component.h"
+#include "ECS/Render/ModelLoading/Shader.h"
+#include "ECS/Render/Camera/Camera.h"
 
 
 enum LightType {

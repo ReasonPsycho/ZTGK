@@ -9,20 +9,18 @@
 #include <list> //std::list
 #include <array> //std::array
 #include <memory> //std::unique_ptr
-#include "modelLoading/Model.h"
-#include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "Transform/Transform.h"
-#include "Systems/SystemManager.h"
 #include "Component.h"
+#include "SystemManager.h"
 
 
 class Entity {
 public:
 
-    Entity(SystemManager* systemManager,string name);
+    Entity(SystemManager* systemManager,std::string name);
     
-    string name;
+    std::string name;
     //Scene graph
     const Entity *parent = nullptr;
     

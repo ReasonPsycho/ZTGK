@@ -247,4 +247,4 @@ struct Vec3 {
     }
 };
 
-#endif // VECTORUTILS_H
+#endif //ZTGK_VECTORUTILS_H

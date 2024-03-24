@@ -1,62 +1,55 @@
 
 #pragma region Includes
-
-
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
 #include <ImGuizmo.h>
-#include "Camera.h"
-#include "modelLoading/Model.h"
 #include <cstdio>
-#include "Systems/SignalSystem/SignalQueue.h"
-#include "Systems/SignalSystem/DataCargo/MouseEvents/MouseMoveSignalData.h"
-#include "Systems/SignalSystem/DataCargo/MouseEvents/MouseScrollSignalData.h"
-#include "Systems/SignalSystem/DataCargo/MouseEvents/MouseButtonSignalData.h"
-#include "Systems/SignalSystem/DataCargo/KeySignalData.h"
+
+#include "ECS/SignalSystem/SignalQueue.h"
+#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseScrollSignalData.h"
+#include "ECS/SignalSystem/DataCargo/MouseEvents/MouseButtonSignalData.h"
+#include "ECS/SignalSystem/DataCargo/KeySignalData.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #define STB_IMAGE_IMPLEMENTATION
 
-
-//#include <glad/glad.h>  // Initialize with gladLoadGL()
-
-
 //Instancing
 #include <glm/gtc/type_ptr.hpp>
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
-
 #include <iostream>
 #include "spdlog/sinks/basic_file_sink.h"
-
-#include "Systems/RenderSystem/PBR/PBRSystem.h"
-#include "Systems/RenderSystem/PostProcessing/BloomSystem/BloomSystem.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
-#include "Systems/EntitySystem/Scene.h"
-#include "Systems/SignalSystem/SignalQueue.h"
+#include "ECS/Util.h"
 #include "ECS/Render/Components/Render.h"
-#include "Systems/Util.h"
+#include "ECS/Scene.h"
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
+#define STB_IMAGE_IMPLEMENTATION
 
-#include <list> //std::list
-#include <memory> //std::unique_ptr
+#include "ECS/Render/Pipelines/PBRPipeline.h"
+#include "ECS/Render/Postprocessing/BloomPostProcess.h"
+#include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Render/Primitives/PBRPrimitives.h"
+#include "ECS/Render/Primitives/Primitives.h"
 
-#endif
 
-Scene scene;
-string modelPath = "res/models/asteroid/Asteroid.fbx";
-Model model = Model(&modelPath);
-
-shared_ptr<spdlog::logger> file_logger;
 #pragma endregion Includes
 
 #pragma region constants
 
+Scene scene;
+string modelPath = "res/models/asteroid/Asteroid.fbx";
+Model model = Model(&modelPath);
+Model* cubeModel;
+Model* quadModel;
+shared_ptr<spdlog::logger> file_logger;
+const Color& white = {0, 0, 0, 0};
 #pragma endregion constants
 
 #pragma region Function definitions
@@ -82,11 +75,6 @@ void input();
 void update();
 
 void render();
-
-void render_scene();
-
-void render_scene_to_depth();
-
 
 void imgui_begin();
 
@@ -126,7 +114,6 @@ constexpr int32_t GL_VERSION_MINOR = 6;
 
 //Not my things but I could probably change them
 
-
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 #pragma endregion Orginal set up
@@ -139,10 +126,12 @@ Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
 float lastX = 0;
 float lastY = 0;
 
-LightSystem lightSystem(&camera);
-PBRSystem pbrSystem(&camera);
+Primitives primitives;
+PBRPrimitives PBRPrimitives;
+LightSystem lightSystem(&camera,&scene);
+PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
-BloomSystem bloomSystem;
+BloomPostProcess bloomSystem;
 
 
 bool captureMouse = false;
@@ -310,37 +299,41 @@ bool init() {
 
 
 void init_systems() {
-    pbrSystem.Init();
-    bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&signalQueue);
+    primitives.Init();
+    PBRPrimitives.Init();
+    pbrSystem.Init();
+    bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
+
+    Color myColor = {255, 32, 21, 0};  // This defines your color.
+
+    Material whiteMaterial = Material(myColor);
+    cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
+   quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
 }
 
 void load_enteties() {
     model.loadModel();
-    Entity *gameObject = scene.addGameObject("asteroid");
+    Entity *gameObject = scene.addEntity("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(new Render(&model));
+    gameObject->addComponent(new Render(cubeModel));
     for (unsigned int i = 0; i < 2; ++i) {
-        gameObject = scene.addGameObject(gameObject, "asteroid");
+        gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(new Render(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-    gameObject = scene.addGameObject("Dir light");
-    gameObject->addComponent(new DirLight(
-            DirLightData(glm::vec4(1), glm::vec4(255.0f, 255.0f, 255.0f, 1.0f), glm::vec4(1), glm::mat4x4(1))));
-    gameObject = scene.addGameObject("Point Light");
-    gameObject->addComponent(
-            new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255), 1))));
-    gameObject = scene.addGameObject("Spot Light");
-    gameObject->addComponent(new SpotLight(
-            SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-                          glm::vec4(255, 255, 255, 1))));
+  //  gameObject = scene.addEntity("Dir light");
+   // gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
+    gameObject = scene.addEntity("Point Light");
+    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+   // gameObject = scene.addEntity("Spot Light");
+   // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
     gameObject = scene.addGameObject("Signal Receiver DEMO");
     gameObject->addComponent(new SignalReceiver(
@@ -391,7 +384,6 @@ void update() {
 }
 
 void render() {
-    render_scene_to_depth();
 
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
@@ -410,7 +402,7 @@ void render() {
 
     pbrSystem.pbrShader.use();
 
-    render_scene();
+    renderSystem.DrawScene(&pbrSystem.pbrShader);
 
     file_logger->info("Rendered AsteroidsSystem.");
 
@@ -420,19 +412,8 @@ void render() {
 }
 
 
-void render_scene() {
-    renderSystem.DrawScene(&pbrSystem.pbrShader);
-    file_logger->info("Rendered Entities.");
-}
 
 
-void render_scene_to_depth() {
-    // for (auto &light: lightSystem.lights) {
-    //    light->SetUpShadowBuffer(Normal);
-    //    glClear(GL_DEPTH_BUFFER_BIT);
-    //    scene.drawScene(*light->shadowMapShader,*light->instanceShadowMapShader);
-    //}
-}
 
 void imgui_begin() {
     // Start the Dear ImGui frame

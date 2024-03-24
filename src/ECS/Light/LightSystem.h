@@ -16,16 +16,15 @@
 #include "Components/DirLight.h"
 #include "Components/PointLight.h"
 #include "Components/SpotLight.h"
-#include "Camera.h"
-#include "modelLoading/Texture.h"
 #include "../System.h"
 #include "../Component.h"
+#include "ECS/Scene.h"
 
 
 class LightSystem : public System {
 public:
     //Setup
-    LightSystem(Camera *camera);
+    LightSystem(Camera *camera,Scene* scene);
 
     ~LightSystem();
 
@@ -37,14 +36,11 @@ public:
     void GenerateShadowBuffers();
 
 
-    const std::type_index* getComponentTypes() override {return reinterpret_cast<const type_index *>(&componentTypes); };
+    const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
     int getNumComponentTypes() override { return 4;};
 
 
     void addComponent(void* component) override;
-    
-    //Imgui
-    void showLightTree();
     
     void PushDepthMapsToShader(Shader *shader);
 
@@ -62,6 +58,7 @@ private:
 
     //Camera
     Camera *camera;
+    Scene *scene;
 
     //Shaders
     Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",

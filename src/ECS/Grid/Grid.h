@@ -31,6 +31,7 @@ public:
     // Destructor
     ~Grid() override;
 
+    void showImGuiDetails(Camera *camera) override;
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);

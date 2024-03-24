@@ -131,9 +131,8 @@ void AsteroidsSystem::Init() {
     cumputeShaderMovment.init();
     cumputeShaderGridCreation.init();
     cumputeShaderGridCreation.use();
-    float furthestPoint = (asteroidModel.futhestLenghtsFromCenter.x + asteroidModel.futhestLenghtsFromCenter.y +
-                           asteroidModel.futhestLenghtsFromCenter.z) / 3;
-    cumputeShaderGridCreation.setFloat("gridRadius", maxScale * furthestPoint * 2.0f);
+    
+    cumputeShaderGridCreation.setFloat("gridRadius", maxScale * 1);
 
     cumputeShaderGridSort.init();
     cumputeShaderGridSort.use();
@@ -143,8 +142,8 @@ void AsteroidsSystem::Init() {
 
     cumputeShaderCollide.init();
     cumputeShaderCollide.use();
-    cumputeShaderCollide.setFloat("collisionRadius", furthestPoint);
-    cumputeShaderCollide.setFloat("gridRadius", maxScale * furthestPoint * 2.0f);
+    cumputeShaderCollide.setFloat("collisionRadius", 1);
+    cumputeShaderCollide.setFloat("gridRadius", maxScale * 1 * 2.0f);
 
     cumputeShaderSeperation.init();
     cumputeShaderSeperation.use();

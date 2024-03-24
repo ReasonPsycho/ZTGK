@@ -7,6 +7,7 @@
 #define REASONABLEGL_COMPONENT_H
 
 #include <typeindex>
+#include "ECS/Render/Camera/Camera.h"
 
 class Entity;
 class Camera;

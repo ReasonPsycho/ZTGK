@@ -15,8 +15,6 @@
 #include <list> //std::list
 #include <array> //std::array
 #include <memory> //std::unique_ptr
-#include "modelLoading/Model.h"
-#include "Camera.h"
 
 
 class System {
@@ -24,10 +22,8 @@ public:
     virtual ~System() = default;
     
     virtual void addComponent(void* component) = 0;
-    
     virtual const std::type_index* getComponentTypes() = 0;
     virtual int getNumComponentTypes() = 0;
-
 };
 
 

@@ -1,5 +1,3 @@
-[![](../../actions/workflows/cpp_cmake.yml/badge.svg)](../../actions)
+# ZTGK
 
-# Reasonable2D
-
-An OpenGL game engine. Originally a project created at course called "Programowanie Aplikacji Graficznych" (Programming graphic applications) at Lodz University of Technology. It is now my passion project.
+Video game project from team Linux Haters being made to present at ZTGK.

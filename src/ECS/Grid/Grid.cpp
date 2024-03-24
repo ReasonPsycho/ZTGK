@@ -124,3 +124,15 @@ Vector2Int Grid::WorldToGridPosition(Vector3 position) const {
             static_cast<int>((int) (position.z - entity->transform.getGlobalPosition().z) / tileSize)};
 }
 
+void Grid::showImGuiDetails(Camera *camera) {
+    ImGui::PushID(uniqueID);
+    if (ImGui::CollapsingHeader("Grid")) {
+        ImGui::Text("Width: %d", width);
+        ImGui::Text("Height: %d", height);
+        ImGui::Text("Tile Size: %f", tileSize);
+        ImGui::Text("Offset X: %f", offsetX);
+        ImGui::Text("Offset Z: %f", offsetZ);
+    }
+    ImGui::PopID();
+
+}
