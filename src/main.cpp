@@ -359,6 +359,7 @@ void init_imgui() {
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void) io;
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
@@ -428,22 +429,28 @@ void render() {
 
 
 void imgui_begin() {
+    ImGuiIO &io = ImGui::GetIO();
+    
     // Start the Dear ImGui frame
     if (!captureMouse) {
-        ImGuiIO &io = ImGui::GetIO();
         io.MouseDrawCursor = true;
     } else {
-        ImGuiIO &io = ImGui::GetIO();
         io.MouseDrawCursor = false;
     };
 
+    
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
+ 
+    
 }
 
 void imgui_render() {
+
+
+    
     ImGui::Begin("Debug menu");
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
@@ -461,7 +468,16 @@ void imgui_render() {
 
 void imgui_end() {
     ImGui::Render();
+  
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGuiIO &io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
 }
 
 // put things here that need continuous input handling and cannot work with events; otherwise use the SignalQueue
