@@ -25,26 +25,24 @@ uniform float far_plane;
 
 layout (binding = 8) uniform samplerCube cubeShadowMaps[MAX_LIGHTS];
 layout (binding = 8 + 5) uniform sampler2D planeShadowMaps[MAX_LIGHTS];
-
 struct DirLight {
-    vec4 direction;
     vec4 color;
     vec4 position;
+    vec4 direction;
     mat4x4 lightSpaceMatrix;
 };
-
 struct PointLight {
+    vec4 color;
     vec4 position;
 
     float constant;
     float linear;
     float quadratic;
     float pointlessfloat;
-
-    vec4 color;
 };
 
 struct SpotLight {
+    vec4 color;
     vec4 position;
     vec4 direction;
     float cutOff;
@@ -58,9 +56,9 @@ struct SpotLight {
     float pointlessfloat2;
     float pointlessfloat3;
 
-    vec4 color;
     mat4x4 lightSpaceMatrix;
 };
+
 
 layout (std430, binding = 3) buffer DirLightBuffer {
     DirLight dirLights[];

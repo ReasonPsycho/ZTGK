@@ -6,30 +6,27 @@ struct Material {
     sampler2D specular;
     float shininess;
 };
-
 struct DirLight {
-    vec3 direction;
-
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec4 color;
+    vec4 position;
+    vec4 direction;
+    mat4x4 lightSpaceMatrix;
 };
 
 struct PointLight {
-    vec3 position;
+    vec4 color;
+    vec4 position;
 
     float constant;
     float linear;
     float quadratic;
-
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float pointlessfloat;
 };
 
 struct SpotLight {
-    vec3 position;
-    vec3 direction;
+    vec4 color;
+    vec4 position;
+    vec4 direction;
     float cutOff;
     float outerCutOff;
 
@@ -37,10 +34,13 @@ struct SpotLight {
     float linear;
     float quadratic;
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float pointlessfloat;
+    float pointlessfloat2;
+    float pointlessfloat3;
+
+    mat4x4 lightSpaceMatrix;
 };
+
 
 #define NR_POINT_LIGHTS 4 //TODO set it up for rest of the lioght and just do max
 

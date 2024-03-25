@@ -137,7 +137,6 @@ void Grid::showImGuiDetails(Camera *camera) {
 
 }
 
-
 /**
  * @brief Renders the tiles in the grid.
  *

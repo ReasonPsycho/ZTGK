@@ -44,10 +44,8 @@ public:
     [[nodiscard]] Vector3 GridToWorldPosition(int x, int z) const;
 
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
-
+  
     void RenderTiles(Scene* scene, float scale, Model* tileModel);
-
-
 private:
     float offsetX = 0;
     float offsetZ = 0;

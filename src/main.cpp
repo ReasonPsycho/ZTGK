@@ -5,6 +5,16 @@
 #include "imgui_impl_glfw.h"
 #include <ImGuizmo.h>
 #include <cstdio>
+
+#include "ECS/SignalQueue/SignalQueue.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
+#include "ECS/SignalQueue/DataCargo/KeySignalData.h"
+
+//Instancing
+#include <glm/gtc/type_ptr.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
@@ -12,6 +22,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
+#include "ECS/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
 
@@ -21,7 +32,12 @@
 #include "ECS/Render/Pipelines/PBRPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
+
 #include "ECS/Grid/Grid.h"
+
+#include "ECS/Render/Primitives/PBRPrimitives.h"
+#include "ECS/Render/Primitives/Primitives.h"
+
 
 
 #pragma endregion Includes
@@ -66,11 +82,6 @@ void update();
 
 void render();
 
-void render_scene();
-
-void render_scene_to_depth();
-
-
 void imgui_begin();
 
 void imgui_render();
@@ -86,6 +97,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 void processInput(GLFWwindow *window);
 
@@ -118,7 +133,8 @@ float lastX = 0;
 float lastY = 0;
 
 Primitives primitives;
-LightSystem lightSystem(&camera);
+PBRPrimitives PBRPrimitives;
+LightSystem lightSystem(&camera,&scene);
 PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 BloomPostProcess bloomSystem;
@@ -134,6 +150,12 @@ int timeStep = 1;
 bool timeStepKeyPressed = false;
 
 #pragma endregion My set up
+
+#pragma region ZTGK-Global
+
+SignalQueue signalQueue = SignalQueue();
+
+#pragma endregion
 
 
 int main(int, char **) {
@@ -168,13 +190,15 @@ int main(int, char **) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
 
+    signalQueue.init();
 #pragma endregion Init
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        //Setting up things for the rest of functionalities (ex. delta time)
+        //Setting up things for the rest of functionalities (ex. update_delta time)
         file_logger->info("Before frame");
         before_frame();
+        signalQueue.update();
 
         // Process I/O operations here
         file_logger->info("Input");
@@ -281,16 +305,19 @@ bool init() {
 
 
 void init_systems() {
-    primitives.Init();
-    pbrSystem.Init();
-    bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
+    scene.systemManager.addSystem(&signalQueue);
+    primitives.Init();
+    PBRPrimitives.Init();
+    pbrSystem.Init();
+    bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
+
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
     Material whiteMaterial = Material(myColor);
-    cubeModel = new Model(primitives.cubeVAO, whiteMaterial,vector<GLuint>(primitives.cubeIndices,primitives.cubeIndices + 36));
-   quadModel = new Model(primitives.quadVAO,whiteMaterial,vector<GLuint>(primitives.quadIndices,primitives.quadIndices + 6));
+    cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
+   quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
 }
 
 void load_enteties() {
@@ -308,12 +335,12 @@ void load_enteties() {
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-    gameObject = scene.addEntity("Dir light");
-    gameObject->addComponent(new DirLight(DirLightData(glm::vec4(1), glm::vec4(255.0f,255.0f,255.0f,1.0f), glm::vec4(1), glm::mat4x4(1))));
+  //  gameObject = scene.addEntity("Dir light");
+   // gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");
-    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(1), 1.0f, 1.0f, 1.0f, 1.0f, glm::vec4(glm::vec3(255),1))));
-    gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(1), glm::vec4(1), 1.0f, 1.0f, 1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,glm::vec4(255,255,255,1))));
+    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+   // gameObject = scene.addEntity("Spot Light");
+   // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
 
     Entity* tileEntity = scene.addEntity("Tile");
@@ -344,11 +371,11 @@ void init_imgui() {
 }
 
 void before_frame() {
-    // Setting up delta time
+    // Setting up update_delta time
     double currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
-};
+}
 
 
 void input() {
@@ -357,6 +384,8 @@ void input() {
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     processInput(window);
 }
@@ -367,7 +396,6 @@ void update() {
 }
 
 void render() {
-    render_scene_to_depth();
 
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
     lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
@@ -386,7 +414,7 @@ void render() {
 
     pbrSystem.pbrShader.use();
 
-    render_scene();
+    renderSystem.DrawScene(&pbrSystem.pbrShader);
 
     file_logger->info("Rendered AsteroidsSystem.");
 
@@ -396,19 +424,8 @@ void render() {
 }
 
 
-void render_scene() {
-    renderSystem.DrawScene(&pbrSystem.pbrShader);
-    file_logger->info("Rendered Entities.");
-}
 
 
-void render_scene_to_depth() {
-    // for (auto &light: lightSystem.lights) {
-    //    light->SetUpShadowBuffer(Normal);
-    //    glClear(GL_DEPTH_BUFFER_BIT);
-    //    scene.drawScene(*light->shadowMapShader,*light->instanceShadowMapShader);
-    //}
-}
 
 void imgui_begin() {
     // Start the Dear ImGui frame
@@ -438,6 +455,8 @@ void imgui_render() {
 
     bloomSystem.showImguiOptions();
 
+    signalQueue.editor_control_window();
+
 }
 
 void imgui_end() {
@@ -445,6 +464,7 @@ void imgui_end() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+// put things here that need continuous input handling and cannot work with events; otherwise use the SignalQueue
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
@@ -512,6 +532,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
+    signalQueue += MouseMoveSignalData::signal(
+            {xposIn, yposIn}, {lastX, lastY},
+            "Forwarding GLFW event."
+    );
+
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -537,12 +562,29 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
         io.MousePos = ImVec2(uixpos, uiypos);
     }
 
+    ImGuiIO &io = ImGui::GetIO();
+    io.MousePos = ImVec2(xpos, ypos);
+
+    ImGui_ImplGlfw_CursorPosCallback(window, xposIn, yposIn);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
+
     camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
 
 void end_frame() {

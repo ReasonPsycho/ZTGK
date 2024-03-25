@@ -50,6 +50,7 @@ public:
     void setupMesh();
 
     void Draw(Shader &shader);
+    void SimpleDraw(Shader &shader);
 
 private:
     // render data 

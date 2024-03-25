@@ -66,14 +66,17 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     shadowMapShader->use();
     for (unsigned int i = 0; i < 6; ++i)
-        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                    glm::value_ptr(shadowTransforms[i]));
+      
 
 
     if (shaderType == Normal) {
+        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                    glm::value_ptr(shadowTransforms[i]));
         shadowMapShader->setFloat("far_plane", 25.0);
         shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     } else {
+        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                    glm::value_ptr(shadowTransforms[i]));
         instanceShadowMapShader->setFloat("far_plane", 25.0);
         instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     }
@@ -107,6 +110,34 @@ void PointLight::showImGuiDetails(Camera *camera) {
 }
 
 void PointLight::UpdateData() {
+    shadowTransforms.clear();
+    shadowProj = glm::perspective(glm::radians(90.0f), (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT,
+                                  1.0f, 25.0f); //TODO add based pn calculation
+    shadowTransforms.push_back(
+            shadowProj *
+            glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(1.0f, 0.0f, 0.0f),
+                        glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(
+            shadowProj *
+            glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(-1.0f, 0.0f, 0.0f),
+                        glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(
+            shadowProj *
+            glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, 1.0f, 0.0f),
+                        glm::vec3(0.0f, 0.0f, 1.0f)));
+    shadowTransforms.push_back(
+            shadowProj *
+            glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, -1.0f, 0.0f),
+                        glm::vec3(0.0f, 0.0f, -1.0f)));
+    shadowTransforms.push_back(
+            shadowProj *
+            glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, 0.0f, 1.0f),
+                        glm::vec3(0.0f, -1.0f, 0.0f)));
+    shadowTransforms.push_back(
+            shadowProj *
+            glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, 0.0f, -1.0f),
+                        glm::vec3(0.0f, -1.0f, 0.0f)));
+
     data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
