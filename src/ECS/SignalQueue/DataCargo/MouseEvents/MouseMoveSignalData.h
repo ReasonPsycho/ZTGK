@@ -6,7 +6,7 @@
 
 #include "Utils/VectorUtils.h"
 #include "../SignalData.h"
-#include "ECS/Util.h"
+#include "Utils/Util.h"
 
 struct MouseMoveSignalData : public SignalData {
     ztgk::Vec2<double> pos;
