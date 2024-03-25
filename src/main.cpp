@@ -38,6 +38,7 @@
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Render/Primitives/Primitives.h"
 
+#include "Utils/Time.h"
 
 
 #pragma endregion Includes
@@ -52,7 +53,6 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
-
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -73,6 +73,8 @@ void load_enteties();
 void init_imgui();
 
 void init_camera();
+
+void init_time();
 
 void before_frame();
 
@@ -144,8 +146,7 @@ bool captureMouse = false;
 bool captureMouseButtonPressed = false;
 
 // timing
-double deltaTime = 0;
-double lastFrame = 0;
+double deltaTime = Time::Instance().DeltaTime();
 int timeStep = 1;
 bool timeStepKeyPressed = false;
 
@@ -191,6 +192,7 @@ int main(int, char **) {
     glDepthFunc(GL_LEQUAL);
 
     signalQueue.init();
+    init_time();
 #pragma endregion Init
 
     // Main loop
@@ -372,9 +374,8 @@ void init_imgui() {
 
 void before_frame() {
     // Setting up update_delta time
-    double currentFrame = glfwGetTime();
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+    Time::Instance().Update();
+    deltaTime = Time::Instance().DeltaTime();
 }
 
 
@@ -603,5 +604,10 @@ void init_camera() {
     lastX = display_w / 2.0f;
     lastY = display_h / 2.0f;
 }
+
+void init_time() {
+    Time::Instance().SetLastFrame(glfwGetTime());
+}
+
 
 #pragma endregion Functions
