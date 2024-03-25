@@ -66,7 +66,9 @@ find_package(imgui CONFIG REQUIRED) #TODO remove on build compilation docking
 find_package(imguizmo CONFIG REQUIRED) #TODO remove on build compilation
 find_package(spdlog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-
+find_package(freetype-gl CONFIG REQUIRED)
+find_path(MINIAUDIO_INCLUDE_DIRS "miniaudio.h")
+find_package(yaml-cpp CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_opengl_LIBRARY})
 target_link_libraries(${PROJECT_NAME} PRIVATE glad::glad)
@@ -77,7 +79,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui)
 target_link_libraries(${PROJECT_NAME} PRIVATE imguizmo::imguizmo)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
-
+target_link_libraries(${PROJECT_NAME} PRIVATE freetype-gl)
+target_include_directories(${PROJECT_NAME} PRIVATE ${MINIAUDIO_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink

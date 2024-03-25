@@ -11,7 +11,7 @@
     "name" : "glfw3"
   }, {
     "name" : "imgui",
-    "features" : [ "opengl3-binding", "glfw-binding" ]
+    "features" : [ "docking-experimental","opengl3-binding", "glfw-binding" ]
   }, {
     "name" : "imguizmo"
   }, {
@@ -20,5 +20,11 @@
     "name" : "glm"
   }, {
     "name" : "glad"
+  }, {
+    "name" : "freetype-gl"
+  }, {
+    "name" : "miniaudio"
+  }, {
+    "name" : "yaml-cpp"
   } ]
 }

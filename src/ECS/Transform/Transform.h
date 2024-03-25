@@ -46,6 +46,8 @@ public:
     const glm::vec3 &getLocalPosition() const;
 
     const glm::quat &getLocalRotation() const;
+    
+    const glm::quat &getGlobalRotation() const;
 
     const glm::vec3 &getLocalScale() const;
 
