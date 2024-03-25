@@ -9,7 +9,9 @@
 #include <vector>
 #include "Tile.h"
 #include "ECS/Component.h"
-#include "VectorUtils.h"
+#include "Utils/VectorUtils.h"
+#include "ECS/Scene.h"
+#include "ECS/Render/ModelLoading/Model.h"
 
 
 class Grid : public Component{
@@ -26,7 +28,8 @@ public:
     std::vector<std::vector<Tile>> gridArray;
 
     // Constructor
-    Grid(int width, int height, float tileSize);
+    Grid() = default;
+    Grid(int width, int height, float tileSize, Entity* parentEntity);
 
     // Destructor
     ~Grid() override;
@@ -41,7 +44,8 @@ public:
     [[nodiscard]] Vector3 GridToWorldPosition(int x, int z) const;
 
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
-
+  
+    void RenderTiles(Scene* scene, float scale, Model* tileModel);
 private:
     float offsetX = 0;
     float offsetZ = 0;
