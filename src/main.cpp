@@ -32,8 +32,12 @@
 #include "ECS/Render/Pipelines/PBRPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
+
+#include "ECS/Grid/Grid.h"
+
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Render/Primitives/Primitives.h"
+
 
 
 #pragma endregion Includes
@@ -42,9 +46,14 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
+string tileModelPath = "res/models/Tile/Tile.fbx";
+Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
+Entity *gridEntity;
+
+
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
 #pragma endregion constants
@@ -313,6 +322,7 @@ void init_systems() {
 
 void load_enteties() {
     model.loadModel();
+    tileModel.loadModel();
     Entity *gameObject = scene.addEntity("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
@@ -332,6 +342,15 @@ void load_enteties() {
     gameObject = scene.addEntity("Spot Light");
     gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
+
+    Entity* tileEntity = scene.addEntity("Tile");
+    tileEntity->transform.setLocalPosition({1,1,1});
+    tileEntity->addComponent(new Render(&tileModel));
+//    gridEntity = scene.addEntity("Grid");
+//    Grid grid = Grid(10, 10, 1.0f, gridEntity);
+//    gridEntity->addComponent(&grid);
+//    Grid* pGrid = gridEntity->getComponent<Grid>();
+//    pGrid->RenderTiles(&scene, 1.0f, &tileModel);
 }
 
 void init_imgui() {
@@ -491,6 +510,10 @@ void processInput(GLFWwindow *window) {
         timeStepKeyPressed = false;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+        ImGui::GetIO().MousePos = ImVec2(0,0);
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -517,6 +540,9 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
+    static float uixpos{ xpos };
+    static float uiypos{ ypos };
+
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
@@ -529,8 +555,12 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
         } else {
             camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
         }
+    } else {
+        uixpos += xoffset;
+        uiypos -= yoffset;
+        ImGuiIO &io = ImGui::GetIO();
+        io.MousePos = ImVec2(uixpos, uiypos);
     }
-
 
     ImGuiIO &io = ImGui::GetIO();
     io.MousePos = ImVec2(xpos, ypos);
