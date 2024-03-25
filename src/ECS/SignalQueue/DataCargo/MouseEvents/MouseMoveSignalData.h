@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ECS/Grid/VectorUtils.h"
+#include "Utils/VectorUtils.h"
 #include "../SignalData.h"
 #include "ECS/Util.h"
 

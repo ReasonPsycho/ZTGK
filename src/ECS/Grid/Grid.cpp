@@ -4,6 +4,7 @@
 
 #include "Grid.h"
 #include "ECS/Entity.h"
+#include "ECS/Render/Components/Render.h"
 
 
 /**
@@ -18,8 +19,9 @@
  * @param height The height of the grid.
  * @param tileSize The size of each tile in the grid.
  */
-Grid::Grid(int width, int height, float tileSize) {
+Grid::Grid(int width, int height, float tileSize, Entity* parentEntity) {
 
+    setEntity(parentEntity); // set the parent entity (the entity that the grid is attached to
     this->entity = getEntity();
 
     this->width = width;
@@ -34,7 +36,7 @@ Grid::Grid(int width, int height, float tileSize) {
 
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            gridArray[i][j] = Tile(i, j);
+            gridArray[i][j] = *new Tile(i, j);
         }
     }
 }
@@ -49,9 +51,7 @@ Grid::~Grid() {
         for (int j = 0; j < height; j++) {
             delete &gridArray[i][j];
         }
-        delete &gridArray[i];
     }
-    delete &gridArray;
 
     delete this;
 }
@@ -136,3 +136,33 @@ void Grid::showImGuiDetails(Camera *camera) {
     ImGui::PopID();
 
 }
+
+/**
+ * @brief Renders the tiles in the grid.
+ *
+ * The RenderTiles function renders the tiles in the grid by creating an entity for each tile.
+ * The entity is named "Tile" followed by the x and z indices of the tile.
+ * The entity is then added to the scene and its position is set based on the tile index and size.
+ *
+ * @param scene The scene in which to render the tiles.
+ * @param scale The scale of the tiles.
+ */
+void Grid::RenderTiles(Scene *scene, float scale, Model* tileModel){
+    for(int i = 0; i < width; i++){
+        for(int j = 0; j < height; j++){
+            std::string name = "Tile" + std::to_string(gridArray[i][j].index.x) + std::to_string(gridArray[i][j].index.z);
+            Entity* tileEntity = scene->addEntity(name);
+            tileEntity->transform.setLocalScale(VectorUtils::Vector3ToGlmVec3(Vector3(scale, scale, scale)));
+
+            glm::vec3 position = VectorUtils::Vector3ToGlmVec3(Vector3(entity->transform.getGlobalPosition().x + gridArray[i][j].index.x * tileSize * scale,
+                                                                                 entity->transform.getGlobalPosition().y,
+                                                                              entity->transform.getGlobalPosition().z +  gridArray[i][j].index.z * tileSize * scale));
+            tileEntity->transform.setLocalPosition(position);
+            tileEntity->addComponent(new Render(tileModel));
+
+
+        }
+    }
+
+}
+
