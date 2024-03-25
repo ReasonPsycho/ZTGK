@@ -327,10 +327,10 @@ void load_enteties() {
     }
   //  gameObject = scene.addEntity("Dir light");
    // gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
-    gameObject = scene.addEntity("Point Light");
-    gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-   // gameObject = scene.addEntity("Spot Light");
-   // gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
+   // gameObject = scene.addEntity("Point Light");
+  //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+    gameObject = scene.addEntity("Spot Light");
+    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
 }
 

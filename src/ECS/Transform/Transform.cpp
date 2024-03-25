@@ -170,3 +170,7 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
     }
 }
 
+const glm::quat &Transform::getGlobalRotation() const {
+    return glm::quat_cast(m_modelMatrix);
+}
+
