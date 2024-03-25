@@ -157,7 +157,7 @@ void Grid::RenderTiles(Scene *scene, float scale, Model* tileModel){
         for(int j = 0; j < height; j++){
             std::string name = "Tile" + std::to_string(gridArray[i][j]->index.x) + '-' + std::to_string(gridArray[i][j]->index.z);
             Entity* tileEntity = scene->addEntity(parentEntity, name);
-//            tileEntity->addComponent(new Render(new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6))))
+            // todo zamienic na primitive
             tileEntity->addComponent(new Render(tileModel));
             tileEntity->transform.setLocalScale(VectorUtils::Vector3ToGlmVec3(Vector3(scale, scale, scale)));
 
@@ -170,7 +170,6 @@ void Grid::RenderTiles(Scene *scene, float scale, Model* tileModel){
 
         }
     }
-//    parentEntity->transform.setLocalScale(VectorUtils::Vector3ToGlmVec3(Vector3(scale, scale, scale)));
 
 }
 
