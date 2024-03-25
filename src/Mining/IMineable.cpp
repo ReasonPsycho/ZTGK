@@ -4,13 +4,16 @@
 
 #include "IMineable.h"
 
+#include "ECS/SignalQueue/SignalReceiver.h"
+#include "Utils/Time.h"
+
 IMineable::IMineable(float timeToMine) {
     this->timeToMine = timeToMine;
     this->timeToMineRemaining = timeToMine;
 }
 
 void IMineable::Mine() {
-    //TODO: time delta time or something
+    timeToMineRemaining -= Time::Instance().DeltaTime();
     if (timeToMineRemaining<=0) {
         delete this;
     }
