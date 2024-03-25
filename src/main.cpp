@@ -22,7 +22,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
-#include "ECS/Util.h"
+#include "Utils/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
 
@@ -345,14 +345,15 @@ void load_enteties() {
     gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
     lightSystem.Init();
 
-    Entity* tileEntity = scene.addEntity("Tile");
-    tileEntity->transform.setLocalPosition({1,1,1});
-    tileEntity->addComponent(new Render(&tileModel));
-//    gridEntity = scene.addEntity("Grid");
-//    Grid grid = Grid(10, 10, 1.0f, gridEntity);
-//    gridEntity->addComponent(&grid);
-//    Grid* pGrid = gridEntity->getComponent<Grid>();
-//    pGrid->RenderTiles(&scene, 1.0f, &tileModel);
+//    Entity* tileEntity = scene.addEntity("Tile");
+//    tileEntity->transform.setLocalPosition({1,1,1});
+//    tileEntity->addComponent(new Render(&tileModel));
+
+    gridEntity = scene.addEntity("Grid");
+    Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
+    gridEntity->addComponent(grid);
+    // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
+    grid->RenderTiles(&scene, 0.011f, &tileModel);
 }
 
 void init_imgui() {

@@ -25,7 +25,7 @@ public:
     float tileSize;
 
     //2D array of tiles
-    std::vector<std::vector<Tile>> gridArray;
+    std::vector<std::vector<Tile*>> gridArray;
 
     // Constructor
     Grid() = default;
