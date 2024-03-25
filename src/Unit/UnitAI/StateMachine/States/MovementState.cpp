@@ -7,6 +7,7 @@
 #include "Unit/UnitAI/StateMachine/States/CombatState.h"
 #include "Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "Unit/UnitAI/StateMachine/States/MiningState.h"
+#include "Utils/Time.h"
 
 
 State *MovementState::RunCurrentState() {
@@ -50,8 +51,8 @@ void MovementState::MoveOnPath() {
                 return;
             }
         }
-        else{                                                                                                                                       //TODO: vvv Time.DeltaTime or sth
-            unit->worldPosition = VectorUtils::MoveTowards(unit->worldPosition, nextTileWorldPosition, unit->stats.movementSpeed * 1.0f/60.0f);
+        else{
+            unit->worldPosition = VectorUtils::MoveTowards(unit->worldPosition, nextTileWorldPosition, unit->stats.movementSpeed * Time::Instance().DeltaTime());
         }
     }
 }
