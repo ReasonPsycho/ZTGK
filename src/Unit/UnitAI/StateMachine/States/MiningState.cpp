@@ -39,10 +39,10 @@ bool MiningState::isTargetInRange() {
         unit->isTargetInRange = false;
         return false;
     }
-    if(unit->miningTarget != nullptr && VectorUtils::Distance(unit->worldPosition, unit->miningTarget->worldPosition) <= unit->stats.range){
-        unit->isTargetInRange = true;
-        return true;
-    }
+    // if(unit->miningTarget != nullptr && VectorUtils::Distance(unit->worldPosition, unit->miningTarget->worldPosition) <= unit->stats.range){
+    //     unit->isTargetInRange = true;
+    //     return true;
+    // }
 }
 
 void MiningState::Mine() {
