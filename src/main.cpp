@@ -39,6 +39,7 @@
 #include "ECS/Render/Primitives/Primitives.h"
 
 #include "Utils/Time.h"
+#include "ECS/Render/Text.h"
 
 
 #pragma endregion Includes
@@ -53,6 +54,7 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
+Text text = {};
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -75,6 +77,8 @@ void init_imgui();
 void init_camera();
 
 void init_time();
+
+void init_text();
 
 void before_frame();
 
@@ -192,7 +196,17 @@ int main(int, char **) {
     glDepthFunc(GL_LEQUAL);
 
     signalQueue.init();
+    spdlog::info("Initialized signal queue.");
+    file_logger->info("Initialized signal queue.");
+
     init_time();
+    spdlog::info("Initialized system timer.");
+    file_logger->info("Initialized system timer.");
+
+    init_text();
+    spdlog::info("Initialized text renderer.");
+    file_logger->info("Initialized text renderer.");
+
 #pragma endregion Init
 
     // Main loop
@@ -210,9 +224,11 @@ int main(int, char **) {
         file_logger->info("Update");
         update();
 
+
         // OpenGL rendering code here
         file_logger->info("Render");
         render();
+
 
         // Draw ImGui
         file_logger->info("Imgui");
@@ -220,6 +236,8 @@ int main(int, char **) {
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
+        file_logger->info("Text");
+        text.RenderText("ABCDEFGHIJKLMNOPRSTUVWXYZabcdefghijklmnoprestuvwxyz0123456789+-*/,.[]()", 800, 600, 100.0, {1.0f,1.0f,1.0f});
 
         // End frame and swap buffers (double buffering)
         file_logger->info("End frame");
@@ -350,7 +368,7 @@ void load_enteties() {
     Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
     gridEntity->addComponent(grid);
     // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
-    grid->RenderTiles(&scene, 0.011f, &tileModel);
+//    grid->RenderTiles(&scene, 0.011f, &tileModel);
 }
 
 void init_imgui() {
@@ -369,6 +387,10 @@ void init_imgui() {
     // Setup style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
+}
+
+void init_text() {
+    text.init();
 }
 
 void before_frame() {
@@ -555,8 +577,8 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    static float uixpos{ xpos };
-    static float uiypos{ ypos };
+    static float uixpos{ 1920/2 };
+    static float uiypos{ 1080/2 };
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
