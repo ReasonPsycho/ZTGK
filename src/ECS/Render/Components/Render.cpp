@@ -6,7 +6,7 @@
 #include "Render.h"
 
 Render::Render(Model *pModel):pModel(pModel) {
-
+    name = "Renderer";
 }
 
 void Render::draw(Shader &regularShader) {
@@ -15,12 +15,7 @@ void Render::draw(Shader &regularShader) {
 }
 
 void Render::showImGuiDetails(Camera *camera) {
-    ImGui::PushID(uniqueID);
-    if (ImGui::TreeNode("Render")) {
-        // Display other light properties...
-        ImGui::TreePop();
-    }
-    ImGui::PopID();
+    
 }
 
 void Render::simpleDraw(Shader &regularShader) {

@@ -76,22 +76,18 @@ void SpotLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader
 }
 
 SpotLight::SpotLight(SpotLightData data) : data(data) {
+    name = "Spot light";
+
     lightType = Spot;
 }
 
 void SpotLight::showImGuiDetails(Camera *camera) {
-    ImGui::PushID(uniqueID);
-    if (ImGui::TreeNode("Spot light")) {
         ImGui::InputFloat4("Color", glm::value_ptr(data.color));
         ImGui::InputFloat("Constant", &data.constant);
         ImGui::InputFloat("Linear", &data.linear);
         ImGui::InputFloat("Quadratic", &data.quadratic);
         ImGui::InputFloat("Cut off", &data.cutOff);
         ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
-        ImGui::TreePop();
-    }
-    ImGui::PopID();
-
 }
 
 void SpotLight::UpdateData() {
@@ -105,7 +101,7 @@ void SpotLight::UpdateData() {
     glm::quat globalRotation = getEntity()->transform.getGlobalRotation();
     
     data.position = glm::vec4(getEntity()->transform.getGlobalPosition(),1);
-    data.direction =  glm::vec4 (glm::eulerAngles(globalRotation),1);
+    data.direction =  glm::vec4 (glm::rotate(globalRotation,forward),1);
     lightView = glm::mat4_cast(globalRotation);
     lightView = glm::translate(lightView,glm::vec3 (data.position ));
 // Take in mind that glm::lookAt requires a position where the camera is located, a target where it should look at

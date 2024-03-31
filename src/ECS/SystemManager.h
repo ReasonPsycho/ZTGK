@@ -12,6 +12,7 @@
 #include <array> //std::array
 #include <memory> //std::unique_ptr
 #include "ECS/System.h"
+#include "imgui.h"
 
 class Component;
 class Entity; 
@@ -47,7 +48,8 @@ public:
         }
         return dynamic_cast<T*>(it->second);
     }
-private:
+
+    virtual void showImGuiDetails(Camera *camera);
     std::unordered_map<std::type_index, System*> systems;
 };
 

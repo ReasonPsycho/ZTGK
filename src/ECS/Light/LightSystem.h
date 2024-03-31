@@ -44,7 +44,7 @@ public:
     
     void PushDepthMapsToShader(Shader *shader);
 
-
+    void showImGuiDetails(Camera *camera);
 
     //Vectors
     std::vector<ILight *> lights;

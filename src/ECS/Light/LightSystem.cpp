@@ -65,7 +65,7 @@ LightSystem::~LightSystem() {
 }
 
 LightSystem::LightSystem(Camera *camera,Scene* scene) : camera(camera),scene(scene) {
-
+name = "Light system";
 }
 
 void LightSystem::GenerateShadowBuffers() {
@@ -176,4 +176,8 @@ void LightSystem::addComponent(void *component) {
             break;
     }
     lights.push_back(light);
+}
+
+void LightSystem::showImGuiDetails(Camera *camera){
+
 }

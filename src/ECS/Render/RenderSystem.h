@@ -15,12 +15,14 @@ class RenderSystem : public System  {
 
 
 public:
+    RenderSystem();
     const std::type_index* getComponentTypes() override {return reinterpret_cast<const type_index *>(&componentTypes); };
     int getNumComponentTypes() override { return 1;};
     void addComponent(void* component) override;
     
     void DrawScene(Shader* regularShader);
     void SimpleDrawScene(Shader* regularShader);
+    void showImGuiDetails(Camera *camera);
 
 private:
     std::vector<Render *> renderComponents;

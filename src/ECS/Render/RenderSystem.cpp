@@ -19,3 +19,11 @@ void RenderSystem::SimpleDrawScene(Shader *regularShader) {
         renderComponent->simpleDraw(*regularShader);
     }
 }
+
+void RenderSystem::showImGuiDetails(Camera *camera) {
+
+}
+
+RenderSystem::RenderSystem() {
+    name = "Render system";
+}

@@ -333,7 +333,7 @@ vec3 CalcPointLight(PointLight light, vec3 N, vec3 V, float roughness, float met
 vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metallic, vec3 albedo, vec3 F0, int lightIndex)
 {
     // calculate per-light radiance
-    vec3 L = normalize(light.position.xyz - WorldPos);
+    vec3 L = normalize(-light.direction.xyz);
     vec3 H = normalize(V + L);
     float distance = length(light.position.xyz - WorldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));

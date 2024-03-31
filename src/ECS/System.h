@@ -15,15 +15,26 @@
 #include <list> //std::list
 #include <array> //std::array
 #include <memory> //std::unique_ptr
+#include "ECS/Render/Camera/Camera.h"
 
 
 class System {
 public:
+    System();
+    std::string name;
+    
     virtual ~System() = default;
     
     virtual void addComponent(void* component) = 0;
     virtual const std::type_index* getComponentTypes() = 0;
     virtual int getNumComponentTypes() = 0;
+
+    virtual void showImGuiDetails(Camera *camera) = 0;
+
+    int uniqueID;     // Instance variable to store the unique ID for each object
+
+private:
+    static int nextID; // Static variable to keep track of the next available ID
 };
 
 

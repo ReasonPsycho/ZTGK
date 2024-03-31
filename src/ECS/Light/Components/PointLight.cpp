@@ -92,20 +92,17 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader
 
 PointLight::PointLight(PointLightData data):
                                                                     data(data) {
+    name = "Point light";
+
     lightType = Point;
 }
 
 void PointLight::showImGuiDetails(Camera *camera) {
-    ImGui::PushID(uniqueID);
-
-    if (ImGui::TreeNode("Point light")) {
+  
         ImGui::InputFloat4("Color", glm::value_ptr(data.color));
         ImGui::InputFloat("Constant", &data.constant);
         ImGui::InputFloat("Linear", &data.linear);
         ImGui::InputFloat("Quadratic", &data.quadratic);
-     ImGui::TreePop();
-    }
-    ImGui::PopID();
 
 }
 

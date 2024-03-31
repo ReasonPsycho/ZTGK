@@ -5,7 +5,7 @@
 #ifndef REASONABLEGL_SCENE_H
 #define REASONABLEGL_SCENE_H
 
-#include "ECS/Entity.h"
+#include "SystemManager.h"
 
 class Scene {
 public:
@@ -16,6 +16,8 @@ public:
     Entity *addEntity(Entity *parent, std::string name);
     
     void updateScene();
+    
+    int selectedEntityNumber = -1;
     
     SystemManager systemManager;
 
