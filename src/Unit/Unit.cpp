@@ -5,7 +5,7 @@
 #include "Unit.h"
 
 
-Unit::Unit(SystemManager *systemManager, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) :Entity(scene, std::move(name)) {
+Unit::Unit(Scene *Scene, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) :Entity(scene, std::move(name)) {
     this->equipment = UnitEquipment();
     this->grid = grid;
     this->gridPosition = gridPosition;
