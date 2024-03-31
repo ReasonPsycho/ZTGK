@@ -3,10 +3,11 @@
 //
 
 #include "System.h"
-
+#include "Utils/Util.h"
+using namespace ztgk;
 
 int System::nextID = 0;
 
 System::System() {
-    uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
+    uniqueID = id<ID_POOL_SYSTEM>(); // Assign the current value of nextID and then increment it for the next instance
 }

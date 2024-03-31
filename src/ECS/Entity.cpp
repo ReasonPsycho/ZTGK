@@ -3,17 +3,12 @@
 //
 
 #include "Entity.h"
+#include "Utils/Util.h"
+using namespace ztgk;
 
+Entity::Entity(Scene* scene, std::string name): uniqueID(id<ID_POOL_ENTITY>()), scene(scene) , name(name) {}
 
-int Entity::nextID = 0;
-
-Entity::Entity(Scene* scene, std::string name): scene(scene) , name(name){
-    uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
-}
-
-Entity::Entity(Scene *scene, Entity *parent, std::string name): scene(scene),parent(parent) , name(name) {
-    uniqueID = nextID++; // Assign the current value of nextID and then increment it for the next instance
-}
+Entity::Entity(Scene *scene, Entity *parent, std::string name): uniqueID(id<ID_POOL_ENTITY>()), scene(scene), parent(parent) , name(name) {}
 
 
 void Entity::forceUpdateSelfAndChild() {
