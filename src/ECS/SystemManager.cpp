@@ -3,3 +3,8 @@
 //
 
 #include "SystemManager.h"
+
+void SystemManager::showImGuiDetails(Camera *camera) {
+    ImGuiID dockspace_id = ImGui::GetID("Scene");
+
+}

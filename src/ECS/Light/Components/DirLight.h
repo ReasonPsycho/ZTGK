@@ -33,7 +33,6 @@ class DirLight : public ILight {
 public:
     DirLight( DirLightData data);
     
-
     DirLightData data;
 
     void showImGuiDetails(Camera *camera) override;

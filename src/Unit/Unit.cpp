@@ -4,7 +4,7 @@
 
 #include "Unit.h"
 
-Unit::Unit(SystemManager *systemManager, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly) : Entity(systemManager, std::move(name)) {
+Unit::Unit(Scene *scene, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly) : Entity(scene, std::move(name)) {
     this->grid = grid;
     this->gridPosition = gridPosition;
     this->worldPosition = grid->GridToWorldPosition(gridPosition);

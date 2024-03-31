@@ -1,6 +1,7 @@
 #ifndef ZTGK_UNIT_H
 #define ZTGK_UNIT_H
 #include "ECS/Grid/Grid.h"
+#include "ECS/Entity.h"
 #include "Mining/IMineable.h"
 #include "Utils/AstarPathfinding.h"
 #include "UnitAI/StateMachine/StateManager.h"
@@ -35,7 +36,7 @@ public:
     Unit* combatTarget;
     IMineable* miningTarget;
 
-    Unit(SystemManager *systemManager, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
+    Unit(Scene *scene, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
     ~Unit();
 
     bool IsAlly() const;
