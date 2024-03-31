@@ -5,6 +5,8 @@
 #include "Grid.h"
 #include "ECS/Entity.h"
 #include "ECS/Render/Components/Render.h"
+#include "ECS/Render/Primitives/Primitives.h"
+#include "ECS/Render/Primitives/PBRPrimitives.h"
 
 
 /**
@@ -28,6 +30,9 @@ Grid::Grid(int width, int height, float tileSize, Entity* parentEntity) {
     this->height = height;
     this->tileSize = tileSize;
 
+    // center the grid
+    offsetX = -width*tileSize/2.0f;
+    offsetZ = -height*tileSize/2.0f;
 
     gridArray.resize(width);
     for (int i = 0; i < width; i++) {
@@ -36,7 +41,7 @@ Grid::Grid(int width, int height, float tileSize, Entity* parentEntity) {
 
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            gridArray[i][j] = *new Tile(i, j);
+            gridArray[i][j] = new Tile(i, j);
         }
     }
 }
@@ -49,7 +54,7 @@ Grid::Grid(int width, int height, float tileSize, Entity* parentEntity) {
 Grid::~Grid() {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            delete &gridArray[i][j];
+            delete gridArray[i][j];
         }
     }
 
@@ -66,7 +71,7 @@ Grid::~Grid() {
  * @return Tile* A pointer to the Tile object at the specified index.
  */
 Tile *Grid::getTileAt(int x, int z) {
-    return &gridArray[x][z];
+    return gridArray[x][z];
 }
 
 /**
@@ -78,7 +83,7 @@ Tile *Grid::getTileAt(int x, int z) {
  * @return Tile* A pointer to the Tile object at the specified index.
  */
 Tile *Grid::getTileAt(Vector2Int index) {
-    return &gridArray[index.x][index.z];
+    return gridArray[index.x][index.z];
 }
 
 /**
@@ -150,15 +155,17 @@ void Grid::showImGuiDetails(Camera *camera) {
 void Grid::RenderTiles(Scene *scene, float scale, Model* tileModel){
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
-            std::string name = "Tile" + std::to_string(gridArray[i][j].index.x) + std::to_string(gridArray[i][j].index.z);
-            Entity* tileEntity = scene->addEntity(name);
+            std::string name = "Tile" + std::to_string(gridArray[i][j]->index.x) + '-' + std::to_string(gridArray[i][j]->index.z);
+            Entity* tileEntity = scene->addEntity(parentEntity, name);
+            // todo zamienic na primitive
+            tileEntity->addComponent(new Render(tileModel));
             tileEntity->transform.setLocalScale(VectorUtils::Vector3ToGlmVec3(Vector3(scale, scale, scale)));
 
-            glm::vec3 position = VectorUtils::Vector3ToGlmVec3(Vector3(entity->transform.getGlobalPosition().x + gridArray[i][j].index.x * tileSize * scale,
-                                                                                 entity->transform.getGlobalPosition().y,
-                                                                              entity->transform.getGlobalPosition().z +  gridArray[i][j].index.z * tileSize * scale));
+            glm::vec3 position = VectorUtils::Vector3ToGlmVec3(Vector3(parentEntity->transform.getGlobalPosition().x + gridArray[i][j]->index.x * tileSize + offsetX,
+                                                                                 parentEntity->transform.getGlobalPosition().y,
+                                                                              parentEntity->transform.getGlobalPosition().z + gridArray[i][j]->index.z * tileSize + offsetZ));
             tileEntity->transform.setLocalPosition(position);
-            tileEntity->addComponent(new Render(tileModel));
+            tileEntity->transform.setLocalRotation(glm::quat(glm::vec3(glm::half_pi<float>(), 0, 0)));
 
 
         }
