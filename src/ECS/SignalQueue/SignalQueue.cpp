@@ -102,122 +102,126 @@ void SignalQueue::addComponent(void *component) {
 // editor
 SignalQueue::editor_s_new_signal_config SignalQueue::editor_new_signal_config{};
 
-void SignalQueue::editor_control_window() {
+void SignalQueue::showImGuiDetails(Camera *camera) {
     auto &cfg = editor_new_signal_config;
 
-    ImGui::Begin("Queue control");
-    ImGui::Text("dt: %lld", get_delta());
-    if (ImGui::Button("Toggle log")) {
-        cfg.enablelog = !cfg.enablelog;
+    if (ImGui::CollapsingHeader("Queue control")){
 
+        ImGui::Text("dt: %lld", get_delta());
+        if (ImGui::Button("Toggle log")) {
+            cfg.enablelog = !cfg.enablelog;
+
+            if (cfg.enablelog) {
+                cfg.logger = editor_s_new_signal_config::new_logger();
+                *this += cfg.logger;
+            } else {
+                *this -= cfg.logger;
+                cfg.log.clear();
+                delete cfg.logger;
+            }
+        }
         if (cfg.enablelog) {
-            cfg.logger = editor_s_new_signal_config::new_logger();
-            *this += cfg.logger;
-        } else {
-            *this -= cfg.logger;
-            cfg.log.clear();
-            delete cfg.logger;
-        }
-    }
-    if (cfg.enablelog) {
-        ImGui::SameLine();
-        if (ImGui::Button("Print")) {
-            cfg.log.emplace_back("Current queue:");
-            for (const auto &item: queue)
-                cfg.log.push_back("\t" + item.to_string());
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Clear"))
-            cfg.log.clear();
+            ImGui::SameLine();
+            if (ImGui::Button("Print")) {
+                cfg.log.emplace_back("Current queue:");
+                for (const auto &item: queue)
+                    cfg.log.push_back("\t" + item.to_string());
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Clear"))
+                cfg.log.clear();
 
-        cfg.logger->showImGuiDetails(nullptr);
-    }
+            cfg.logger->showImGuiDetails(nullptr);
+        }
 
-    ImGui::Text("New Signal:");
-    if (ImGui::Button("Post")) {
-        std::shared_ptr<SignalData> data;
-        auto choicemask = 1 << cfg.choice;
+        ImGui::Text("New Signal:");
+        if (ImGui::Button("Post")) {
+            std::shared_ptr<SignalData> data;
+            auto choicemask = 1 << cfg.choice;
+            if (choicemask == Signal::signal_types.test_signal) {
+                data = std::make_shared<TestSignalData>(cfg.message);
+            } else if (choicemask == Signal::signal_types.keyboard_signal) {
+                data = std::make_shared<KeySignalData>(cfg.key, cfg.scancode, cfg.kaction, cfg.kmods, cfg.message);
+            } else if (choicemask == Signal::signal_types.mouse_button_signal) {
+                data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, cfg.message);
+            } else if (choicemask == Signal::signal_types.mouse_move_signal) {
+                data = std::make_shared<MouseMoveSignalData>(Vec2{cfg.xnew, cfg.ynew}, Vec2{cfg.xold, cfg.yold},
+                                                             cfg.message);
+            } else if (choicemask == Signal::signal_types.mouse_scroll_signal) {
+                data = std::make_shared<MouseScrollSignalData>(Vec2{cfg.xoff, cfg.yoff}, cfg.message);
+            } else if (choicemask == Signal::signal_types.audio_signal) {
+                data = std::make_shared<AudioSignalData>(cfg.soundpath, cfg.message);
+            } else {
+                data = std::make_shared<SignalData>(cfg.message);
+            }
+
+            for (int i = 0; i < cfg.nsignals; ++i) {
+                auto sig = Signal{
+                        static_cast<unsigned int>(1 << cfg.choice),
+                        static_cast<long long>(cfg.defertime * 1000),
+                        cfg.receiver,
+                        data,
+                        nullptr
+                };
+                sig.consume = cfg.consume;
+                post(sig);
+            }
+
+        }
+        ImGui::InputFloat("Defer time (sec)", &cfg.defertime);
+        ImGui::InputText("Message", cfg.message, editor_s_new_signal_config::message_size);
+
+        ImGui::InputInt("Amount to send", &cfg.nsignals);
+        ImGui::InputInt("Receiver ID", reinterpret_cast<int *>(&cfg.receiver));
+        ImGui::Checkbox("Single-use", &cfg.consume);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip(
+                    "The signal will be consumed after the first receiver handles it (unless it explicitly sets the flag otherwise)."
+                    "\nThat is the first event in order of subscription that matches the typemask or id."
+                    "\nThis also means any log will only print this signal if no other receiver caught it.");
+        }
+        const char *types[] = {"Test", "Keyboard", "Mouse Button", "Mouse Move", "Mouse Scroll", "Audio"};
+        ImGui::Combo("Type", &cfg.choice, types, 6);
+        unsigned choicemask = 1 << cfg.choice;
+
         if (choicemask == Signal::signal_types.test_signal) {
-            data = std::make_shared<TestSignalData>(cfg.message);
         } else if (choicemask == Signal::signal_types.keyboard_signal) {
-            data = std::make_shared<KeySignalData>(cfg.key, cfg.scancode, cfg.kaction, cfg.kmods, cfg.message);
+            ImGui::InputInt("Key", &cfg.key);
+            ImGui::InputInt("Scancode", &cfg.scancode);
+            ImGui::InputInt("Action", &cfg.kaction);
+            ImGui::InputInt("Mods", &cfg.kmods);
         } else if (choicemask == Signal::signal_types.mouse_button_signal) {
-            data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, cfg.message);
+            ImGui::InputInt("Button", &cfg.button);
+            ImGui::InputInt("Action", &cfg.maction);
+            ImGui::InputInt("Mods", &cfg.mmods);
         } else if (choicemask == Signal::signal_types.mouse_move_signal) {
-            data = std::make_shared<MouseMoveSignalData>(Vec2{cfg.xnew, cfg.ynew}, Vec2{cfg.xold, cfg.yold},
-                                                         cfg.message);
+            ImGui::InputDouble("New X", &cfg.xnew);
+            ImGui::InputDouble("New Y", &cfg.ynew);
+            ImGui::InputDouble("Old X", &cfg.xold);
+            ImGui::InputDouble("Old Y", &cfg.yold);
         } else if (choicemask == Signal::signal_types.mouse_scroll_signal) {
-            data = std::make_shared<MouseScrollSignalData>(Vec2{cfg.xoff, cfg.yoff}, cfg.message);
+            ImGui::InputDouble("X-offset", &cfg.xoff);
+            ImGui::InputDouble("Y-offset", &cfg.yoff);
         } else if (choicemask == Signal::signal_types.audio_signal) {
-            data = std::make_shared<AudioSignalData>(cfg.soundpath, cfg.message);
+            ImGui::InputText("Sound filepath", cfg.soundpath, editor_s_new_signal_config::message_size);
         } else {
-            data = std::make_shared<SignalData>(cfg.message);
+            ImGui::Text("Unimplemented - see SignalQueue::editor_control_window");
         }
-
-        for (int i = 0; i < cfg.nsignals; ++i) {
-            auto sig = Signal{
-                    static_cast<unsigned int>(1 << cfg.choice),
-                    static_cast<long long>(cfg.defertime * 1000),
-                    cfg.receiver,
-                    data,
-                    nullptr
-            };
-            sig.consume = cfg.consume;
-            post(sig);
-        }
-
     }
-    ImGui::InputFloat("Defer time (sec)", &cfg.defertime);
-    ImGui::InputText("Message", cfg.message, editor_s_new_signal_config::message_size);
-
-    ImGui::InputInt("Amount to send", &cfg.nsignals);
-    ImGui::InputInt("Receiver ID", reinterpret_cast<int *>(&cfg.receiver));
-    ImGui::Checkbox("Single-use", &cfg.consume);
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(
-                "The signal will be consumed after the first receiver handles it (unless it explicitly sets the flag otherwise)."
-                "\nThat is the first event in order of subscription that matches the typemask or id."
-                "\nThis also means any log will only print this signal if no other receiver caught it.");
-    }
-    const char *types[] = {"Test", "Keyboard", "Mouse Button", "Mouse Move", "Mouse Scroll", "Audio"};
-    ImGui::Combo("Type", &cfg.choice, types, 6);
-    unsigned choicemask = 1 << cfg.choice;
-
-    if (choicemask == Signal::signal_types.test_signal) {
-    } else if (choicemask == Signal::signal_types.keyboard_signal) {
-        ImGui::InputInt("Key", &cfg.key);
-        ImGui::InputInt("Scancode", &cfg.scancode);
-        ImGui::InputInt("Action", &cfg.kaction);
-        ImGui::InputInt("Mods", &cfg.kmods);
-    } else if (choicemask == Signal::signal_types.mouse_button_signal) {
-        ImGui::InputInt("Button", &cfg.button);
-        ImGui::InputInt("Action", &cfg.maction);
-        ImGui::InputInt("Mods", &cfg.mmods);
-    } else if (choicemask == Signal::signal_types.mouse_move_signal) {
-        ImGui::InputDouble("New X", &cfg.xnew);
-        ImGui::InputDouble("New Y", &cfg.ynew);
-        ImGui::InputDouble("Old X", &cfg.xold);
-        ImGui::InputDouble("Old Y", &cfg.yold);
-    } else if (choicemask == Signal::signal_types.mouse_scroll_signal) {
-        ImGui::InputDouble("X-offset", &cfg.xoff);
-        ImGui::InputDouble("Y-offset", &cfg.yoff);
-    } else if (choicemask == Signal::signal_types.audio_signal) {
-        ImGui::InputText("Sound filepath", cfg.soundpath, editor_s_new_signal_config::message_size);
-    } else {
-        ImGui::Text("Unimplemented - see SignalQueue::editor_control_window");
-    }
-
-    ImGui::End();
-
+    
     if (cfg.enablelog) {
-        ImGui::Begin("Queue log");
-        for (auto &line: cfg.log) {
-            ImGui::Text("%s", line.c_str());
+        if(ImGui::CollapsingHeader("Queue log")){
+            for (auto &line: cfg.log) {
+                ImGui::Text("%s", line.c_str());
+            }
+            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+                ImGui::SetScrollHereY(1.0f); 
         }
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-            ImGui::SetScrollHereY(1.0f);
-        ImGui::End();
     }
+}
+
+SignalQueue::SignalQueue() {
+name = "Signal Queue";
 }
 
 SignalReceiver *SignalQueue::editor_s_new_signal_config::new_logger() {

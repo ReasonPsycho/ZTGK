@@ -13,20 +13,23 @@
 #include "Transform/Transform.h"
 #include "Component.h"
 #include "SystemManager.h"
+#include "Scene.h"
 
 
 class Entity {
 public:
-
-    Entity(SystemManager* systemManager,std::string name);
     
+    Entity(Scene *scene, std::string name);
+    Entity(Scene *scene,Entity *parent, std::string name);
+
+    Scene *scene;
+
     std::string name;
     //Scene graph
     const Entity *parent = nullptr;
     
     //Space information
     Transform transform = Transform();
-
     
     //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
     Entity* addChild(std::unique_ptr<Entity> child);
@@ -44,7 +47,7 @@ public:
         component->setEntity(this);
         std::type_index typeName = std::type_index(typeid(T));
         components[typeName] = component;
-        systemManager->addComponent(component);
+        scene->systemManager.addComponent(component);
     }
 
     template <typename T>
@@ -62,11 +65,11 @@ public:
     void showImGuiDetails(Camera *camera);
     
 //protected:
-    int uniqueID;     // Instance variable to store the unique ID for each object
     std::unordered_map<std::type_index, Component*> components;
     std::vector<std::unique_ptr<Entity>> children;
-    SystemManager *systemManager;
     bool isSelected = false;
+
+    int uniqueID;     // Instance variable to store the unique ID for each object
 
 private:
     static int nextID; // Static variable to keep track of the next available ID

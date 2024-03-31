@@ -14,21 +14,12 @@ jobs:
     runs-on: windows-latest
 
     steps:
-        
       - name: Support longpaths
         run: git config --system core.longpaths true
 
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - name: Cache vcpkg packages
-        uses: actions/cache@v2
-        with:
-          path: C:\vcpkg
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
 
       - name: Install vcpkg packages
         run: vcpkg integrate install
