@@ -28,13 +28,15 @@ public:
 
     std::string name;
     //Scene graph
-    const Entity *parent = nullptr;
+    Entity *parent = nullptr;
     
     //Space information
     Transform transform = Transform();
     
     //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
     Entity* addChild(std::unique_ptr<Entity> child);
+    void removeChild(Entity *child);
+    void Destroy();
     
     //Update transform if it was changed
     void updateSelfAndChild();
@@ -51,6 +53,9 @@ public:
         components[typeName] = std::move(component); // now the map owns the component
         scene->systemManager.addComponent(components[typeName].get()); // pass raw pointer
     }
+
+    void removeComponentFromMap(const std::unique_ptr<Component> &comp);
+
 
     template <typename T>
     T* getComponent() {
@@ -71,7 +76,7 @@ public:
     std::vector<std::unique_ptr<Entity>> children;
 
     unsigned uniqueID;     // Instance variable to store the unique ID for each object
-    
+
 };
 
 

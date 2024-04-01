@@ -206,24 +206,19 @@ int main(int, char **) {
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
-        file_logger->info("Before frame");
         before_frame();
         signalQueue.update();
 
         // Process I/O operations here
-        file_logger->info("Input");
         input();
 
         // Update game objects' state here
-        file_logger->info("Update");
         update();
 
         // OpenGL rendering code here
-        file_logger->info("Render");
         render();
 
         // Draw ImGui
-        file_logger->info("Imgui");
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
@@ -459,7 +454,7 @@ void imgui_begin() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
- 
+  
     
 }
 

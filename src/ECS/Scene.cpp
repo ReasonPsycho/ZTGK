@@ -14,6 +14,16 @@ Entity *Scene::addEntity(std::string name) {
     children.push_back(make_unique<Entity>(this, name));
     return children.back().get();
 }
+void Scene::removeChild(Entity *child) {
+auto iter = std::find_if(children.begin(), children.end(),
+                         [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
+if (iter != children.end())
+{
+// Entity was found. Now remove it.
+// unique_ptr will automatically delete the Entity when erased.
+children.erase(iter);
+}
+}
 
 
 Entity *Scene::addEntity(Entity *parent, std::string name) {
@@ -32,7 +42,9 @@ void Scene::showImGuiDetails(Camera *camera) {
     ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
     ImGui::Begin("Scene graph");
     for (auto &child: children) {
-        child->showImGuiDetails(camera);
+        if(!stopRenderingImgui){
+            child->showImGuiDetails(camera);
+        }
     }
     ImGui::End();
     for (const auto &system: systemManager.systems) {
@@ -42,4 +54,5 @@ void Scene::showImGuiDetails(Camera *camera) {
         ImGui::End();
     }   
     ImGui::End();
+    stopRenderingImgui = false;
 }

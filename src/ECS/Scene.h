@@ -14,6 +14,8 @@ public:
     Entity *addEntity(std::string name);
     
     Entity *addEntity(Entity *parent, std::string name);
+
+    void removeChild(Entity *child);
     
     void updateScene();
     
@@ -22,6 +24,8 @@ public:
     SystemManager systemManager;
 
     void showImGuiDetails(Camera *camera);
+    
+    bool stopRenderingImgui = false;
     
 private:
     std::vector<std::unique_ptr<Entity>> children;

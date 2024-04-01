@@ -31,5 +31,9 @@ void RenderSystem::addComponent(void *component) {
 
 
 void RenderSystem::removeComponent(void *component) {
-    renderComponents.erase(std::remove(renderComponents.begin(), renderComponents.end(),reinterpret_cast<Render *const>(component)), renderComponents.end());
+    auto component_iter = std::find(renderComponents.begin(), renderComponents.end(), reinterpret_cast<Render *const>(component));
+
+    if (component_iter != renderComponents.end()) {
+        renderComponents.erase(component_iter);
+    }
 }
