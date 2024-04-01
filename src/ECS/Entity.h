@@ -22,6 +22,8 @@ public:
     Entity(Scene *scene, std::string name);
     Entity(Scene *scene,Entity *parent, std::string name);
 
+    ~Entity();
+    
     Scene *scene;
 
     std::string name;
@@ -43,11 +45,11 @@ public:
 
 
     template <typename T>
-    void addComponent(T* component) {
+    void addComponent(std::unique_ptr<T> component) {
         component->setEntity(this);
         std::type_index typeName = std::type_index(typeid(T));
-        components[typeName] = component;
-        scene->systemManager.addComponent(component);
+        components[typeName] = std::move(component); // now the map owns the component
+        scene->systemManager.addComponent(components[typeName].get()); // pass raw pointer
     }
 
     template <typename T>
@@ -56,7 +58,7 @@ public:
         auto it = components.find(typeName);
 
         if(it != components.end()) {
-            return static_cast<T*>(it->second);
+            return static_cast<T*>(it->second.get());
         }
         // Component of type T doesn't exist for the entity - handle this case appropriately
         return nullptr; // This is just an example, you could also assert(false) or throw an exception
@@ -65,9 +67,8 @@ public:
     void showImGuiDetails(Camera *camera);
     
 //protected:
-    std::unordered_map<std::type_index, Component*> components;
+    std::unordered_map<std::type_index, std::unique_ptr<Component>> components; 
     std::vector<std::unique_ptr<Entity>> children;
-    bool isSelected = false;
 
     int uniqueID;     // Instance variable to store the unique ID for each object
 

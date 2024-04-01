@@ -91,22 +91,26 @@ void SpotLight::showImGuiDetails(Camera *camera) {
 }
 
 void SpotLight::UpdateData() {
-    glm::mat4 lightProjection, lightView = glm::mat4x4(1);
-    lightProjection = glm::perspective(glm::radians(90.0f), (GLfloat) SHADOW_WIDTH / (GLfloat) SHADOW_HEIGHT,
-                                       near_plane,
-                                       far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
-    //lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    
+    glm::mat4 lightProjection, lightView;
+    lightProjection = glm::perspective(data.outerCutOff, (GLfloat) SHADOW_WIDTH / (GLfloat) SHADOW_HEIGHT, near_plane, far_plane);
+
     glm::vec3 forward = glm::vec3(1,0,0);
     glm::quat globalRotation = getEntity()->transform.getGlobalRotation();
-    
-    data.position = glm::vec4(getEntity()->transform.getGlobalPosition(),1);
-    data.direction =  glm::vec4 (glm::rotate(globalRotation,forward),1);
-    lightView = glm::mat4_cast(globalRotation);
-    lightView = glm::translate(lightView,glm::vec3 (data.position ));
-// Take in mind that glm::lookAt requires a position where the camera is located, a target where it should look at
-// and an up vector to decide where is your top. Most likely, that it should be glm::vec3(0.0f, 1.0f, 0.0f)
+
+    data.position = glm::vec4(getEntity()->transform.getGlobalPosition(), 1.0f);
+    glm::vec3 direction = glm::rotate(globalRotation, forward);
+    data.direction = glm::vec4(direction, 0.0f);
+
+    glm::vec3 lightPos = glm::vec3(data.position);
+    glm::vec3 target = lightPos + direction;
+
+    // To define the 'up' direction for lookAt function 
+    // you will generally use glm::vec3(0.0f, 1.0f, 0.0f) if your world's 'up' vector is along y-axis
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    lightView = glm::lookAt(lightPos, target, up);
+
     data.lightSpaceMatrix = lightProjection * lightView;
-    // render scene from light's point of view
-    this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
+
+    this->setIsDirty(false);
 }

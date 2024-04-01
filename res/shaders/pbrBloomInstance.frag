@@ -175,8 +175,9 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     shadow /= 9.0;
 
     // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
-    if (projCoords.z > 1.0)
-    shadow = 0.0;
+    if (projCoords.z > 1.0){
+        shadow = 0.0;
+    }
 
     return shadow;
 }
@@ -351,7 +352,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 N, vec3 V, float roughness, float metal
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-    vec3 radiance = light.color.xyz * attenuation * light.color.w;
+    vec3 radiance = light.color.xyz * attenuation * intensity * light.color.w;
 
 
     // Cook-Torrance BRDF

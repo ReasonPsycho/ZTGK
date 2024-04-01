@@ -4,9 +4,6 @@
 
 #include "RenderSystem.h"
 
-void RenderSystem::addComponent(void *component) {
-    renderComponents.push_back(reinterpret_cast<Render *const>(component));
-}
 
 void RenderSystem::DrawScene(Shader *regularShader) {
     for (auto &renderComponent: renderComponents) {
@@ -26,4 +23,13 @@ void RenderSystem::showImGuiDetails(Camera *camera) {
 
 RenderSystem::RenderSystem() {
     name = "Render system";
+}
+
+void RenderSystem::addComponent(void *component) {
+    renderComponents.push_back(reinterpret_cast<Render *const>(component));
+}
+
+
+void RenderSystem::removeComponent(void *component) {
+    renderComponents.erase(std::remove(renderComponents.begin(), renderComponents.end(),reinterpret_cast<Render *const>(component)), renderComponents.end());
 }

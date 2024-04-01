@@ -27,3 +27,7 @@ bool Component::getIsDirty() {
 void Component::setEntity(Entity *newParentEntity) {
 parentEntity = newParentEntity;
 }
+
+Component::~Component() {
+    getEntity()->scene->systemManager.removeComponent(this);
+}

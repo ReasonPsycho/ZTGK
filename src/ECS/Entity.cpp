@@ -89,5 +89,9 @@ void Entity::showImGuiDetails(Camera *camera) {
     ImGui::PopID();
 }
 
+Entity::~Entity() {
+
+}
+
 
 

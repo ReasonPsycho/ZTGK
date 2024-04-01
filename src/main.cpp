@@ -330,10 +330,10 @@ void load_enteties() {
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(new Render(cubeModel));
+    gameObject->addComponent(make_unique<Render>(cubeModel));
     for (unsigned int i = 0; i < 2; ++i) {
         gameObject = scene.addEntity(gameObject, "asteroid");
-        gameObject->addComponent(new Render(&model));
+        gameObject->addComponent(make_unique<Render>(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
@@ -343,15 +343,17 @@ void load_enteties() {
    // gameObject = scene.addEntity("Point Light");
   //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
+    gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
+    /*
     gridEntity = scene.addEntity("Grid");
     // size modelu = 5.0 przy skali 0.01; true size -> 500
     Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
     gridEntity->addComponent(grid);
     // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
     grid->RenderTiles(&scene, 0.011f, &tileModel);
+     */
 }
 
 void init_imgui() {

@@ -29,7 +29,7 @@ void PointLight::InnitShadow() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     shadowProj = glm::perspective(glm::radians(90.0f), (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT,
-                                  1.0f, 25.0f); //TODO add based pn calculation
+                                  near_plane, far_plane); //TODO add based pn calculation
     shadowTransforms.push_back(
             shadowProj *
             glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(1.0f, 0.0f, 0.0f),
@@ -72,12 +72,12 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader
     if (shaderType == Normal) {
         shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
                                     glm::value_ptr(shadowTransforms[i]));
-        shadowMapShader->setFloat("far_plane", 25.0);
+        shadowMapShader->setFloat("far_plane", far_plane);
         shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     } else {
         shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
                                     glm::value_ptr(shadowTransforms[i]));
-        instanceShadowMapShader->setFloat("far_plane", 25.0);
+        instanceShadowMapShader->setFloat("far_plane", near_plane);
         instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     }
 

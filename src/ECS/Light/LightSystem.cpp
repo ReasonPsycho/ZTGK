@@ -54,6 +54,7 @@ void LightSystem::PushToSSBO() {
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
+    isDataPushedToSSBO = true;
 }
 
 
@@ -163,16 +164,28 @@ void LightSystem::Update(double deltaTime) {
 
 void LightSystem::addComponent(void *component) {
     ILight *light = static_cast<ILight *>(component);
-
+    
     switch (light->lightType) {
         case Point:
             pointLights.push_back(reinterpret_cast<PointLight *>(light));
+            if(isDataPushedToSSBO){
+                glBufferData(GL_SHADER_STORAGE_BUFFER, pointLights.size() * sizeof(PointLightData), NULL, GL_DYNAMIC_DRAW); // orphaning
+                glBufferData(GL_SHADER_STORAGE_BUFFER, pointLights.size() * sizeof(PointLightData), pointLights.data(), GL_DYNAMIC_DRAW);
+            }
             break;
         case Directional:
             dirLights.push_back(reinterpret_cast<DirLight *>(light));
+            if(isDataPushedToSSBO){
+                glBufferData(GL_SHADER_STORAGE_BUFFER, dirLights.size() * sizeof(DirLightData), NULL, GL_DYNAMIC_DRAW); // orphaning
+                glBufferData(GL_SHADER_STORAGE_BUFFER, dirLights.size() * sizeof(DirLightData), pointLights.data(), GL_DYNAMIC_DRAW);
+            }
             break;
         case Spot:
             spotLights.push_back(reinterpret_cast<SpotLight *>(light));
+            if(isDataPushedToSSBO){
+                glBufferData(GL_SHADER_STORAGE_BUFFER, spotLights.size() * sizeof(SpotLightData), NULL, GL_DYNAMIC_DRAW); // orphaning
+                glBufferData(GL_SHADER_STORAGE_BUFFER, spotLights.size() * sizeof(SpotLightData), spotLights.data(), GL_DYNAMIC_DRAW);
+            }
             break;
     }
     lights.push_back(light);
@@ -180,4 +193,32 @@ void LightSystem::addComponent(void *component) {
 
 void LightSystem::showImGuiDetails(Camera *camera){
 
+}
+
+void LightSystem::removeComponent(void *component) {
+    ILight *light = static_cast<ILight *>(component);
+
+    switch (light->lightType) {
+        case Point:
+            pointLights.erase(std::remove(pointLights.begin(), pointLights.end(), reinterpret_cast<PointLight *>(light)), pointLights.end());
+            if(isDataPushedToSSBO){
+                glBufferData(GL_SHADER_STORAGE_BUFFER, pointLights.size() * sizeof(PointLightData), NULL, GL_DYNAMIC_DRAW); // orphaning
+                glBufferData(GL_SHADER_STORAGE_BUFFER, pointLights.size() * sizeof(PointLightData), pointLights.data(), GL_DYNAMIC_DRAW);
+            }
+            break;
+        case Directional:
+            dirLights.erase(std::remove(dirLights.begin(), dirLights.end(), reinterpret_cast<DirLight *>(light)), dirLights.end());
+            if(isDataPushedToSSBO){
+                glBufferData(GL_SHADER_STORAGE_BUFFER, dirLights.size() * sizeof(DirLightData), NULL, GL_DYNAMIC_DRAW); // orphaning
+                glBufferData(GL_SHADER_STORAGE_BUFFER, dirLights.size() * sizeof(DirLightData), pointLights.data(), GL_DYNAMIC_DRAW);
+            }
+            break;
+        case Spot:
+            spotLights.erase(std::remove(spotLights.begin(), spotLights.end(), reinterpret_cast<SpotLight *>(light)), spotLights.end());
+            if(isDataPushedToSSBO){
+                glBufferData(GL_SHADER_STORAGE_BUFFER, spotLights.size() * sizeof(SpotLightData), NULL, GL_DYNAMIC_DRAW); // orphaning
+                glBufferData(GL_SHADER_STORAGE_BUFFER, spotLights.size() * sizeof(SpotLightData), spotLights.data(), GL_DYNAMIC_DRAW);
+            }
+            break;
+    }
 }
