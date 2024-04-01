@@ -31,10 +31,7 @@ public:
 
     virtual void showImGuiDetails(Camera *camera) = 0;
 
-    int uniqueID;     // Instance variable to store the unique ID for each object
-
-private:
-    static int nextID; // Static variable to keep track of the next available ID
+    unsigned uniqueID;     // Instance variable to store the unique ID for each object
 };
 
 

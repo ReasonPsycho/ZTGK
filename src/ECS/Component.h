@@ -35,12 +35,10 @@ public:
     bool getIsDirty();
     virtual void showImGuiDetails(Camera *camera) = 0;
 
-protected:
-    int uniqueID;     // Instance variable to store the unique ID for each object
+    unsigned uniqueID;     // Instance variable to store the unique ID for each object
     Entity *parentEntity = nullptr;
 
 private:
-    static int nextID; // Static variable to keep track of the next available ID
     bool isDirty = false;
 };
 
