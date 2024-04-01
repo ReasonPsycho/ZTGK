@@ -25,7 +25,6 @@ public:
     Component();
 
     std::string name;
-    virtual ~Component() = default;
     void setEntity(Entity* newParentEntity);
     Entity *getEntity();
 

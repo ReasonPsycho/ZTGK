@@ -34,6 +34,21 @@ public:
     }
 
     template <typename T>
+    void removeComponent(T* component) {
+        std::type_index typeIndex(typeid(*component));
+
+        for (auto& [_, system] : systems) {
+            for (int i = 0; i < system->getNumComponentTypes(); ++i) {
+                if (typeIndex == system->getComponentTypes()[i]) {
+                    // Pass the pointer or whatever information needed here
+                    system->removeComponent(component);
+                    break;
+                }
+            }
+        }
+    }
+
+    template <typename T>
     void addSystem(T* system) {
         std::type_index typeIndex(typeid(*system));
         systems[typeIndex] = system;

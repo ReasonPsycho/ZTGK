@@ -32,7 +32,7 @@ public:
     Grid(int width, int height, float tileSize, Entity* parentEntity);
 
     // Destructor
-    ~Grid() override;
+    ~Grid();
 
     void showImGuiDetails(Camera *camera) override;
 

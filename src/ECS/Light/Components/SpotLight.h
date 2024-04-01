@@ -16,11 +16,11 @@ struct SpotLightData {
     glm::vec4 color;
     glm::vec4 position;
     glm::vec4 direction;
-    float cutOff;
-    float outerCutOff;
-    float constant;
-    float linear;
-    float quadratic;
+    float cutOff;  
+    float outerCutOff; 
+    float constant;  
+    float linear; 
+    float quadratic;  
     float pointlessfloat;
     float pointlessfloat2;
     float pointlessfloat3;
@@ -53,7 +53,7 @@ struct SpotLightData {
 
 class SpotLight : public ILight {
 private:
-    float near_plane = 1.0f, far_plane = 25.0f;
+    float near_plane = 0.1f, far_plane = 25.0f;
 
 public:
     SpotLight(SpotLightData data);
