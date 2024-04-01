@@ -6,8 +6,6 @@
 #include "Utils/Util.h"
 using namespace ztgk;
 
-int System::nextID = 0;
-
 System::System() {
     uniqueID = id<ID_POOL_SYSTEM>(); // Assign the current value of nextID and then increment it for the next instance
 }

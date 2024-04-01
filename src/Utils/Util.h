@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <chrono>
+#include "Console.h"
 
 namespace ztgk {
     static constexpr short ID_POOL_SYSTEM = 0;
@@ -32,6 +33,8 @@ namespace ztgk {
 
     // in millis
     long long time();
+
+    extern Console console;
 
     template<typename T>
     struct Vec2 {
