@@ -70,10 +70,7 @@ public:
     std::unordered_map<std::type_index, std::unique_ptr<Component>> components; 
     std::vector<std::unique_ptr<Entity>> children;
 
-    int uniqueID;     // Instance variable to store the unique ID for each object
-
-private:
-    static int nextID; // Static variable to keep track of the next available ID
+    unsigned uniqueID;     // Instance variable to store the unique ID for each object
     
 };
 

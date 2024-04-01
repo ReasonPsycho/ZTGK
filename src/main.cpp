@@ -40,6 +40,7 @@
 #include "ECS/Render/Primitives/Primitives.h"
 
 #include "Utils/Time.h"
+#include "Utils/ImGuiSpdlogSink.h"
 
 
 #pragma endregion Includes
@@ -193,7 +194,13 @@ int main(int, char **) {
     glDepthFunc(GL_LEQUAL);
 
     signalQueue.init();
+    spdlog::info("Initialized signal queue.");
+    file_logger->info("Initialized signal queue.");
+
     init_time();
+    spdlog::info("Initialized game clock.");
+    file_logger->info("Initialized game clock.");
+
 #pragma endregion Init
 
     // Main loop
@@ -247,6 +254,9 @@ void cleanup() {
 }
 
 bool init() {
+    auto sink = make_shared<ImGuiSpdlogSink>();
+    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and logger name since it's null anyway)
+    spdlog::get("")->sinks().push_back(sink);
 
     // Get current date and time
     auto now = std::chrono::system_clock::now();
@@ -271,13 +281,14 @@ bool init() {
         file_logger->info("Init log file");
     }
     catch (const spdlog::spdlog_ex &ex) {
-        spdlog::error("Log initialization failed.");
+        spdlog::error("File log initialization failed.");
     }
 
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit()) {
         spdlog::error("Failed to initalize GLFW!");
+        file_logger->error("Failed to initalize GLFW!");
         return false;
     }
 
@@ -291,6 +302,7 @@ bool init() {
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
     if (window == NULL) {
         spdlog::error("Failed to create GLFW Window!");
+        file_logger->error("Failed to create GLFW Window!");
         return false;
     }
 
@@ -299,6 +311,7 @@ bool init() {
     bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     if (err) {
         spdlog::error("Failed to initialize OpenGL loader!");
+        file_logger->error("Failed to initialize OpenGL loader!");
         return false;
     }
 
@@ -320,7 +333,7 @@ void init_systems() {
 
     Material whiteMaterial = Material(myColor);
     cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
-   quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
+    quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
 }
 
 void load_enteties() {
@@ -462,6 +475,8 @@ void imgui_render() {
     //lightSystem.showLightTree();
     ImGui::End();
     scene.showImGuiDetails(&camera);
+
+    ztgk::console.imguiWindow();
 
    // bloomSystem .showImguiOptions();
 }

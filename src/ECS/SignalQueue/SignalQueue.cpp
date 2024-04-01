@@ -210,13 +210,15 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
     }
     
     if (cfg.enablelog) {
-        if(ImGui::CollapsingHeader("Queue log")){
-            for (auto &line: cfg.log) {
-                ImGui::Text("%s", line.c_str());
-            }
-            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-                ImGui::SetScrollHereY(1.0f); 
+        ImGui::Begin("Queue log");
+
+        for (auto &line: cfg.log) {
+            ImGui::Text("%s", line.c_str());
         }
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+            ImGui::SetScrollHereY(1.0f);
+
+        ImGui::End();
     }
 }
 
