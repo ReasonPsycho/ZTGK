@@ -5,6 +5,7 @@
 #pragma once
 
 #include "spdlog/sinks/base_sink.h"
+#include <mutex>
 
 class ImGuiSpdlogSink : public spdlog::sinks::base_sink <std::mutex> {
 
