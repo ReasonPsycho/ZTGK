@@ -226,6 +226,10 @@ SignalQueue::SignalQueue() {
 name = "Signal Queue";
 }
 
+void SignalQueue::removeComponent(void *component) {
+    receivers.erase(std::remove(receivers.begin(), receivers.end(),reinterpret_cast<SignalReceiver *const>(component)), receivers.end());
+}
+
 SignalReceiver *SignalQueue::editor_s_new_signal_config::new_logger() {
     return new SignalReceiver(
             Signal::signal_types.all,

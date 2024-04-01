@@ -158,7 +158,7 @@ void Grid::RenderTiles(Scene *scene, float scale, Model* tileModel){
             std::string name = "Tile" + std::to_string(gridArray[i][j]->index.x) + '-' + std::to_string(gridArray[i][j]->index.z);
             Entity* tileEntity = scene->addEntity(parentEntity, name);
             // todo zamienic na primitive
-            tileEntity->addComponent(new Render(tileModel));
+            tileEntity->addComponent(make_unique<Render>(tileModel));
             tileEntity->transform.setLocalScale(VectorUtils::Vector3ToGlmVec3(Vector3(scale, scale, scale)));
 
             glm::vec3 position = VectorUtils::Vector3ToGlmVec3(Vector3(parentEntity->transform.getGlobalPosition().x + gridArray[i][j]->index.x * tileSize + offsetX,

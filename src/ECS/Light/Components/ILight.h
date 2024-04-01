@@ -47,7 +47,7 @@ protected:
     //For shadows
     bool initializedShadow = false;
     unsigned int depthMapFBO{};
-    const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
+    const unsigned int SHADOW_WIDTH = 512, SHADOW_HEIGHT = 512;
     glm::mat4 shadowProj{};
 };
 
