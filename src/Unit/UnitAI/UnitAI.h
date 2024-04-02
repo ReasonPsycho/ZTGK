@@ -15,7 +15,9 @@ public:
     ~UnitAI();
 
     void Update() override;
+    void showImGuiDetails(Camera *camera) override; // Pure virtual function
 
+    
     private:
     Unit* unit;
     StateManager* stateManager;

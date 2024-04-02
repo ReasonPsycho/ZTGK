@@ -32,6 +32,7 @@
 #include "ECS/Render/Pipelines/PBRPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Entity.h"
 
 #include "ECS/Grid/Grid.h"
 
@@ -39,7 +40,11 @@
 #include "ECS/Render/Primitives/Primitives.h"
 
 #include "Utils/Time.h"
+
 #include "ECS/Render/Text.h"
+
+#include "Utils/ImGuiSpdlogSink.h"
+
 
 
 #pragma endregion Includes
@@ -200,12 +205,16 @@ int main(int, char **) {
     file_logger->info("Initialized signal queue.");
 
     init_time();
+
     spdlog::info("Initialized system timer.");
     file_logger->info("Initialized system timer.");
 
     init_text();
     spdlog::info("Initialized text renderer.");
-    file_logger->info("Initialized text renderer.");
+
+    spdlog::info("Initialized game clock.");
+    file_logger->info("Initialized game clock.");
+
 
 #pragma endregion Init
 //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
@@ -224,26 +233,21 @@ int main(int, char **) {
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
-        file_logger->info("Before frame");
         before_frame();
         signalQueue.update();
 
         // Process I/O operations here
-        file_logger->info("Input");
         input();
 
         // Update game objects' state here
-        file_logger->info("Update");
         update();
 
 
         // OpenGL rendering code here
-        file_logger->info("Render");
         render();
 
 
         // Draw ImGui
-        file_logger->info("Imgui");
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
@@ -304,6 +308,9 @@ void cleanup() {
 }
 
 bool init() {
+    auto sink = make_shared<ImGuiSpdlogSink>();
+    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and logger name since it's null anyway)
+    spdlog::get("")->sinks().push_back(sink);
 
     // Get current date and time
     auto now = std::chrono::system_clock::now();
@@ -328,13 +335,14 @@ bool init() {
         file_logger->info("Init log file");
     }
     catch (const spdlog::spdlog_ex &ex) {
-        spdlog::error("Log initialization failed.");
+        spdlog::error("File log initialization failed.");
     }
 
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit()) {
         spdlog::error("Failed to initalize GLFW!");
+        file_logger->error("Failed to initalize GLFW!");
         return false;
     }
 
@@ -348,6 +356,7 @@ bool init() {
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
     if (window == NULL) {
         spdlog::error("Failed to create GLFW Window!");
+        file_logger->error("Failed to create GLFW Window!");
         return false;
     }
 
@@ -356,6 +365,7 @@ bool init() {
     bool err = !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     if (err) {
         spdlog::error("Failed to initialize OpenGL loader!");
+        file_logger->error("Failed to initialize OpenGL loader!");
         return false;
     }
 
@@ -377,7 +387,7 @@ void init_systems() {
 
     Material whiteMaterial = Material(myColor);
     cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
-   quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
+    quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
 }
 
 void load_enteties() {
@@ -387,28 +397,32 @@ void load_enteties() {
     gameObject->transform.setLocalPosition({-0, 0, 0});
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(new Render(cubeModel));
+    gameObject->addComponent(make_unique<Render>(cubeModel));
     for (unsigned int i = 0; i < 2; ++i) {
         gameObject = scene.addEntity(gameObject, "asteroid");
-        gameObject->addComponent(new Render(&model));
+        gameObject->addComponent(make_unique<Render>(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
     }
-  //  gameObject = scene.addEntity("Dir light");
-   // gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
+    //gameObject = scene.addEntity("Dir light");
+    //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
    // gameObject = scene.addEntity("Point Light");
   //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(new SpotLight(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),1.0f, 1.0f, 1.0f,1.0f,1.0f)));
+    gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
+    /*
     gridEntity = scene.addEntity("Grid");
     // size modelu = 5.0 przy skali 0.01; true size -> 500
     Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
     gridEntity->addComponent(grid);
     // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
-//    grid->RenderTiles(&scene, 0.011f, &tileModel);
+
+    grid->RenderTiles(&scene, 0.011f, &tileModel);
+     */
+
 }
 
 void init_imgui() {
@@ -416,11 +430,12 @@ void init_imgui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    (void) io;
-    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
-
+    
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -504,7 +519,7 @@ void imgui_begin() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
- 
+  
     
 }
 
@@ -521,10 +536,9 @@ void imgui_render() {
     ImGui::End();
     scene.showImGuiDetails(&camera);
 
-    bloomSystem.showImguiOptions();
+    ztgk::console.imguiWindow();
 
-    signalQueue.editor_control_window();
-
+   // bloomSystem .showImguiOptions();
 }
 
 void imgui_end() {
@@ -534,6 +548,7 @@ void imgui_end() {
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
+        
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();

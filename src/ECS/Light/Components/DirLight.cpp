@@ -66,16 +66,13 @@ void DirLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader,
 
 DirLight::DirLight(DirLightData data) :
         data(data) {
+    name = "Directional light";
     lightType = Directional;
 }
 
 void DirLight::showImGuiDetails(Camera *camera) {
-    ImGui::PushID(uniqueID);
-    if (ImGui::TreeNode("Directional light")) {
         ImGui::InputFloat4("Color", glm::value_ptr(data.color));
         ImGui::TreePop();
-    }
-    ImGui::PopID();
 }
 
 void DirLight::UpdateData() {

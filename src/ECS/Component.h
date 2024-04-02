@@ -12,6 +12,8 @@
 class Entity;
 class Camera;
 
+
+
 /**
  * Abstract base class for a Component.
  * A Component can be attached to an Entity to give it specific properties.
@@ -21,8 +23,8 @@ class Camera;
 class Component {
 public:
     Component();
-    
-    virtual ~Component() = default;
+
+    std::string name;
     void setEntity(Entity* newParentEntity);
     Entity *getEntity();
 
@@ -32,14 +34,13 @@ public:
     bool getIsDirty();
     virtual void showImGuiDetails(Camera *camera) = 0;
 
-protected:
-    int uniqueID;     // Instance variable to store the unique ID for each object
+    unsigned uniqueID;     // Instance variable to store the unique ID for each object
     Entity *parentEntity = nullptr;
 
 private:
-    static int nextID; // Static variable to keep track of the next available ID
     bool isDirty = false;
 };
+
 
 
 #endif //REASONABLEGL_COMPONENT_H

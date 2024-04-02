@@ -13,23 +13,30 @@
 #include "Transform/Transform.h"
 #include "Component.h"
 #include "SystemManager.h"
+#include "Scene.h"
 
 
 class Entity {
 public:
-
-    Entity(SystemManager* systemManager,std::string name);
     
+    Entity(Scene *scene, std::string name);
+    Entity(Scene *scene,Entity *parent, std::string name);
+
+    ~Entity();
+    
+    Scene *scene;
+
     std::string name;
     //Scene graph
-    const Entity *parent = nullptr;
+    Entity *parent = nullptr;
     
     //Space information
     Transform transform = Transform();
-
     
     //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
     Entity* addChild(std::unique_ptr<Entity> child);
+    void removeChild(Entity *child);
+    void Destroy();
     
     //Update transform if it was changed
     void updateSelfAndChild();
@@ -40,12 +47,15 @@ public:
 
 
     template <typename T>
-    void addComponent(T* component) {
+    void addComponent(std::unique_ptr<T> component) {
         component->setEntity(this);
         std::type_index typeName = std::type_index(typeid(T));
-        components[typeName] = component;
-        systemManager->addComponent(component);
+        components[typeName] = std::move(component); // now the map owns the component
+        scene->systemManager.addComponent(components[typeName].get()); // pass raw pointer
     }
+
+    void removeComponentFromMap(const std::unique_ptr<Component> &comp);
+
 
     template <typename T>
     T* getComponent() {
@@ -53,7 +63,7 @@ public:
         auto it = components.find(typeName);
 
         if(it != components.end()) {
-            return static_cast<T*>(it->second);
+            return static_cast<T*>(it->second.get());
         }
         // Component of type T doesn't exist for the entity - handle this case appropriately
         return nullptr; // This is just an example, you could also assert(false) or throw an exception
@@ -62,15 +72,11 @@ public:
     void showImGuiDetails(Camera *camera);
     
 //protected:
-    int uniqueID;     // Instance variable to store the unique ID for each object
-    std::unordered_map<std::type_index, Component*> components;
+    std::unordered_map<std::type_index, std::unique_ptr<Component>> components; 
     std::vector<std::unique_ptr<Entity>> children;
-    SystemManager *systemManager;
-    bool isSelected = false;
 
-private:
-    static int nextID; // Static variable to keep track of the next available ID
-    
+    unsigned uniqueID;     // Instance variable to store the unique ID for each object
+
 };
 
 

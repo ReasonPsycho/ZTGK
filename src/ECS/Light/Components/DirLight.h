@@ -33,7 +33,6 @@ class DirLight : public ILight {
 public:
     DirLight( DirLightData data);
     
-
     DirLightData data;
 
     void showImGuiDetails(Camera *camera) override;
@@ -48,7 +47,7 @@ public:
     
     
 private:
-    float near_plane = 1.0f, far_plane = 50.0f;
+    float near_plane = 0.1f, far_plane = 50.0f;
     
 };
 

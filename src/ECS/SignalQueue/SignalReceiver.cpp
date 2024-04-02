@@ -42,7 +42,7 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
         if (parentEntity != nullptr) {
             if (ImGui::Button("Subscribe debug clone")) {
                 if (debugClones.contains(receiver_uid)) {
-                    (this->parentEntity->systemManager->getSystem<SignalQueue>())->post(Signal(
+                    (this->parentEntity->scene->systemManager.getSystem<SignalQueue>())->post(Signal(
                             0,
                             0,
                             debugClones[receiver_uid].first->receiver_uid,
@@ -63,11 +63,11 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
                     debugClones[receiver_uid] = std::make_pair(
                             clone, std::vector<std::string>()
                     );
-                    *(this->parentEntity->systemManager->getSystem<SignalQueue>()) += clone;
+                    *(this->parentEntity->scene->systemManager.getSystem<SignalQueue>()) += clone;
                 }
             }
             if (ImGui::Button("Remove debug clones")) {
-                *(this->parentEntity->systemManager->getSystem<SignalQueue>()) -= debugClones[receiver_uid].first;
+                *(this->parentEntity->scene->systemManager.getSystem<SignalQueue>()) -= debugClones[receiver_uid].first;
                 delete debugClones[receiver_uid].first;
                 debugClones.erase(receiver_uid);
             }

@@ -19,6 +19,7 @@
 #include "../System.h"
 #include "../Component.h"
 #include "ECS/Scene.h"
+#include <algorithm>
 
 
 class LightSystem : public System {
@@ -41,25 +42,21 @@ public:
 
 
     void addComponent(void* component) override;
-    
+    void removeComponent(void* component) override;
     void PushDepthMapsToShader(Shader *shader);
 
-
+    void showImGuiDetails(Camera *camera);
 
     //Vectors
     std::vector<ILight *> lights;
     std::vector<DirLight*> dirLights;
     std::vector<PointLight*> pointLights;
     std::vector<SpotLight*> spotLights;
-
-
 private:
-
-
     //Camera
     Camera *camera;
     Scene *scene;
-
+    bool isDataPushedToSSBO = false;
     //Shaders
     Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
                                       "res/shaders/Shadows/point_shadows_depth.frag",

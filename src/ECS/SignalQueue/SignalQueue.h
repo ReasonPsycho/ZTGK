@@ -17,6 +17,7 @@ public:
     std::deque<Signal> queue = std::deque<Signal>();
     std::vector<SignalReceiver *> receivers = std::vector<SignalReceiver *>();
 
+    SignalQueue();
     void init();
     long long get_delta();
     long long update_delta();
@@ -38,8 +39,11 @@ public:
 
     std::array<std::type_index, 1> component_types = {std::type_index(typeid(SignalReceiver))};
     void addComponent(void *component) override;
+    void removeComponent(void* component) override;
+
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&component_types); };
     int getNumComponentTypes() override { return 1; };
+    void showImGuiDetails(Camera *camera);
 
 
     // editor
@@ -71,6 +75,5 @@ public:
         static SignalReceiver * new_logger();
     };
     static editor_s_new_signal_config editor_new_signal_config;
-    void editor_control_window();
 };
 

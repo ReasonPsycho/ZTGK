@@ -12,6 +12,7 @@
 #include <array> //std::array
 #include <memory> //std::unique_ptr
 #include "ECS/System.h"
+#include "imgui.h"
 
 class Component;
 class Entity; 
@@ -33,6 +34,21 @@ public:
     }
 
     template <typename T>
+    void removeComponent(T* component) {
+        std::type_index typeIndex(typeid(*component));
+
+        for (auto& [_, system] : systems) {
+            for (int i = 0; i < system->getNumComponentTypes(); ++i) {
+                if (typeIndex == system->getComponentTypes()[i]) {
+                    // Pass the pointer or whatever information needed here
+                    system->removeComponent(component);
+                    break;
+                }
+            }
+        }
+    }
+
+    template <typename T>
     void addSystem(T* system) {
         std::type_index typeIndex(typeid(*system));
         systems[typeIndex] = system;
@@ -47,7 +63,8 @@ public:
         }
         return dynamic_cast<T*>(it->second);
     }
-private:
+
+    virtual void showImGuiDetails(Camera *camera);
     std::unordered_map<std::type_index, System*> systems;
 };
 
