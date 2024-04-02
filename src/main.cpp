@@ -208,7 +208,19 @@ int main(int, char **) {
     file_logger->info("Initialized text renderer.");
 
 #pragma endregion Init
+//_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
+    float lastTextx = 500;
+    float lastTexty = 500;
 
+    int signx = 1;
+    int signy = 1;
+
+    float textx = 0;
+    float texty = 0;
+
+    int number = 0;
+
+//____________________________________________________________________________________________________
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
@@ -237,7 +249,35 @@ int main(int, char **) {
         imgui_end(); // this call effectively renders ImGui
 
         file_logger->info("Text");
-        text.RenderText("ABCDEFGHIJKLMNOPRSTUVWXYZabcdefghijklmnoprestuvwxyz0123456789+-*/,.[]()", 800, 600, 100.0, {1.0f,1.0f,1.0f});
+
+        //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
+        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
+
+        if(lastTextx > 450){
+            signx = -1;
+        }
+        if(lastTextx < 0){
+            signx = 1;
+        }
+        if(lastTexty > 550){
+            signy = -1;
+        }
+        if(lastTexty < 0){
+            signy = 1;
+        }
+
+        textx = lastTextx + signx;
+        texty = lastTexty + signy;
+
+        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
+
+        lastTextx = textx;
+        lastTexty = texty;
+
+        string numberString = to_string(number);
+        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
+        number++;
+        //____________________________________________________________________________________________________
 
         // End frame and swap buffers (double buffering)
         file_logger->info("End frame");

@@ -29,7 +29,8 @@ struct Character {
     unsigned int Advance;    // Offset to advance to next glyph
 };
 
-struct Text {
+class Text {
+public:
     FT_Library ft;
     FT_Face face;
 
