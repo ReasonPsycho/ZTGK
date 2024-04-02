@@ -40,7 +40,11 @@
 #include "ECS/Render/Primitives/Primitives.h"
 
 #include "Utils/Time.h"
+
+#include "ECS/Render/Text.h"
+
 #include "Utils/ImGuiSpdlogSink.h"
+
 
 
 #pragma endregion Includes
@@ -55,6 +59,7 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
+Text text = {};
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -77,6 +82,8 @@ void init_imgui();
 void init_camera();
 
 void init_time();
+
+void init_text();
 
 void before_frame();
 
@@ -198,11 +205,31 @@ int main(int, char **) {
     file_logger->info("Initialized signal queue.");
 
     init_time();
+
+    spdlog::info("Initialized system timer.");
+    file_logger->info("Initialized system timer.");
+
+    init_text();
+    spdlog::info("Initialized text renderer.");
+
     spdlog::info("Initialized game clock.");
     file_logger->info("Initialized game clock.");
 
-#pragma endregion Init
 
+#pragma endregion Init
+//_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
+    float lastTextx = 500;
+    float lastTexty = 500;
+
+    int signx = 1;
+    int signy = 1;
+
+    float textx = 0;
+    float texty = 0;
+
+    int number = 0;
+
+//____________________________________________________________________________________________________
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
@@ -215,14 +242,46 @@ int main(int, char **) {
         // Update game objects' state here
         update();
 
+
         // OpenGL rendering code here
         render();
+
 
         // Draw ImGui
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
+        file_logger->info("Text");
+
+        //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
+        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
+
+        if(lastTextx > 450){
+            signx = -1;
+        }
+        if(lastTextx < 0){
+            signx = 1;
+        }
+        if(lastTexty > 550){
+            signy = -1;
+        }
+        if(lastTexty < 0){
+            signy = 1;
+        }
+
+        textx = lastTextx + signx;
+        texty = lastTexty + signy;
+
+        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
+
+        lastTextx = textx;
+        lastTexty = texty;
+
+        string numberString = to_string(number);
+        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
+        number++;
+        //____________________________________________________________________________________________________
 
         // End frame and swap buffers (double buffering)
         file_logger->info("End frame");
@@ -360,8 +419,10 @@ void load_enteties() {
     Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
     gridEntity->addComponent(grid);
     // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
+
     grid->RenderTiles(&scene, 0.011f, &tileModel);
      */
+
 }
 
 void init_imgui() {
@@ -381,6 +442,10 @@ void init_imgui() {
     // Setup style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
+}
+
+void init_text() {
+    text.init();
 }
 
 void before_frame() {
@@ -567,8 +632,8 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    static float uixpos{ xpos };
-    static float uiypos{ ypos };
+    static float uixpos{ 1920/2 };
+    static float uiypos{ 1080/2 };
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
