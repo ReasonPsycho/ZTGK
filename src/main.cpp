@@ -42,6 +42,7 @@
 #include "Utils/Time.h"
 #include "Utils/ImGuiSpdlogSink.h"
 
+#include "ECS/Render/FrustumCulling/Frustum.h"
 
 #pragma endregion Includes
 

@@ -3,6 +3,7 @@
 //
 #include "Entity.h"
 #include "Scene.h"
+#include "../Raycasting/Collider.h"
 
 void Scene::updateScene() {
     for (auto &&child: children) {
@@ -55,4 +56,16 @@ void Scene::showImGuiDetails(Camera *camera) {
     }   
     ImGui::End();
     stopRenderingImgui = false;
+}
+
+std::vector<std::unique_ptr<Entity>> &Scene::getChildren() {
+    return children;
+}
+
+std::vector<Collider *> Scene::getColliders() {
+    std::vector<Collider *> colliders;
+    for (auto &child: children) {
+        colliders.push_back(child->getComponent<Collider>());
+    }
+    return colliders;
 }
