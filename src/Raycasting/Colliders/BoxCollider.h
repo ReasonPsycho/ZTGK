@@ -13,6 +13,10 @@ public:
     glm::vec3 size{};
 
     BoxCollider(const glm::vec3& center, const glm::vec3& size);
+
+    void showImGuiDetails(Camera* camera) override;
+
+    BoxCollider(Entity* entity, glm::vec3 size);
 };
 
 

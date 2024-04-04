@@ -43,6 +43,7 @@
 #include "Utils/ImGuiSpdlogSink.h"
 
 #include "ECS/Render/FrustumCulling/Frustum.h"
+#include "Raycasting/Colliders/BoxCollider.h"
 
 #pragma endregion Includes
 
@@ -56,6 +57,7 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
+BoxCollider *boxCollider;
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -340,12 +342,13 @@ void load_enteties() {
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(make_unique<Render>(cubeModel));
-    for (unsigned int i = 0; i < 2; ++i) {
-        gameObject = scene.addEntity(gameObject, "asteroid");
+    for (unsigned int i = 0; i < 2; ++i) {gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(make_unique<Render>(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
+      //  gameObject->addComponent(make_unique<BoxCollider>(BoxCollider(gameObject, {1.0f,1.0f,1.0f})));
+     //   std::cout<<"uid: "<<gameObject->getComponent<BoxCollider>()->uniqueID<<std::endl;
     }
     //gameObject = scene.addEntity("Dir light");
     //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));

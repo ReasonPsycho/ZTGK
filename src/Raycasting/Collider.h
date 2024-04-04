@@ -16,9 +16,11 @@ enum ColliderType{
 
 class Collider : public Component{
 public:
-    Collider() =default;
+    Collider() : Component() {};
     virtual ~Collider() = default;
     ColliderType type;
+
+    void showImGuiDetails(Camera *camera) override;
 };
 
 
