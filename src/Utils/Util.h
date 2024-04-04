@@ -7,6 +7,8 @@
 #include <atomic>
 #include <chrono>
 #include "Console.h"
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
 
 namespace ztgk {
     static constexpr short ID_POOL_SYSTEM = 0;
@@ -35,6 +37,29 @@ namespace ztgk {
     long long time();
 
     extern Console console;
+
+    static struct {
+        const glm::vec3 BLACK = { 0, 0, 0 };
+        const glm::vec3 WHITE = { 1, 1, 1 };
+        const glm::vec3 RED = { 1, 0, 0 };
+        const glm::vec3 GREEN = { 0, 1, 0 };
+        const glm::vec3 BLUE = { 0, 0, 1 };
+        const glm::vec3 YELLOW = { 1, 1, 0 };
+        const glm::vec3 CYAN = { 0, 1, 1 };
+        const glm::vec3 MAGENTA = { 1, 0, 1 };
+        const glm::vec3 GRAY = { 0.5, 0.5, 0.5 };
+        const glm::vec3 BROWN = { 0.647, 0.165, 0.165 };
+        const glm::vec3 ORANGE = { 1, 0.647, 0 };
+        const glm::vec3 PURPLE = { 0.5, 0, 0.5 };
+        const glm::vec3 TEAL = { 0, 0.5, 0.5 };
+        const glm::vec3 PINK = { 1, 0.753, 0.796 };
+        const glm::vec3 LIME = { 0, 1, 0 };
+        const glm::vec3 NAVY = { 0, 0, 0.5 };
+        const glm::vec3 MAROON = { 0.5, 0, 0 };
+        const glm::vec3 OLIVE = { 0.5, 0.5, 0 };
+        const glm::vec3 TURQUOISE = { 0.251, 0.878, 0.816 };
+        const glm::vec3 INDIGO = { 0.294, 0, 0.51 };
+    } color;
 
     template<typename T>
     struct Vec2 {

@@ -41,10 +41,10 @@
 
 #include "Utils/Time.h"
 
-#include "ECS/Render/Text.h"
+#include "ECS/Render/TextRenderer.h"
+//#include "ECS/Canvas/TextRenderer.h"
 
 #include "Utils/ImGuiSpdlogSink.h"
-
 
 
 #pragma endregion Includes
@@ -59,7 +59,10 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
-Text text = {};
+TextRenderer text = {};
+//TextRenderer* textRenderer = nullptr;
+//TextData text1 = {};
+//TextData text2 = {};
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -254,8 +257,10 @@ int main(int, char **) {
 
         file_logger->info("Text");
 
+//        textRenderer->render(text1);
+//        textRenderer->render(text2);
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
+        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, ztgk::color.WHITE);
 
         if(lastTextx > 450){
             signx = -1;
@@ -273,13 +278,13 @@ int main(int, char **) {
         textx = lastTextx + signx;
         texty = lastTexty + signy;
 
-        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
+        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, ztgk::color.OLIVE);
 
         lastTextx = textx;
         lastTexty = texty;
 
         string numberString = to_string(number);
-        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
+        text.RenderText(numberString, 0, 500, 0.5, ztgk::color.LIME);
         number++;
         //____________________________________________________________________________________________________
 
@@ -298,6 +303,8 @@ int main(int, char **) {
 #pragma region Functions
 
 void cleanup() {
+//    delete textRenderer;
+
     //Orginal clean up
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -445,6 +452,13 @@ void init_imgui() {
 }
 
 void init_text() {
+//    textRenderer = new TextRenderer();
+//
+//    text1.content = "TEEEEKST";
+//    text1.pos = { 50, 500 };
+//
+//    text2.content = "INNY TEEEEEKST";
+//    text2.pos = { 500, 100 };
     text.init();
 }
 

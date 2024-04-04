@@ -2,12 +2,12 @@
 // Created by cheily on 27.03.2024.
 //
 
-#include "Text.h"
+#include "Ecs/Render/TextRenderer.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "freetype/freetype.h"
 #include "glm/gtc/type_ptr.hpp"
 
-bool Text::init() {
+bool TextRenderer::init() {
     if (FT_Init_FreeType(&ft)) {
         spdlog::error("ERROR::FREETYPE: Could not init FreeType Library");
         return -1;
@@ -51,13 +51,13 @@ bool Text::init() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         // now store character for later use
-        Character character = {
+        Glyph character = {
                 texture,
                 glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
                 glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                 static_cast<unsigned int>(face->glyph->advance.x)
         };
-        characters.insert(std::pair<char, Character>(c, character));
+        characters.insert(std::pair<char, Glyph>(c, character));
     }
 
     glGenVertexArrays(1, &VAO);
@@ -77,21 +77,20 @@ bool Text::init() {
 
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
-
 }
 
-void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3 color) {
+void TextRenderer::RenderText(std::string text, float x, float y, float scale, glm::vec3 color) {
     // activate corresponding render state
     shader.use();
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-    glUniform3f(glGetUniformLocation(glGetUniformLocation(shader.ID, "textColor"), "textColor"), color.x, color.y, color.z);
+    glUniform3f(glGetUniformLocation(shader.ID, "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
     // iterate through all characters
     std::string::const_iterator c;
     for (c = text.begin(); c != text.end(); c++) {
-        Character ch = characters[*c];
+        Glyph ch = characters[*c];
 
         float xpos = x + ch.Bearing.x * scale;
         float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
@@ -123,5 +122,5 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Text::Text() : shader("res/shaders/text.vert", "res/shaders/text.frag") {
+TextRenderer::TextRenderer() : shader("res/shaders/text.vert", "res/shaders/text.frag") {
 }
