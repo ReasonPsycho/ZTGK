@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "glm/vec2.hpp"
 
 
 void Shader::init() {
@@ -77,14 +78,22 @@ void Shader::setMatrix4(const std::string &name, bool transpose, const GLfloat *
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, transpose, value);
 }
 
+void Shader::setVec2(const std::string &name, glm::vec2 vec2) {
+    glUniform2f(glGetUniformLocation(ID, name.c_str()), vec2.x, vec2.y);
+}
+
 void Shader::setVec3(const std::string &name, float d, float d1, float d2) {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), d, d1, d2);
 }
 
 void Shader::setVec3(const std::string &name, glm::vec3 vec3) {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), vec3.x, vec3.y, vec3.z);
-
 }
+
+void Shader::setVec4(const std::string &name, glm::vec4 vec4) {
+    glUniform4f(glGetUniformLocation(ID, name.c_str()), vec4.x, vec4.y, vec4.z, vec4.w);
+}
+
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     int success;

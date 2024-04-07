@@ -5,7 +5,7 @@
 #include "ECS/Canvas/TextRenderer.h"
 using namespace ztgk;
 
-TextRenderer::TextRenderer(const FontFamily & fontFamily) : shader("res/shaders/text.vert", "res/shaders/text.frag") {
+TextRenderer::TextRenderer(const FontFamily & fontFamily) : shader("res/shaders/hud_text.vert", "res/shaders/hud_text.frag") {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -95,8 +95,8 @@ void TextRenderer::loadGlyphs(FT_Library ft, std::string face_path, int offset) 
 void TextRenderer::render(TextData text) {
     // activate corresponding render state
     shader.use();
-    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-    glUniform3f(glGetUniformLocation(shader.ID, "textColor"), text.color.x, text.color.y, text.color.z);
+    shader.setMatrix4("projection", false, glm::value_ptr(projection));
+    shader.setVec3("textColor", text.color);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 

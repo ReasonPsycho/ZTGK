@@ -41,8 +41,8 @@
 
 #include "Utils/Time.h"
 
-//#include "ECS/Render/TextRenderer.h"
 #include "ECS/Canvas/TextRenderer.h"
+#include "ECS/Canvas/SpriteRenderer.h"
 
 #include "Utils/ImGuiSpdlogSink.h"
 
@@ -64,6 +64,8 @@ Entity *gridEntity;
 TextRenderer* textRenderer = nullptr;
 TextData text1 = {};
 TextData text2 = {};
+SpriteRenderer* spriteRenderer = nullptr;
+Sprite * sprite;
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -277,6 +279,12 @@ int main(int, char **) {
         textRenderer->render(text1);
         textRenderer->render(text2);
 
+        spriteRenderer->render(*sprite);
+        ImGui::Begin("Szprite");
+        ImGui::SliderFloat("S:w", &sprite->size.x, -10, 1000);
+        ImGui::SliderFloat("S:h", &sprite->size.y, -10, 1000);
+        ImGui::End();
+
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
@@ -325,6 +333,8 @@ int main(int, char **) {
 
 void cleanup() {
     delete textRenderer;
+    delete sprite;
+    delete spriteRenderer;
 
     //Orginal clean up
     ImGui_ImplOpenGL3_Shutdown();
@@ -483,6 +493,9 @@ void init_text() {
     text2.pos = { 500, 100 };
     text2.style = TextStyle::BOLD | TextStyle::ITALIC;
 
+    spriteRenderer = new SpriteRenderer();
+    sprite = new Sprite();
+    sprite->load("res/textures/stone.jpg");
 //    text.init();
 }
 
