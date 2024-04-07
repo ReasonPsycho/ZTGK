@@ -13,22 +13,30 @@
  * @param direction
  * @param scene
  */
-Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene)
-{
+Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
     this->origin = origin;
     this->direction = direction;
 
     std::vector<Collider*> colliders = scene->getColliders();
+    if (colliders.empty()) {
+        spdlog::error("IN RAY CONSTRUCTOR: No colliders found in the scene");
+        return;
+    }
 
-    for (auto & collider : colliders)
-    {
-        if (collider->type == ColliderType::BOX && doesCollide(collider))
-        {
-            RayHit = GetRayHit(ColliderType::BOX, collider);
+    for (auto collider : colliders) {
+        if (collider == nullptr) {
+            spdlog::error("IN RAY CONSTRUCTOR: Collider is null");
+            continue;
         }
-        else if(collider->type == ColliderType::SPHERE && doesCollide(collider))
-        {
-            RayHit = GetRayHit(ColliderType::SPHERE, collider);
+
+        if (doesCollide(collider)) {
+            if (collider->type == ColliderType::BOX) {
+                RayHit = GetRayHit(ColliderType::BOX, collider);
+            } else if (collider->type == ColliderType::SPHERE) {
+                RayHit = GetRayHit(ColliderType::SPHERE, collider);
+            }
+            // Stop after the first hit
+            break;
         }
     }
 }
@@ -43,6 +51,10 @@ glm::vec3 Ray::GetRayHit(ColliderType type,Collider* collider) const
 {
     if (type == ColliderType::BOX){
         auto* box = dynamic_cast<BoxCollider*>(collider);
+        if (!box) {
+            spdlog::error("Failed to cast collider to BoxCollider");
+            return defaultHit;
+        }
         glm::vec3 min = box->center - box->size;
         glm::vec3 max = box->center + box->size;
         glm::vec3 tmin = (min - origin) / direction;
@@ -59,6 +71,10 @@ glm::vec3 Ray::GetRayHit(ColliderType type,Collider* collider) const
     else if(type == ColliderType::SPHERE)
     {
         auto *sphere = dynamic_cast<SphereCollider*>(collider);
+        if (!sphere) {
+            spdlog::error("Failed to cast collider to SphereCollider");
+            return defaultHit;
+        }
         glm::vec3 oc = origin - sphere->center;
         float a = glm::dot(direction, direction);
         float b = 2.0f * glm::dot(oc, direction);

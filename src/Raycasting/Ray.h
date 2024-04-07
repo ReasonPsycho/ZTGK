@@ -23,6 +23,7 @@ public:
 
 private:
     glm::vec3 RayHit;
+    glm::vec3 defaultHit = glm::vec3(std::numeric_limits<float>::infinity());
 
 };
 

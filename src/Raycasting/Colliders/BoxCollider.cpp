@@ -20,6 +20,7 @@ void BoxCollider::showImGuiDetails(Camera *camera) {
 }
 
 BoxCollider::BoxCollider(Entity *entity, glm::vec3 size) {
+    this->name = "Box Collider";
     this->center = entity->transform.getLocalPosition();
     this->size = size;
     this->type = ColliderType::BOX;

@@ -16,7 +16,7 @@ enum ColliderType{
 
 class Collider : public Component{
 public:
-    Collider() : Component() {};
+    Collider() : Component() {this->name = "Collider";};
     virtual ~Collider() = default;
     ColliderType type;
 
