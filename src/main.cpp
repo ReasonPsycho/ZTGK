@@ -41,10 +41,11 @@
 
 #include "Utils/Time.h"
 
-#include "ECS/Render/TextRenderer.h"
-//#include "ECS/Canvas/TextRenderer.h"
+//#include "ECS/Render/TextRenderer.h"
+#include "ECS/Canvas/TextRenderer.h"
 
 #include "Utils/ImGuiSpdlogSink.h"
+
 
 
 #pragma endregion Includes
@@ -59,10 +60,10 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
-TextRenderer text = {};
-//TextRenderer* textRenderer = nullptr;
-//TextData text1 = {};
-//TextData text2 = {};
+//TextRenderer text = {};
+TextRenderer* textRenderer = nullptr;
+TextData text1 = {};
+TextData text2 = {};
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -250,42 +251,62 @@ int main(int, char **) {
         render();
 
 
-        // Draw ImGui
+                // Draw ImGui
         imgui_begin();
+
+        static int textsign = 1;
+        static int textyy = 0;
+        textyy += textsign;
+        if (textyy > 1000 || textyy < -10)
+            textsign *= -1;
+        text1.pos.y = textyy;
+
+        ImGui::Begin("Text");
+        ImGui::SliderFloat("P:x", &text2.pos.x, -10, 2000);
+        ImGui::SliderFloat("P:y", &text2.pos.y, -10, 1000);
+        ImGui::SliderFloat("S:y", &text2.scale.y, 0, 2);
+        if ( ImGui::Button("lato") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Lato)); }
+        if ( ImGui::Button("arimo") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Arimo)); }
+        if ( ImGui::Button("nunito") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Nunito)); }
+        if ( ImGui::Button("quicksand") ) { textRenderer->setFont({ ztgk::font.Reg_Quicksand, ztgk::font.Reg_Quicksand, ztgk::font.Bld_Quicksand, ztgk::font.Bld_Quicksand }); }
+        if ( ImGui::Button("concert") ) { textRenderer->setFont({ ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert }); }
+        if ( ImGui::Button("lobster") ) { textRenderer->setFont({ ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster }); }
+        if ( ImGui::Button("novamono") ) { textRenderer->setFont({ ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono }); }
+        ImGui::End();
+
+        textRenderer->render(text1);
+        textRenderer->render(text2);
+
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
-        file_logger->info("Text");
-
-//        textRenderer->render(text1);
-//        textRenderer->render(text2);
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, ztgk::color.WHITE);
-
-        if(lastTextx > 450){
-            signx = -1;
-        }
-        if(lastTextx < 0){
-            signx = 1;
-        }
-        if(lastTexty > 550){
-            signy = -1;
-        }
-        if(lastTexty < 0){
-            signy = 1;
-        }
-
-        textx = lastTextx + signx;
-        texty = lastTexty + signy;
-
-        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, ztgk::color.OLIVE);
-
-        lastTextx = textx;
-        lastTexty = texty;
-
-        string numberString = to_string(number);
-        text.RenderText(numberString, 0, 500, 0.5, ztgk::color.LIME);
-        number++;
+//        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, ztgk::color.WHITE);
+//
+//        if(lastTextx > 450){
+//            signx = -1;
+//        }
+//        if(lastTextx < 0){
+//            signx = 1;
+//        }
+//        if(lastTexty > 550){
+//            signy = -1;
+//        }
+//        if(lastTexty < 0){
+//            signy = 1;
+//        }
+//
+//        textx = lastTextx + signx;
+//        texty = lastTexty + signy;
+//
+//        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, ztgk::color.OLIVE);
+//
+//        lastTextx = textx;
+//        lastTexty = texty;
+//
+//        string numberString = to_string(number);
+//        text.RenderText(numberString, 0, 500, 0.5, ztgk::color.LIME);
+//        number++;
         //____________________________________________________________________________________________________
 
         // End frame and swap buffers (double buffering)
@@ -303,7 +324,7 @@ int main(int, char **) {
 #pragma region Functions
 
 void cleanup() {
-//    delete textRenderer;
+    delete textRenderer;
 
     //Orginal clean up
     ImGui_ImplOpenGL3_Shutdown();
@@ -452,14 +473,17 @@ void init_imgui() {
 }
 
 void init_text() {
-//    textRenderer = new TextRenderer();
-//
-//    text1.content = "TEEEEKST";
-//    text1.pos = { 50, 500 };
-//
-//    text2.content = "INNY TEEEEEKST";
-//    text2.pos = { 500, 100 };
-    text.init();
+    textRenderer = new TextRenderer();
+
+    text1.content = "TEEEEKST";
+    text1.pos = { 50, 500 };
+    text1.color = ztgk::color.TURQUOISE;
+
+    text2.content = "INNY TEEEEEKST";
+    text2.pos = { 500, 100 };
+    text2.style = TextStyle::BOLD | TextStyle::ITALIC;
+
+//    text.init();
 }
 
 void before_frame() {
