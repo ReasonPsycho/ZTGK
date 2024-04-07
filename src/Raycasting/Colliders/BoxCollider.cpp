@@ -17,7 +17,6 @@ void BoxCollider::showImGuiDetails(Camera *camera) {
     ImGui::Text("Center: (%.2f, %.2f, %.2f)", center.x, center.y, center.z);
     ImGui::Text("Size: (%.2f, %.2f, %.2f)", size.x, size.y, size.z);
 
-    ImGui::PopID();
 }
 
 BoxCollider::BoxCollider(Entity *entity, glm::vec3 size) {
