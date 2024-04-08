@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "Colliders/BoxCollider.h"
 #include "Raycasting/Colliders/SphereCollider.h"
+#include "../ECS/Entity.h"
 
 /**
  * @brief Ray constructor
@@ -35,6 +36,7 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
             } else if (collider->type == ColliderType::SPHERE) {
                 RayHit = GetRayHit(ColliderType::SPHERE, collider);
             }
+            hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
             // Stop after the first hit
             break;
         }
@@ -134,6 +136,14 @@ bool Ray::doesCollide(Collider* collider) const
  */
 glm::vec3 Ray::RayHitPoint() {
     return RayHit;
+}
+
+/**
+ * @brief Returns the entity that the ray hit
+ * @return Entity*
+ */
+Entity* Ray::getHitEntity() {
+    return hitEntity;
 }
 
 

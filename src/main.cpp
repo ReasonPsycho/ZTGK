@@ -253,47 +253,40 @@ int main(int, char **) {
         // OpenGL rendering code here
         render();
 
-
-        /*
-        Ray r = Ray(camera.Position, camera.Front, &scene);
-        std::cout<< "Raycast: " << r.RayHitPoint().x << " " << r.RayHitPoint().y << " " << r.RayHitPoint().z << std::endl;
-        */
-
-
         // Draw ImGui
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
-        file_logger->info("Text");
-
-        //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
-
-        if(lastTextx > 450){
-            signx = -1;
-        }
-        if(lastTextx < 0){
-            signx = 1;
-        }
-        if(lastTexty > 550){
-            signy = -1;
-        }
-        if(lastTexty < 0){
-            signy = 1;
-        }
-
-        textx = lastTextx + signx;
-        texty = lastTexty + signy;
-
-        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
-
-        lastTextx = textx;
-        lastTexty = texty;
-
-        string numberString = to_string(number);
-        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
-        number++;
+//        file_logger->info("Text");
+//
+//        //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
+//        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
+//
+//        if(lastTextx > 450){
+//            signx = -1;
+//        }
+//        if(lastTextx < 0){
+//            signx = 1;
+//        }
+//        if(lastTexty > 550){
+//            signy = -1;
+//        }
+//        if(lastTexty < 0){
+//            signy = 1;
+//        }
+//
+//        textx = lastTextx + signx;
+//        texty = lastTexty + signy;
+//
+//        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
+//
+//        lastTextx = textx;
+//        lastTexty = texty;
+//
+//        string numberString = to_string(number);
+//        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
+//        number++;
         //____________________________________________________________________________________________________
 
         // End frame and swap buffers (double buffering)
@@ -411,7 +404,7 @@ void load_enteties() {
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(make_unique<Render>(cubeModel));
-    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f, 1.0f, 1.0f}));
+    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{11.0f, 11.0f, 11.0f}));
     for (unsigned int i = 0; i < 2; ++i) {gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(make_unique<Render>(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
@@ -619,7 +612,6 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
         ImGui::GetIO().MousePos = ImVec2(0,0);
     }
-
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -682,7 +674,44 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        // Convert mouse position to world coordinates
+        float mouseX = (2.0f * xpos) / display_w - 1.0f;
+        float mouseY = 1.0f - (2.0f * ypos) / display_h;
+        float mouseZ = 1.0f;
+
+        glm::vec3 ray_nds = glm::vec3(mouseX, mouseY, mouseZ);
+        glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+
+        glm::mat4 invProjMat = glm::inverse(camera.GetProjectionMatrix());
+        glm::vec4 ray_eye = invProjMat * ray_clip;
+        ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+
+        glm::mat4 invViewMat = glm::inverse(camera.GetViewMatrix());
+        glm::vec4 ray_world = invViewMat * ray_eye;
+        ray_world = glm::normalize(ray_world);
+
+        // Create ray from mouse position
+        //spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
+        //Ray ray = Ray(camera.Position, glm::vec3(ray_world), &scene);
+        Ray ray = Ray(camera.Position, camera.Front, &scene);
+        if(ray.getHitEntity() != nullptr){
+            spdlog::info("Hit entity: {}", ray.getHitEntity()->name);
+        }
+        else{
+            spdlog::info("No hit entity");
+        }
+
+        // Now you can use this ray for raycasting
+        // For example:
+        // ray.IntersectWithSomeObject();
+    }
 }
+
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");

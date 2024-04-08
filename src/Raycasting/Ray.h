@@ -20,11 +20,12 @@ public:
     glm::vec3 GetRayHit(ColliderType type, Collider* collider) const;
 
     glm::vec3 RayHitPoint();
+    Entity* getHitEntity();
 
 private:
     glm::vec3 RayHit;
     glm::vec3 defaultHit = glm::vec3(std::numeric_limits<float>::infinity());
-
+    Entity* hitEntity = nullptr;
 };
 
 
