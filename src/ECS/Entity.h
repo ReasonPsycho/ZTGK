@@ -15,6 +15,7 @@
 #include "SystemManager.h"
 #include "Scene.h"
 
+#include "../Raycasting/Colliders/BoxCollider.h"
 
 class Entity {
 public:
@@ -46,12 +47,19 @@ public:
 
 
 
-    template <typename T>
-    void addComponent(std::unique_ptr<T> component) {
+//    template <typename T>
+//    void addComponent(std::unique_ptr<T> component) {
+//        component->setEntity(this);
+//        std::type_index typeName = std::type_index(typeid(T));
+//        components[typeName] = std::move(component); // now the map owns the component
+//        scene->systemManager.addComponent(components[typeName].get()); // pass raw pointer
+//    }
+
+    void addComponent(std::unique_ptr<Component> component) {
         component->setEntity(this);
-        std::type_index typeName = std::type_index(typeid(T));
-        components[typeName] = std::move(component); // now the map owns the component
-        scene->systemManager.addComponent(components[typeName].get()); // pass raw pointer
+        std::type_index typeName = std::type_index(typeid(*component));
+        components[typeName] = std::move(component);
+        scene->systemManager.addComponent(components[typeName].get());
     }
 
     void removeComponentFromMap(const std::unique_ptr<Component> &comp);
@@ -59,15 +67,21 @@ public:
 
     template <typename T>
     T* getComponent() {
-        std::type_index typeName = std::type_index(typeid(T));
+        auto typeName = std::type_index(typeid(T));
         auto it = components.find(typeName);
 
-        if(it != components.end()) {
-            return static_cast<T*>(it->second.get());
+        if (it != components.end()) {
+            Component* component = it->second.get();
+            if (T* castedComponent = dynamic_cast<T*>(component)) {
+                return castedComponent;
+            } else {
+                spdlog::error("Type mismatch in getComponent()");
+            }
         }
         // Component of type T doesn't exist for the entity - handle this case appropriately
-        return nullptr; // This is just an example, you could also assert(false) or throw an exception
+        return nullptr;
     }
+
 
     void showImGuiDetails(Camera *camera);
     

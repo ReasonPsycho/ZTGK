@@ -6,6 +6,7 @@
 #define REASONABLEGL_SCENE_H
 
 #include "SystemManager.h"
+class Collider;
 
 class Scene {
 public:
@@ -26,6 +27,10 @@ public:
     void showImGuiDetails(Camera *camera);
     
     bool stopRenderingImgui = false;
+
+    std::vector<std::unique_ptr<Entity>>& getChildren();
+
+    std::vector<Collider*> getColliders();
     
 private:
     std::vector<std::unique_ptr<Entity>> children;
