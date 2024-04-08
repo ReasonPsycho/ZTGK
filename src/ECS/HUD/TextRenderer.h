@@ -43,7 +43,7 @@ public:
     void loadFont(std::string font);
 
     void setFont(const ztgk::FontFamily & path);
-    void render(TextData text);
+    void render(const Text & text);
 
 private:
     void loadGlyphs(FT_Library ft, std::string face_path, int offset = 0);

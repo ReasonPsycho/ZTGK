@@ -6,10 +6,11 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "Utils/Config.h"
+#include "HUD.h"
 
 using namespace ztgk;
 
-SpriteRenderer::SpriteRenderer() : shader("res/shaders/hud_sprite.vert", "res/shaders/hud_sprite.frag") {
+SpriteRenderer::SpriteRenderer(HUD * hud) : hud(hud), shader("res/shaders/hud_sprite.vert", "res/shaders/hud_sprite.frag") {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
@@ -31,9 +32,12 @@ SpriteRenderer::SpriteRenderer() : shader("res/shaders/hud_sprite.vert", "res/sh
 }
 
 void SpriteRenderer::render(Sprite sprite) {
+    if (hud->groups[sprite.HUDGroupID].hidden) return;
+
     shader.use();
     glBindTexture(GL_TEXTURE_2D, sprite.texture);
-    float xpos = sprite.pos.x, ypos = sprite.pos.y;
+    float xpos = sprite.pos.x + hud->groups[sprite.HUDGroupID].offset.x;
+    float ypos = sprite.pos.y + hud->groups[sprite.HUDGroupID].offset.y;
     float w = sprite.size.x, h = sprite.size.y;
 
     float vertices[] = {

@@ -34,3 +34,7 @@ void Sprite::load(const std::string &path) {
 
     size = { width, height };
 }
+
+void Sprite::showImGuiDetails(Camera *camera) {
+
+}

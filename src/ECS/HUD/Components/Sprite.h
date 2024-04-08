@@ -9,8 +9,9 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "glad/glad.h"
+#include "ECS/Component.h"
 
-struct Sprite {
+struct Sprite : public Component {
     glm::vec2 pos = { 500, 500 };
     glm::vec2 size = {};
     GLuint texture;
@@ -18,4 +19,6 @@ struct Sprite {
     unsigned HUDGroupID = 0;
 
     void load(const std::string & path);
+
+    void showImGuiDetails(Camera *camera) override;
 };

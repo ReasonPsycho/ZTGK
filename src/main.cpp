@@ -45,7 +45,7 @@
 #include "ECS/HUD/SpriteRenderer.h"
 
 #include "Utils/ImGuiSpdlogSink.h"
-
+#include "ECS/HUD/HUD.h"
 
 
 #pragma endregion Includes
@@ -60,12 +60,12 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
-//TextRenderer text = {};
 TextRenderer* textRenderer = nullptr;
-TextData text1 = {};
-TextData text2 = {};
+Text text1 = {};
+Text text2 = {};
 SpriteRenderer* spriteRenderer = nullptr;
 Sprite * sprite;
+HUD hud;
 
 shared_ptr<spdlog::logger> file_logger;
 const Color& white = {0, 0, 0, 0};
@@ -279,10 +279,18 @@ int main(int, char **) {
         textRenderer->render(text1);
         textRenderer->render(text2);
 
-        spriteRenderer->render(*sprite);
+        hud.spriteRenderer->render(*sprite);
+
+//        hud.draw();
+//        spriteRenderer->render(*sprite);
         ImGui::Begin("Szprite");
         ImGui::SliderFloat("S:w", &sprite->size.x, -10, 1000);
         ImGui::SliderFloat("S:h", &sprite->size.y, -10, 1000);
+        ImGui::End();
+
+        ImGui::Begin("Group 0");
+        ImGui::DragFloat("O:x", &hud.groups[0].offset.x);
+        ImGui::DragFloat("O:y", &hud.groups[0].offset.y);
         ImGui::End();
 
         imgui_render(); // edit this function to add your own ImGui controls
@@ -420,6 +428,8 @@ void init_systems() {
     PBRPrimitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
@@ -461,6 +471,9 @@ void load_enteties() {
     grid->RenderTiles(&scene, 0.011f, &tileModel);
      */
 
+    gameObject = scene.addEntity("HUD DEMO");
+    gameObject->addComponent(make_unique<Text>(text1));
+    gameObject->addComponent(make_unique<Text>(text2));
 }
 
 void init_imgui() {
@@ -493,7 +506,7 @@ void init_text() {
     text2.pos = { 500, 100 };
     text2.style = TextStyle::BOLD | TextStyle::ITALIC;
 
-    spriteRenderer = new SpriteRenderer();
+    spriteRenderer = new SpriteRenderer(&hud);
     sprite = new Sprite();
     sprite->load("res/textures/stone.jpg");
     sprite->color = ztgk::color.RED;

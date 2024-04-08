@@ -2,10 +2,7 @@
 // Created by cheily on 08.04.2024.
 //
 
-#ifndef ZTGK_CONFIG_H
-#define ZTGK_CONFIG_H
-
-#endif //ZTGK_CONFIG_H
+#pragma once
 
 namespace ztgk::config {
 

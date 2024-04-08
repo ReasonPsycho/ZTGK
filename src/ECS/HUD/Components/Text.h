@@ -10,16 +10,6 @@
 #include "ECS/Component.h"
 #include "ECS/HUD/Fonts.h"
 
-struct TextData {
-    std::string content;
-    std::string font;
-    unsigned HUDGroupID = 0;
-    glm::vec2 pos = { 200, 200 };
-    glm::vec2 scale = { 1, 1 };
-    glm::vec3 color = ztgk::color.WHITE;
-    unsigned style = 0;
-};
-
 enum TextStyle {
     NONE            = 0,
     UNDERSCORE      = 1 << 0,
@@ -34,7 +24,15 @@ enum TextStyle {
 
 class Text : public Component {
 public:
-    TextData data;
+
+
+    std::string content;
+    std::string font;
+    unsigned HUDGroupID = 0;
+    glm::vec2 pos = { 200, 200 };
+    glm::vec2 scale = { 1, 1 };
+    glm::vec3 color = ztgk::color.WHITE;
+    unsigned style = 0;
 
     // component overrides
     void showImGuiDetails(Camera *camera) override;
