@@ -5,6 +5,9 @@
 #include "SpriteRenderer.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "Utils/Config.h"
+
+using namespace ztgk;
 
 SpriteRenderer::SpriteRenderer() : shader("res/shaders/hud_sprite.vert", "res/shaders/hud_sprite.frag") {
     glGenVertexArrays(1, &VAO);
@@ -23,7 +26,7 @@ SpriteRenderer::SpriteRenderer() : shader("res/shaders/hud_sprite.vert", "res/sh
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    projection = glm::ortho(0.0f, canvas_size.x, 0.0f, canvas_size.y);
+    projection = glm::ortho(0.0f, (float)config::window_size.x, 0.0f, (float)config::window_size.y);
     shader.init();
 }
 

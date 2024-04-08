@@ -2,7 +2,9 @@
 // Created by cheily on 04.04.2024.
 //
 
-#include "ECS/Canvas/TextRenderer.h"
+#include "TextRenderer.h"
+#include "Utils/Config.h"
+
 using namespace ztgk;
 
 TextRenderer::TextRenderer(const FontFamily & fontFamily) : shader("res/shaders/hud_text.vert", "res/shaders/hud_text.frag") {
@@ -16,7 +18,7 @@ TextRenderer::TextRenderer(const FontFamily & fontFamily) : shader("res/shaders/
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    projection = glm::ortho(0.0f, canvas_size.x, 0.0f, canvas_size.y);
+    projection = glm::ortho(0.0f, (float)config::window_size.x, 0.0f, (float)config::window_size.y);
     shader.init();
 
     setFont(fontFamily);

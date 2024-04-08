@@ -15,6 +15,7 @@ struct Sprite {
     glm::vec2 size = {};
     GLuint texture;
     glm::vec3 color = { 1, 1, 1 };
+    unsigned HUDGroupID = 0;
 
     void load(const std::string & path);
 };

@@ -15,7 +15,7 @@
 #include "glm/detail/type_vec2.hpp"
 #include "glm/detail/type_mat4x4.hpp"
 #include "ECS/Render/ModelLoading/Shader.h"
-#include "ECS/Canvas/Components/Text.h"
+#include "ECS/HUD/Components/Text.h"
 #include "Fonts.h"
 
 struct Glyph {
@@ -30,13 +30,17 @@ public:
     explicit TextRenderer(const ztgk::FontFamily & fontFamily = ztgk::font.default_font);
 
     const ztgk::FontFamily font_family = ztgk::font.family(ztgk::font.Fam_Arimo);
-    glm::vec2 canvas_size = { 1920, 1080 };
 
     unsigned VAO, VBO;
     glm::mat4 projection;
     std::unordered_map<unsigned short, Glyph> glyphs;
 
+    FT_Library ft;
+    std::unordered_map<std::string, std::unordered_map<unsigned, Glyph>> fonts;
+
     Shader shader;
+
+    void loadFont(std::string font);
 
     void setFont(const ztgk::FontFamily & path);
     void render(TextData text);

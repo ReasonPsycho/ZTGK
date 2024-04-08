@@ -4,10 +4,6 @@
 
 #include "Text.h"
 
-void Text::Update() {
-    Component::Update();
-}
-
 void Text::showImGuiDetails(Camera *camera) {
 
 }

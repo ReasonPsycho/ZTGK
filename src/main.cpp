@@ -41,8 +41,8 @@
 
 #include "Utils/Time.h"
 
-#include "ECS/Canvas/TextRenderer.h"
-#include "ECS/Canvas/SpriteRenderer.h"
+#include "ECS/HUD/TextRenderer.h"
+#include "ECS/HUD/SpriteRenderer.h"
 
 #include "Utils/ImGuiSpdlogSink.h"
 
@@ -496,6 +496,7 @@ void init_text() {
     spriteRenderer = new SpriteRenderer();
     sprite = new Sprite();
     sprite->load("res/textures/stone.jpg");
+    sprite->color = ztgk::color.RED;
 //    text.init();
 }
 

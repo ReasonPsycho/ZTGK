@@ -8,13 +8,15 @@
 #include "glm/vec3.hpp"
 #include "Utils/Util.h"
 #include "ECS/Component.h"
+#include "ECS/HUD/Fonts.h"
 
 struct TextData {
     std::string content;
+    std::string font;
+    unsigned HUDGroupID = 0;
     glm::vec2 pos = { 200, 200 };
     glm::vec2 scale = { 1, 1 };
     glm::vec3 color = ztgk::color.WHITE;
-    float rotation = 0;
     unsigned style = 0;
 };
 
@@ -35,6 +37,5 @@ public:
     TextData data;
 
     // component overrides
-    void Update() override;
     void showImGuiDetails(Camera *camera) override;
 };
