@@ -33,6 +33,7 @@ SpriteRenderer::SpriteRenderer(HUD * hud) : hud(hud), shader("res/shaders/hud_sp
 
 void SpriteRenderer::render(Sprite * sprite) {
     shader.use();
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sprite->texture);
     float xpos = sprite->pos.x + hud->groups[sprite->groupID].offset.x;
     float ypos = sprite->pos.y + hud->groups[sprite->groupID].offset.y;

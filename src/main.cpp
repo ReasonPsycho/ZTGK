@@ -464,7 +464,7 @@ void load_enteties() {
     gameObject->addComponent(make_unique<Text>(text1));
 //    auto text2 = Text("Tekst2", {300, 300});
 //    gameObject->addComponent(make_unique<Text>(text2));
-    auto sprite1 = Sprite("res/textures/stone.jpg");
+    auto sprite1 = Sprite("res/textures/container2.png");
     gameObject->addComponent(make_unique<Sprite>(sprite1));
 //    gameObject->addComponent(make_unique<Sprite>("res/textures/stone.jpg"));
 //    auto sprite2 = Sprite("res/textures/container2.png");

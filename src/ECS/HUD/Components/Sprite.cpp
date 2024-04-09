@@ -22,6 +22,7 @@ Sprite::Sprite(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec4 &col
 }
 
 void Sprite::load(const std::string &path) {
+    glDeleteTextures(1, &texture);
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -33,10 +34,18 @@ void Sprite::load(const std::string &path) {
         loadColor();
     } else {
         // load and generate the texture
+        stbi_set_flip_vertically_on_load(false);
         int width, height, nrChannels;
         unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
         if (data) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            GLenum format;
+            if (nrChannels == 1) //nifty
+                format = GL_RED;
+            else if (nrChannels == 3)
+                format = GL_RGB;
+            else if (nrChannels == 4)
+                format = GL_RGBA;
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
             spdlog::error("Failed to load sprite \"" + path + "\". Generating color pixel texture.");
