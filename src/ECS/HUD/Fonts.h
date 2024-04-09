@@ -9,18 +9,6 @@
 
 namespace ztgk {
 
-    struct FontFamily {
-        std::string regular;
-        std::string bold;
-        std::string italic;
-        std::string bold_italic;
-
-        [[nodiscard]] std::string toString() const {
-            return std::format("FontFamily{{regular='{}', bold='{}', italic='{}', bold_italic='{}'}}",
-                               regular, bold, italic, bold_italic);
-        }
-    };
-
     struct s_font {
         // variants, use as default
         const std::string Fam_Lato = "res/fonts/Lato/Lato-";
@@ -40,13 +28,24 @@ namespace ztgk {
         const std::string bold = "Bold.ttf";
         const std::string bold_italic = "BoldItalic.ttf";
 
-        [[nodiscard]] constexpr FontFamily family(const std::string & base) const {
-            return { base + regular, base + bold, base + italic, base + bold_italic };
-        }
-
         const std::string default_font = Fam_Lato + regular;
-        const FontFamily default_family = family(Fam_Lato);
+
+        [[nodiscard]] constexpr std::vector<std::string> all_presets() const {
+            std::vector<std::string> ret = {};
+
+            for ( auto & fam : { Fam_Lato, Fam_Arimo, Fam_Nunito } ) {
+                ret.push_back(fam + regular);
+                ret.push_back(fam + bold);
+                ret.push_back(fam + italic);
+                ret.push_back(fam + bold_italic);
+            }
+            ret.push_back(Reg_Quicksand);
+            ret.push_back(Bld_Quicksand);
+            ret.push_back(Reg_Lobster);
+            ret.push_back(Reg_Concert);
+            ret.push_back(Reg_NovaMono);
+
+            return ret;
+        }
     } static font;
-
-
 }

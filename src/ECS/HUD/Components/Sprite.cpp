@@ -68,9 +68,10 @@ void Sprite::showImGuiDetails(Camera *camera) {
     ImGui::DragFloat2("Pos", glm::value_ptr(pos));
     ImGui::DragFloat2("Size", glm::value_ptr(size));
     ImGui::ColorEdit3("Color", glm::value_ptr(color));
-    static int e_tex = texture;
+    static int e_tex;
+    e_tex = static_cast<int>(texture);
     ImGui::InputInt("Texture ID", &e_tex);
-    texture = e_tex;
+    texture = static_cast<GLuint>(e_tex);
 }
 
 void Sprite::loadColor() {
