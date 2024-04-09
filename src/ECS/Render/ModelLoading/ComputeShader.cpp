@@ -103,13 +103,13 @@ void ComputeShader::checkCompileErrors(unsigned int shader, std::string type) {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error("Shader in path: " + computeShaderPath + " has compilation error of type: " + type + infoLog);
+            spdlog::error("Shader in editor_path: " + computeShaderPath + " has compilation error of type: " + type + infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error("Shader in path: " + computeShaderPath + " has compilation error of type: " + type + infoLog);
+            spdlog::error("Shader in editor_path: " + computeShaderPath + " has compilation error of type: " + type + infoLog);
         }
     }
 }

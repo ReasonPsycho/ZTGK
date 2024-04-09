@@ -7,8 +7,9 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "Utils/Util.h"
-#include "ECS/Component.h"
 #include "ECS/HUD/Fonts.h"
+#include "AHUDComponent.h"
+#include "Utils/Config.h"
 
 enum TextStyle {
     NONE            = 0,
@@ -22,18 +23,24 @@ enum TextStyle {
     BOLD            = 1 << 8,   //256
 };
 
-class Text : public Component {
+class Text : public AHUDComponent {
 public:
-
+//todo ctor
+    Text(const std::string &content = "",
+          const glm::vec2 &pos = ztgk::config::window_size / 2,
+         const glm::vec2 &scale = { 1, 1 },
+         const glm::vec4 &color = ztgk::color.WHITE,
+         const std::string &font = ztgk::font.default_font,
+         TextStyle style = NONE,
+         unsigned int hudGroupId = 0);
 
     std::string content;
     std::string font;
-    unsigned HUDGroupID = 0;
-    glm::vec2 pos = { 200, 200 };
-    glm::vec2 scale = { 1, 1 };
-    glm::vec3 color = ztgk::color.WHITE;
-    unsigned style = 0;
+    glm::vec2 pos;
+    glm::vec2 scale;
+    glm::vec4 color;
+    unsigned style;
 
-    // component overrides
+    // editor
     void showImGuiDetails(Camera *camera) override;
 };

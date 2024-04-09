@@ -40,26 +40,26 @@ namespace ztgk {
     extern Console console;
 
     static struct {
-        const glm::vec3 BLACK = { 0, 0, 0 };
-        const glm::vec3 WHITE = { 1, 1, 1 };
-        const glm::vec3 RED = { 1, 0, 0 };
-        const glm::vec3 GREEN = { 0, 1, 0 };
-        const glm::vec3 BLUE = { 0, 0, 1 };
-        const glm::vec3 YELLOW = { 1, 1, 0 };
-        const glm::vec3 CYAN = { 0, 1, 1 };
-        const glm::vec3 MAGENTA = { 1, 0, 1 };
-        const glm::vec3 GRAY = { 0.5, 0.5, 0.5 };
-        const glm::vec3 BROWN = { 0.647, 0.165, 0.165 };
-        const glm::vec3 ORANGE = { 1, 0.647, 0 };
-        const glm::vec3 PURPLE = { 0.5, 0, 0.5 };
-        const glm::vec3 TEAL = { 0, 0.5, 0.5 };
-        const glm::vec3 PINK = { 1, 0.753, 0.796 };
-        const glm::vec3 LIME = { 0, 1, 0 };
-        const glm::vec3 NAVY = { 0, 0, 0.5 };
-        const glm::vec3 MAROON = { 0.5, 0, 0 };
-        const glm::vec3 OLIVE = { 0.5, 0.5, 0 };
-        const glm::vec3 TURQUOISE = { 0.251, 0.878, 0.816 };
-        const glm::vec3 INDIGO = { 0.294, 0, 0.51 };
+        const glm::vec4 BLACK = { 0, 0, 0, 1 };
+        const glm::vec4 WHITE = { 1, 1, 1, 1 };
+        const glm::vec4 RED = { 1, 0, 0, 1 };
+        const glm::vec4 GREEN = { 0, 1, 0, 1 };
+        const glm::vec4 BLUE = { 0, 0, 1, 1 };
+        const glm::vec4 YELLOW = { 1, 1, 0, 1 };
+        const glm::vec4 CYAN = { 0, 1, 1, 1 };
+        const glm::vec4 MAGENTA = { 1, 0, 1, 1 };
+        const glm::vec4 GRAY = { 0.5, 0.5, 0.5, 1 };
+        const glm::vec4 BROWN = { 0.647, 0.165, 0.165, 1 };
+        const glm::vec4 ORANGE = { 1, 0.647, 0, 1 };
+        const glm::vec4 PURPLE = { 0.5, 0, 0.5, 1 };
+        const glm::vec4 TEAL = { 0, 0.5, 0.5, 1 };
+        const glm::vec4 PINK = { 1, 0.753, 0.796, 1 };
+        const glm::vec4 LIME = { 0, 1, 0, 1 };
+        const glm::vec4 NAVY = { 0, 0, 0.5, 1 };
+        const glm::vec4 MAROON = { 0.5, 0, 0, 1 };
+        const glm::vec4 OLIVE = { 0.5, 0.5, 0, 1 };
+        const glm::vec4 TURQUOISE = { 0.251, 0.878, 0.816, 1 };
+        const glm::vec4 INDIGO = { 0.294, 0, 0.51, 1 };
     } color;
 
     template<typename T>

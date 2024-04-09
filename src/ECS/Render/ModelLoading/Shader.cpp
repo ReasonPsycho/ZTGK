@@ -105,13 +105,13 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
         if (!success) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
             spdlog::error(
-                    "Shader in path: " + stringFragmentPath + " has compilation error of type: " + type + infoLog);
+                    "Shader in editor_path: " + stringFragmentPath + " has compilation error of type: " + type + infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            spdlog::error("Shader in path: " + stringVertexPath + " has compilation error of type: " + type + infoLog);
+            spdlog::error("Shader in editor_path: " + stringVertexPath + " has compilation error of type: " + type + infoLog);
         }
     }
 }
@@ -142,7 +142,7 @@ void Shader::initWithGeometry() {
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-        // if geometry shader path is present, also load a geometry shader
+        // if geometry shader editor_path is present, also load a geometry shader
         if (geometryPath != nullptr) {
             gShaderFile.open(geometryPath);
             std::stringstream gShaderStream;

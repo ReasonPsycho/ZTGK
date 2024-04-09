@@ -60,11 +60,11 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
-TextRenderer* textRenderer = nullptr;
-Text text1 = {};
-Text text2 = {};
-SpriteRenderer* spriteRenderer = nullptr;
-Sprite * sprite;
+//TextRenderer* textRenderer = nullptr;
+//Text text1 = {};
+//Text text2 = {};
+//SpriteRenderer* spriteRenderer = nullptr;
+//Sprite * sprite;
 HUD hud;
 
 shared_ptr<spdlog::logger> file_logger;
@@ -182,24 +182,16 @@ int main(int, char **) {
         spdlog::error("Failed to initialize project!");
         return EXIT_FAILURE;
     }
-    spdlog::info("Initialized project.");
-    file_logger->info("Initialized project.");
+    spdlog::info("Initialized OpenGL.");
 
     init_systems();
     spdlog::info("Initialized textures and vertices.");
-    file_logger->info("Initialized textures and vertices.");
-
-    load_enteties();
-    spdlog::info("Initialized entities.");
-    file_logger->info("Initialized entities.");
 
     init_imgui();
     spdlog::info("Initialized ImGui.");
-    file_logger->info("Initialized ImGui.");
 
     init_camera();
     spdlog::info("Initialized camera and viewport.");
-    file_logger->info("Initialized camera and viewport.");
 
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
@@ -208,19 +200,17 @@ int main(int, char **) {
 
     signalQueue.init();
     spdlog::info("Initialized signal queue.");
-    file_logger->info("Initialized signal queue.");
 
     init_time();
-
     spdlog::info("Initialized system timer.");
-    file_logger->info("Initialized system timer.");
 
     init_text();
     spdlog::info("Initialized text renderer.");
 
-    spdlog::info("Initialized game clock.");
-    file_logger->info("Initialized game clock.");
-
+    hud.init();
+    scene.systemManager.addSystem(&hud);
+    load_enteties();
+    spdlog::info("Initialized entities.");
 
 #pragma endregion Init
 //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
@@ -256,37 +246,37 @@ int main(int, char **) {
                 // Draw ImGui
         imgui_begin();
 
-        static int textsign = 1;
-        static int textyy = 0;
-        textyy += textsign;
-        if (textyy > 1000 || textyy < -10)
-            textsign *= -1;
-        text1.pos.y = textyy;
+//        static int textsign = 1;
+//        static int textyy = 0;
+//        textyy += textsign;
+//        if (textyy > 1000 || textyy < -10)
+//            textsign *= -1;
+//        text1.pos.y = textyy;
 
-        ImGui::Begin("Text");
-        ImGui::SliderFloat("P:x", &text2.pos.x, -10, 2000);
-        ImGui::SliderFloat("P:y", &text2.pos.y, -10, 1000);
-        ImGui::SliderFloat("S:y", &text2.scale.y, 0, 2);
-        if ( ImGui::Button("lato") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Lato)); }
-        if ( ImGui::Button("arimo") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Arimo)); }
-        if ( ImGui::Button("nunito") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Nunito)); }
-        if ( ImGui::Button("quicksand") ) { textRenderer->setFont({ ztgk::font.Reg_Quicksand, ztgk::font.Reg_Quicksand, ztgk::font.Bld_Quicksand, ztgk::font.Bld_Quicksand }); }
-        if ( ImGui::Button("concert") ) { textRenderer->setFont({ ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert }); }
-        if ( ImGui::Button("lobster") ) { textRenderer->setFont({ ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster }); }
-        if ( ImGui::Button("novamono") ) { textRenderer->setFont({ ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono }); }
-        ImGui::End();
+//        ImGui::Begin("Text");
+//        ImGui::SliderFloat("P:x", &text2.pos.x, -10, 2000);
+//        ImGui::SliderFloat("P:y", &text2.pos.y, -10, 1000);
+//        ImGui::SliderFloat("S:y", &text2.scale.y, 0, 2);
+//        if ( ImGui::Button("lato") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Lato)); }
+//        if ( ImGui::Button("arimo") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Arimo)); }
+//        if ( ImGui::Button("nunito") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Nunito)); }
+//        if ( ImGui::Button("quicksand") ) { textRenderer->setFont({ ztgk::font.Reg_Quicksand, ztgk::font.Reg_Quicksand, ztgk::font.Bld_Quicksand, ztgk::font.Bld_Quicksand }); }
+//        if ( ImGui::Button("concert") ) { textRenderer->setFont({ ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert }); }
+//        if ( ImGui::Button("lobster") ) { textRenderer->setFont({ ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster }); }
+//        if ( ImGui::Button("novamono") ) { textRenderer->setFont({ ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono }); }
+//        ImGui::End();
 
-        textRenderer->render(text1);
-        textRenderer->render(text2);
+//        textRenderer->render(text1);
+//        textRenderer->render(text2);
 
-        hud.spriteRenderer->render(*sprite);
+//        hud.spriteRenderer->render(*sprite);
 
-//        hud.draw();
+        hud.draw();
 //        spriteRenderer->render(*sprite);
-        ImGui::Begin("Szprite");
-        ImGui::SliderFloat("S:w", &sprite->size.x, -10, 1000);
-        ImGui::SliderFloat("S:h", &sprite->size.y, -10, 1000);
-        ImGui::End();
+//        ImGui::Begin("Szprite");
+//        ImGui::SliderFloat("S:w", &sprite->size.x, -10, 1000);
+//        ImGui::SliderFloat("S:h", &sprite->size.y, -10, 1000);
+//        ImGui::End();
 
         ImGui::Begin("Group 0");
         ImGui::DragFloat("O:x", &hud.groups[0].offset.x);
@@ -340,9 +330,9 @@ int main(int, char **) {
 #pragma region Functions
 
 void cleanup() {
-    delete textRenderer;
-    delete sprite;
-    delete spriteRenderer;
+//    delete textRenderer;
+//    delete sprite;
+//    delete spriteRenderer;
 
     //Orginal clean up
     ImGui_ImplOpenGL3_Shutdown();
@@ -428,8 +418,6 @@ void init_systems() {
     PBRPrimitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    hud.init();
-    scene.systemManager.addSystem(&hud);
 
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
@@ -472,8 +460,26 @@ void load_enteties() {
      */
 
     gameObject = scene.addEntity("HUD DEMO");
+    auto text1 = Text("Tekst1");
     gameObject->addComponent(make_unique<Text>(text1));
-    gameObject->addComponent(make_unique<Text>(text2));
+//    auto text2 = Text("Tekst2", {300, 300});
+//    gameObject->addComponent(make_unique<Text>(text2));
+    auto sprite1 = Sprite("res/textures/stone.jpg");
+    gameObject->addComponent(make_unique<Sprite>(sprite1));
+//    gameObject->addComponent(make_unique<Sprite>("res/textures/stone.jpg"));
+//    auto sprite2 = Sprite("res/textures/container2.png");
+//    gameObject->addComponent(make_unique<Sprite>(sprite2));
+//    text1.content = "TEEEEKST";
+//    text1.pos = { 50, 500 };
+//    text1.color = ztgk::color.TURQUOISE;
+//
+//    text2.content = "INNY TEEEEEKST";
+//    text2.pos = { 500, 100 };
+//    gameObject->addComponent(make_unique<Text>(text1));
+//    gameObject->addComponent(make_unique<Text>(text2));
+//    auto spr = Sprite{};
+//    spr.load("res/textures/stone.jpg");
+//    gameObject->addComponent<Sprite>(make_unique<Sprite>());
 }
 
 void init_imgui() {
@@ -496,20 +502,20 @@ void init_imgui() {
 }
 
 void init_text() {
-    textRenderer = new TextRenderer();
-
-    text1.content = "TEEEEKST";
-    text1.pos = { 50, 500 };
-    text1.color = ztgk::color.TURQUOISE;
-
-    text2.content = "INNY TEEEEEKST";
-    text2.pos = { 500, 100 };
-    text2.style = TextStyle::BOLD | TextStyle::ITALIC;
-
-    spriteRenderer = new SpriteRenderer(&hud);
-    sprite = new Sprite();
-    sprite->load("res/textures/stone.jpg");
-    sprite->color = ztgk::color.RED;
+//    textRenderer = new TextRenderer();
+//
+//    text1.content = "TEEEEKST";
+//    text1.pos = { 50, 500 };
+//    text1.color = ztgk::color.TURQUOISE;
+//
+//    text2.content = "INNY TEEEEEKST";
+//    text2.pos = { 500, 100 };
+//    text2.style = TextStyle::BOLD | TextStyle::ITALIC;
+//
+//    spriteRenderer = new SpriteRenderer(&hud);
+//    sprite = new Sprite();
+//    sprite->load("res/textures/stone.jpg");
+//    sprite->color = ztgk::color.RED;
 //    text.init();
 }
 

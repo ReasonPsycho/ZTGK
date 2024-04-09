@@ -16,7 +16,7 @@ class SpriteRenderer {
 
 public:
     explicit SpriteRenderer(HUD * hud);
-    void render(Sprite sprite);
+    void render(Sprite * sprite);
 
     HUD * hud;
 private:

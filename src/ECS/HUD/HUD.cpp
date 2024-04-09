@@ -10,7 +10,7 @@ void HUD::init() {
 
     Group default_group;
     groups[default_group.id] = default_group;
-    textRenderer = make_unique<TextRenderer>();
+    textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
 }
 
@@ -26,10 +26,10 @@ void HUD::drawGroup(unsigned int groupID) {
         groupID = 0;
     }
     if ( groups[groupID].hidden ) return;
-    for ( auto & sprite : sprites[groupID] ) {
+    for ( auto sprite : sprites[groupID] ) {
         spriteRenderer->render(sprite);
     }
-    for ( auto & text : texts[groupID] ) {
+    for ( auto text : texts[groupID] ) {
         textRenderer->render(text);
     }
 }
@@ -43,22 +43,36 @@ Group * HUD::addGroup(glm::vec2 offset, bool hidden) {
 }
 
 void HUD::addComponent(void *component) {
-    if ( typeid(component) == typeid(Sprite*) ) {
-        auto sprite = *(Sprite*)component;
-        sprites[sprite.HUDGroupID].push_back(sprite);
-    } else if ( typeid(component) == typeid(Text*) ) {
-        auto text = *(Text*)component;
-        texts[text.HUDGroupID].push_back(text);
+    auto c = (AHUDComponent*)component;
+    switch (c->type) {
+        case AHUDComponent::SPRITE: {
+            Sprite * sprite = (Sprite *) component;
+            if (!sprites.contains(sprite->groupID))
+                sprites[sprite->groupID] = {};
+            sprites[sprite->groupID].push_back(sprite);
+            break;
+        }
+        case AHUDComponent::TEXT: {
+            Text * text = (Text *)component;
+            if (!texts.contains(text->groupID))
+                texts[text->groupID] = {};
+            texts[text->groupID].push_back(text);
+            break;
+        }
     }
 }
 
 void HUD::removeComponent(void *component) {
-    if ( typeid(component) == typeid(Sprite*) ) {
-        auto sprite = *(Sprite*)component;
-        erase_if(sprites[sprite.HUDGroupID], [sprite](const Sprite & spr){ return spr.uniqueID == sprite.uniqueID; });
-    } else if ( typeid(component) == typeid(Text*) ) {
-        auto text = *(Text*)component;
-        erase_if(texts[text.HUDGroupID], [text](const Text & txt) { return txt.uniqueID == text.uniqueID; });
+    auto c = (AHUDComponent*)component;
+    switch (c->type) {
+        case AHUDComponent::SPRITE: {
+            erase(sprites[c->groupID], dynamic_cast<Sprite *>(c));
+            break;
+        }
+        case AHUDComponent::TEXT: {
+            erase(texts[c->groupID], dynamic_cast<Text *>(c));
+            break;
+        }
     }
 }
 

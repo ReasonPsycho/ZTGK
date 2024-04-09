@@ -44,7 +44,8 @@ namespace ztgk {
             return { base + regular, base + bold, base + italic, base + bold_italic };
         }
 
-        const FontFamily default_font = family(Fam_Lato);
+        const std::string default_font = Fam_Lato + regular;
+        const FontFamily default_family = family(Fam_Lato);
     } static font;
 
 

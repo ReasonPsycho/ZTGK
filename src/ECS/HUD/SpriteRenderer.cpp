@@ -31,14 +31,12 @@ SpriteRenderer::SpriteRenderer(HUD * hud) : hud(hud), shader("res/shaders/hud_sp
     shader.init();
 }
 
-void SpriteRenderer::render(Sprite sprite) {
-    if (hud->groups[sprite.HUDGroupID].hidden) return;
-
+void SpriteRenderer::render(Sprite * sprite) {
     shader.use();
-    glBindTexture(GL_TEXTURE_2D, sprite.texture);
-    float xpos = sprite.pos.x + hud->groups[sprite.HUDGroupID].offset.x;
-    float ypos = sprite.pos.y + hud->groups[sprite.HUDGroupID].offset.y;
-    float w = sprite.size.x, h = sprite.size.y;
+    glBindTexture(GL_TEXTURE_2D, sprite->texture);
+    float xpos = sprite->pos.x + hud->groups[sprite->groupID].offset.x;
+    float ypos = sprite->pos.y + hud->groups[sprite->groupID].offset.y;
+    float w = sprite->size.x, h = sprite->size.y;
 
     float vertices[] = {
             xpos,     ypos + h, 0.0f, 0.0f,
@@ -51,7 +49,7 @@ void SpriteRenderer::render(Sprite sprite) {
     };
 
     shader.setMatrix4("projection", false, glm::value_ptr(projection));
-    shader.setVec4("texColor", glm::vec4(sprite.color, 1.0f));
+    shader.setVec4("texColor", sprite->color);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

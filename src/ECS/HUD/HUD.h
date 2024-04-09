@@ -27,8 +27,8 @@ public:
     int getNumComponentTypes() override { return 2; }
     void showImGuiDetails(Camera *camera) override;
 
-    std::unordered_map<unsigned, std::vector<Sprite>> sprites;
-    std::unordered_map<unsigned, std::vector<Text>> texts;
+    std::unordered_map<unsigned, std::vector<Sprite*>> sprites;
+    std::unordered_map<unsigned, std::vector<Text*>> texts;
 
 private:
     std::array<std::type_index, 2> componentTypes = {
