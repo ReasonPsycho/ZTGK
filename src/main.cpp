@@ -464,11 +464,14 @@ void load_enteties() {
     gameObject->addComponent(make_unique<Text>(text1));
 //    auto text2 = Text("Tekst2", {300, 300});
 //    gameObject->addComponent(make_unique<Text>(text2));
+    auto child = scene.addEntity(gameObject, "Sprite1");
     auto sprite1 = Sprite("res/textures/container2.png");
-    gameObject->addComponent(make_unique<Sprite>(sprite1));
-//    gameObject->addComponent(make_unique<Sprite>("res/textures/stone.jpg"));
-//    auto sprite2 = Sprite("res/textures/container2.png");
-//    gameObject->addComponent(make_unique<Sprite>(sprite2));
+    child->addComponent(make_unique<Sprite>(sprite1));
+    child = scene.addEntity(gameObject, "Sprite2");
+    child->addComponent(make_unique<Sprite>("res/textures/stone.jpg"));
+    child = scene.addEntity(gameObject, "Sprite3");
+    auto sprite2 = Sprite("res/textures/container2.png");
+    child->addComponent(make_unique<Sprite>(sprite2));
 //    text1.content = "TEEEEKST";
 //    text1.pos = { 50, 500 };
 //    text1.color = ztgk::color.TURQUOISE;

@@ -43,19 +43,15 @@ Group * HUD::addGroup(glm::vec2 offset, bool hidden) {
 }
 
 void HUD::addComponent(void *component) {
-    auto c = (AHUDComponent*)component;
+    auto c = static_cast<AHUDComponent*>(component);
     switch (c->type) {
         case AHUDComponent::SPRITE: {
-            Sprite * sprite = (Sprite *) component;
-            if (!sprites.contains(sprite->groupID))
-                sprites[sprite->groupID] = {};
+            Sprite * sprite = reinterpret_cast<Sprite*>(component);
             sprites[sprite->groupID].push_back(sprite);
             break;
         }
         case AHUDComponent::TEXT: {
-            Text * text = (Text *)component;
-            if (!texts.contains(text->groupID))
-                texts[text->groupID] = {};
+            Text * text = reinterpret_cast<Text*>(component);
             texts[text->groupID].push_back(text);
             break;
         }
