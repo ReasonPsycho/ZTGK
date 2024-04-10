@@ -6,6 +6,7 @@
 #define ZTGK_COLLIDER_H
 #include "../ECS/Component.h"
 #include "ECS/Render/Components/Render.h"
+#include "ECS/Render/Primitives/Primitives.h"
 
 class Ray;
 
@@ -21,10 +22,8 @@ public:
     Collider() : Component() { this -> name = "Collider"; }
     virtual ~Collider() = default;
     ColliderType type;
-    Model *model;
+    virtual void drawWire(Shader *shader, Primitives *primitives) = 0;
     void showImGuiDetails(Camera *camera) override;
-    std::unique_ptr<Render> render = std::make_unique<Render>(Render(nullptr));
-
 
 };
 

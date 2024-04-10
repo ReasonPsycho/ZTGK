@@ -19,14 +19,19 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, Model* pModel) {
     this->center = entity->transform.getLocalPosition();
     this->size = size;
     this->type = ColliderType::BOX;
-    this->model = pModel;
-    this->render = std::make_unique<Render>(Render(pModel));
-    this->render->parentEntity = entity;
-    this->render->name = "Box Collider Render";
+
 
 }
 
 void BoxCollider::update() {
     center = getEntity()->transform.getLocalPosition();
+}
+
+void BoxCollider::drawWire(Shader *shader, Primitives *primitives) {
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
+
+    shader->setMatrix4("model", false, glm::value_ptr(translation * scale));
+    primitives->renderCube();
 }
 

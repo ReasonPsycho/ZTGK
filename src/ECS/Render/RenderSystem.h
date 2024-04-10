@@ -19,10 +19,10 @@ public:
     int getNumComponentTypes() override { return 1;};
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
-
+    void showImGuiDetails(Camera *camera);
     void DrawScene(Shader* regularShader);
     void SimpleDrawScene(Shader* regularShader);
-    void showImGuiDetails(Camera *camera);
+
 
 private:
     std::vector<Render *> renderComponents;

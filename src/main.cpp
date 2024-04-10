@@ -48,6 +48,7 @@
 #include "ECS/Render/FrustumCulling/Frustum.h"
 #include "Raycasting/Colliders/BoxCollider.h"
 #include "Raycasting/Ray.h"
+#include "ECS/Render/WireRenderer.h"
 
 
 #pragma endregion Includes
@@ -155,6 +156,7 @@ PBRPrimitives PBRPrimitives;
 LightSystem lightSystem(&camera,&scene);
 PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
+WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
 
 
@@ -353,11 +355,12 @@ void init_systems() {
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&signalQueue);
+    scene.systemManager.addSystem(&wireRenderer);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-
+    wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
 
     Material whiteMaterial = Material(myColor);
@@ -377,8 +380,8 @@ void load_enteties() {
     //create new cube model that will fit exactly to the size of the BoxCollider added to the asteroid
 
     gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
-    for (unsigned int i = 0; i < 2; ++i) {gameObject = scene.addEntity(gameObject, "asteroid");
-        gameObject->addComponent(make_unique<Render>(&model));
+    for (unsigned int i = 0; i < 2; ++i) {
+        gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
@@ -471,9 +474,8 @@ void render() {
     pbrSystem.pbrShader.use();
 
     renderSystem.DrawScene(&pbrSystem.pbrShader);
-//    for (Collider *collider: scene.getColliders()) {
-//        collider->render->draw(pbrSystem.pbrShader);
-//    }
+     wireRenderer.DrawColliders();
+     wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -671,14 +673,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
         // Create ray from mouse position
         spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
-        Ray ray = Ray(camera.Position, glm::vec3(ray_world), &scene);
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, glm::vec3(ray_world), &scene);
         //Ray ray = Ray(camera.Position, camera.Front, &scene);
-        if(ray.getHitEntity() != nullptr){
-            spdlog::info("Hit entity: {}", ray.getHitEntity()->name);
+        if(ray->getHitEntity() != nullptr){
+            spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
         }
         else{
             spdlog::info("No hit entity");
         }
+
+        wireRenderer.rayComponents.push_back(std::move(ray));        
     }
 }
 

@@ -24,6 +24,25 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
         return;
     }
 
+    rayPoints[0]  = origin.x;
+    rayPoints[1]  = origin.y;
+    rayPoints[2]  = origin.z;
+    rayPoints[3]  = origin.x + direction.x * 10000;
+    rayPoints[4]  = origin.y + direction.y * 10000;
+    rayPoints[5]  = origin.z + direction.z * 10000;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rayPoints), &rayPoints, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindVertexArray(0);
+    
     for (auto collider : colliders) {
         if (collider == nullptr) {
             spdlog::error("IN RAY CONSTRUCTOR: Collider is null");
@@ -144,6 +163,12 @@ glm::vec3 Ray::RayHitPoint() {
  */
 Entity* Ray::getHitEntity() {
     return hitEntity;
+}
+
+void Ray::drawWire(Shader *shader) {
+    shader->setMatrix4("model", false, glm::value_ptr(glm::mat4x4(1)));
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, 2);
 }
 
 

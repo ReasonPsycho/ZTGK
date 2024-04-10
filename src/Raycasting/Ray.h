@@ -18,11 +18,14 @@ public:
 
     bool doesCollide(Collider* collider) const;
     glm::vec3 GetRayHit(ColliderType type, Collider* collider) const;
+    void drawWire(Shader* shader);
 
     glm::vec3 RayHitPoint();
     Entity* getHitEntity();
 
 private:
+    float rayPoints[6];
+    unsigned int VBO, VAO;
     glm::vec3 RayHit;
     glm::vec3 defaultHit = glm::vec3(std::numeric_limits<float>::infinity());
     Entity* hitEntity = nullptr;
