@@ -5,6 +5,8 @@
 #ifndef ZTGK_COLLIDER_H
 #define ZTGK_COLLIDER_H
 #include "../ECS/Component.h"
+#include "ECS/Render/Components/Render.h"
+
 class Ray;
 
 enum ColliderType{
@@ -16,11 +18,14 @@ enum ColliderType{
 
 class Collider : public Component{
 public:
-    Collider() : Component() {this->name = "Collider";};
+    Collider() : Component() { this -> name = "Collider"; }
     virtual ~Collider() = default;
     ColliderType type;
-
+    Model *model;
     void showImGuiDetails(Camera *camera) override;
+    std::unique_ptr<Render> render = std::make_unique<Render>(Render(nullptr));
+
+
 };
 
 

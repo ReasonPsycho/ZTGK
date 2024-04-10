@@ -258,37 +258,6 @@ int main(int, char **) {
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
-//        file_logger->info("Text");
-//
-//        //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-//        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
-//
-//        if(lastTextx > 450){
-//            signx = -1;
-//        }
-//        if(lastTextx < 0){
-//            signx = 1;
-//        }
-//        if(lastTexty > 550){
-//            signy = -1;
-//        }
-//        if(lastTexty < 0){
-//            signy = 1;
-//        }
-//
-//        textx = lastTextx + signx;
-//        texty = lastTexty + signy;
-//
-//        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
-//
-//        lastTextx = textx;
-//        lastTexty = texty;
-//
-//        string numberString = to_string(number);
-//        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
-//        number++;
-        //____________________________________________________________________________________________________
-
         // End frame and swap buffers (double buffering)
         file_logger->info("End frame");
         end_frame();
@@ -401,16 +370,19 @@ void load_enteties() {
     tileModel.loadModel();
     Entity *gameObject = scene.addEntity("asteroid");
     gameObject->transform.setLocalPosition({-0, 0, 0});
-    const float scale = 10;
+    const float scale = 5;
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(make_unique<Render>(cubeModel));
-    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{11.0f, 11.0f, 11.0f}));
+
+    //create new cube model that will fit exactly to the size of the BoxCollider added to the asteroid
+
+    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
     for (unsigned int i = 0; i < 2; ++i) {gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(make_unique<Render>(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
-        gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + i + 1, 1.0f, 1.0f}));
+        gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + i + 1, 1.0f, 1.0f}, cubeModel));
     }
     //gameObject = scene.addEntity("Dir light");
     //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
@@ -499,7 +471,9 @@ void render() {
     pbrSystem.pbrShader.use();
 
     renderSystem.DrawScene(&pbrSystem.pbrShader);
-
+//    for (Collider *collider: scene.getColliders()) {
+//        collider->render->draw(pbrSystem.pbrShader);
+//    }
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -696,19 +670,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         ray_world = glm::normalize(ray_world);
 
         // Create ray from mouse position
-        //spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
-        //Ray ray = Ray(camera.Position, glm::vec3(ray_world), &scene);
-        Ray ray = Ray(camera.Position, camera.Front, &scene);
+        spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
+        Ray ray = Ray(camera.Position, glm::vec3(ray_world), &scene);
+        //Ray ray = Ray(camera.Position, camera.Front, &scene);
         if(ray.getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray.getHitEntity()->name);
         }
         else{
             spdlog::info("No hit entity");
         }
-
-        // Now you can use this ray for raycasting
-        // For example:
-        // ray.IntersectWithSomeObject();
     }
 }
 
