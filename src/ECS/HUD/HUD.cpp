@@ -4,6 +4,7 @@
 
 #include "HUD.h"
 #include <ranges>
+#include <algorithm>
 using namespace std;
 
 void HUD::init() {
