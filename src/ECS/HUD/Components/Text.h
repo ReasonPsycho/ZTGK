@@ -16,11 +16,7 @@ enum TextStyle {
     UNDERSCORE      = 1 << 0,
     STRIKETHROUGH   = 1 << 1,
     OVERLINE        = 1 << 2,
-    BOX             = 1 << 3,
-
-    // we are loading the basic ascii table of 128 chars, these values can directly work as array indexing offset for their effects
-    ITALIC          = 1 << 7,   //128
-    BOLD            = 1 << 8,   //256
+//    BOX             = 1 << 3,
 };
 
 class Text : public AHUDComponent {

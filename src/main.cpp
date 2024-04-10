@@ -228,7 +228,7 @@ int main(int, char **) {
         Ray r = Ray(camera.Position, camera.Front, &scene);
         std::cout<< "Raycast: " << r.RayHitPoint().x << " " << r.RayHitPoint().y << " " << r.RayHitPoint().z << std::endl;
         */
-  
+
         // Draw ImGui
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
