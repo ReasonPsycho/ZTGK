@@ -32,22 +32,20 @@ public:
 
     virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
 
-    virtual void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader,
-                                   Shader *instanceShadowMapShader) = 0; // Pure virtual function
-    virtual void InnitShadow() = 0;
-    virtual void UpdateData() = 0;
-
+    virtual void
+    SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
+                      int height, GLuint ShadowMapArrayId, int index) = 0; // Pure virtual function
+    virtual void Innit(int width, int height, int index) = 0;
+    virtual void UpdateData(int height, int width) = 0;
+    unsigned int depthMap{};
     void DeleteShadow();
 
-    unsigned int depthMap{};
-    
-protected:
-    int uniqueID;     // Instance variable to store the unique ID for each object
 
-    //For shadows
+protected:
     bool initializedShadow = false;
     unsigned int depthMapFBO{};
-    const unsigned int SHADOW_WIDTH = 512, SHADOW_HEIGHT = 512;
+
+    //For shadows
     glm::mat4 shadowProj{};
 };
 

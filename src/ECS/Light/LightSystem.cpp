@@ -70,8 +70,19 @@ name = "Light system";
 }
 
 void LightSystem::GenerateShadowBuffers() {
-    for (auto &light: lights) {
-        light->InnitShadow();
+    int index = 0;
+    for (auto &light: dirLights) {
+        light->Innit(SHADOW_WIDTH, SHADOW_HEIGHT, index++);
+    }
+
+    for (auto &light: spotLights) {
+        light->Innit(SHADOW_WIDTH, SHADOW_HEIGHT, index++);
+
+    }
+    
+    index = 0;
+    for (auto &light: pointLights) {
+        light->Innit(SHADOW_WIDTH, SHADOW_HEIGHT, index++);
     }
 }
 
@@ -85,65 +96,86 @@ void LightSystem::Init() {
     glGenBuffers(1, &dirLightBufferId);
     glGenBuffers(1, &pointLightBufferId);
     glGenBuffers(1, &spotLightBufferId);
+
+    GLubyte whitePixel[3] = {255, 255, 255};
+    GLubyte *whiteImage = new GLubyte[SHADOW_WIDTH * SHADOW_HEIGHT * 3];
+    for(int i = 0; i < SHADOW_WIDTH * SHADOW_HEIGHT * 3; i += 3) {
+        whiteImage[i] = whitePixel[0];
+        whiteImage[i + 1] = whitePixel[1];
+        whiteImage[i + 2] = whitePixel[2];
+    }
+
+    glGenTextures(1, &planeShadowMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
+    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGB8, SHADOW_WIDTH, SHADOW_HEIGHT, dirLights.size() + spotLights.size()); //TODO gonna need optimilize it giving IDK a 100 lights to start
+
+    for(GLsizei layer = 0; layer <  dirLights.size() + spotLights.size(); layer++) {
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE, whiteImage);
+    }
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    glGenTextures(1, &cubeShadowMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, cubeShadowMaps);
+    glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_RGB8, SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size()); //TODO gonna need optimilize it giving IDK a 100 lights to start
+    for(GLsizei layer = 0; layer <  pointLights.size(); layer++) {
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE, whiteImage);
+    }
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    delete[] whiteImage;
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     
     PushToSSBO();
 }
-
-
-int TEXTURE_UNITS_OFFSET = 8;
-int POINT_SHADOW_OFFSET = TEXTURE_UNITS_OFFSET + 5;
+int CUBE_SHADOW_INDEX = 8;
+int PLANE_SHADOW_TEXTURE_INDEX = 9;
 
 void LightSystem::PushDepthMapsToShader(Shader *shader) { 
-    int planeShadowIndex = 0, cubeShadowIndex = 0;
+    int planeShadowIndex = PLANE_SHADOW_TEXTURE_INDEX, cubeShadowIndex = CUBE_SHADOW_INDEX;
     for (auto &light: lights) {
         if (light->lightType == Point) {
             std::string number = std::to_string(cubeShadowIndex);
-            glActiveTexture(GL_TEXTURE0 + TEXTURE_UNITS_OFFSET +
-                            cubeShadowIndex); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
+            glActiveTexture(GL_TEXTURE0 + cubeShadowIndex); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
             glBindTexture(GL_TEXTURE_CUBE_MAP, light->depthMap);
-            glUniform1i(glGetUniformLocation(shader->ID, ("cubeShadowMaps[" + number + "]").c_str()),
-                        TEXTURE_UNITS_OFFSET + cubeShadowIndex);
+            glUniform1i(glGetUniformLocation(shader->ID, ("cubeShadowMaps[" + number + "]").c_str()), cubeShadowIndex);
             cubeShadowIndex++;
         } else {
             std::string number = std::to_string(planeShadowIndex);
-            glActiveTexture(GL_TEXTURE0 + POINT_SHADOW_OFFSET +
-                            planeShadowIndex); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
+            glActiveTexture(GL_TEXTURE0 + planeShadowIndex); // TEXTURE_UNITS_OFFSET is the number of non-shadow map textures you have
             glBindTexture(GL_TEXTURE_2D, light->depthMap);
-            glUniform1i(glGetUniformLocation(shader->ID, ("planeShadowMaps[" + number + "]").c_str()),
-                        POINT_SHADOW_OFFSET + planeShadowIndex);
+            glUniform1i(glGetUniformLocation(shader->ID, ("planeShadowMaps[" + number + "]").c_str()), planeShadowIndex);
             planeShadowIndex++;
         }
-
     }
 }
 
 void LightSystem::Update(double deltaTime) {
+
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,dirLights.size() + spotLights.size(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, cubeShadowMaps);
+    glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size() , 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     GLenum err;
     int offset = 0;
+    int index = 0;
     RenderSystem* renderSystem = scene->systemManager.getSystem<RenderSystem>();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
         if (light->getIsDirty()) {  // Only push it if it's dirty
-            light->UpdateData();
+            light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,sizeof(DirLightData), &light->data);
         }
-        light->SetUpShadowBuffer(Normal, &planeDepthShader,&instancePlaneDepthShader);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        light->SetUpShadowBuffer(Normal, &planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT, planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
-        offset += sizeof(light->data);
-    }
-
-    offset = 0;
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
-    for (auto &light: pointLights) {
-        if (light->getIsDirty()) {  // Only push it if it's dirty
-            light->UpdateData();
-            glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
-            
-        }
-        light->SetUpShadowBuffer(Normal, &cubeDepthShader,&instanceCubeDepthShader);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        renderSystem->SimpleDrawScene(&cubeDepthShader);
         offset += sizeof(light->data);
     }
 
@@ -151,15 +183,27 @@ void LightSystem::Update(double deltaTime) {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
     for (auto &light: spotLights) {
         if (light->getIsDirty()) {  // Only push it if it's dirty
-            light->UpdateData();
+            light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,  sizeof(SpotLightData), &light->data);
         }
-        light->SetUpShadowBuffer(Normal, &planeDepthShader,&instancePlaneDepthShader);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        light->SetUpShadowBuffer(Normal, &planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT, planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
         offset += sizeof(light->data);
     }
-     
+
+    index = 0;
+    offset = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
+    for (auto &light: pointLights) {
+        if (light->getIsDirty()) {  // Only push it if it's dirty
+            light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
+            
+        }
+        light->SetUpShadowBuffer(Normal, &cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT, cubeShadowMaps, index++);
+        renderSystem->SimpleDrawScene(&cubeDepthShader);
+        offset += sizeof(light->data);
+    }
 }
 
 void LightSystem::addComponent(void *component) {

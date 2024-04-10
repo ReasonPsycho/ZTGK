@@ -64,10 +64,11 @@ public:
 
     void showImGuiDetails(Camera *camera) override;
     
-    void InnitShadow() override;
+    void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
-    void UpdateData() override;
+    void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
+                           int height, GLuint ShadowMapArrayId, int index) override; // Pure virtual function
+    void UpdateData(int height, int width) override;
 
 };
 
