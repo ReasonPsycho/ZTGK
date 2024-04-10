@@ -459,8 +459,10 @@ void load_enteties() {
     grid->RenderTiles(&scene, 0.011f, &tileModel);
      */
 
+    hud.addGroup();
     gameObject = scene.addEntity("HUD DEMO");
     auto text1 = Text("Tekst1");
+    text1.groupID = 1;
     gameObject->addComponent(make_unique<Text>(text1));
 //    auto text2 = Text("Tekst2", {300, 300});
 //    gameObject->addComponent(make_unique<Text>(text2));
@@ -600,11 +602,28 @@ void imgui_begin() {
 void imgui_render() {
 
 
-    
-    ImGui::Begin("Debug menu");
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
-    ImGui::Text(buffer);
+    static double fps_max = -1;
+    static double max_timestamp;
+    static double fps_min = 1000000;
+    static double min_timestamp;
+    auto fps = 1.0f / deltaTime;
+    if (fps > fps_max) {
+        fps_max = fps;
+        max_timestamp = Time::Instance().LastFrame();
+    }
+    if (fps < fps_min) {
+        fps_min = fps;
+        min_timestamp = Time::Instance().LastFrame();
+    }
+    ImGui::Begin(format("FPS: {:.2f} H: {:.2f} L: {:.2f}###FPS_COUNTER", fps, fps_max, fps_min).c_str());
+    ImGui::Text("%s", std::format("High @ {:.3f}", max_timestamp).c_str());
+    ImGui::Text("%s", std::format("Low @ {:.3f}", min_timestamp).c_str());
+    if (ImGui::Button("Clear")) {
+        fps_max = -1;
+        max_timestamp = 0;
+        fps_min = 1000000;
+        min_timestamp = 0;
+    }
 
     //lightSystem.showLightTree();
     ImGui::End();

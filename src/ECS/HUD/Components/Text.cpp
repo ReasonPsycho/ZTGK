@@ -7,7 +7,7 @@
 Text::Text(const std::string &content, const glm::vec2 &pos, const glm::vec2 &scale, const glm::vec4 &color,
            const std::string &font, TextStyle style, unsigned int hudGroupId)
 : AHUDComponent(TEXT, hudGroupId), content(content), pos(pos), scale(scale), color(color), font(font), style(style) {
-    name = "Text";
+    name = std::format("Text: {}###{}", content, uniqueID);
     strcpy_s(editor_content_buffer, content.c_str());
     strcpy_s(editor_font_buffer, font.c_str());
 }
@@ -17,10 +17,12 @@ void Text::showImGuiDetails(Camera *camera) {
     ImGui::DragFloat2("Scale", glm::value_ptr(scale), 0.01);
     ImGui::ColorEdit4("Color", glm::value_ptr(color));
     ImGui::InputText("Content", editor_content_buffer, 100);
-    content = editor_content_buffer;
+    if ( content != editor_content_buffer ) {
+        content = editor_content_buffer;
+        name = std::format("Text: {}###{}", content, uniqueID);
+    }
     ImGui::InputInt("Group ID", reinterpret_cast<int *>(&groupID));
 
-//    ImGui::LabelText("Font", "");
     ImGui::Text("Font");
 
     ImGui::InputText("Path", editor_font_buffer, editor_buffer_size);

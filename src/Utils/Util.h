@@ -16,12 +16,12 @@ namespace ztgk {
     static constexpr short ID_POOL_COMPONENT = 2;
     static constexpr short ID_POOL_SIGNAL_RECEIVER = 3;
     static constexpr short ID_POOL_SIGNAL = 4;
-    static constexpr short ID_POOL_CANVAS = 5;
+    static constexpr short ID_POOL_HUD_GROUP = 5;
 
     template<int POOL>
     constexpr unsigned id() {
         static std::atomic<unsigned> _id{0};
-        return ++_id;
+        return _id++;
     }
 
     static constexpr short MASK_ID_POOL_SIGNAL_TYPE = 0;

@@ -180,8 +180,9 @@ void TextRenderer::render(Text * text) {
     for (auto & c : text->content) {
         Glyph ch = glyphs[c];
 
-        xpos = text->pos.x + ch.Bearing.x * text->scale.x + hud->groups[text->groupID].offset.x + adv;
-        ypos = text->pos.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + hud->groups[text->groupID].offset.y;
+        auto group = hud->getGroupOrDefault(text->groupID);
+        xpos = text->pos.x + ch.Bearing.x * text->scale.x + group->offset.x + adv;
+        ypos = text->pos.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y;
 
         float w = ch.Size.x * text->scale.x;
         float h = ch.Size.y * text->scale.y;
@@ -212,4 +213,8 @@ void TextRenderer::render(Text * text) {
 
 TextRenderer::~TextRenderer() {
     FT_Done_FreeType(ft);
+}
+
+void TextRenderer::imgui_controls() {
+
 }

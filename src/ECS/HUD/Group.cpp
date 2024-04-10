@@ -4,10 +4,12 @@
 #include "Group.h"
 #include "imgui.h"
 #include "Utils/Util.h"
+#include "spdlog/spdlog.h"
+#include "glm/gtc/type_ptr.hpp"
 
 using namespace ztgk;
 
-Group::Group() : id(::id<ID_POOL_CANVAS>()), hidden(false), offset(0, 0) {}
+Group::Group() : id(::id<ID_POOL_HUD_GROUP>()), hidden(false), offset(0, 0, 0) {}
 
 bool Group::isHidden() const {
     return hidden;
@@ -19,6 +21,14 @@ void Group::setHidden(bool hidden) {
 }
 
 void Group::imgui_controls() {
-    ImGui::LabelText(std::format("Group {}", id).c_str(), "");
-    ImGui::DragFloat2("Offset", (float *) &offset);
+    ImGui::Text("%s", std::format("Group {}", id).c_str());
+    ImGui::SameLine();
+    if (ImGui::SmallButton(std::format("Toggle hide: {}##{}", hidden, id).c_str()))
+        setHidden(!hidden);
+    ImGui::SameLine();
+    if (ImGui::SmallButton(std::format("Remove Group##{}", id).c_str())) {
+        spdlog::info("Todo Make this send signal to HUD.");
+        // todo send signal
+    }
+    ImGui::DragFloat3(std::format("Offset##{}", id).c_str(), glm::value_ptr(offset));
 }

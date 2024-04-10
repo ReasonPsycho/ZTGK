@@ -35,8 +35,9 @@ void SpriteRenderer::render(Sprite * sprite) {
     shader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sprite->texture);
-    float xpos = sprite->pos.x + hud->groups[sprite->groupID].offset.x;
-    float ypos = sprite->pos.y + hud->groups[sprite->groupID].offset.y;
+    auto group = hud->getGroupOrDefault(sprite->groupID);
+    float xpos = sprite->pos.x + group->offset.x;
+    float ypos = sprite->pos.y + group->offset.y;
     float w = sprite->size.x, h = sprite->size.y;
 
     float vertices[] = {
@@ -61,4 +62,8 @@ void SpriteRenderer::render(Sprite * sprite) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void SpriteRenderer::imgui_controls() {
+
 }

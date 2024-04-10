@@ -18,7 +18,11 @@ public:
 
     void draw();
     void drawGroup(unsigned groupID);
-    Group * addGroup(glm::vec2 offset = {0, 0}, bool hidden = false);
+    Group * getDefaultGroup() const;
+    Group * getGroupOrDefault(unsigned groupID) const;
+    Group * getGroupOrAddDefault(unsigned groupID);
+    Group * addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
+    bool removeGroup(unsigned groupID);
 
     void init();
     void addComponent(void *component) override;
@@ -30,7 +34,10 @@ public:
     std::unordered_map<unsigned, std::vector<Sprite*>> sprites;
     std::unordered_map<unsigned, std::vector<Text*>> texts;
 
+    void sort_z();
+
 private:
+    std::vector<Group *> z_sorted_groups;
     std::array<std::type_index, 2> componentTypes = {
         std::type_index(typeid(Sprite)),
         std::type_index(typeid(Text))

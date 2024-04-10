@@ -21,7 +21,6 @@ struct Group {
 
     void imgui_controls();
 
-    // don't use these directly
-    bool hidden = false;
-    glm::vec2 offset = {0, 0 };
+    bool hidden = false; // don't set this directly
+    glm::vec3 offset = {0, 0, 0 };
 };

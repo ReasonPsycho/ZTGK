@@ -31,23 +31,20 @@ public:
     explicit TextRenderer(HUD * hud);
     ~TextRenderer();
 
-//    const ztgk::FontFamily font_family = ztgk::font.family(ztgk::font.Fam_Arimo);
     HUD * hud;
 
-    unsigned VAO, VBO;
-    glm::mat4 projection;
-//    std::unordered_map<unsigned short, Glyph> glyphs;
-
-    FT_Library ft;
-    std::unordered_map<std::string, std::unordered_map<unsigned, Glyph>> fonts;
-
-    Shader shader;
-
     void loadFont(std::string font);
-
-//    void setFont(const ztgk::FontFamily & editor_path);
     void render(Text * text);
 
+    std::unordered_map<std::string, std::unordered_map<unsigned, Glyph>> fonts;
+
+    // editor
+    void imgui_controls();
 private:
-//    void loadGlyphs(FT_Library ft, std::string face_path, int offset = 0);
+    unsigned VAO, VBO;
+
+    glm::mat4 projection;
+    FT_Library ft;
+
+    Shader shader;
 };

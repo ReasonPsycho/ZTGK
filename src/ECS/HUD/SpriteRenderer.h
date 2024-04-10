@@ -19,6 +19,9 @@ public:
     void render(Sprite * sprite);
 
     HUD * hud;
+
+    // editor
+    void imgui_controls();
 private:
     unsigned VAO, VBO;
     glm::mat4 projection;
