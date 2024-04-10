@@ -46,6 +46,9 @@
 
 #include "Utils/ImGuiSpdlogSink.h"
 #include "ECS/HUD/HUD.h"
+#include "ECS/Render/FrustumCulling/Frustum.h"
+#include "Raycasting/Colliders/BoxCollider.h"
+#include "Raycasting/Ray.h"
 
 
 #pragma endregion Includes
@@ -64,6 +67,9 @@ HUD hud;
 unsigned bggroup, zmgroup;
 Sprite * zmspr;
 Text * zmtxt;
+
+BoxCollider *boxCollider;
+
 
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion constants
@@ -218,7 +224,11 @@ int main(int, char **) {
 
         // OpenGL rendering code here
         render();
-
+  /*
+        Ray r = Ray(camera.Position, camera.Front, &scene);
+        std::cout<< "Raycast: " << r.RayHitPoint().x << " " << r.RayHitPoint().y << " " << r.RayHitPoint().z << std::endl;
+        */
+  
         // Draw ImGui
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
@@ -364,12 +374,13 @@ void load_enteties() {
     const float scale = 10;
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(make_unique<Render>(cubeModel));
-    for (unsigned int i = 0; i < 2; ++i) {
-        gameObject = scene.addEntity(gameObject, "asteroid");
+    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f, 1.0f, 1.0f}));
+    for (unsigned int i = 0; i < 2; ++i) {gameObject = scene.addEntity(gameObject, "asteroid");
         gameObject->addComponent(make_unique<Render>(&model));
         gameObject->transform.setLocalScale({scale, scale, scale});
         gameObject->transform.setLocalPosition({5, 0, 0});
         gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
+        gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + i + 1, 1.0f, 1.0f}));
     }
     //gameObject = scene.addEntity("Dir light");
     //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
