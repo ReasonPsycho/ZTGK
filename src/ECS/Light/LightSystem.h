@@ -71,7 +71,9 @@ private:
 
     Shader instancePlaneDepthShader = Shader("res/shaders/Shadows/instance_shadows_depth.vert",
                                              "res/shaders/Shadows/shadows_depth.frag");
-    
+
+    int CUBE_SHADOW_INDEX = 8;
+    int PLANE_SHADOW_TEXTURE_INDEX = 9;    
     
     GLuint dirLightBufferBindingPoint = 3;
     GLuint pointLightBufferBindingPoint = 4;

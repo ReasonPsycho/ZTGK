@@ -6,27 +6,7 @@
 #include "PointLight.h"
 
 void PointLight::Innit(int width, int height, int index) {
-    if (initializedShadow) {
-        DeleteShadow();
-    }
     glGenFramebuffers(1, &depthMapFBO);
-    // create depth cubemap texture
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
-    for (unsigned int i = 0; i < 6; ++i)
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, height, index, 0,
-                     GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    // attach depth texture as FBO's depth buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, index);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     shadowProj = glm::perspective(glm::radians(90.0f), (float) width / (float) height,
                                   near_plane, far_plane); //TODO add based pn calculation
     shadowTransforms.push_back(
@@ -73,15 +53,55 @@ void PointLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShade
             instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
         }
 
+    GLenum attachments[6];
+
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
+    for(int i = 0; i < 6; i++)
+    {
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT + i, ShadowMapArrayId, 0, i * 6);
+        attachments[i] = GL_DEPTH_ATTACHMENT + i;
+    }
+
+    glDrawBuffers(6, attachments);  
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, width, height);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        const char *errorType = "";
+        switch (status) {
+            case GL_FRAMEBUFFER_UNDEFINED:
+                errorType = "GL_FRAMEBUFFER_UNDEFINED";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                errorType = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                errorType = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                errorType = "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                errorType = "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
+                break;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                errorType = "GL_FRAMEBUFFER_UNSUPPORTED";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+                errorType = "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+                errorType = "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS";
+                break;
+            default:
+                errorType = "UNKNOWN_ERROR";
+                break;
+        }
+        spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete! Error: {}", errorType);
+    }
 }
 
 PointLight::PointLight(PointLightData data):

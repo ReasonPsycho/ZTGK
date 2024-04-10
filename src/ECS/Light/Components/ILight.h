@@ -42,6 +42,7 @@ public:
 
 
 protected:
+    int uniqueID;     // Instance variable to store the unique ID for each object
     bool initializedShadow = false;
     unsigned int depthMapFBO{};
 
