@@ -60,15 +60,12 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
-//TextRenderer* textRenderer = nullptr;
-//Text text1 = {};
-//Text text2 = {};
-//SpriteRenderer* spriteRenderer = nullptr;
-//Sprite * sprite;
 HUD hud;
+unsigned bggroup, zmgroup;
+Sprite * zmspr;
+Text * zmtxt;
 
 shared_ptr<spdlog::logger> file_logger;
-const Color& white = {0, 0, 0, 0};
 #pragma endregion constants
 
 #pragma region Function definitions
@@ -88,8 +85,6 @@ void init_imgui();
 void init_camera();
 
 void init_time();
-
-void init_text();
 
 void before_frame();
 
@@ -204,33 +199,16 @@ int main(int, char **) {
     init_time();
     spdlog::info("Initialized system timer.");
 
-    init_text();
-    spdlog::info("Initialized text renderer.");
-
-    hud.init();
-    scene.systemManager.addSystem(&hud);
     load_enteties();
     spdlog::info("Initialized entities.");
 
 #pragma endregion Init
-//_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-    float lastTextx = 500;
-    float lastTexty = 500;
-
-    int signx = 1;
-    int signy = 1;
-
-    float textx = 0;
-    float texty = 0;
-
-    int number = 0;
 
 //____________________________________________________________________________________________________
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-        signalQueue.update();
 
         // Process I/O operations here
         input();
@@ -238,81 +216,34 @@ int main(int, char **) {
         // Update game objects' state here
         update();
 
-
         // OpenGL rendering code here
         render();
 
-
-                // Draw ImGui
+        // Draw ImGui
         imgui_begin();
-
-//        static int textsign = 1;
-//        static int textyy = 0;
-//        textyy += textsign;
-//        if (textyy > 1000 || textyy < -10)
-//            textsign *= -1;
-//        text1.pos.y = textyy;
-
-//        ImGui::Begin("Text");
-//        ImGui::SliderFloat("P:x", &text2.pos.x, -10, 2000);
-//        ImGui::SliderFloat("P:y", &text2.pos.y, -10, 1000);
-//        ImGui::SliderFloat("S:y", &text2.scale.y, 0, 2);
-//        if ( ImGui::Button("lato") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Lato)); }
-//        if ( ImGui::Button("arimo") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Arimo)); }
-//        if ( ImGui::Button("nunito") ) { textRenderer->setFont(ztgk::font.family(ztgk::font.Fam_Nunito)); }
-//        if ( ImGui::Button("quicksand") ) { textRenderer->setFont({ ztgk::font.Reg_Quicksand, ztgk::font.Reg_Quicksand, ztgk::font.Bld_Quicksand, ztgk::font.Bld_Quicksand }); }
-//        if ( ImGui::Button("concert") ) { textRenderer->setFont({ ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert, ztgk::font.Reg_Concert }); }
-//        if ( ImGui::Button("lobster") ) { textRenderer->setFont({ ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster, ztgk::font.Reg_Lobster }); }
-//        if ( ImGui::Button("novamono") ) { textRenderer->setFont({ ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono, ztgk::font.Reg_NovaMono }); }
-//        ImGui::End();
-
-//        textRenderer->render(text1);
-//        textRenderer->render(text2);
-
-//        hud.spriteRenderer->render(*sprite);
-
-        hud.draw();
-//        spriteRenderer->render(*sprite);
-//        ImGui::Begin("Szprite");
-//        ImGui::SliderFloat("S:w", &sprite->size.x, -10, 1000);
-//        ImGui::SliderFloat("S:h", &sprite->size.y, -10, 1000);
-//        ImGui::End();
-
-        ImGui::Begin("Group 0");
-        ImGui::DragFloat("O:x", &hud.groups[0].offset.x);
-        ImGui::DragFloat("O:y", &hud.groups[0].offset.y);
-        ImGui::End();
-
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-//        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, ztgk::color.WHITE);
-//
-//        if(lastTextx > 450){
-//            signx = -1;
-//        }
-//        if(lastTextx < 0){
-//            signx = 1;
-//        }
-//        if(lastTexty > 550){
-//            signy = -1;
-//        }
-//        if(lastTexty < 0){
-//            signy = 1;
-//        }
-//
-//        textx = lastTextx + signx;
-//        texty = lastTexty + signy;
-//
-//        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, ztgk::color.OLIVE);
-//
-//        lastTextx = textx;
-//        lastTexty = texty;
-//
-//        string numberString = to_string(number);
-//        text.RenderText(numberString, 0, 500, 0.5, ztgk::color.LIME);
-//        number++;
+        static bool bgup = true;
+        auto group = hud.getGroupOrDefault(bggroup);
+        if (group->offset.y == ztgk::config::window_size.y) {
+            bgup = false;
+        } else if (group->offset.y == 0) {
+            bgup = true;
+        }
+        if (bgup) {
+            group->offset.y++;
+        } else {
+            group->offset.y--;
+        }
+        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
+        auto s = sin(Time::Instance().LastFrame());
+        auto c = cos(Time::Instance().LastFrame());
+        static auto ogsprsize = zmspr->size;
+        zmspr->size = ogsprsize * glm::vec2(c,s);
+        zmtxt->color = { s, c, s + c / 2, 1.0f };
+        zmspr->color = { s, c, s + c / 2, 1.0f };
         //____________________________________________________________________________________________________
 
         // End frame and swap buffers (double buffering)
@@ -330,10 +261,6 @@ int main(int, char **) {
 #pragma region Functions
 
 void cleanup() {
-//    delete textRenderer;
-//    delete sprite;
-//    delete spriteRenderer;
-
     //Orginal clean up
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -424,6 +351,9 @@ void init_systems() {
     Material whiteMaterial = Material(myColor);
     cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
     quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
+
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -459,32 +389,32 @@ void load_enteties() {
     grid->RenderTiles(&scene, 0.011f, &tileModel);
      */
 
-    hud.addGroup();
-    gameObject = scene.addEntity("HUD DEMO");
-    auto text1 = Text("Tekst1");
-    text1.groupID = 1;
-    gameObject->addComponent(make_unique<Text>(text1));
-//    auto text2 = Text("Tekst2", {300, 300});
-//    gameObject->addComponent(make_unique<Text>(text2));
-    auto child = scene.addEntity(gameObject, "Sprite1");
-    auto sprite1 = Sprite("res/textures/container2.png");
-    child->addComponent(make_unique<Sprite>(sprite1));
-    child = scene.addEntity(gameObject, "Sprite2");
-    child->addComponent(make_unique<Sprite>("res/textures/stone.jpg"));
-    child = scene.addEntity(gameObject, "Sprite3");
-    auto sprite2 = Sprite("res/textures/container2.png");
-    child->addComponent(make_unique<Sprite>(sprite2));
-//    text1.content = "TEEEEKST";
-//    text1.pos = { 50, 500 };
-//    text1.color = ztgk::color.TURQUOISE;
-//
-//    text2.content = "INNY TEEEEEKST";
-//    text2.pos = { 500, 100 };
-//    gameObject->addComponent(make_unique<Text>(text1));
-//    gameObject->addComponent(make_unique<Text>(text2));
-//    auto spr = Sprite{};
-//    spr.load("res/textures/stone.jpg");
-//    gameObject->addComponent<Sprite>(make_unique<Sprite>());
+    auto ehud = scene.addEntity("HUD DEMO");
+    auto ebg = scene.addEntity(ehud, "Background");
+    bggroup = hud.addGroup(glm::vec3(0, 0, 10));
+    auto bgelem = scene.addEntity(ebg, "Puni1");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni2");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni3");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni4");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni5");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+
+    auto efg = scene.addEntity(ehud, "Foreground");
+    auto fgelem = scene.addEntity(efg, "Fixed");
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!",ztgk::config::window_size / 5));
+    zmgroup = hud.addGroup();
+    fgelem = scene.addEntity(efg, "Variable Text");
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2( ztgk::config::window_size.x * 0.5 - 300, ztgk::config::window_size.y * 0.5 )));
+    zmtxt = fgelem->getComponent<Text>();
+    zmtxt->groupID = zmgroup;
+    fgelem = scene.addEntity(efg, "Animated Sprite");
+    fgelem->addComponent(make_unique<Sprite>("res/textures/puni.png"));
+    zmspr = fgelem->getComponent<Sprite>();
+    zmspr->groupID = zmgroup;
 }
 
 void init_imgui() {
@@ -504,24 +434,6 @@ void init_imgui() {
     // Setup style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
-}
-
-void init_text() {
-//    textRenderer = new TextRenderer();
-//
-//    text1.content = "TEEEEKST";
-//    text1.pos = { 50, 500 };
-//    text1.color = ztgk::color.TURQUOISE;
-//
-//    text2.content = "INNY TEEEEEKST";
-//    text2.pos = { 500, 100 };
-//    text2.style = TextStyle::BOLD | TextStyle::ITALIC;
-//
-//    spriteRenderer = new SpriteRenderer(&hud);
-//    sprite = new Sprite();
-//    sprite->load("res/textures/stone.jpg");
-//    sprite->color = ztgk::color.RED;
-//    text.init();
 }
 
 void before_frame() {
@@ -546,6 +458,7 @@ void input() {
 void update() {
     scene.updateScene();
     lightSystem.Update(deltaTime);
+    signalQueue.update();
 }
 
 void render() {
@@ -574,6 +487,7 @@ void render() {
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
+    hud.draw();
 }
 
 

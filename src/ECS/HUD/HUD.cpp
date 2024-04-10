@@ -49,14 +49,14 @@ Group *HUD::getGroupOrAddDefault(unsigned int groupID) {
     return &groups[groupID];
 }
 
-Group * HUD::addGroup(glm::vec3 offset, bool hidden) {
+unsigned HUD::addGroup(glm::vec3 offset, bool hidden) {
     Group newGroup;
     newGroup.offset = offset;
     newGroup.setHidden(hidden);
-    groups.insert({newGroup.id, newGroup}).second;
+    groups.insert({newGroup.id, newGroup});
     z_sorted_groups.push_back(&groups.at(newGroup.id));
     sort_z();
-    return &groups.at(newGroup.id);
+    return newGroup.id;
 }
 
 bool HUD::removeGroup(unsigned int groupID) {

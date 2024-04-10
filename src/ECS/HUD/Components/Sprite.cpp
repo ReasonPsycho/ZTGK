@@ -53,6 +53,7 @@ void Sprite::load(const std::string &path) {
         }
         if (size == glm::vec2{0,0}) {
             size = { width, height };
+            pos -= (size / 2.0f);
         }
 
         stbi_image_free(data);

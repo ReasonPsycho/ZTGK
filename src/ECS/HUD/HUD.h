@@ -21,7 +21,7 @@ public:
     Group * getDefaultGroup() const;
     Group * getGroupOrDefault(unsigned groupID) const;
     Group * getGroupOrAddDefault(unsigned groupID);
-    Group * addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
+    unsigned addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
     bool removeGroup(unsigned groupID);
 
     void init();
