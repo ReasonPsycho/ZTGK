@@ -28,7 +28,7 @@ void Model::loadModel() {
         spdlog::error("Assimp error: " + string(importer.GetErrorString()));
         return;
     }
-    // retrieve the directory path of the filepath
+    // retrieve the directory editor_path of the filepath
     directory = path->substr(0, path->find_last_of('/'));
 
     // process ASSIMP's root node recursively

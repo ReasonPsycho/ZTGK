@@ -41,10 +41,11 @@
 
 #include "Utils/Time.h"
 
-#include "ECS/Render/Text.h"
+#include "ECS/HUD/TextRenderer.h"
+#include "ECS/HUD/SpriteRenderer.h"
 
 #include "Utils/ImGuiSpdlogSink.h"
-
+#include "ECS/HUD/HUD.h"
 #include "ECS/Render/FrustumCulling/Frustum.h"
 #include "Raycasting/Colliders/BoxCollider.h"
 #include "Raycasting/Ray.h"
@@ -62,14 +63,15 @@ Model model = Model(&modelPath);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
+HUD hud;
+unsigned bggroup, zmgroup;
+Sprite * zmspr;
+Text * zmtxt;
 
 BoxCollider *boxCollider;
 
-Text text = {};
-
 
 shared_ptr<spdlog::logger> file_logger;
-const Color& white = {0, 0, 0, 0};
 #pragma endregion constants
 
 #pragma region Function definitions
@@ -89,8 +91,6 @@ void init_imgui();
 void init_camera();
 
 void init_time();
-
-void init_text();
 
 void before_frame();
 
@@ -183,24 +183,16 @@ int main(int, char **) {
         spdlog::error("Failed to initialize project!");
         return EXIT_FAILURE;
     }
-    spdlog::info("Initialized project.");
-    file_logger->info("Initialized project.");
+    spdlog::info("Initialized OpenGL.");
 
     init_systems();
     spdlog::info("Initialized textures and vertices.");
-    file_logger->info("Initialized textures and vertices.");
-
-    load_enteties();
-    spdlog::info("Initialized entities.");
-    file_logger->info("Initialized entities.");
 
     init_imgui();
     spdlog::info("Initialized ImGui.");
-    file_logger->info("Initialized ImGui.");
 
     init_camera();
     spdlog::info("Initialized camera and viewport.");
-    file_logger->info("Initialized camera and viewport.");
 
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
@@ -209,39 +201,20 @@ int main(int, char **) {
 
     signalQueue.init();
     spdlog::info("Initialized signal queue.");
-    file_logger->info("Initialized signal queue.");
 
     init_time();
-
     spdlog::info("Initialized system timer.");
-    file_logger->info("Initialized system timer.");
 
-    init_text();
-    spdlog::info("Initialized text renderer.");
-
-    spdlog::info("Initialized game clock.");
-    file_logger->info("Initialized game clock.");
-
+    load_enteties();
+    spdlog::info("Initialized entities.");
 
 #pragma endregion Init
-//_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-    float lastTextx = 500;
-    float lastTexty = 500;
-
-    int signx = 1;
-    int signy = 1;
-
-    float textx = 0;
-    float texty = 0;
-
-    int number = 0;
 
 //____________________________________________________________________________________________________
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-        signalQueue.update();
 
         // Process I/O operations here
         input();
@@ -249,51 +222,38 @@ int main(int, char **) {
         // Update game objects' state here
         update();
 
-
         // OpenGL rendering code here
         render();
-
-
-        /*
+  /*
         Ray r = Ray(camera.Position, camera.Front, &scene);
         std::cout<< "Raycast: " << r.RayHitPoint().x << " " << r.RayHitPoint().y << " " << r.RayHitPoint().z << std::endl;
         */
-
 
         // Draw ImGui
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
-        file_logger->info("Text");
-
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-        text.RenderText("TEN JEST STATYCZNY", 0, 550, 0.3, {1.0f,0.0f,0.0f});
-
-        if(lastTextx > 450){
-            signx = -1;
+        static bool bgup = true;
+        auto group = hud.getGroupOrDefault(bggroup);
+        if (group->offset.y == ztgk::config::window_size.y) {
+            bgup = false;
+        } else if (group->offset.y == 0) {
+            bgup = true;
         }
-        if(lastTextx < 0){
-            signx = 1;
+        if (bgup) {
+            group->offset.y++;
+        } else {
+            group->offset.y--;
         }
-        if(lastTexty > 550){
-            signy = -1;
-        }
-        if(lastTexty < 0){
-            signy = 1;
-        }
-
-        textx = lastTextx + signx;
-        texty = lastTexty + signy;
-
-        text.RenderText("TEN TEKST JEST ANIMOWANY", textx, texty, 0.3, {1.0f,1.0f,1.0f});
-
-        lastTextx = textx;
-        lastTexty = texty;
-
-        string numberString = to_string(number);
-        text.RenderText(numberString, 0, 500, 0.5, {1.0f,1.0f,1.0f});
-        number++;
+        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
+        auto s = sin(Time::Instance().LastFrame());
+        auto c = cos(Time::Instance().LastFrame());
+        static auto ogsprsize = zmspr->size;
+        zmspr->size = ogsprsize * glm::vec2(c,s);
+        zmtxt->color = { s, c, s + c / 2, 1.0f };
+        zmspr->color = { s, c, s + c / 2, 1.0f };
         //____________________________________________________________________________________________________
 
         // End frame and swap buffers (double buffering)
@@ -401,6 +361,9 @@ void init_systems() {
     Material whiteMaterial = Material(myColor);
     cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
     quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
+
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -437,6 +400,32 @@ void load_enteties() {
     grid->RenderTiles(&scene, 0.011f, &tileModel);
      */
 
+    auto ehud = scene.addEntity("HUD DEMO");
+    auto ebg = scene.addEntity(ehud, "Background");
+    bggroup = hud.addGroup(glm::vec3(0, 0, 10));
+    auto bgelem = scene.addEntity(ebg, "Puni1");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni2");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni3");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni4");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem = scene.addEntity(ebg, "Puni5");
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+
+    auto efg = scene.addEntity(ehud, "Foreground");
+    auto fgelem = scene.addEntity(efg, "Fixed");
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!",ztgk::config::window_size / 5));
+    zmgroup = hud.addGroup();
+    fgelem = scene.addEntity(efg, "Variable Text");
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2( ztgk::config::window_size.x * 0.5 - 300, ztgk::config::window_size.y * 0.5 )));
+    zmtxt = fgelem->getComponent<Text>();
+    zmtxt->groupID = zmgroup;
+    fgelem = scene.addEntity(efg, "Animated Sprite");
+    fgelem->addComponent(make_unique<Sprite>("res/textures/puni.png"));
+    zmspr = fgelem->getComponent<Sprite>();
+    zmspr->groupID = zmgroup;
 }
 
 void init_imgui() {
@@ -456,10 +445,6 @@ void init_imgui() {
     // Setup style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
-}
-
-void init_text() {
-    text.init();
 }
 
 void before_frame() {
@@ -484,6 +469,7 @@ void input() {
 void update() {
     scene.updateScene();
     lightSystem.Update(deltaTime);
+    signalQueue.update();
 }
 
 void render() {
@@ -512,6 +498,7 @@ void render() {
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
+    hud.draw();
 }
 
 
@@ -540,11 +527,28 @@ void imgui_begin() {
 void imgui_render() {
 
 
-    
-    ImGui::Begin("Debug menu");
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
-    ImGui::Text(buffer);
+    static double fps_max = -1;
+    static double max_timestamp;
+    static double fps_min = 1000000;
+    static double min_timestamp;
+    auto fps = 1.0f / deltaTime;
+    if (fps > fps_max) {
+        fps_max = fps;
+        max_timestamp = Time::Instance().LastFrame();
+    }
+    if (fps < fps_min) {
+        fps_min = fps;
+        min_timestamp = Time::Instance().LastFrame();
+    }
+    ImGui::Begin(format("FPS: {:.2f} H: {:.2f} L: {:.2f}###FPS_COUNTER", fps, fps_max, fps_min).c_str());
+    ImGui::Text("%s", std::format("High @ {:.3f}", max_timestamp).c_str());
+    ImGui::Text("%s", std::format("Low @ {:.3f}", min_timestamp).c_str());
+    if (ImGui::Button("Clear")) {
+        fps_max = -1;
+        max_timestamp = 0;
+        fps_min = 1000000;
+        min_timestamp = 0;
+    }
 
     //lightSystem.showLightTree();
     ImGui::End();

@@ -69,7 +69,7 @@ void Entity::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
     ImGuiStorage* storage = ImGui::GetStateStorage();
 
-    if (ImGui::TreeNode(name.c_str())) {
+    if (ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
             if (uniqueID != scene->selectedEntityNumber){
                 storage->SetBool(scene->selectedEntityNumber, false); // close the tree node
