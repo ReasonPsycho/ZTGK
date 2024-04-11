@@ -19,12 +19,11 @@ struct SignalReceiver : Component {
     std::function<void(const Signal&)> receive{};
 
     SignalReceiver();
-    SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal &)> onSignal);
+    explicit SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal &)> onSignal = [](const Signal &) {});
     virtual ~SignalReceiver() = default;
 
     // editor
     void showImGuiDetails(Camera *camera) override;
-    static void editor_typemask_config(unsigned * mask);
 };
 
 

@@ -8,6 +8,7 @@
 
 struct AHUDComponent : public Component {
     enum hudcType {
+        UNDEFINED,
         SPRITE, TEXT
     };
 

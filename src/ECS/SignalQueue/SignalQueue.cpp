@@ -1,5 +1,3 @@
-//
-
 #include "SignalQueue.h"
 #include "Utils/Util.h"
 #include "imgui.h"
@@ -9,10 +7,11 @@
 #include "DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "DataCargo/MouseEvents/MouseScrollSignalData.h"
 #include "DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDUpdateGroupMappingsSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDSortZDepthSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
 
 using namespace ztgk;
-//
-// Created by cheily on 20.03.2024.
 void SignalQueue::init() {
     update_delta();
 }
@@ -138,9 +137,9 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
         if (ImGui::Button("Post")) {
             std::shared_ptr<SignalData> data;
             auto choicemask = 1 << cfg.choice;
-            if (choicemask == Signal::signal_types.test_signal) {
+            if (choicemask == Signal::signal_types.test) {
                 data = std::make_shared<TestSignalData>(cfg.message);
-            } else if (choicemask == Signal::signal_types.keyboard_signal) {
+            } else if (choicemask == Signal::signal_types.keyboard) {
                 data = std::make_shared<KeySignalData>(cfg.key, cfg.scancode, cfg.kaction, cfg.kmods, cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_button_signal) {
                 data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, cfg.message);
@@ -151,6 +150,12 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
                 data = std::make_shared<MouseScrollSignalData>(Vec2{cfg.xoff, cfg.yoff}, cfg.message);
             } else if (choicemask == Signal::signal_types.audio_signal) {
                 data = std::make_shared<AudioSignalData>(cfg.soundpath, cfg.message);
+            } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
+                data = std::make_shared<HUDSortZDepthSignalData>(cfg.message);
+            } else if (choicemask == Signal::signal_types.hud_update_group_mappings_signal) {
+                data = std::make_shared<HUDUpdateGroupMappingsSignalData>(cfg.all, cfg.componentID, cfg.oldGroupID, cfg.newGroupID, cfg.message);
+            } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
+                data = std::make_shared<HUDRemoveGroupSignalData>(cfg.groupId, cfg.message);
             } else {
                 data = std::make_shared<SignalData>(cfg.message);
             }
@@ -180,12 +185,13 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
                     "\nThat is the first event in order of subscription that matches the typemask or id."
                     "\nThis also means any log will only print this signal if no other receiver caught it.");
         }
-        const char *types[] = {"Test", "Keyboard", "Mouse Button", "Mouse Move", "Mouse Scroll", "Audio"};
-        ImGui::Combo("Type", &cfg.choice, types, 6);
+        const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud update mappings", "Hud sort z depth", "Hud remove group"};
+        ImGui::Combo("Type", &cfg.choice, types, 9);
+        // assumes types are ordered the same way type id masks are initialized!!
         unsigned choicemask = 1 << cfg.choice;
 
-        if (choicemask == Signal::signal_types.test_signal) {
-        } else if (choicemask == Signal::signal_types.keyboard_signal) {
+        if (choicemask == Signal::signal_types.test) {
+        } else if (choicemask == Signal::signal_types.keyboard) {
             ImGui::InputInt("Key", &cfg.key);
             ImGui::InputInt("Scancode", &cfg.scancode);
             ImGui::InputInt("Action", &cfg.kaction);
@@ -204,6 +210,15 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
             ImGui::InputDouble("Y-offset", &cfg.yoff);
         } else if (choicemask == Signal::signal_types.audio_signal) {
             ImGui::InputText("Sound filepath", cfg.soundpath, editor_s_new_signal_config::message_size);
+        } else if (choicemask == Signal::signal_types.hud_update_group_mappings_signal) {
+            ImGui::Checkbox("All?", &cfg.all);
+            ImGui::InputInt("Component ID", &cfg.componentID);
+            ImGui::InputInt("Old Group ID", &cfg.oldGroupID);
+            ImGui::InputInt("New Group ID", &cfg.newGroupID);
+        } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
+            ImGui::Text("No unique fields.");
+        } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
+            ImGui::InputInt("Group ID", &cfg.groupId);
         } else {
             ImGui::Text("Unimplemented - see SignalQueue::editor_control_window");
         }
@@ -223,7 +238,7 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
 }
 
 SignalQueue::SignalQueue() {
-name = "Signal Queue";
+    name = "Signal Queue";
 }
 
 void SignalQueue::removeComponent(void *component) {

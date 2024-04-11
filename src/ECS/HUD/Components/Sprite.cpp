@@ -11,7 +11,7 @@
 
 
 Sprite::Sprite(const std::string &path)
-: Sprite(ztgk::config::window_size / 2, {0, 0 }, ztgk::color.WHITE, 0, path)
+: Sprite(ztgk::game::window_size / 2, {0, 0 }, ztgk::color.WHITE, 0, path)
 {}
 
 Sprite::Sprite(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec4 &color, unsigned int hudGroupId, const std::string &path)

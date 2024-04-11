@@ -3,7 +3,7 @@
 //
 
 #include "TextRenderer.h"
-#include "Utils/Config.h"
+#include "Utils/Globals.h"
 #include "HUD.h"
 
 using namespace ztgk;
@@ -25,7 +25,7 @@ TextRenderer::TextRenderer(HUD * hud) : hud(hud), shader("res/shaders/hud_text.v
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    projection = glm::ortho(0.0f, (float)config::window_size.x, 0.0f, (float)config::window_size.y);
+    projection = glm::ortho(0.0f, (float)game::window_size.x, 0.0f, (float)game::window_size.y);
     shader.init();
 
     if (FT_Init_FreeType(&ft)) {

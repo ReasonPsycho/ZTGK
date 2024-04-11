@@ -72,6 +72,12 @@ public:
         // audio
         char soundpath[message_size]{};
 
+        // hud mapping
+        bool all{false};
+        int componentID{-1}, oldGroupID{-1}, newGroupID{-1};
+        // hud remove group
+        int groupId{-1};
+
         static SignalReceiver * new_logger();
     };
     static editor_s_new_signal_config editor_new_signal_config;

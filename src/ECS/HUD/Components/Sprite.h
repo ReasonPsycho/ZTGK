@@ -11,12 +11,12 @@
 #include "glad/glad.h"
 #include "ECS/Component.h"
 #include "AHUDComponent.h"
-#include "Utils/Config.h"
+#include "Utils/Globals.h"
 #include "Utils/Util.h"
 
 struct Sprite : public AHUDComponent {
     explicit Sprite(const std::string & path);
-    explicit Sprite(const glm::vec2 &pos = ztgk::config::window_size / 2,
+    explicit Sprite(const glm::vec2 &pos = ztgk::game::window_size / 2,
            const glm::vec2 &size = { 0, 0 },
            const glm::vec4 &color = ztgk::color.WHITE,
            unsigned int hudGroupId = 0,

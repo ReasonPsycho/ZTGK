@@ -237,7 +237,7 @@ int main(int, char **) {
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
         static bool bgup = true;
         auto group = hud.getGroupOrDefault(bggroup);
-        if (group->offset.y == ztgk::config::window_size.y) {
+        if (group->offset.y == ztgk::game::window_size.y) {
             bgup = false;
         } else if (group->offset.y == 0) {
             bgup = true;
@@ -348,6 +348,8 @@ bool init() {
 
 
 void init_systems() {
+    ztgk::game::scene = &scene;
+
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&signalQueue);
@@ -416,16 +418,18 @@ void load_enteties() {
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!",ztgk::config::window_size / 5));
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
     fgelem = scene.addEntity(efg, "Variable Text");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2( ztgk::config::window_size.x * 0.5 - 300, ztgk::config::window_size.y * 0.5 )));
+    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300, ztgk::game::window_size.y * 0.5 ));
+    tx.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Text>( tx ));
     zmtxt = fgelem->getComponent<Text>();
-    zmtxt->groupID = zmgroup;
     fgelem = scene.addEntity(efg, "Animated Sprite");
-    fgelem->addComponent(make_unique<Sprite>("res/textures/puni.png"));
+    auto spr = Sprite("res/textures/puni.png");
+    spr.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Sprite>( spr ));
     zmspr = fgelem->getComponent<Sprite>();
-    zmspr->groupID = zmgroup;
 }
 
 void init_imgui() {

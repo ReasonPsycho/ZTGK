@@ -3,16 +3,40 @@
 //
 
 #include "HUD.h"
+#include "ECS/SignalQueue/Signal.h"
+#include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
+#include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDUpdateGroupMappingsSignalData.h"
+#include "ECS/SignalQueue/SignalQueue.h"
 #include <ranges>
 #include <algorithm>
 using namespace std;
 
 void HUD::init() {
     name = "HUD";
+
     // []op auto adds default group
     z_sorted_groups.push_back(&groups[0]);
     textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
+    signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud);
+    signalReceiver->receive = [this](const Signal & signal) {
+        if ( signal.stype == Signal::signal_types.hud_sort_z_depth_signal ) {
+            sort_z();
+            return;
+        } else if ( signal.stype == Signal::signal_types.hud_remove_group_signal ) {
+            removeGroup(std::dynamic_pointer_cast<HUDRemoveGroupSignalData>(signal.data)->groupID);
+            return;
+        } else if ( signal.stype == Signal::signal_types.hud_update_group_mappings_signal ) {
+            auto data = std::dynamic_pointer_cast<HUDUpdateGroupMappingsSignalData>(signal.data);
+            if ( data->all ) {
+                // update
+            } else {
+
+            }
+        }
+    };
+
+    *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += signalReceiver.get();
 }
 
 void HUD::draw() {
@@ -61,8 +85,8 @@ unsigned HUD::addGroup(glm::vec3 offset, bool hidden) {
 }
 
 bool HUD::removeGroup(unsigned int groupID) {
-    // Return value - The number of erased elements.
     std::erase_if(z_sorted_groups, [groupID](Group * g){ return g->id == groupID; });
+    // Return value - The number of erased elements.
     return groups.erase(groupID) != 0;
 }
 

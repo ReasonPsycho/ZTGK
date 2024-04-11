@@ -1,0 +1,14 @@
+1. Nowy field w Signal.h -> signal_types, zainicjalizuj w Signal.cpp!
+	1.1. Dodaj też do all i ew. własnej kolekcji jak all_mouse.
+2. Klasa dziedziczy : public SignalData
+	2.1. override to_string()!!!
+	2.2. ctor z argumentem message (domyślnie ""), inicjalizuje ctor bazy
+		-> ExampleSignalData(..., const std::string & message) : SignalData(message), ...
+3. "Opcjonalne" / debug / editor
+	3.0. SignalReceiver::showImGuiDetails
+	3.1. static Signal signal(...)/signal_... budująca defaultowy signal dla tej paczki danych, przykład KeySignalData.cpp, HUDUpdateGroupMappingsSignalData.cpp
+	3.2. SignalQueue::showImGuiDetails -> edytor do postowania nowych sygnałów ręcznie #todo uprościć przez metody w klasach signal data
+		-> SignalQueue.h -> editor_s_new_signal_config -> bindingi imgui dla nowego typu
+		-> const char* types -> string na nowy typ do comboboxa #todo zamiast tego lista w signal_types
+		-> if (choicemask == -> edytor dla nowych pól
+		-> ImGui::Button("Post"), postowanie nowego sygnału z polami z edytora
