@@ -6,12 +6,12 @@
 
 #include "ECS/Component.h"
 
-struct AHUDComponent : public Component {
-    enum hudcType {
-        UNDEFINED,
-        SPRITE, TEXT
-    };
+enum hudcType {
+    UNDEFINED,
+    SPRITE, TEXT
+};
 
+struct AHUDComponent : public Component {
     AHUDComponent(hudcType type, unsigned int groupId) : type(type), groupID(groupId) {}
     virtual ~AHUDComponent() = default;
 

@@ -8,6 +8,8 @@
 #include "imgui_impl_opengl3_loader.h"
 #include "glad/glad.h"
 #include "stb_image.h"
+#include "ECS/SignalQueue/SignalQueue.h"
+#include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
 
 
 Sprite::Sprite(const std::string &path)
@@ -73,6 +75,15 @@ void Sprite::showImGuiDetails(Camera *camera) {
     e_tex = static_cast<int>(texture);
     ImGui::InputInt("Texture ID", &e_tex);
     texture = static_cast<GLuint>(e_tex);
+    static unsigned gid;
+    gid = groupID;
+    ImGui::InputInt("Group ID", reinterpret_cast<int *>(&groupID));
+    if (gid != groupID) {
+        *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += HUDRemapGroupsSignalData::signal(
+            false, uniqueID, type, gid, groupID, "Editor event."
+        );
+        gid = groupID;
+    }
 }
 
 void Sprite::loadColor() {

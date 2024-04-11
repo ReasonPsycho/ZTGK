@@ -6,7 +6,7 @@
 		-> ExampleSignalData(..., const std::string & message) : SignalData(message), ...
 3. "Opcjonalne" / debug / editor
 	3.0. SignalReceiver::showImGuiDetails
-	3.1. static Signal signal(...)/signal_... budująca defaultowy signal dla tej paczki danych, przykład KeySignalData.cpp, HUDUpdateGroupMappingsSignalData.cpp
+	3.1. static Signal signal(...)/signal_... budująca defaultowy signal dla tej paczki danych, przykład KeySignalData.cpp, HUDRemapGroupsSignalData.cpp
 	3.2. SignalQueue::showImGuiDetails -> edytor do postowania nowych sygnałów ręcznie #todo uprościć przez metody w klasach signal data
 		-> SignalQueue.h -> editor_s_new_signal_config -> bindingi imgui dla nowego typu
 		-> const char* types -> string na nowy typ do comboboxa #todo zamiast tego lista w signal_types

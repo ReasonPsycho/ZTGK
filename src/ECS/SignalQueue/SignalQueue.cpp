@@ -7,7 +7,7 @@
 #include "DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "DataCargo/MouseEvents/MouseScrollSignalData.h"
 #include "DataCargo/MouseEvents/MouseMoveSignalData.h"
-#include "DataCargo/EditorSignals/HUD/HUDUpdateGroupMappingsSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
 #include "DataCargo/EditorSignals/HUD/HUDSortZDepthSignalData.h"
 #include "DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
 
@@ -153,7 +153,7 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
             } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
                 data = std::make_shared<HUDSortZDepthSignalData>(cfg.message);
             } else if (choicemask == Signal::signal_types.hud_update_group_mappings_signal) {
-                data = std::make_shared<HUDUpdateGroupMappingsSignalData>(cfg.all, cfg.componentID, cfg.oldGroupID, cfg.newGroupID, cfg.message);
+                data = std::make_shared<HUDRemapGroupsSignalData>(cfg.all, cfg.componentID, (hudcType)cfg.componentType, cfg.oldGroupID, cfg.newGroupID, cfg.message);
             } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
                 data = std::make_shared<HUDRemoveGroupSignalData>(cfg.groupId, cfg.message);
             } else {
@@ -185,7 +185,7 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
                     "\nThat is the first event in order of subscription that matches the typemask or id."
                     "\nThis also means any log will only print this signal if no other receiver caught it.");
         }
-        const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud update mappings", "Hud sort z depth", "Hud remove group"};
+        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud update mappings", "Hud sort z depth", "Hud remove group"};
         ImGui::Combo("Type", &cfg.choice, types, 9);
         // assumes types are ordered the same way type id masks are initialized!!
         unsigned choicemask = 1 << cfg.choice;
@@ -212,9 +212,13 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
             ImGui::InputText("Sound filepath", cfg.soundpath, editor_s_new_signal_config::message_size);
         } else if (choicemask == Signal::signal_types.hud_update_group_mappings_signal) {
             ImGui::Checkbox("All?", &cfg.all);
-            ImGui::InputInt("Component ID", &cfg.componentID);
-            ImGui::InputInt("Old Group ID", &cfg.oldGroupID);
-            ImGui::InputInt("New Group ID", &cfg.newGroupID);
+            if ( !cfg.all ) {
+                ImGui::InputInt("Component ID", &cfg.componentID);
+                static const char *componentTypeLabels[] = {"UNDEFINED", "TEXT", "SPRITE"};
+                ImGui::Combo("Component Type", &cfg.componentType, componentTypeLabels, 3);
+                ImGui::InputInt("Old Group ID", &cfg.oldGroupID);
+                ImGui::InputInt("New Group ID", &cfg.newGroupID);
+            }
         } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
             ImGui::Text("No unique fields.");
         } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {

@@ -75,6 +75,7 @@ public:
         // hud mapping
         bool all{false};
         int componentID{-1}, oldGroupID{-1}, newGroupID{-1};
+        int componentType{0};
         // hud remove group
         int groupId{-1};
 

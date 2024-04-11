@@ -5,7 +5,7 @@
 #include "HUD.h"
 #include "ECS/SignalQueue/Signal.h"
 #include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
-#include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDUpdateGroupMappingsSignalData.h"
+#include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include <ranges>
 #include <algorithm>
@@ -27,11 +27,58 @@ void HUD::init() {
             removeGroup(std::dynamic_pointer_cast<HUDRemoveGroupSignalData>(signal.data)->groupID);
             return;
         } else if ( signal.stype == Signal::signal_types.hud_update_group_mappings_signal ) {
-            auto data = std::dynamic_pointer_cast<HUDUpdateGroupMappingsSignalData>(signal.data);
+            auto data = std::dynamic_pointer_cast<HUDRemapGroupsSignalData>(signal.data);
             if ( data->all ) {
-                // update
+                std::unordered_map<unsigned, std::vector<Sprite*>> remapped_s;
+                for ( auto & mapping : sprites ) {
+                    for ( auto spr : mapping.second ) {
+                        remapped_s[spr->groupID].push_back(spr);
+                    }
+                }
+                std::unordered_map<unsigned, std::vector<Text*>> remapped_t;
+                for ( auto & mapping : texts ) {
+                    for ( auto spr : mapping.second ) {
+                        remapped_t[spr->groupID].push_back(spr);
+                    }
+                }
+                sprites = remapped_s;
+                texts = remapped_t;
             } else {
-
+                switch (data->componentType) {
+                    case hudcType::SPRITE: {
+                         auto pos = std::find_if(sprites[data->oldGroup].begin(), sprites[data->oldGroup].end(), [data](Sprite * spr){ return spr->uniqueID == data->componentID; });
+                         auto e = sprites[data->oldGroup].end();
+                         if ( pos == sprites[data->oldGroup].end() ) {
+                             spdlog::warn("HUD group remap request - Component not found. Aborting.");
+                             return;
+                         }
+                         if ( !groups.contains(data->newGroup) ) {
+                             spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
+                         }
+                         auto val = *pos;
+                         sprites[data->oldGroup].erase(pos);
+                         sprites[data->newGroup].push_back(val);
+                         return;
+                    }
+                    case hudcType::TEXT: {
+                         auto pos = std::find_if(texts[data->oldGroup].begin(), texts[data->oldGroup].end(), [data](Text * spr){ return spr->uniqueID == data->componentID; });
+                         if ( pos == texts[data->oldGroup].end() ) {
+                             spdlog::warn("HUD group remap request - Component not found. Aborting.");
+                             return;
+                         }
+                         if ( !groups.contains(data->newGroup) ) {
+                             spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
+                         }
+                         auto val = *pos;
+                         texts[data->oldGroup].erase(pos);
+                         texts[data->newGroup].push_back(val);
+                         return;
+                    }
+                    case hudcType::UNDEFINED: {
+                        spdlog::warn("HUD group remap request for undefined type! Aborting.");
+                        return;
+                    }
+                }
             }
         }
     };
@@ -93,12 +140,16 @@ bool HUD::removeGroup(unsigned int groupID) {
 void HUD::addComponent(void *component) {
     auto c = static_cast<AHUDComponent*>(component);
     switch (c->type) {
-        case AHUDComponent::SPRITE: {
+        case hudcType::UNDEFINED: {
+            spdlog::error("Component type undefined! Cannot assign to HUD system.");
+            break;
+        }
+        case hudcType::SPRITE: {
             Sprite * sprite = reinterpret_cast<Sprite*>(component);
             sprites[sprite->groupID].push_back(sprite);
             break;
         }
-        case AHUDComponent::TEXT: {
+        case hudcType::TEXT: {
             Text * text = reinterpret_cast<Text*>(component);
             texts[text->groupID].push_back(text);
             break;
@@ -109,11 +160,11 @@ void HUD::addComponent(void *component) {
 void HUD::removeComponent(void *component) {
     auto c = (AHUDComponent*)component;
     switch (c->type) {
-        case AHUDComponent::SPRITE: {
+        case hudcType::SPRITE: {
             erase(sprites[c->groupID], dynamic_cast<Sprite *>(c));
             break;
         }
-        case AHUDComponent::TEXT: {
+        case hudcType::TEXT: {
             erase(texts[c->groupID], dynamic_cast<Text *>(c));
             break;
         }
