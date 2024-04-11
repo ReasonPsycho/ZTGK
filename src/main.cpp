@@ -648,33 +648,42 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
 
-        // Convert mouse position to world coordinates
-        float mouseX = (2.0f * xpos) / display_w - 1.0f;
-        float mouseY = 1.0f - (2.0f * ypos) / display_h;
-        float mouseZ = 1.0f;
+        // Oblicz współrzędne myszy w przestrzeni gry przy użyciu funkcji z klasy Camera
+        glm::vec3 mouseWorldPos = camera.screenToWorldCoords(xpos, ypos, display_w, display_h);
 
-        glm::vec3 ray_nds = glm::vec3(mouseX, mouseY, mouseZ);
-        glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+        // Punkt startowy promienia to punkt, w którym nastąpiło naciśnięcie myszy
+        glm::vec3 rayOrigin = mouseWorldPos;
 
-        glm::mat4 invProjMat = glm::inverse(camera.GetProjectionMatrix());
-        glm::vec4 ray_eye = invProjMat * ray_clip;
-        ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+        // Kierunek promienia - przeskaluj współrzędne myszy w zależności od wymiarów ekranu
+        float aspectRatio = static_cast<float>(display_w) / static_cast<float>(display_h);
+        float fovRadians = glm::radians(camera.Zoom);
+        float tanFovHalf = tanf(fovRadians / 2.0f);
 
-        glm::mat4 invViewMat = glm::inverse(camera.GetViewMatrix());
-        glm::vec4 ray_world = invViewMat * ray_eye;
-        ray_world = glm::normalize(ray_world);
+        // Oblicz współrzędne punktu na ekranie w przestrzeni normalizowanych urządzeń (NDC)
+        float screenX = (2.0f * xpos) / display_w - 1.0f;
+        float screenY = 1.0f - (2.0f * ypos) / display_h;
 
-        // Create ray from mouse position
-        spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, glm::vec3(ray_world), &scene);
-        //Ray ray = Ray(camera.Position, camera.Front, &scene);
+        // Przekształć współrzędne ekranowe na współrzędne w przestrzeni kamerowej
+        glm::vec4 clipCoords(screenX, screenY, -1.0f, 1.0f);
+        glm::vec4 eyeCoords = glm::inverse(camera.GetProjectionMatrix()) * clipCoords;
+        eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f); // Promień leci w głąb ekranu
+
+        // Przekształć współrzędne kamerowe na współrzędne świata
+        glm::vec3 rayDirection = glm::normalize(glm::vec3(glm::inverse(camera.GetViewMatrix()) * eyeCoords));
+
+        spdlog::info("Mouse screen position: ({}, {})", xpos, ypos);
+        spdlog::info("Camera position: ({}, {}, {})", camera.Position.x, camera.Position.y, camera.Position.z);
+        spdlog::info("Mouse world position: ({}, {}, {})", mouseWorldPos.x, mouseWorldPos.y, mouseWorldPos.z);
+        spdlog::info("Ray origin: ({}, {}, {})", rayOrigin.x, rayOrigin.y, rayOrigin.z);
+        spdlog::info("Ray direction: ({}, {}, {})", rayDirection.x, rayDirection.y, rayDirection.z);
+
+        // Stwórz promień z punktu początkowego i obliczonego kierunku
+        std::unique_ptr<Ray> ray = make_unique<Ray>(rayOrigin, rayDirection, &scene);
+
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
         }
@@ -682,10 +691,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             spdlog::info("No hit entity");
         }
 
-        wireRenderer.rayComponents.push_back(std::move(ray));        
+        wireRenderer.rayComponents.push_back(std::move(ray));
     }
 }
-
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
