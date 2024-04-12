@@ -5,6 +5,9 @@
 #ifndef ZTGK_BOXCOLLIDER_H
 #define ZTGK_BOXCOLLIDER_H
 #include "../Collider.h"
+#include "ECS/Render/Components/Render.h"
+#include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Render/Primitives/Primitives.h"
 
 class BoxCollider : public Collider
 {
@@ -12,11 +15,16 @@ public:
     glm::vec3 center{};
     glm::vec3 size{};
 
-    BoxCollider(const glm::vec3& center, const glm::vec3& size);
-
     void showImGuiDetails(Camera* camera) override;
+    void drawWire(Shader *shader, Primitives *primitives) override;
 
-    BoxCollider(Entity* entity, glm::vec3 size);
+    BoxCollider(Entity* entity, glm::vec3 size, Model *pModel);
+
+    void update();
+
+
+
+
 };
 
 

@@ -11,13 +11,13 @@ class Primitives {
 public:
     GLuint cubeVAO, cubeVBO, cubeEBO;
     GLuint quadVAO, quadVBO, quadEBO;
-
+    
      GLfloat cubeVertices[24];
      GLuint cubeIndices[36];
 
      GLfloat quadVertices[20];
      GLuint quadIndices[6];
-    
+
 
     Primitives();
     void Init();

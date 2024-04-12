@@ -5,7 +5,6 @@
 #include "Primitives.h"
 
 void Primitives::renderCube() {
-
     glBindVertexArray(cubeVAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -93,3 +92,4 @@ void Primitives::Init() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
+

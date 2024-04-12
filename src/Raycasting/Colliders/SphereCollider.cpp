@@ -3,10 +3,15 @@
 //
 
 #include "SphereCollider.h"
+#include "ECS/Render/Primitives/Primitives.h"
 
 SphereCollider::SphereCollider(const glm::vec3& center, float radius){
     this->name = "Sphere Collider";
     this->center = center;
     this->radius = radius;
     this->type = ColliderType::SPHERE;
+}
+
+void SphereCollider::drawWire(Shader *shader, Primitives *primitives) {
+
 }

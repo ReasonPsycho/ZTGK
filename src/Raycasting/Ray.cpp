@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "Colliders/BoxCollider.h"
 #include "Raycasting/Colliders/SphereCollider.h"
+#include "../ECS/Entity.h"
 
 /**
  * @brief Ray constructor
@@ -23,6 +24,29 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
         return;
     }
 
+    std::sort(colliders.begin(), colliders.end(), [origin](Collider* a, Collider* b) {
+        return glm::distance(a->parentEntity->transform.getGlobalPosition(), origin) < glm::distance(b->parentEntity->transform.getGlobalPosition(), origin);
+    });
+
+    rayPoints[0]  = origin.x;
+    rayPoints[1]  = origin.y;
+    rayPoints[2]  = origin.z;
+    rayPoints[3]  = origin.x + direction.x * 10000;
+    rayPoints[4]  = origin.y + direction.y * 10000;
+    rayPoints[5]  = origin.z + direction.z * 10000;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rayPoints), &rayPoints, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindVertexArray(0);
+    
     for (auto collider : colliders) {
         if (collider == nullptr) {
             spdlog::error("IN RAY CONSTRUCTOR: Collider is null");
@@ -35,6 +59,7 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
             } else if (collider->type == ColliderType::SPHERE) {
                 RayHit = GetRayHit(ColliderType::SPHERE, collider);
             }
+            hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
             // Stop after the first hit
             break;
         }
@@ -134,6 +159,20 @@ bool Ray::doesCollide(Collider* collider) const
  */
 glm::vec3 Ray::RayHitPoint() {
     return RayHit;
+}
+
+/**
+ * @brief Returns the entity that the ray hit
+ * @return Entity*
+ */
+Entity* Ray::getHitEntity() {
+    return hitEntity;
+}
+
+void Ray::drawWire(Shader *shader) {
+    shader->setMatrix4("model", false, glm::value_ptr(glm::mat4x4(1)));
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, 2);
 }
 
 
