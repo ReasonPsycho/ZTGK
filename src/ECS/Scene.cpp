@@ -87,5 +87,7 @@ std::vector<Collider*> Scene::getColliders() {
         collectCollidersRecursive(entity.get(), colliders);
     }
 
+
+
     return colliders;
 }

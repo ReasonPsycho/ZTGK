@@ -24,6 +24,10 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
         return;
     }
 
+    std::sort(colliders.begin(), colliders.end(), [origin](Collider* a, Collider* b) {
+        return glm::distance(a->parentEntity->transform.getGlobalPosition(), origin) < glm::distance(b->parentEntity->transform.getGlobalPosition(), origin);
+    });
+
     rayPoints[0]  = origin.x;
     rayPoints[1]  = origin.y;
     rayPoints[2]  = origin.z;

@@ -16,15 +16,16 @@ void BoxCollider::showImGuiDetails(Camera *camera) {
 
 BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, Model* pModel) {
     this->name = "Box Collider";
-    this->center = entity->transform.getLocalPosition();
-    this->size = size;
+    this->center = entity->transform.getGlobalPosition();
+    this->size = entity->transform.getLocalScale();
     this->type = ColliderType::BOX;
 
 
 }
 
 void BoxCollider::update() {
-    center = getEntity()->transform.getLocalPosition();
+    center = getEntity()->transform.getGlobalPosition();
+    size = getEntity()->transform.getLocalScale();
 }
 
 void BoxCollider::drawWire(Shader *shader, Primitives *primitives) {
