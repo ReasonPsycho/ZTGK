@@ -66,9 +66,6 @@ Entity *gridEntity;
 
 Entity *box1;
 Entity *box2;
-
-BoxCollider *boxCollider;
-
 Text text = {};
 
 
@@ -162,9 +159,12 @@ RenderSystem renderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
 
-
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
+
+ImGuiIO mouseio;
+double mouseX;
+double mouseY;
 
 // timing
 double deltaTime = Time::Instance().DeltaTime();
@@ -178,6 +178,7 @@ bool timeStepKeyPressed = false;
 SignalQueue signalQueue = SignalQueue();
 
 #pragma endregion
+
 
 
 int main(int, char **) {
@@ -229,19 +230,6 @@ int main(int, char **) {
 
 
 #pragma endregion Init
-//_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-    float lastTextx = 500;
-    float lastTexty = 500;
-
-    int signx = 1;
-    int signy = 1;
-
-    float textx = 0;
-    float texty = 0;
-
-    int number = 0;
-
-//____________________________________________________________________________________________________
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
@@ -380,17 +368,17 @@ void load_enteties() {
     gameObject->transform.setLocalScale({scale, scale, scale});
     gameObject->addComponent(make_unique<Render>(cubeModel));
 
-    //create new cube model that will fit exactly to the size of the BoxCollider added to the asteroid
-
     box1 = scene.addEntity("box1");
+    box1->transform.setLocalPosition({-10, 0, 0});
     box2 = scene.addEntity("box2");
+    box2->transform.setLocalPosition({-10, 10, 0});
     box1->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
     box2->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + 1, 1.0f, 1.0f}, cubeModel));
 
     //gameObject = scene.addEntity("Dir light");
     //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
-   // gameObject = scene.addEntity("Point Light");
-  //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+    // gameObject = scene.addEntity("Point Light");
+    //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
     gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
@@ -414,10 +402,10 @@ void init_imgui() {
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    
+
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
-    
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -450,6 +438,10 @@ void input() {
 }
 
 void update() {
+    //update mouse position
+    mouseX = mouseio.MousePos.x;
+    mouseY = mouseio.MousePos.y;
+
     scene.updateScene();
     lightSystem.Update(deltaTime);
     box1->getComponent<BoxCollider>()->update();
@@ -476,8 +468,8 @@ void render() {
     pbrSystem.pbrShader.use();
 
     renderSystem.DrawScene(&pbrSystem.pbrShader);
-     wireRenderer.DrawColliders();
-     wireRenderer.DrawRays();
+    wireRenderer.DrawColliders();
+    wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -485,33 +477,26 @@ void render() {
 
 }
 
-
-
-
-
 void imgui_begin() {
     ImGuiIO &io = ImGui::GetIO();
-    
+    mouseio = io;
     // Start the Dear ImGui frame
     if (!captureMouse) {
         io.MouseDrawCursor = true;
     } else {
         io.MouseDrawCursor = false;
-    };
+    }
 
-    
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
-  
-    
+
+
 }
 
 void imgui_render() {
-
-
-    
     ImGui::Begin("Debug menu");
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
@@ -523,17 +508,17 @@ void imgui_render() {
 
     ztgk::console.imguiWindow();
 
-   // bloomSystem .showImguiOptions();
+    // bloomSystem .showImguiOptions();
 }
 
 void imgui_end() {
     ImGui::Render();
-  
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        
+
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
@@ -637,7 +622,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
         ImGuiIO &io = ImGui::GetIO();
         io.MousePos = ImVec2(uixpos, uiypos);
     }
-    
+
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
@@ -651,54 +636,17 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
+        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
-        // Oblicz współrzędne myszy w przestrzeni gry przy użyciu funkcji z klasy Camera
-        glm::vec3 mouseWorldPos = camera.screenToWorldCoords(xpos, ypos, display_w, display_h);
-
-        // Punkt startowy promienia to punkt, w którym nastąpiło naciśnięcie myszy
-        glm::vec3 rayOrigin = mouseWorldPos;
-
-        // Kierunek promienia - przeskaluj współrzędne myszy w zależności od wymiarów ekranu
-        float aspectRatio = static_cast<float>(display_w) / static_cast<float>(display_h);
-        float fovRadians = glm::radians(camera.Zoom);
-        float tanFovHalf = tanf(fovRadians / 2.0f);
-
-        // Oblicz współrzędne punktu na ekranie w przestrzeni normalizowanych urządzeń (NDC)
-        float screenX = (2.0f * xpos) / display_w - 1.0f;
-        float screenY = 1.0f - (2.0f * ypos) / display_h;
-
-        // Przekształć współrzędne ekranowe na współrzędne w przestrzeni kamerowej
-        glm::vec4 clipCoords(screenX, screenY, -1.0f, 1.0f);
-        glm::vec4 eyeCoords = glm::inverse(camera.GetProjectionMatrix()) * clipCoords;
-        eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f); // Promień leci w głąb ekranu
-
-        // Przekształć współrzędne kamerowe na współrzędne świata
-        glm::vec3 rayDirection = glm::normalize(glm::vec3(glm::inverse(camera.GetViewMatrix()) * eyeCoords));
-
-        spdlog::info("Mouse screen position: ({}, {})", xpos, ypos);
-        spdlog::info("Camera position: ({}, {}, {})", camera.Position.x, camera.Position.y, camera.Position.z);
-        spdlog::info("Mouse world position: ({}, {}, {})", mouseWorldPos.x, mouseWorldPos.y, mouseWorldPos.z);
-        spdlog::info("Ray origin: ({}, {}, {})", rayOrigin.x, rayOrigin.y, rayOrigin.z);
-        spdlog::info("Ray direction: ({}, {}, {})", rayDirection.x, rayDirection.y, rayDirection.z);
-
-        // Stwórz promień z punktu początkowego i obliczonego kierunku
-        std::unique_ptr<Ray> ray = make_unique<Ray>(rayOrigin, rayDirection, &scene);
-
-        // Create ray from mouse position
-        spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
-        //std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, glm::vec3(ray_world), &scene);
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, camera.Front, &scene);
-
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &scene);
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
         }
         else{
             spdlog::info("No hit entity");
         }
-        wireRenderer.rayComponents.push_back(std::move(ray));        
 
+        wireRenderer.rayComponents.push_back(std::move(ray));
     }
 }
 

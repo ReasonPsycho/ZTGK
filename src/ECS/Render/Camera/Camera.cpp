@@ -118,28 +118,32 @@ void Camera::UpdateCamera(int display_w, int display_h) {
 }
 
 
-glm::vec3 Camera::screenToWorldCoords(float mouseX, float mouseY, int screenWidth, int screenHeight) {
-    // Przekształć współrzędne ekranu do zakresu [-1, 1]
+glm::vec3 Camera::getDirFromCameraToCursor(float mouseX, float mouseY, int screenWidth, int screenHeight) {
+    // Calculate normalized device coordinates (NDC)
     float x = (2.0f * mouseX) / screenWidth - 1.0f;
     float y = 1.0f - (2.0f * mouseY) / screenHeight;
-    float z = 1.0f; // punkt jest na granicy view frustum
+    float z = 1.0f;
 
-    // Przekształć współrzędne z ekranu do przestrzeni clip
-    glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f);
+    // Convert NDC to clip space
+    glm::vec3 ray_nds = glm::vec3(x, y, z);
+    glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 
-    // Przekształć współrzędne z przestrzeni clip do przestrzeni kamery
-    glm::mat4 inverseProjection = glm::inverse(GetProjectionMatrix());
-    glm::vec4 rayEye = inverseProjection * rayClip;
-    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f); // Zmiana kierunku promienia
+    // Convert clip space to eye space
+    glm::vec4 ray_eye = glm::inverse(GetProjectionMatrix()) * ray_clip;
+    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
 
-    // Przekształć współrzędne z przestrzeni kamery do przestrzeni świata
-    glm::mat4 inverseView = glm::inverse(GetViewMatrix());
-    glm::vec4 rayWorld =  rayEye * inverseView;
-    glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld)); // Kierunek promienia
+    // Convert eye space to world space (use updated view matrix)
+    glm::mat4 viewMatrix = GetViewMatrix();
+    glm::vec3 ray_wor = glm::vec3(glm::inverse(viewMatrix) * ray_eye);
+    ray_wor = glm::normalize(ray_wor);
 
-    // Dodaj kierunek promienia do pozycji kamery
-    return Position + rayDir;
+    return ray_wor;
 }
+
+
+
+
+
 
 
 
