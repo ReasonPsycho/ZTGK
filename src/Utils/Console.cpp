@@ -4,15 +4,14 @@
 
 #include "Console.h"
 #include "Util.h"
-using namespace ztgk;
 
-Console::Console(const std::string & name) : id(::id<ID_POOL_CONSOLE>()), name(name) {}
+Console::Console(const std::string & name) : name(name) {}
 
 Console::Console(const custom_menus_t & custom_menus, const std::string & name)
-: id(::id<ID_POOL_CONSOLE>()), name(name), custom_menus(custom_menus) {}
+: name(name), custom_menus(custom_menus) {}
 
 void Console::imguiWindow() {
-    ImGui::Begin(std::format("{}##Console{}", name, id).c_str(), nullptr, ImGuiWindowFlags_MenuBar);
+    ImGui::Begin(std::format("{0}##Console_{0}", name).c_str(), nullptr, ImGuiWindowFlags_MenuBar);
     if (ImGui::BeginMenuBar()) {
         for ( auto & cmenu : custom_menus ) {
             if (ImGui::MenuItem(cmenu.first.c_str())) {

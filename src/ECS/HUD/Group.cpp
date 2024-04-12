@@ -13,6 +13,13 @@ using namespace ztgk;
 
 Group::Group() : id(::id<ID_POOL_HUD_GROUP>()), hidden(false), offset(0, 0, 0) {}
 
+Group::Group(/* ignored */ unsigned int id) : id(0), hidden(false), offset(0, 0, 0)
+{}
+
+Group Group::default_group() {
+    return Group(0);
+}
+
 bool Group::isHidden() const {
     return hidden;
 }

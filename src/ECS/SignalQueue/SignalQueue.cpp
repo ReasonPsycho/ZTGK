@@ -17,7 +17,6 @@ void SignalQueue::init() {
 
     editor_log.console = std::make_unique<Console>("Signal Queue");
     editor_log.recv = std::make_unique<SignalReceiver>( editor_s_logging::new_receiver() );
-    *this += editor_log.recv.get();
     editor_log.console->custom_menus = {
         {
             "Print Q",
@@ -119,18 +118,15 @@ SignalQueue::editor_s_logging SignalQueue::editor_log{};
 void SignalQueue::showImGuiDetails(Camera *camera) {
     auto &cfg = editor_new_signal_config;
     auto &log = editor_log;
-    auto & lconsole = log.console;
 
     if (ImGui::Button("Toggle log")) {
         log.enable = !log.enable;
 
-//        if (log.enable) {
-//            log.recv = std::make_unique<SignalReceiver>(editor_s_logging::new_receiver());
-//            *this += log.recv.get();
-//        } else {
-//            *this -= log.recv.get();
-//            lconsole->clear(); //?
-//        }
+        if (log.enable) {
+            *this += log.recv.get();
+        } else {
+            *this -= log.recv.get();
+        }
     }
     ImGui::SameLine();
     ImGui::Text("dt: %lld", get_delta());

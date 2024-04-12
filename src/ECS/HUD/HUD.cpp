@@ -14,8 +14,9 @@ using namespace std;
 void HUD::init() {
     name = "HUD";
 
-    // []op auto adds default group
-    z_sorted_groups.push_back(&groups[0]);
+    auto g = Group::default_group();
+    groups.insert({0, g});
+    z_sorted_groups.push_back(&g);
     textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
     signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud);

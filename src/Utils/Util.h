@@ -17,16 +17,17 @@ namespace ztgk {
     static constexpr short ID_POOL_SIGNAL_RECEIVER = 3;
     static constexpr short ID_POOL_SIGNAL = 4;
     static constexpr short ID_POOL_HUD_GROUP = 5;
-    static constexpr short ID_POOL_CONSOLE = 6;
 
+    // Values start from 1. 0 is intended to be left for manually created default objects or left as invalid id.
     template<int POOL>
     constexpr unsigned id() {
         static std::atomic<unsigned> _id{0};
-        return _id++;
+        return ++_id;
     }
 
     static constexpr short MASK_ID_POOL_SIGNAL_TYPE = 0;
 
+    // Values start from 1. 0 is intended to be left as the empty/undefined mask.
     template<int POOL>
     constexpr unsigned mask_id() {
         static std::atomic<unsigned> _id{1};

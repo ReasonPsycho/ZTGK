@@ -20,7 +20,6 @@ class Console {
     bool scroll_down{true};
 
 public:
-    unsigned id;
     using custom_menus_t = std::unordered_map<std::string, std::function<void()>>;
     custom_menus_t custom_menus;
 
