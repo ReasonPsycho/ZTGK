@@ -10,6 +10,7 @@ class SphereCollider : public Collider {
 public:
     glm::vec3 center{};
     float radius;
+    void drawWire(Shader *shader, Primitives *primitives) override;
 
     SphereCollider(const glm::vec3& center, float radius);
 };

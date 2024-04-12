@@ -116,3 +116,43 @@ void Camera::UpdateCamera(int display_w, int display_h) {
     saved_display_w = display_w;
     saved_display_h = display_h;
 }
+
+
+glm::vec3 Camera::getDirFromCameraToCursor(float mouseX, float mouseY, int screenWidth, int screenHeight) {
+    // Calculate normalized device coordinates (NDC)
+    float x = (2.0f * mouseX) / screenWidth - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / screenHeight;
+    float z = 1.0f;
+
+    // Convert NDC to clip space
+    glm::vec3 ray_nds = glm::vec3(x, y, z);
+    glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+
+    // Convert clip space to eye space
+    glm::vec4 ray_eye = glm::inverse(GetProjectionMatrix()) * ray_clip;
+    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
+
+    // Convert eye space to world space (use updated view matrix)
+    glm::mat4 viewMatrix = GetViewMatrix();
+    glm::vec3 ray_wor = glm::vec3(glm::inverse(viewMatrix) * ray_eye);
+    ray_wor = glm::normalize(ray_wor);
+
+    return ray_wor;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

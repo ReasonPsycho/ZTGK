@@ -5,12 +5,7 @@
 #include "BoxCollider.h"
 #include "imgui.h"
 #include "ECS/Entity.h"
-BoxCollider::BoxCollider(const glm::vec3& center, const glm::vec3& size)
-{
-    this->center = center;
-    this->size = size;
-    this->type = ColliderType::BOX;
-}
+
 
 void BoxCollider::showImGuiDetails(Camera *camera) {
     Collider::showImGuiDetails(camera);
@@ -19,10 +14,25 @@ void BoxCollider::showImGuiDetails(Camera *camera) {
 
 }
 
-BoxCollider::BoxCollider(Entity *entity, glm::vec3 size) {
+BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, Model* pModel) {
     this->name = "Box Collider";
-    this->center = entity->transform.getLocalPosition();
-    this->size = size;
+    this->center = entity->transform.getGlobalPosition();
+    this->size = entity->transform.getLocalScale();
     this->type = ColliderType::BOX;
 
+
 }
+
+void BoxCollider::update() {
+    center = getEntity()->transform.getGlobalPosition();
+    size = getEntity()->transform.getLocalScale();
+}
+
+void BoxCollider::drawWire(Shader *shader, Primitives *primitives) {
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
+
+    shader->setMatrix4("model", false, glm::value_ptr(translation * scale));
+    primitives->renderCube();
+}
+
