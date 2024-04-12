@@ -282,7 +282,7 @@ void cleanup() {
 
 bool init() {
     auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and logger name since it's null anyway)
+    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
     spdlog::get("")->sinks().push_back(sink);
 
     // Get current date and time

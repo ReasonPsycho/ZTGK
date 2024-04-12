@@ -17,6 +17,7 @@ namespace ztgk {
     static constexpr short ID_POOL_SIGNAL_RECEIVER = 3;
     static constexpr short ID_POOL_SIGNAL = 4;
     static constexpr short ID_POOL_HUD_GROUP = 5;
+    static constexpr short ID_POOL_CONSOLE = 6;
 
     template<int POOL>
     constexpr unsigned id() {

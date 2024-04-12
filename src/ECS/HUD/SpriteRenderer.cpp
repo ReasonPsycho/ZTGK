@@ -65,5 +65,5 @@ void SpriteRenderer::render(Sprite * sprite) {
 }
 
 void SpriteRenderer::imgui_controls() {
-
+    ImGui::Text("%s", std::format("Shader ID: {}", shader.ID).c_str());
 }

@@ -11,6 +11,8 @@
 #include "SpriteRenderer.h"
 #include "ECS/SignalQueue/SignalReceiver.h"
 
+struct HUDRemapGroupsSignalData;
+
 class HUD : public System {
 public:
     std::unordered_map<unsigned, Group> groups;
@@ -37,6 +39,7 @@ public:
     std::unordered_map<unsigned, std::vector<Text*>> texts;
 
     void sort_z();
+    void remap_groups(HUDRemapGroupsSignalData data);
 
 private:
     std::vector<Group *> z_sorted_groups;

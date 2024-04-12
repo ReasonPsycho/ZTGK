@@ -14,6 +14,20 @@
 using namespace ztgk;
 void SignalQueue::init() {
     update_delta();
+
+    editor_log.console = std::make_unique<Console>("Signal Queue");
+    editor_log.recv = std::make_unique<SignalReceiver>( editor_s_logging::new_receiver() );
+    *this += editor_log.recv.get();
+    editor_log.console->custom_menus = {
+        {
+            "Print Q",
+            [this](){
+                editor_log.console->log("Current queue:");
+                for (const auto &item: queue)
+                    editor_log.console->log("\t" + item.to_string());
+            }
+        },
+    };
 }
 
 long long SignalQueue::get_delta() {
@@ -100,40 +114,32 @@ void SignalQueue::addComponent(void *component) {
 
 // editor
 SignalQueue::editor_s_new_signal_config SignalQueue::editor_new_signal_config{};
+SignalQueue::editor_s_logging SignalQueue::editor_log{};
 
 void SignalQueue::showImGuiDetails(Camera *camera) {
     auto &cfg = editor_new_signal_config;
+    auto &log = editor_log;
+    auto & lconsole = log.console;
 
-    if (ImGui::CollapsingHeader("Queue control")){
+    if (ImGui::Button("Toggle log")) {
+        log.enable = !log.enable;
 
-        ImGui::Text("dt: %lld", get_delta());
-        if (ImGui::Button("Toggle log")) {
-            cfg.enablelog = !cfg.enablelog;
+//        if (log.enable) {
+//            log.recv = std::make_unique<SignalReceiver>(editor_s_logging::new_receiver());
+//            *this += log.recv.get();
+//        } else {
+//            *this -= log.recv.get();
+//            lconsole->clear(); //?
+//        }
+    }
+    ImGui::SameLine();
+    ImGui::Text("dt: %lld", get_delta());
+    if ( log.enable && ImGui::TreeNodeEx(std::format("Debug Receiver##{}", log.recv->receiver_uid).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth) ) {
+        log.recv->showImGuiDetails(camera);
+        ImGui::TreePop();
+    }
 
-            if (cfg.enablelog) {
-                cfg.logger = editor_s_new_signal_config::new_logger();
-                *this += cfg.logger;
-            } else {
-                *this -= cfg.logger;
-                cfg.log.clear();
-                delete cfg.logger;
-            }
-        }
-        if (cfg.enablelog) {
-            ImGui::SameLine();
-            if (ImGui::Button("Print")) {
-                cfg.log.emplace_back("Current queue:");
-                for (const auto &item: queue)
-                    cfg.log.push_back("\t" + item.to_string());
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Clear"))
-                cfg.log.clear();
-
-            cfg.logger->showImGuiDetails(nullptr);
-        }
-
-        ImGui::Text("New Signal:");
+    if (ImGui::CollapsingHeader("Signal Spoofing")){
         if (ImGui::Button("Post")) {
             std::shared_ptr<SignalData> data;
             auto choicemask = 1 << cfg.choice;
@@ -227,18 +233,29 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
             ImGui::Text("Unimplemented - see SignalQueue::editor_control_window");
         }
     }
-    
-    if (cfg.enablelog) {
-        ImGui::Begin("Queue log");
-
-        for (auto &line: cfg.log) {
-            ImGui::Text("%s", line.c_str());
+    if ( ImGui::CollapsingHeader("Managed Components") ) {
+        for (auto & recv : receivers) {
+            if (ImGui::TreeNodeEx(std::format("ID {0}, RID {1}, Mask {2}##Recv{0}", recv->uniqueID, recv->receiver_uid, recv->receive_type_mask).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                recv->showImGuiDetails(camera);
+                ImGui::TreePop();
+            }
         }
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-            ImGui::SetScrollHereY(1.0f);
-
-        ImGui::End();
     }
+
+    // todo replace
+    if (log.enable)
+        log.console->imguiWindow();
+//    if (cfg.enablelog) {
+//        ImGui::Begin("Queue log");
+//
+//        for (auto &line: cfg.log) {
+//            ImGui::Text("%s", line.c_str());
+//        }
+//        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+//            ImGui::SetScrollHereY(1.0f);
+//
+//        ImGui::End();
+//    }
 }
 
 SignalQueue::SignalQueue() {
@@ -249,13 +266,13 @@ void SignalQueue::removeComponent(void *component) {
     receivers.erase(std::remove(receivers.begin(), receivers.end(),reinterpret_cast<SignalReceiver *const>(component)), receivers.end());
 }
 
-SignalReceiver *SignalQueue::editor_s_new_signal_config::new_logger() {
-    return new SignalReceiver(
+SignalReceiver SignalQueue::editor_s_logging::new_receiver() {
+    return SignalReceiver(
             Signal::signal_types.all,
             [](const Signal &signal) {
-                editor_new_signal_config.log.emplace_back(std::format(
+                editor_log.console->log(std::format(
                         "[{}] received signal {}",
                         ztgk::time(), signal.to_string()
-                ).c_str());
+                ));
             });
 }

@@ -145,5 +145,15 @@ TextRenderer::~TextRenderer() {
 }
 
 void TextRenderer::imgui_controls() {
-
+    ImGui::Text("%s", std::format("Shader ID: {}", shader.ID).c_str());
+    ImGui::Text("Loaded fonts:");
+    for ( auto & font : fonts ) {
+        if ( ImGui::SmallButton(std::format("Reload##Reload{}", font.first).c_str()) ) {
+            fonts.erase( font.first );
+            // render() will automatically load the font back in
+            return;
+        }
+        ImGui::SameLine();
+        ImGui::Text("%s", font.first.c_str());
+    }
 }

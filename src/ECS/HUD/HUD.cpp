@@ -27,59 +27,8 @@ void HUD::init() {
             removeGroup(std::dynamic_pointer_cast<HUDRemoveGroupSignalData>(signal.data)->groupID);
             return;
         } else if ( signal.stype == Signal::signal_types.hud_update_group_mappings_signal ) {
-            auto data = std::dynamic_pointer_cast<HUDRemapGroupsSignalData>(signal.data);
-            if ( data->all ) {
-                std::unordered_map<unsigned, std::vector<Sprite*>> remapped_s;
-                for ( auto & mapping : sprites ) {
-                    for ( auto spr : mapping.second ) {
-                        remapped_s[spr->groupID].push_back(spr);
-                    }
-                }
-                std::unordered_map<unsigned, std::vector<Text*>> remapped_t;
-                for ( auto & mapping : texts ) {
-                    for ( auto spr : mapping.second ) {
-                        remapped_t[spr->groupID].push_back(spr);
-                    }
-                }
-                sprites = remapped_s;
-                texts = remapped_t;
-            } else {
-                switch (data->componentType) {
-                    case hudcType::SPRITE: {
-                         auto pos = std::find_if(sprites[data->oldGroup].begin(), sprites[data->oldGroup].end(), [data](Sprite * spr){ return spr->uniqueID == data->componentID; });
-                         auto e = sprites[data->oldGroup].end();
-                         if ( pos == sprites[data->oldGroup].end() ) {
-                             spdlog::warn("HUD group remap request - Component not found. Aborting.");
-                             return;
-                         }
-                         if ( !groups.contains(data->newGroup) ) {
-                             spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
-                         }
-                         auto val = *pos;
-                         sprites[data->oldGroup].erase(pos);
-                         sprites[data->newGroup].push_back(val);
-                         return;
-                    }
-                    case hudcType::TEXT: {
-                         auto pos = std::find_if(texts[data->oldGroup].begin(), texts[data->oldGroup].end(), [data](Text * spr){ return spr->uniqueID == data->componentID; });
-                         if ( pos == texts[data->oldGroup].end() ) {
-                             spdlog::warn("HUD group remap request - Component not found. Aborting.");
-                             return;
-                         }
-                         if ( !groups.contains(data->newGroup) ) {
-                             spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
-                         }
-                         auto val = *pos;
-                         texts[data->oldGroup].erase(pos);
-                         texts[data->newGroup].push_back(val);
-                         return;
-                    }
-                    case hudcType::UNDEFINED: {
-                        spdlog::warn("HUD group remap request for undefined type! Aborting.");
-                        return;
-                    }
-                }
-            }
+            remap_groups( *dynamic_pointer_cast<HUDRemapGroupsSignalData>(signal.data) );
+            return;
         }
     };
 
@@ -172,8 +121,13 @@ void HUD::removeComponent(void *component) {
 }
 
 void HUD::showImGuiDetails(Camera *camera) {
-    if (ImGui::Button("Sort"))
+    if (ImGui::Button("Sort Z Depth"))
         sort_z();
+    ImGui::SameLine();
+    if (ImGui::Button("Remap groups")) {
+        remap_groups( HUDRemapGroupsSignalData() );
+    }
+
     if (ImGui::CollapsingHeader("Groups", true)) {
         if (ImGui::Button("New Group"))
             addGroup();
@@ -184,8 +138,87 @@ void HUD::showImGuiDetails(Camera *camera) {
         spriteRenderer->imgui_controls();
     if (ImGui::CollapsingHeader("Text Renderer"))
         textRenderer->imgui_controls();
+    if (ImGui::CollapsingHeader("Managed Components")) {
+        if (ImGui::TreeNodeEx("Sprites", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+            for (auto & pair : sprites) {
+                for (auto & spr : sprites[pair.first]) {
+                    if (ImGui::TreeNodeEx(std::format("ID {0}, '{1}'##Sprite{0}", spr->uniqueID, spr->editor_path).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                        spr->showImGuiDetails(camera);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNodeEx("Texts", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+            for (auto & pair : texts) {
+                for (auto & txt : texts[pair.first]) {
+                    if (ImGui::TreeNodeEx(std::format("ID {0}, '{1}'##Text{0}", txt->uniqueID, txt->content).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                        txt->showImGuiDetails(camera);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
+    }
 }
 
 void HUD::sort_z() {
     std::sort(z_sorted_groups.begin(), z_sorted_groups.end(), [](Group * g1, Group * g2){ return g1->offset.z > g2->offset.z; });
+}
+
+void HUD::remap_groups(HUDRemapGroupsSignalData data) {
+    if ( data.all ) {
+        std::unordered_map<unsigned, std::vector<Sprite*>> remapped_s;
+        for ( auto & mapping : sprites ) {
+            for ( auto spr : mapping.second ) {
+                remapped_s[spr->groupID].push_back(spr);
+            }
+        }
+        std::unordered_map<unsigned, std::vector<Text*>> remapped_t;
+        for ( auto & mapping : texts ) {
+            for ( auto spr : mapping.second ) {
+                remapped_t[spr->groupID].push_back(spr);
+            }
+        }
+        sprites = remapped_s;
+        texts = remapped_t;
+    } else {
+        switch (data.componentType) {
+            case hudcType::SPRITE: {
+                 auto pos = std::find_if(sprites[data.oldGroup].begin(), sprites[data.oldGroup].end(), [data](Sprite * spr){ return spr->uniqueID == data.componentID; });
+                 auto e = sprites[data.oldGroup].end();
+                 if ( pos == sprites[data.oldGroup].end() ) {
+                     spdlog::warn("HUD group remap request - Component not found. Aborting.");
+                     return;
+                 }
+                 if ( !groups.contains(data.newGroup) ) {
+                     spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
+                 }
+                 auto val = *pos;
+                 sprites[data.oldGroup].erase(pos);
+                 sprites[data.newGroup].push_back(val);
+                 return;
+            }
+            case hudcType::TEXT: {
+                 auto pos = std::find_if(texts[data.oldGroup].begin(), texts[data.oldGroup].end(), [data](Text * spr){ return spr->uniqueID == data.componentID; });
+                 if ( pos == texts[data.oldGroup].end() ) {
+                     spdlog::warn("HUD group remap request - Component not found. Aborting.");
+                     return;
+                 }
+                 if ( !groups.contains(data.newGroup) ) {
+                     spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
+                 }
+                 auto val = *pos;
+                 texts[data.oldGroup].erase(pos);
+                 texts[data.newGroup].push_back(val);
+                 return;
+            }
+            case hudcType::UNDEFINED: {
+                spdlog::warn("HUD group remap request for undefined type! Aborting.");
+                return;
+            }
+        }
+    }
 }
