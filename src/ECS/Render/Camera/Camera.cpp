@@ -116,3 +116,39 @@ void Camera::UpdateCamera(int display_w, int display_h) {
     saved_display_w = display_w;
     saved_display_h = display_h;
 }
+
+
+glm::vec3 Camera::screenToWorldCoords(float mouseX, float mouseY, int screenWidth, int screenHeight) {
+    // Przekształć współrzędne ekranu do zakresu [-1, 1]
+    float x = (2.0f * mouseX) / screenWidth - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / screenHeight;
+    float z = 1.0f; // punkt jest na granicy view frustum
+
+    // Przekształć współrzędne z ekranu do przestrzeni clip
+    glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f);
+
+    // Przekształć współrzędne z przestrzeni clip do przestrzeni kamery
+    glm::mat4 inverseProjection = glm::inverse(GetProjectionMatrix());
+    glm::vec4 rayEye = inverseProjection * rayClip;
+    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f); // Zmiana kierunku promienia
+
+    // Przekształć współrzędne z przestrzeni kamery do przestrzeni świata
+    glm::mat4 inverseView = glm::inverse(GetViewMatrix());
+    glm::vec4 rayWorld =  rayEye * inverseView;
+    glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld)); // Kierunek promienia
+
+    // Dodaj kierunek promienia do pozycji kamery
+    return Position + rayDir;
+}
+
+
+
+
+
+
+
+
+
+
+
+

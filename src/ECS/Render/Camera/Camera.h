@@ -76,6 +76,8 @@ public:
     void UpdateShader(Shader *shader);
     void UpdateCamera(int display_w, int display_h);
 
+    glm::vec3 screenToWorldCoords(float mouseX, float mouseY, int screenWidth, int screenHeight);
+
     int saved_display_w = 1920;
     int saved_display_h = 1080;
 private:
