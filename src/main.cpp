@@ -64,6 +64,9 @@ Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
 
+Entity *box1;
+Entity *box2;
+
 BoxCollider *boxCollider;
 
 Text text = {};
@@ -379,14 +382,11 @@ void load_enteties() {
 
     //create new cube model that will fit exactly to the size of the BoxCollider added to the asteroid
 
-    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
-    for (unsigned int i = 0; i < 2; ++i) {
-        gameObject = scene.addEntity(gameObject, "asteroid");
-        gameObject->transform.setLocalScale({scale, scale, scale});
-        gameObject->transform.setLocalPosition({5, 0, 0});
-        gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
-        gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + i + 1, 1.0f, 1.0f}, cubeModel));
-    }
+    box1 = scene.addEntity("box1");
+    box2 = scene.addEntity("box2");
+    box1->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
+    box2->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + 1, 1.0f, 1.0f}, cubeModel));
+
     //gameObject = scene.addEntity("Dir light");
     //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
    // gameObject = scene.addEntity("Point Light");
@@ -452,6 +452,8 @@ void input() {
 void update() {
     scene.updateScene();
     lightSystem.Update(deltaTime);
+    box1->getComponent<BoxCollider>()->update();
+    box2->getComponent<BoxCollider>()->update();
 }
 
 void render() {
@@ -684,14 +686,19 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         // Stwórz promień z punktu początkowego i obliczonego kierunku
         std::unique_ptr<Ray> ray = make_unique<Ray>(rayOrigin, rayDirection, &scene);
 
+        // Create ray from mouse position
+        spdlog::info("Mouse position: ({}, {}, {})", ray_world.x, ray_world.y, ray_world.z);
+        //std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, glm::vec3(ray_world), &scene);
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, camera.Front, &scene);
+
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
         }
         else{
             spdlog::info("No hit entity");
         }
+        wireRenderer.rayComponents.push_back(std::move(ray));        
 
-        wireRenderer.rayComponents.push_back(std::move(ray));
     }
 }
 
