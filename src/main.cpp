@@ -53,7 +53,7 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
-string tileModelPath = "res/models/Tile/Tile.fbx";
+string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
 Model* cubeModel;
@@ -417,16 +417,13 @@ void load_enteties() {
     gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    /*
+    
     gridEntity = scene.addEntity("Grid");
     // size modelu = 5.0 przy skali 0.01; true size -> 500
-    Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
-    gridEntity->addComponent(grid);
+    gridEntity->addComponent(make_unique<Grid>(100, 100, 5.0f, gridEntity));
     // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
 
-    grid->RenderTiles(&scene, 0.011f, &tileModel);
-     */
-
+    gridEntity->getComponent<Grid>()->RenderTiles(&scene, 0.011f, &tileModel);
 }
 
 void init_imgui() {
@@ -520,16 +517,12 @@ void imgui_begin() {
     } else {
         io.MouseDrawCursor = false;
     };
-
     
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
-  
-    
 }
-
 void imgui_render() {
 
 
@@ -555,7 +548,6 @@ void imgui_end() {
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();

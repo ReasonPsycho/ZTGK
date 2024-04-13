@@ -93,7 +93,7 @@ void DirLight::UpdateData(int height, int width) {
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 
     float scale_factor = 25.0f;
-// assume data.direction contains Euler angles (yaw, pitch, roll)
+    // assume data.direction contains Euler angles (yaw, pitch, roll)
     glm::vec3 forward = glm::vec3(1,0,0);
     data.direction =  glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward),1);
     glm::vec3 translatedPos = -scale_factor * data.direction; //adjust the sign and scale
