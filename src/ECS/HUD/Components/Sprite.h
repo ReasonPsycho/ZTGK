@@ -11,8 +11,8 @@
 #include "glad/glad.h"
 #include "ECS/Component.h"
 #include "AHUDComponent.h"
-#include "Utils/Config.h"
-#include "Utils/Util.h"
+#include "ECS/Utils/Config.h"
+#include "ECS/Utils/Util.h"
 
 struct Sprite : public AHUDComponent {
     explicit Sprite(const std::string & path);

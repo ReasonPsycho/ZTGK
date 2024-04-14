@@ -22,7 +22,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
-#include "Utils/Util.h"
+#include "ECS/Utils/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
 
@@ -39,16 +39,16 @@
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Render/Primitives/Primitives.h"
 
-#include "Utils/Time.h"
+#include "ECS/Utils/Time.h"
 
 #include "ECS/HUD/TextRenderer.h"
 #include "ECS/HUD/SpriteRenderer.h"
 
-#include "Utils/ImGuiSpdlogSink.h"
+#include "ECS/Utils/ImGuiSpdlogSink.h"
 #include "ECS/HUD/HUD.h"
 #include "ECS/Render/FrustumCulling/Frustum.h"
-#include "Raycasting/Colliders/BoxCollider.h"
-#include "Raycasting/Ray.h"
+#include "ECS/Raycasting/Colliders/BoxCollider.h"
+#include "ECS/Raycasting/Ray.h"
 #include "ECS/Render/WireRenderer.h"
 
 
@@ -243,25 +243,25 @@ int main(int, char **) {
 
 
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-        static bool bgup = true;
-        auto group = hud.getGroupOrDefault(bggroup);
-        if (group->offset.y == ztgk::config::window_size.y) {
-            bgup = false;
-        } else if (group->offset.y == 0) {
-            bgup = true;
-        }
-        if (bgup) {
-            group->offset.y++;
-        } else {
-            group->offset.y--;
-        }
-        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
-        auto s = sin(Time::Instance().LastFrame());
-        auto c = cos(Time::Instance().LastFrame());
-        static auto ogsprsize = zmspr->size;
-        zmspr->size = ogsprsize * glm::vec2(c,s);
-        zmtxt->color = { s, c, s + c / 2, 1.0f };
-        zmspr->color = { s, c, s + c / 2, 1.0f };
+//        static bool bgup = true;
+//        auto group = hud.getGroupOrDefault(bggroup);
+//        if (group->offset.y == ztgk::config::window_size.y) {
+//            bgup = false;
+//        } else if (group->offset.y == 0) {
+//            bgup = true;
+//        }
+//        if (bgup) {
+//            group->offset.y++;
+//        } else {
+//            group->offset.y--;
+//        }
+//        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
+//        auto s = sin(Time::Instance().LastFrame());
+//        auto c = cos(Time::Instance().LastFrame());
+//        static auto ogsprsize = zmspr->size;
+//        zmspr->size = ogsprsize * glm::vec2(c,s);
+//        zmtxt->color = { s, c, s + c / 2, 1.0f };
+//        zmspr->color = { s, c, s + c / 2, 1.0f };
         //____________________________________________________________________________________________________
 
 
@@ -372,8 +372,8 @@ void init_systems() {
     cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
     quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
 
-    hud.init();
-    scene.systemManager.addSystem(&hud);
+//    hud.init();
+//    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -579,6 +579,7 @@ void imgui_render() {
 }
 
 void imgui_end() {
+    ImGui::End();
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -702,6 +703,9 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 

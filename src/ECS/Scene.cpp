@@ -3,9 +3,9 @@
 //
 #include "Entity.h"
 #include "Scene.h"
-#include "../Raycasting/Collider.h"
-#include "Raycasting/Colliders/BoxCollider.h"
-#include "Raycasting/Colliders/SphereCollider.h"
+#include "../ECS/Raycasting/Collider.h"
+#include "ECS/Raycasting/Colliders/BoxCollider.h"
+#include "ECS/Raycasting/Colliders/SphereCollider.h"
 
 void Scene::updateScene() {
     for (auto &&child: children) {
