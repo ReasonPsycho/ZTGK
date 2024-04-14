@@ -20,7 +20,7 @@ class Unit : public Entity {
 public:
 
     Vector2Int gridPosition;
-    Vector3 worldPosition;
+    glm::vec3 worldPosition;
 
     State* currentState;
     AstarPathfinding pathfinding;
