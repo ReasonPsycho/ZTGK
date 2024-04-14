@@ -9,7 +9,7 @@
 #include <vector>
 #include "Tile.h"
 #include "ECS/Component.h"
-#include "Utils/VectorUtils.h"
+#include "ECS/Utils/VectorUtils.h"
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
 

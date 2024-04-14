@@ -7,9 +7,9 @@
 
 
 #include "ECS/System.h"
-#include "Raycasting/Collider.h"
-#include "Raycasting/Ray.h"
-#include "Raycasting/Colliders/BoxCollider.h"
+#include "ECS/Raycasting/Collider.h"
+#include "ECS/Raycasting/Ray.h"
+#include "ECS/Raycasting/Colliders/BoxCollider.h"
 
 class WireRenderer : public System {
 
