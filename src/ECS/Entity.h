@@ -15,7 +15,7 @@
 #include "SystemManager.h"
 #include "Scene.h"
 
-#include "../Raycasting/Colliders/BoxCollider.h"
+#include "../ECS/Raycasting/Colliders/BoxCollider.h"
 
 class Entity {
 public:

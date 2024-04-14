@@ -5,7 +5,7 @@
 #pragma once
 
 #include "glm/vec2.hpp"
-#include "Utils/Config.h"
+#include "ECS/Utils/Config.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/fwd.hpp"
 #include "glm/detail/type_mat4x4.hpp"
