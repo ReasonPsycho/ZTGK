@@ -28,6 +28,7 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
         return glm::distance(a->parentEntity->transform.getGlobalPosition(), origin) < glm::distance(b->parentEntity->transform.getGlobalPosition(), origin);
     });
 
+    /*
     rayPoints[0]  = origin.x;
     rayPoints[1]  = origin.y;
     rayPoints[2]  = origin.z;
@@ -46,7 +47,8 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glBindVertexArray(0);
-    
+    */
+
     for (auto collider : colliders) {
         if (collider == nullptr) {
             spdlog::error("IN RAY CONSTRUCTOR: Collider is null");
@@ -65,6 +67,7 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
         }
     }
 }
+
 
 /**
  * @brief Returns the point where the ray hits the collider

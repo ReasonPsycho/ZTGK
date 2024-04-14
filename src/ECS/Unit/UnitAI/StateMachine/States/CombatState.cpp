@@ -38,7 +38,9 @@ bool CombatState::isTargetInRange() {
         unit->hasCombatTarget = false;
         return false;
     }
-    if(unit->combatTarget != nullptr && VectorUtils::Distance(unit->worldPosition, unit->combatTarget->worldPosition) <= unit->stats.range){
+    Vector3 worldPosition = Vector3(unit->gridPosition.x, 0, unit->gridPosition.z);
+    Vector3 combatTargetWorldPosition = Vector3(unit->combatTarget->gridPosition.x, 0, unit->combatTarget->gridPosition.z);
+    if(VectorUtils::Distance(worldPosition, combatTargetWorldPosition) <= unit->stats.range){
         unit->isTargetInRange = true;
         return true;
     }

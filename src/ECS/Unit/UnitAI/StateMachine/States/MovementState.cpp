@@ -43,7 +43,7 @@ void MovementState::MoveOnPath() {
     }
     if (unit->pathfinding.path.size() > 0) {
         Vector2Int nextTile = unit->pathfinding.path[0];
-        Vector3 nextTileWorldPosition = unit->grid->GridToWorldPosition(nextTile);
+        glm::vec3 nextTileWorldPosition = unit->grid->GridToWorldPosition(nextTile);
         if(unit->worldPosition == nextTileWorldPosition){
             unit->pathfinding.path.erase(unit->pathfinding.path.begin());
             if (unit->pathfinding.path.size() == 0) {
@@ -52,7 +52,10 @@ void MovementState::MoveOnPath() {
             }
         }
         else{
-            unit->worldPosition = VectorUtils::MoveTowards(unit->worldPosition, nextTileWorldPosition, unit->stats.movementSpeed * Time::Instance().DeltaTime());
+            Vector3 worldPos = Vector3(unit->worldPosition.x, unit->worldPosition.y, unit->worldPosition.z);
+            Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, nextTileWorldPosition.y, nextTileWorldPosition.z);
+            Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, unit->stats.movementSpeed * Time::Instance().DeltaTime());
+            unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
         }
     }
 }
