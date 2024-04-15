@@ -18,7 +18,7 @@ public:
     void showImGuiDetails(Camera* camera) override;
     void drawWire(Shader *shader, Primitives *primitives) override;
 
-    BoxCollider(Entity* entity, glm::vec3 size, Model *pModel);
+    BoxCollider(Entity* entity, glm::vec3 size);
 
     void update();
 

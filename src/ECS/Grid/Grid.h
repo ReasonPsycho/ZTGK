@@ -46,7 +46,7 @@ public:
 
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
   
-    void RenderTiles(float scale, Model* tileModel);
+    void LoadTileEntities(float scale, Model* tileModel);
 
 
     void addComponent(void *component) override;
