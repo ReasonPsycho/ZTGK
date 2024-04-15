@@ -96,6 +96,17 @@ void Grid::showImGuiDetails(Camera *camera) {
         ImGui::Text("Offset X: %f", offsetX);
         ImGui::Text("Offset Z: %f", offsetZ);
     }
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            ImGui::PushID(gridArray[i][j]->uniqueID);
+            if(ImGui::CollapsingHeader(("Tile " + std::to_string(i) + std::to_string(j)).c_str())) {
+                gridArray[i][j]->showImGuiDetails(camera);
+
+            }
+            ImGui::PopID();
+        }
+    }
+
     ImGui::PopID();
 
 }
@@ -112,6 +123,39 @@ void Grid::RenderTiles(float scale, Model* tileModel){
             scene->addEntity(tileEntity, tileEntity->name);
         }
     }
+
+}
+
+void Grid::addComponent(void *component) {
+    auto c = static_cast<Component*>(component);
+    tiles[c->uniqueID].push_back(dynamic_cast<Tile*>(c));
+
+}
+
+void Grid::removeComponent(void *component) {
+    auto c = static_cast<Component*>(component);
+    erase(tiles[c->uniqueID], dynamic_cast<Tile*>(c));
+
+}
+
+const std::type_index *Grid::getComponentTypes() {
+    return componentTypes.data();
+}
+
+int Grid::getNumComponentTypes() {
+    return 1;
+}
+
+Grid::Grid(Grid *grid) {
+    this->name = "Grid";
+    this->scene = grid->scene;
+    this->width = grid->width;
+    this->height = grid->height;
+    this->tileSize = grid->tileSize;
+    this->Position = grid->Position;
+    this->offsetX = grid->offsetX;
+    this->offsetZ = grid->offsetZ;
+    this->gridArray = grid->gridArray;
 
 }
 

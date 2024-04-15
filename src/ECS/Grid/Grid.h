@@ -30,10 +30,11 @@ public:
     Grid() = default;
     Grid(Scene* scene ,int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
 
+    Grid(Grid* grid);
     // Destructor
     ~Grid();
 
-    void showImGuiDetails(Camera *camera) override;
+
 
 
     //get the tile at a specific index
@@ -46,9 +47,24 @@ public:
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
   
     void RenderTiles(float scale, Model* tileModel);
+
+
+    void addComponent(void *component) override;
+    void removeComponent(void *component) override;
+    const std::type_index *getComponentTypes() override;
+    int getNumComponentTypes() override;
+    void showImGuiDetails(Camera *camera) override;
+
+    std::unordered_map<unsigned, std::vector<Tile*>> tiles;
+
+
 private:
     float offsetX = 0;
     float offsetZ = 0;
+
+    std::array<std::type_index, 1> componentTypes = {
+        std::type_index(typeid(Tile))
+    };
 };
 
 

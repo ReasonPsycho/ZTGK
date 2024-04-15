@@ -164,6 +164,7 @@ PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
+Grid grid(&scene, 100, 100, 5.0f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -361,6 +362,7 @@ void init_systems() {
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
+    scene.systemManager.addSystem(&grid);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
@@ -400,15 +402,7 @@ void load_enteties() {
     gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    /*
-    gridEntity = scene.addEntity("Grid");
-    // size modelu = 5.0 przy skali 0.01; true size -> 500
-    Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
-    gridEntity->addComponent(grid);
-    // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
-
-    grid->RenderTiles(&scene, 0.011f, &tileModel);
-     */
+    grid.RenderTiles(1.0f, &tileModel);
 
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
