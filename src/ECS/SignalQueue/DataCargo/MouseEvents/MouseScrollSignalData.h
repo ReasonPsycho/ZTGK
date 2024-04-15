@@ -6,7 +6,7 @@
 
 
 #include "../SignalData.h"
-#include "Utils/Util.h"
+#include "ECS/Utils/Util.h"
 
 struct MouseScrollSignalData : SignalData {
     ztgk::Vec2<double> offset;

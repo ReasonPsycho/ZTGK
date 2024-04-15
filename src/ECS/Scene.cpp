@@ -3,6 +3,9 @@
 //
 #include "Entity.h"
 #include "Scene.h"
+#include "../ECS/Raycasting/Collider.h"
+#include "ECS/Raycasting/Colliders/BoxCollider.h"
+#include "ECS/Raycasting/Colliders/SphereCollider.h"
 
 void Scene::updateScene() {
     for (auto &&child: children) {
@@ -55,4 +58,36 @@ void Scene::showImGuiDetails(Camera *camera) {
     }   
     ImGui::End();
     stopRenderingImgui = false;
+}
+
+std::vector<std::unique_ptr<Entity>> &Scene::getChildren() {
+    return children;
+}
+
+void collectCollidersRecursive(Entity* entity, std::vector<Collider*>& colliders) {
+    // Check if the entity has any collider components and add them to the colliders vector
+    for (auto& componentPair : entity->components) {
+        if (auto collider = dynamic_cast<Collider*>(componentPair.second.get())) {
+            colliders.push_back(collider);
+        }
+    }
+
+    // Recursively iterate over all children entities
+    for (auto& child : entity->children) {
+        collectCollidersRecursive(child.get(), colliders);
+    }
+}
+
+std::vector<Collider*> Scene::getColliders() {
+    std::vector<Collider*> colliders;
+
+    // Iterate over all entities in the scene
+    for (auto& entity : children) {
+        // Recursively collect collider components from all children of the entity
+        collectCollidersRecursive(entity.get(), colliders);
+    }
+
+
+
+    return colliders;
 }

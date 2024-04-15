@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "Utils/VectorUtils.h"
+#include "ECS/Utils/VectorUtils.h"
 #include "../SignalData.h"
-#include "Utils/Util.h"
+#include "ECS/Utils/Util.h"
 
 struct MouseMoveSignalData : public SignalData {
     ztgk::Vec2<double> pos;
