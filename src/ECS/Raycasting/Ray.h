@@ -10,18 +10,22 @@
 
 class Ray {
 public:
+
     glm::vec3 origin;
     glm::vec3 direction;
 
+    // Constructors
     Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene);
 
-
+    // Collision methods
     bool doesCollide(Collider* collider) const;
     glm::vec3 GetRayHit(ColliderType type, Collider* collider) const;
-    void drawWire(Shader* shader);
-
     glm::vec3 RayHitPoint();
     Entity* getHitEntity();
+
+    // Debug methods
+    void drawWire(Shader* shader);
+
 
 private:
     float rayPoints[6];

@@ -490,8 +490,8 @@ void render() {
     pbrSystem.pbrShader.use();
 
     renderSystem.DrawScene(&pbrSystem.pbrShader);
-    wireRenderer.DrawColliders();
-    wireRenderer.DrawRays();
+    //wireRenderer.DrawColliders();
+    //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();

@@ -12,18 +12,21 @@
 class BoxCollider : public Collider
 {
 public:
+
     glm::vec3 center{};
     glm::vec3 size{};
 
-    void showImGuiDetails(Camera* camera) override;
-    void drawWire(Shader *shader, Primitives *primitives) override;
-
+    // Constructors
     BoxCollider(Entity* entity, glm::vec3 size);
 
+    // Debug methods
+    void drawWire(Shader *shader, Primitives *primitives) override;
+
+    // ImGui methods
+    void showImGuiDetails(Camera* camera) override;
+
+    // Other methods
     void update();
-
-
-
 
 };
 
