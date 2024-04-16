@@ -99,7 +99,7 @@ void Grid::showImGuiDetails(Camera *camera) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             ImGui::PushID(gridArray[i][j]->uniqueID);
-            if(ImGui::CollapsingHeader(("Tile " + std::to_string(i) + std::to_string(j)).c_str())) {
+            if(ImGui::CollapsingHeader(("Tile " + std::to_string(i) + " " + std::to_string(j)).c_str())) {
                 gridArray[i][j]->showImGuiDetails(camera);
                 glm::vec3 worldPos = GridToWorldPosition(i, j);
                 ImGui::Text("World Position: (%f, %f, %f)", worldPos.x, worldPos.y, worldPos.z);
