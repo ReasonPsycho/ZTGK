@@ -33,7 +33,7 @@ public:
     string directory;
 
     Model(string const *path) : path(path) {};
-    Model(unsigned int VAO, Material material,vector<unsigned int> indices);
+    Model(unsigned int VAO, MaterialPhong material, vector<unsigned int> indices);
     
     void Draw(Shader &shader);
     void SimpleDraw(Shader &shader);

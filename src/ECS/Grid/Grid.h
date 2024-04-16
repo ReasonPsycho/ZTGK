@@ -51,17 +51,15 @@ public:
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
 
     //loads and distributes the tile entities in world space
-    void LoadTileEntities(float scale, Model* tileModel, CollisionSystem* collisionSystem);
+    void LoadTileEntities(float scale, CollisionSystem *collisionSystem);
 
+    void SetUpWallData();
     //system methods
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override;
     int getNumComponentTypes() override;
     void showImGuiDetails(Camera *camera) override;
-
-    std::unordered_map<unsigned, std::vector<Tile*>> tiles;
-
 
 private:
     float offsetX = 0;
