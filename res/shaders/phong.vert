@@ -18,8 +18,8 @@ out VS_OUT {
 void main()
 {
     vs_out.FragPos = aPos;
-    vs_out.Normal = aNormal;
+    vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
     vs_out.TexCoords = aTexCoords;
     vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
-    gl_Position = projection * view * vec4(aPos, 1.0);
+    gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
 }

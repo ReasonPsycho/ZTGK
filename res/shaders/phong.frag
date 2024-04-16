@@ -134,7 +134,6 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
     float shadow = 1;
     shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
     
-    
     return (diffuse + specular) * shadow;
 }
 

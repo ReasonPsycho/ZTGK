@@ -392,7 +392,7 @@ void load_enteties() {
     //  gameObject = scene.addEntity("Dir light");
  //   gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
      gameObject = scene.addEntity("Point Light");
-      gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+      gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(1,1,1,1), 1.0f, 0.09f, 0.032f)));
     gameObject = scene.addEntity("Point Light 2");
     gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
   //  Entity* gameObject = scene.addEntity("Spot Light");
