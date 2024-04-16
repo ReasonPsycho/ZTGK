@@ -51,6 +51,7 @@
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Render/WireRenderer.h"
 #include "ECS/Raycasting/CollisionSystem.h"
+#include "ECS/Render/InstanceRenderSystem.h"
 
 #pragma endregion Includes
 
@@ -62,6 +63,7 @@ string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
+Model* quad;
 Model gabka = Model(&modelPathGabka);
 Model* cubeModel;
 Model* quadModel;
@@ -166,11 +168,12 @@ PBRPrimitives pbrprimitives;
 LightSystem lightSystem(&camera,&scene);
 PhongPipeline phongPipeline;
 RenderSystem renderSystem;
+InstanceRenderSystem instanceRenderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
 
-Grid grid(&scene, 100, 100, 1.0f, Vector3(0, 0, 0));
+Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -366,6 +369,7 @@ bool init() {
 void init_systems() {
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
+    scene.systemManager.addSystem(&instanceRenderSystem);
     scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
@@ -384,8 +388,16 @@ void init_systems() {
 }
 
 void load_enteties() {
+    Color color = {255, 255, 255, 255}; // this is equivalent to white color
+
+    int n = sizeof(pbrprimitives.quadIndices) / sizeof(pbrprimitives.quadIndices[0]);
+
+    // Convert the array to a vector
+    std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
+    
     model.loadModel();
-    gabka.loadModel();
+    quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
+   // gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
@@ -399,7 +411,13 @@ void load_enteties() {
  //   gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    grid.LoadTileEntities(1.0f, &tileModel, &collisionSystem);
+    gameObject = scene.addEntity("Quad");
+    gameObject->addComponent(make_unique<Render>(quadModel));
+
+
+    instanceRenderSystem.tileModel = quadModel;
+    grid.LoadTileEntities(1.0f, &collisionSystem);
+    instanceRenderSystem.Innit();
 
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
@@ -482,6 +500,7 @@ void update() {
 void render() {
 
     lightSystem.PushDepthMapsToShader(&phongPipeline.phongShader);
+    lightSystem.PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -496,6 +515,7 @@ void render() {
     phongPipeline.PrebindPipeline(&camera);
     
     renderSystem.DrawScene(&phongPipeline.phongShader);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
     //wireRenderer.DrawColliders();
     //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");

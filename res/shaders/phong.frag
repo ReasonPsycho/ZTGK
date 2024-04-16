@@ -3,7 +3,6 @@ out vec4 FragColor;
 
 in VS_OUT {
     vec3 FragPos;
-    vec3 Normal;
     vec2 TexCoords;
     vec3 WorldPos;
 }vs_out;
@@ -97,7 +96,7 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
 void main()
 {
     // properties
-    vec3 norm = normalize(vs_out.Normal);
+    vec3 norm = vec3(texture(material.normal, vs_out.TexCoords));
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
 
     vec3 result = 0.2f * vec3(texture(material.diffuse, vs_out.TexCoords)); //We do be calculating ambient here
@@ -222,7 +221,8 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     float closestDepth = texture(planeShadowMaps, vec3(projCoords.xy, lightID)).r;    // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
-    vec3 normal = normalize(vs_out.Normal);
+
+    vec3 normal = normalize( vec3(texture(material.normal, vs_out.TexCoords)));
     vec3 lightDir = normalize(lightPos - vs_out.WorldPos);
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     // check whether current frag pos is in shadow

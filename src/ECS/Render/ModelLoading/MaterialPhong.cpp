@@ -87,6 +87,7 @@ MaterialPhong::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string 
 }
 
 void MaterialPhong::loadMaterial(Shader *shader) {
+    shader->use();
     glActiveTexture(GL_TEXTURE3); // active proper texture unit before binding
     glUniform1i(glGetUniformLocation(shader->ID, "material.diffuse"), 3);
     glBindTexture(GL_TEXTURE_2D, diffuseMap->ID);

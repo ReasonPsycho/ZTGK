@@ -15,6 +15,7 @@ public:
     void Init();
     void PrebindPipeline(Camera *camera);
     Shader phongShader = Shader("res/shaders/phong.vert", "res/shaders/phong.frag");
+    Shader phongInstanceShader = Shader("res/shaders/phongInstance.vert", "res/shaders/phong.frag");
 };
 
 
