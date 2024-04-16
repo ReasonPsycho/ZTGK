@@ -3,9 +3,6 @@
 UnitAI::UnitAI(Unit *pUnit, StateManager *pStateManager) {
     unit = pUnit;
     stateManager = pStateManager;
-
-    unit->addComponent(std::unique_ptr<UnitAI>(this));
-
     stateManager->unit = unit;
     unit->currentState = stateManager->currentState;
 }

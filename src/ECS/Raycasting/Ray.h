@@ -7,6 +7,7 @@
 #include "glm/glm.hpp"
 #include "ECS/Scene.h"
 #include "Collider.h"
+#include "CollisionSystem.h"
 
 class Ray {
 public:
@@ -15,7 +16,7 @@ public:
     glm::vec3 direction;
 
     // Constructors
-    Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene);
+    Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem* collisionSystem);
 
     // Collision methods
     bool doesCollide(Collider* collider) const;

@@ -5,7 +5,8 @@
 #include "Unit.h"
 
 
-Unit::Unit(Scene *Scene, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) :Entity(scene, std::move(name)) {
+Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) {
+    this->name = name;
     this->equipment = UnitEquipment();
     this->grid = grid;
     this->gridPosition = gridPosition;
@@ -55,4 +56,21 @@ void Unit::UpdateStats() {
 
 UnitStats Unit::GetBaseStats() {
     return this->baseStats;
+}
+
+void Unit::showImGuiDetails(Camera *camera) {
+    ImGui::Text("Unit: %s", name.c_str());
+    ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
+    ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);
+    ImGui::Text("Health: %f", stats.health);
+    ImGui::Text("Attack Damage: %f", stats.attackDamage);
+    ImGui::Text("Attack Speed: %f", stats.attackSpeed);
+    ImGui::Text("Movement Speed: %f", stats.movementSpeed);
+    ImGui::Text("Range: %f", stats.range);
+    ImGui::Text("Ally: %s", isAlly ? "true" : "false");
+
+}
+
+void Unit::Update() {
+
 }

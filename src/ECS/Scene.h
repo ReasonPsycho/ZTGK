@@ -29,8 +29,7 @@ public:
     bool stopRenderingImgui = false;
 
     std::vector<std::unique_ptr<Entity>>& getChildren();
-
-    std::vector<Collider*> getColliders();
+    
     
 private:
     std::vector<std::unique_ptr<Entity>> children;

@@ -9,6 +9,8 @@
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Render/Primitives/Primitives.h"
 
+class CollisionSystem;
+
 class BoxCollider : public Collider
 {
 public:
@@ -17,7 +19,7 @@ public:
     glm::vec3 size{};
 
     // Constructors
-    BoxCollider(Entity* entity, glm::vec3 size);
+    BoxCollider(Entity* entity, glm::vec3 size, CollisionSystem* collisionSystem);
 
     // Debug methods
     void drawWire(Shader *shader, Primitives *primitives) override;
