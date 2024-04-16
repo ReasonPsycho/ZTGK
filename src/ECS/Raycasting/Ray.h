@@ -7,21 +7,26 @@
 #include "glm/glm.hpp"
 #include "ECS/Scene.h"
 #include "Collider.h"
+#include "CollisionSystem.h"
 
 class Ray {
 public:
+
     glm::vec3 origin;
     glm::vec3 direction;
 
-    Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene);
+    // Constructors
+    Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem* collisionSystem);
 
-
+    // Collision methods
     bool doesCollide(Collider* collider) const;
     glm::vec3 GetRayHit(ColliderType type, Collider* collider) const;
-    void drawWire(Shader* shader);
-
     glm::vec3 RayHitPoint();
     Entity* getHitEntity();
+
+    // Debug methods
+    void drawWire(Shader* shader);
+
 
 private:
     float rayPoints[6];

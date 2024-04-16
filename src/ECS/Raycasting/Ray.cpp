@@ -14,11 +14,11 @@
  * @param direction
  * @param scene
  */
-Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, Scene* scene) {
+Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *collisionSystem) {
     this->origin = origin;
     this->direction = direction;
 
-    std::vector<Collider*> colliders = scene->getColliders();
+    std::vector<Collider*> colliders = collisionSystem->getColliders();
     if (colliders.empty()) {
         spdlog::error("IN RAY CONSTRUCTOR: No colliders found in the scene");
         return;

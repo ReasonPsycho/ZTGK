@@ -50,7 +50,7 @@
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Render/WireRenderer.h"
-
+#include "ECS/Raycasting/CollisionSystem.h"
 
 #pragma endregion Includes
 
@@ -168,6 +168,9 @@ PhongPipeline phongPipeline;
 RenderSystem renderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
+CollisionSystem collisionSystem;
+
+Grid grid(&scene, 100, 100, 1.0f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -365,6 +368,8 @@ void init_systems() {
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
+    scene.systemManager.addSystem(&grid);
+    scene.systemManager.addSystem(&collisionSystem);
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -382,19 +387,7 @@ void load_enteties() {
     model.loadModel();
     gabka.loadModel();
     tileModel.loadModel();
-    Entity *gameObject = scene.addEntity("asteroid");
-    gameObject->transform.setLocalPosition({-0, 0, 0});
-    const float scale = 5;
-    gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(std::make_unique<Render>(&gabka));
-    
-    box1 = scene.addEntity("box1");
-    box1->transform.setLocalPosition({-10, 0, 0});
-    box2 = scene.addEntity("box2");
-    box2->transform.setLocalPosition({-10, 10, 0});
-    box1->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
-    box2->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + 1, 1.0f, 1.0f}, cubeModel));
-    
+    Entity *gameObject;
 
     //  gameObject = scene.addEntity("Dir light");
  //   gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
@@ -402,18 +395,11 @@ void load_enteties() {
       gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Point Light 2");
     gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-    gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
+  //  Entity* gameObject = scene.addEntity("Spot Light");
+ //   gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    
-    gridEntity = scene.addEntity("Grid");
-    // size modelu = 5.0 przy skali 0.01; true size -> 500
-   // gridEntity->addComponent(make_unique<Grid>(100, 100, 5.0f, gridEntity));
-    // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
-
-   // grid->RenderTiles(&scene, 0.011f, &tileModel);
-     
+    grid.LoadTileEntities(1.0f, &tileModel, &collisionSystem);
 
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
@@ -488,8 +474,6 @@ void update() {
 
     scene.updateScene();
     lightSystem.Update(deltaTime);
-    box1->getComponent<BoxCollider>()->update();
-    box2->getComponent<BoxCollider>()->update();
 
     signalQueue.update();
 
@@ -512,8 +496,8 @@ void render() {
     phongPipeline.PrebindPipeline(&camera);
     
     renderSystem.DrawScene(&phongPipeline.phongShader);
-    wireRenderer.DrawColliders();
-    wireRenderer.DrawRays();
+    //wireRenderer.DrawColliders();
+    //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -709,7 +693,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &scene);
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
         }
