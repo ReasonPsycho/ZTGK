@@ -71,18 +71,24 @@ private:
 
     Shader instancePlaneDepthShader = Shader("res/shaders/Shadows/instance_shadows_depth.vert",
                                              "res/shaders/Shadows/shadows_depth.frag");
-    
+
+    int CUBE_SHADOW_INDEX = 8;
+    int PLANE_SHADOW_TEXTURE_INDEX = 9;    
     
     GLuint dirLightBufferBindingPoint = 3;
     GLuint pointLightBufferBindingPoint = 4;
     GLuint spotLightBufferBindingPoint = 5;
 
-
-
     GLuint dirLightBufferId;
     GLuint pointLightBufferId;
     GLuint spotLightBufferId;
-    
+
+    GLuint planeShadowMaps;
+    GLuint cubeShadowMaps;
+
+
+    const unsigned int SHADOW_WIDTH = 512, SHADOW_HEIGHT = 512;
+
     std::array<std::type_index, 4> componentTypes = {
             std::type_index(typeid(ILight)),
             std::type_index(typeid(DirLight)),

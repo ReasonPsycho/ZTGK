@@ -12,7 +12,7 @@ using namespace std;
 
 
 // constructor
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material) : vertices(
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, MaterialPhong material) : vertices(
         vertices), indices(indices), material(material) {
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
@@ -87,7 +87,7 @@ void Mesh::setupMesh() {
     glBindVertexArray(0);
 }
 
-Mesh::Mesh(unsigned int VAO, Material material, vector<unsigned int> indices):VAO(VAO), material(material),indices(indices) {
+Mesh::Mesh(unsigned int VAO, MaterialPhong material, vector<unsigned int> indices): VAO(VAO), material(material), indices(indices) {
 
 }
 
