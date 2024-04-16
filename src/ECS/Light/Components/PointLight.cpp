@@ -113,7 +113,8 @@ PointLight::PointLight(PointLightData data):
 
 void PointLight::showImGuiDetails(Camera *camera) {
   
-        ImGui::InputFloat4("Color", glm::value_ptr(data.color));
+        ImGui::InputFloat4("Color", glm::value_ptr(data.diffuse));
+        ImGui::InputFloat4("Color", glm::value_ptr(data.specular));
         ImGui::InputFloat("Constant", &data.constant);
         ImGui::InputFloat("Linear", &data.linear);
         ImGui::InputFloat("Quadratic", &data.quadratic);

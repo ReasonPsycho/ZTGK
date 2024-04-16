@@ -13,7 +13,8 @@
 #include "glm/gtx/quaternion.hpp"
 
 struct SpotLightData {
-    glm::vec4 color;
+    glm::vec4 diffuse;
+    glm::vec4 specular;
     glm::vec4 position;
     glm::vec4 direction;
     float cutOff;  
@@ -26,7 +27,8 @@ struct SpotLightData {
     float pointlessfloat3;
     glm::mat4x4 lightSpaceMatrix;
 
-    SpotLightData( glm::vec4 color = glm::vec4(glm::vec3 (255.0f),1),
+    SpotLightData( glm::vec4 diffuse = glm::vec4(glm::vec3 (255.0f),1),
+                   glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
     glm::vec4 position = glm::vec4(0.0f),
     glm::vec4 direction= glm::vec4(1.0f),
     float cutOff = 1,
@@ -36,7 +38,8 @@ struct SpotLightData {
     float quadratic = 1,
     glm::mat4x4 lightSpaceMatrix = glm::mat4x4(1.0f)
     )
-            : color(color),
+            : diffuse(diffuse),
+             specular(specular),
               position(position),
               direction(direction),
               cutOff(cutOff),

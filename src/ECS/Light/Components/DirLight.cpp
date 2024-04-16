@@ -84,7 +84,8 @@ DirLight::DirLight(DirLightData data) :
 }
 
 void DirLight::showImGuiDetails(Camera *camera) {
-        ImGui::InputFloat4("Color", glm::value_ptr(data.color));
+        ImGui::InputFloat4("Color", glm::value_ptr(data.diffuse));
+        ImGui::InputFloat4("Color", glm::value_ptr(data.specular));
 }
 
 void DirLight::UpdateData(int height, int width) {
