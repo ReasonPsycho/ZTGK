@@ -7,6 +7,7 @@
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Render/Primitives/Primitives.h"
 #include "ECS/Render/Primitives/PBRPrimitives.h"
+#include "ECS/Raycasting/CollisionSystem.h"
 
 
 
@@ -113,7 +114,7 @@ void Grid::showImGuiDetails(Camera *camera) {
 
 }
 
-void Grid::LoadTileEntities(float scale, Model* tileModel){
+void Grid::LoadTileEntities(float scale, Model* tileModel, CollisionSystem* collisionSystem){
     Entity* gridEntity = scene->addEntity("Grid Entity");
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -124,7 +125,7 @@ void Grid::LoadTileEntities(float scale, Model* tileModel){
             tileEntity->transform.setLocalScale(glm::vec3(scale, scale,scale));
             tileEntity->updateSelfAndChild();
 
-            tileEntity->addComponent(std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5,0.5,0.5)));
+            tileEntity->addComponent(std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5,0.5,0.5), collisionSystem));
             tileEntity->getComponent<BoxCollider>()->center = tileEntity->transform.getGlobalPosition() + glm::vec3(0,0,0.5);
 
         }

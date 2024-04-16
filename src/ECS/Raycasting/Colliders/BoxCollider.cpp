@@ -5,7 +5,7 @@
 #include "BoxCollider.h"
 #include "imgui.h"
 #include "ECS/Entity.h"
-
+#include "ECS/Raycasting/CollisionSystem.h"
 
 void BoxCollider::showImGuiDetails(Camera *camera) {
 //    Collider::showImGuiDetails(camera);
@@ -14,12 +14,13 @@ void BoxCollider::showImGuiDetails(Camera *camera) {
 
 }
 
-BoxCollider::BoxCollider(Entity *entity, glm::vec3 size) {
+BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionSystem *collisionSystem) {
     this->name = "Box Collider";
     this->center = entity->transform.getGlobalPosition();
     this->size = size;
     this->type = ColliderType::BOX;
 
+    collisionSystem->addComponent(this);
 
 }
 

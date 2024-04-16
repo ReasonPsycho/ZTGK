@@ -50,7 +50,7 @@
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Render/WireRenderer.h"
-
+#include "ECS/Raycasting/CollisionSystem.h"
 
 #pragma endregion Includes
 
@@ -164,6 +164,8 @@ PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
+CollisionSystem collisionSystem;
+
 Grid grid(&scene, 100, 100, 1.0f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
@@ -363,6 +365,7 @@ void init_systems() {
     scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
+    scene.systemManager.addSystem(&collisionSystem);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
@@ -390,7 +393,7 @@ void load_enteties() {
     gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    grid.LoadTileEntities(1.0f, &tileModel);
+    grid.LoadTileEntities(1.0f, &tileModel, &collisionSystem);
 
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
@@ -689,7 +692,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &scene);
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
         }
