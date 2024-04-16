@@ -13,17 +13,22 @@
 #include "glm/gtx/quaternion.hpp"
 
 struct DirLightData {
+    glm::vec4 diffuse;
+    glm::vec4 specular;
+    ;
     glm::vec4 color;
     glm::vec4 position;
     glm::vec4 direction;
     glm::mat4x4 lightSpaceMatrix;
 
-    DirLightData(glm::vec4 color= glm::vec4(glm::vec3 (255.0f),1),
+    DirLightData(glm::vec4 diffuse= glm::vec4(glm::vec3 (255.0f),1),
+                 glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
                  glm::vec4 position = glm::vec4(0.0f),
     glm::vec4 direction = glm::vec4(1.0f),
     glm::mat4x4 lightSpaceMatrix = glm::mat4x4(1.0f))
-            : color(color),
-             position(position),
+            : diffuse(diffuse),
+              specular(specular),
+              position(position),
               direction(direction),
               lightSpaceMatrix(lightSpaceMatrix) // set to identity matrix
     {}
@@ -38,12 +43,13 @@ public:
     void showImGuiDetails(Camera *camera) override;
 
     
-    void InnitShadow() override;
+    void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
+    void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
+                           int height, GLuint ShadowMapArrayId, int index) override; // Pure virtual function
 
 
-    void UpdateData() override;
+    void UpdateData(int height, int width) override;
     
     
 private:

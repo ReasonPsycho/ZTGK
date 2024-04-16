@@ -15,7 +15,8 @@
 
 
 struct PointLightData {
-    glm::vec4 color;
+    glm::vec4 diffuse;
+    glm::vec4 specular;
     glm::vec4 position;
     float constant;
     float linear;
@@ -23,12 +24,14 @@ struct PointLightData {
     float pointlessfloat;
 
     //Default constructor
-    PointLightData(  glm::vec4 color = glm::vec4(glm::vec3 (255.0f),1),
+    PointLightData(  glm::vec4 diffuse = glm::vec4(glm::vec3 (255.0f),1),
+                     glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
     glm::vec4 position = glm::vec4(0.0f),
     float constant = 1,
     float linear = 1,
     float quadratic = 1)
-            : color(color),
+            : diffuse(diffuse),
+              specular(specular),
               position(position),
               constant(constant),
               linear(linear),
@@ -46,10 +49,11 @@ public:
 
     void showImGuiDetails(Camera *camera) override;
     
-    void InnitShadow() override;
+    void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(ShaderType shaderType,Shader* shadowMapShader,Shader* instanceShadowMapShader) override; // Pure virtual function
-    void UpdateData() override;
+    void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
+                           int height, GLuint ShadowMapArrayId, int index) override; // Pure virtual function
+    void UpdateData(int height, int width) override;
 
 private:
     float near_plane = 0.1f, far_plane = 50.0f;
