@@ -16,8 +16,10 @@ struct UnitStats{
 };
 
 
-class Unit : public Entity {
+class Unit : public Component {
 public:
+
+    bool isSelected;
 
     Vector2Int gridPosition;
     glm::vec3 worldPosition;
@@ -40,7 +42,7 @@ public:
     IMineable* miningTarget;
     UnitStats stats;
 
-    Unit(Scene *scene, std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
+    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
     ~Unit();
 
     bool IsAlly() const;
@@ -50,6 +52,9 @@ public:
     void UpdateStats();
 
     UnitStats GetBaseStats();
+
+    void showImGuiDetails(Camera *camera) override;
+    void Update() override;
 
 private:
     bool isAlly;

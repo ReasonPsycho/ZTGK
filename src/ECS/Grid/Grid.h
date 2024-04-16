@@ -13,7 +13,7 @@
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
 
-
+class CollisionSystem;
 class Grid : public System{
 public:
     //number of tiles in the grid
@@ -51,7 +51,7 @@ public:
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
 
     //loads and distributes the tile entities in world space
-    void LoadTileEntities(float scale, Model* tileModel);
+    void LoadTileEntities(float scale, Model* tileModel, CollisionSystem* collisionSystem);
 
     //system methods
     void addComponent(void *component) override;
