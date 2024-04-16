@@ -19,13 +19,15 @@ public:
     std::vector<Vector2Int> path;
 
 
+    // Constructors
     AstarPathfinding() = default;
     explicit AstarPathfinding(Grid* grid);
 
 
+    // Destructor
     ~AstarPathfinding() = default;
 
-    //VIP function
+    // Most important method
     void FindPath(Vector2Int start, Vector2Int target);
 
 private:
@@ -37,6 +39,8 @@ private:
     std::vector<Vector2Int> GetNeighbours(Vector2Int current, bool simple = false);
 };
 
+
+//Hash function for Vector2Int
 template<> struct std::hash<Vector2Int>{
     std::size_t operator()(const Vector2Int& k) const
     {

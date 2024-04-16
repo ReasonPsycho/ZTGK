@@ -14,15 +14,21 @@ enum ColliderType{
     BOX,
     SPHERE
 };
-//TODO: Add more collider types
-//TODO: Update collider position based on the entity position (?)
 
 class Collider : public Component{
 public:
-    Collider() : Component() { this -> name = "Collider"; }
-    virtual ~Collider() = default;
     ColliderType type;
+
+    // Constructors
+    Collider() : Component() { this -> name = "Collider"; }
+
+    // Destructor
+    virtual ~Collider() = default;
+
+    // Debug methods
     virtual void drawWire(Shader *shader, Primitives *primitives) = 0;
+
+    // ImGui methods
     void showImGuiDetails(Camera *camera) override;
 
 };

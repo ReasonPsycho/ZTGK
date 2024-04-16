@@ -164,6 +164,7 @@ PBRPipeline pbrSystem(&camera,&primitives);
 RenderSystem renderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
+Grid grid(&scene, 100, 100, 1.0f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -361,6 +362,7 @@ void init_systems() {
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
+    scene.systemManager.addSystem(&grid);
     primitives.Init();
     PBRPrimitives.Init();
     pbrSystem.Init();
@@ -379,36 +381,16 @@ void init_systems() {
 void load_enteties() {
     model.loadModel();
     tileModel.loadModel();
-    Entity *gameObject = scene.addEntity("asteroid");
-    gameObject->transform.setLocalPosition({-0, 0, 0});
-    const float scale = 5;
-    gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(make_unique<Render>(cubeModel));
-
-    box1 = scene.addEntity("box1");
-    box1->transform.setLocalPosition({-10, 0, 0});
-    box2 = scene.addEntity("box2");
-    box2->transform.setLocalPosition({-10, 10, 0});
-    box1->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{5.0f, 5.0f, 5.0f}, cubeModel));
-    box2->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + 1, 1.0f, 1.0f}, cubeModel));
 
     //gameObject = scene.addEntity("Dir light");
     //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
     // gameObject = scene.addEntity("Point Light");
     //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-    gameObject = scene.addEntity("Spot Light");
+    Entity* gameObject = scene.addEntity("Spot Light");
     gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    /*
-    gridEntity = scene.addEntity("Grid");
-    // size modelu = 5.0 przy skali 0.01; true size -> 500
-    Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
-    gridEntity->addComponent(grid);
-    // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
-
-    grid->RenderTiles(&scene, 0.011f, &tileModel);
-     */
+    grid.LoadTileEntities(1.0f, &tileModel);
 
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
@@ -483,8 +465,6 @@ void update() {
 
     scene.updateScene();
     lightSystem.Update(deltaTime);
-    box1->getComponent<BoxCollider>()->update();
-    box2->getComponent<BoxCollider>()->update();
 
     signalQueue.update();
 
@@ -510,8 +490,8 @@ void render() {
     pbrSystem.pbrShader.use();
 
     renderSystem.DrawScene(&pbrSystem.pbrShader);
-    wireRenderer.DrawColliders();
-    wireRenderer.DrawRays();
+    //wireRenderer.DrawColliders();
+    //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();

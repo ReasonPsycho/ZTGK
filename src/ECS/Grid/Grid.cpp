@@ -96,22 +96,72 @@ void Grid::showImGuiDetails(Camera *camera) {
         ImGui::Text("Offset X: %f", offsetX);
         ImGui::Text("Offset Z: %f", offsetZ);
     }
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            ImGui::PushID(gridArray[i][j]->uniqueID);
+            if(ImGui::CollapsingHeader(("Tile " + std::to_string(i) + " " + std::to_string(j)).c_str())) {
+                gridArray[i][j]->showImGuiDetails(camera);
+                glm::vec3 worldPos = GridToWorldPosition(i, j);
+                ImGui::Text("World Position: (%f, %f, %f)", worldPos.x, worldPos.y, worldPos.z);
+
+            }
+            ImGui::PopID();
+        }
+    }
+
     ImGui::PopID();
 
 }
 
-void Grid::RenderTiles(float scale, Model* tileModel){
-    Entity* tileEntity;
+void Grid::LoadTileEntities(float scale, Model* tileModel){
+    Entity* gridEntity = scene->addEntity("Grid Entity");
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            tileEntity = new Entity(scene ,"Tile" + std::to_string(i) + std::to_string(j));
+            Entity* tileEntity = scene->addEntity(gridEntity, "Tile" + std::to_string(i) + std::to_string(j));
             tileEntity->addComponent(std::make_unique<Render>(new Model(*tileModel)));
             tileEntity->addComponent(std::make_unique<Tile>(i, j));
             tileEntity->transform.setLocalPosition(GridToWorldPosition(i, j));
             tileEntity->transform.setLocalScale(glm::vec3(scale, scale,scale));
-            scene->addEntity(tileEntity, tileEntity->name);
+            tileEntity->updateSelfAndChild();
+
+            tileEntity->addComponent(std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5,0.5,0.5)));
+            tileEntity->getComponent<BoxCollider>()->center = tileEntity->transform.getGlobalPosition() + glm::vec3(0,0,0.5);
+
         }
     }
+
+}
+
+void Grid::addComponent(void *component) {
+    auto c = static_cast<Component*>(component);
+    tiles[c->uniqueID].push_back(dynamic_cast<Tile*>(c));
+
+}
+
+void Grid::removeComponent(void *component) {
+    auto c = static_cast<Component*>(component);
+    erase(tiles[c->uniqueID], dynamic_cast<Tile*>(c));
+
+}
+
+const std::type_index *Grid::getComponentTypes() {
+    return componentTypes.data();
+}
+
+int Grid::getNumComponentTypes() {
+    return 1;
+}
+
+Grid::Grid(Grid *grid) {
+    this->name = "Grid";
+    this->scene = grid->scene;
+    this->width = grid->width;
+    this->height = grid->height;
+    this->tileSize = grid->tileSize;
+    this->Position = grid->Position;
+    this->offsetX = grid->offsetX;
+    this->offsetZ = grid->offsetZ;
+    this->gridArray = grid->gridArray;
 
 }
 

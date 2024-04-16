@@ -8,15 +8,18 @@ class Tile : public Component{
 public:
     Vector2Int index{};
     bool vacant;
+    bool isFloor = true;
 
     // Constructors
     explicit Tile(Vector2Int index, bool vacant = true, std::string name = "Tile");
     Tile(int index_x, int index_z, bool vacant = true, std::string name = "Tile");
-    void showImGuiDetails(Camera *camera) override;
     Tile() = default;
 
     // Destructor
     ~Tile();
+
+    // Methods
+    void showImGuiDetails(Camera *camera) override;
 };
 
 #endif //ZTGK_TILE_H

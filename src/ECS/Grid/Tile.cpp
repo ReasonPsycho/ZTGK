@@ -25,6 +25,8 @@ Tile::Tile(int index_x, int index_z, bool vacant, std::string name) {
 }
 
 void Tile::showImGuiDetails(Camera *camera) {
+    ImGui::Text("Index: (%d, %d)", index.x, index.z);
+    ImGui::Checkbox("Vacant", &vacant);
 
 }
 
