@@ -30,4 +30,3 @@ void Tile::showImGuiDetails(Camera *camera) {
 
 }
 
-
