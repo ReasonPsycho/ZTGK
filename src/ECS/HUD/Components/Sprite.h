@@ -13,6 +13,7 @@
 #include "AHUDComponent.h"
 #include "ECS/Utils/Config.h"
 #include "ECS/Utils/Util.h"
+#include "stb_image.h"
 
 struct Sprite : public AHUDComponent {
     explicit Sprite(const std::string & path);

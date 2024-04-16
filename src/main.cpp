@@ -29,7 +29,7 @@
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "ECS/Render/Pipelines/PBRPipeline.h"
+#include "ECS/Render/Pipelines/Phong/PhongPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Entity.h"
@@ -58,9 +58,11 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
-string tileModelPath = "res/models/Tile/Tile.fbx";
+string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
+string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
+Model gabka = Model(&modelPathGabka);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
@@ -106,6 +108,8 @@ void input();
 void update();
 
 void render();
+
+void wireFrameRender();
 
 void imgui_begin();
 
@@ -158,9 +162,9 @@ float lastX = 0;
 float lastY = 0;
 
 Primitives primitives;
-PBRPrimitives PBRPrimitives;
+PBRPrimitives pbrprimitives;
 LightSystem lightSystem(&camera,&scene);
-PBRPipeline pbrSystem(&camera,&primitives);
+PhongPipeline phongPipeline;
 RenderSystem renderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
@@ -367,15 +371,13 @@ void init_systems() {
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
     primitives.Init();
-    PBRPrimitives.Init();
-    pbrSystem.Init();
+    phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
-
-    Material whiteMaterial = Material(myColor);
-    cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
-    quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
+    pbrprimitives.Init();
+    MaterialPhong materialPhong = MaterialPhong(myColor);
+    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,vector<GLuint>(pbrprimitives.cubeIndices,pbrprimitives.cubeIndices + 36));
 
 //    hud.init();
 //    scene.systemManager.addSystem(&hud);
@@ -383,14 +385,18 @@ void init_systems() {
 
 void load_enteties() {
     model.loadModel();
+    gabka.loadModel();
     tileModel.loadModel();
+    Entity *gameObject;
 
-    //gameObject = scene.addEntity("Dir light");
-    //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
-    // gameObject = scene.addEntity("Point Light");
-    //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-    Entity* gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
+    //  gameObject = scene.addEntity("Dir light");
+ //   gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
+     gameObject = scene.addEntity("Point Light");
+      gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(1,1,1,1), 1.0f, 0.09f, 0.032f)));
+    gameObject = scene.addEntity("Point Light 2");
+    gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+  //  Entity* gameObject = scene.addEntity("Spot Light");
+ //   gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
     grid.LoadTileEntities(1.0f, &tileModel, &collisionSystem);
@@ -475,8 +481,7 @@ void update() {
 
 void render() {
 
-    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
-    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
+    lightSystem.PushDepthMapsToShader(&phongPipeline.phongShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -486,13 +491,11 @@ void render() {
 
     file_logger->info("Cleared.");
 
-    pbrSystem.PrebindPBR(&camera);
-    pbrSystem.RenderBackground();
+
     file_logger->info("Set up PBR.");
-
-    pbrSystem.pbrShader.use();
-
-    renderSystem.DrawScene(&pbrSystem.pbrShader);
+    phongPipeline.PrebindPipeline(&camera);
+    
+    renderSystem.DrawScene(&phongPipeline.phongShader);
     //wireRenderer.DrawColliders();
     //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
@@ -512,8 +515,7 @@ void imgui_begin() {
     } else {
         io.MouseDrawCursor = false;
     }
-
-
+    
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -521,7 +523,6 @@ void imgui_begin() {
 
 
 }
-
 void imgui_render() {
     ImGui::Begin("Debug menu");
     char buffer[64];
@@ -569,7 +570,7 @@ void imgui_end() {
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-
+        
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();

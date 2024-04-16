@@ -21,10 +21,8 @@ uniform sampler2D brdfLUT;
 uniform vec3 camPos;
 uniform float far_plane;
 
-#define MAX_LIGHTS 5 // IDKKKK!!!!!
-
-layout (binding = 8) uniform samplerCube cubeShadowMaps[MAX_LIGHTS];
-layout (binding = 8 + 5) uniform sampler2D planeShadowMaps[MAX_LIGHTS];
+layout (binding = 8) uniform samplerCubeArray cubeShadowMaps;
+layout (binding = 9) uniform sampler2DArray planeShadowMaps;
 struct DirLight {
     vec4 color;
     vec4 position;
@@ -131,10 +129,10 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(cubeShadowMaps[lightIndex], fragToLight + gridSamplingDisk[i] * diskRadius).r;
-        closestDepth *= far_plane;   // undo mapping [0;1]
-        if (currentDepth - bias > closestDepth)
-        shadow += 1.0;
+        float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;        closestDepth *= far_plane;   // undo mapping [0;1]
+        if (currentDepth - bias > closestDepth){
+            shadow += 1.0;
+        }
     }
     shadow /= float(samples);
 
@@ -152,8 +150,7 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(planeShadowMaps[lightID], projCoords.xy).r;
-    // get depth of current fragment from light's perspective
+    float closestDepth = texture(planeShadowMaps, vec3(projCoords.xy, lightID)).r;    // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
     vec3 normal = normalize(Normal);
@@ -163,12 +160,12 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     // PCF
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(planeShadowMaps[lightID], 0);
+    vec2 texelSize = 1.0 / textureSize(planeShadowMaps, 0).xy;
     for (int x = -1; x <= 1; ++x)
     {
         for (int y = -1; y <= 1; ++y)
         {
-            float pcfDepth = texture(planeShadowMaps[lightID], projCoords.xy + vec2(x, y) * texelSize).r;
+            float pcfDepth = texture(planeShadowMaps, vec3(projCoords.xy + vec2(x, y) * texelSize, lightID)).r;
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }
     }
