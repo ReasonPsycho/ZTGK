@@ -5,7 +5,7 @@
 #include "SpriteRenderer.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "Utils/Globals.h"
+#include "ECS/Utils/Globals.h"
 #include "HUD.h"
 
 using namespace ztgk;

@@ -22,14 +22,14 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "ECS/Light/LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
-#include "Utils/Util.h"
+#include "ECS/Utils/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "ECS/Render/Pipelines/PBRPipeline.h"
+#include "ECS/Render/Pipelines/Phong/PhongPipeline.h"
 #include "ECS/Render/Postprocessing/BloomPostProcess.h"
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Entity.h"
@@ -39,17 +39,19 @@
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Render/Primitives/Primitives.h"
 
-#include "Utils/Time.h"
+#include "ECS/Utils/Time.h"
 
 #include "ECS/HUD/TextRenderer.h"
 #include "ECS/HUD/SpriteRenderer.h"
 
-#include "Utils/ImGuiSpdlogSink.h"
+#include "ECS/Utils/ImGuiSpdlogSink.h"
 #include "ECS/HUD/HUD.h"
 #include "ECS/Render/FrustumCulling/Frustum.h"
-#include "Raycasting/Colliders/BoxCollider.h"
-#include "Raycasting/Ray.h"
-
+#include "ECS/Raycasting/Colliders/BoxCollider.h"
+#include "ECS/Raycasting/Ray.h"
+#include "ECS/Render/WireRenderer.h"
+#include "ECS/Raycasting/CollisionSystem.h"
+#include "ECS/Render/InstanceRenderSystem.h"
 
 #pragma endregion Includes
 
@@ -57,9 +59,12 @@
 
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
-string tileModelPath = "res/models/Tile/Tile.fbx";
+string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
+string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
+Model* quad;
+Model gabka = Model(&modelPathGabka);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
@@ -68,7 +73,13 @@ unsigned bggroup, zmgroup;
 Sprite * zmspr;
 Text * zmtxt;
 
+
+Entity *box1;
+Entity *box2;
+Text text = {};
+
 BoxCollider *boxCollider;
+
 
 
 shared_ptr<spdlog::logger> file_logger;
@@ -99,6 +110,8 @@ void input();
 void update();
 
 void render();
+
+void wireFrameRender();
 
 void imgui_begin();
 
@@ -151,15 +164,23 @@ float lastX = 0;
 float lastY = 0;
 
 Primitives primitives;
-PBRPrimitives PBRPrimitives;
+PBRPrimitives pbrprimitives;
 LightSystem lightSystem(&camera,&scene);
-PBRPipeline pbrSystem(&camera,&primitives);
+PhongPipeline phongPipeline;
 RenderSystem renderSystem;
+InstanceRenderSystem instanceRenderSystem;
+WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
+CollisionSystem collisionSystem;
 
+Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
+
+ImGuiIO mouseio;
+double mouseX;
+double mouseY;
 
 // timing
 double deltaTime = Time::Instance().DeltaTime();
@@ -173,6 +194,7 @@ bool timeStepKeyPressed = false;
 SignalQueue signalQueue = SignalQueue();
 
 #pragma endregion
+
 
 
 int main(int, char **) {
@@ -210,7 +232,6 @@ int main(int, char **) {
 
 #pragma endregion Init
 
-//____________________________________________________________________________________________________
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         //Setting up things for the rest of functionalities (ex. update_delta time)
@@ -224,37 +245,35 @@ int main(int, char **) {
 
         // OpenGL rendering code here
         render();
-  /*
-        Ray r = Ray(camera.Position, camera.Front, &scene);
-        std::cout<< "Raycast: " << r.RayHitPoint().x << " " << r.RayHitPoint().y << " " << r.RayHitPoint().z << std::endl;
-        */
 
         // Draw ImGui
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
+
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-        static bool bgup = true;
-        auto group = hud.getGroupOrDefault(bggroup);
-        if (group->offset.y == ztgk::game::window_size.y) {
-            bgup = false;
-        } else if (group->offset.y == 0) {
-            bgup = true;
-        }
-        if (bgup) {
-            group->offset.y++;
-        } else {
-            group->offset.y--;
-        }
-        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
-        auto s = sin(Time::Instance().LastFrame());
-        auto c = cos(Time::Instance().LastFrame());
-        static auto ogsprsize = zmspr->size;
-        zmspr->size = ogsprsize * glm::vec2(c,s);
-        zmtxt->color = { s, c, s + c / 2, 1.0f };
-        zmspr->color = { s, c, s + c / 2, 1.0f };
+//        static bool bgup = true;
+//        auto group = hud.getGroupOrDefault(bggroup);
+//        if (group->offset.y == ztgk::config::window_size.y) {
+//            bgup = false;
+//        } else if (group->offset.y == 0) {
+//            bgup = true;
+//        }
+//        if (bgup) {
+//            group->offset.y++;
+//        } else {
+//            group->offset.y--;
+//        }
+//        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
+//        auto s = sin(Time::Instance().LastFrame());
+//        auto c = cos(Time::Instance().LastFrame());
+//        static auto ogsprsize = zmspr->size;
+//        zmspr->size = ogsprsize * glm::vec2(c,s);
+//        zmtxt->color = { s, c, s + c / 2, 1.0f };
+//        zmspr->color = { s, c, s + c / 2, 1.0f };
         //____________________________________________________________________________________________________
+
 
         // End frame and swap buffers (double buffering)
         file_logger->info("End frame");
@@ -352,55 +371,55 @@ void init_systems() {
 
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
+    scene.systemManager.addSystem(&instanceRenderSystem);
     scene.systemManager.addSystem(&signalQueue);
+    scene.systemManager.addSystem(&wireRenderer);
+    scene.systemManager.addSystem(&grid);
+    scene.systemManager.addSystem(&collisionSystem);
     primitives.Init();
-    PBRPrimitives.Init();
-    pbrSystem.Init();
+    phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-
+    wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
+    pbrprimitives.Init();
+    MaterialPhong materialPhong = MaterialPhong(myColor);
+    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,vector<GLuint>(pbrprimitives.cubeIndices,pbrprimitives.cubeIndices + 36));
 
-    Material whiteMaterial = Material(myColor);
-    cubeModel = new Model(PBRPrimitives.cubeVAO, whiteMaterial,vector<GLuint>(PBRPrimitives.cubeIndices,PBRPrimitives.cubeIndices + 36));
-    quadModel = new Model(PBRPrimitives.quadVAO,whiteMaterial,vector<GLuint>(PBRPrimitives.quadIndices,PBRPrimitives.quadIndices + 6));
-
-    hud.init();
-    scene.systemManager.addSystem(&hud);
+//    hud.init();
+//    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
+    Color color = {255, 255, 255, 255}; // this is equivalent to white color
+
+    int n = sizeof(pbrprimitives.quadIndices) / sizeof(pbrprimitives.quadIndices[0]);
+
+    // Convert the array to a vector
+    std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
+    
     model.loadModel();
+    quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
+   // gabka.loadModel();
     tileModel.loadModel();
-    Entity *gameObject = scene.addEntity("asteroid");
-    gameObject->transform.setLocalPosition({-0, 0, 0});
-    const float scale = 10;
-    gameObject->transform.setLocalScale({scale, scale, scale});
-    gameObject->addComponent(make_unique<Render>(cubeModel));
-    gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f, 1.0f, 1.0f}));
-    for (unsigned int i = 0; i < 2; ++i) {gameObject = scene.addEntity(gameObject, "asteroid");
-        gameObject->addComponent(make_unique<Render>(&model));
-        gameObject->transform.setLocalScale({scale, scale, scale});
-        gameObject->transform.setLocalPosition({5, 0, 0});
-        gameObject->transform.setLocalScale({0.2f, 0.2f, 0.2f});
-        gameObject->addComponent(std::make_unique<BoxCollider>(gameObject, glm::vec3{1.0f + i + 1, 1.0f, 1.0f}));
-    }
-    //gameObject = scene.addEntity("Dir light");
-    //gameObject->addComponent(new DirLight(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
-   // gameObject = scene.addEntity("Point Light");
-  //  gameObject->addComponent(new PointLight(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-    gameObject = scene.addEntity("Spot Light");
-    gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
+    Entity *gameObject;
+
+    //  gameObject = scene.addEntity("Dir light");
+ //   gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
+     gameObject = scene.addEntity("Point Light");
+      gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(1,1,1,1), 1.0f, 0.09f, 0.032f)));
+    gameObject = scene.addEntity("Point Light 2");
+    gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+  //  Entity* gameObject = scene.addEntity("Spot Light");
+ //   gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
     lightSystem.Init();
 
-    /*
-    gridEntity = scene.addEntity("Grid");
-    // size modelu = 5.0 przy skali 0.01; true size -> 500
-    Grid * grid = new Grid(100, 100, 5.0f, gridEntity);
-    gridEntity->addComponent(grid);
-    // 0.10 to faktyczna wielkość, 0.11 jest żeby nie prześwitywały luki, jak będzie rozpierdalać select to można zmienić
+    gameObject = scene.addEntity("Quad");
+    gameObject->addComponent(make_unique<Render>(quadModel));
 
-    grid->RenderTiles(&scene, 0.011f, &tileModel);
-     */
+
+    instanceRenderSystem.tileModel = quadModel;
+    grid.LoadTileEntities(1.0f, &collisionSystem);
+    instanceRenderSystem.Innit();
 
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
@@ -439,10 +458,10 @@ void init_imgui() {
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    
+
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
-    
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -471,15 +490,21 @@ void input() {
 }
 
 void update() {
+    //update mouse position
+    mouseX = mouseio.MousePos.x;
+    mouseY = mouseio.MousePos.y;
+
     scene.updateScene();
     lightSystem.Update(deltaTime);
+
     signalQueue.update();
+
 }
 
 void render() {
 
-    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrShader);
-    lightSystem.PushDepthMapsToShader(&pbrSystem.pbrInstanceShader);
+    lightSystem.PushDepthMapsToShader(&phongPipeline.phongShader);
+    lightSystem.PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -489,14 +514,14 @@ void render() {
 
     file_logger->info("Cleared.");
 
-    pbrSystem.PrebindPBR(&camera);
-    pbrSystem.RenderBackground();
+
     file_logger->info("Set up PBR.");
-
-    pbrSystem.pbrShader.use();
-
-    renderSystem.DrawScene(&pbrSystem.pbrShader);
-
+    phongPipeline.PrebindPipeline(&camera);
+    
+    renderSystem.DrawScene(&phongPipeline.phongShader);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
+    //wireRenderer.DrawColliders();
+    //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -505,31 +530,28 @@ void render() {
     hud.draw();
 }
 
-
-
-
-
 void imgui_begin() {
     ImGuiIO &io = ImGui::GetIO();
-    
+    mouseio = io;
     // Start the Dear ImGui frame
     if (!captureMouse) {
         io.MouseDrawCursor = true;
     } else {
         io.MouseDrawCursor = false;
-    };
-
+    }
     
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
-  
-    
+
+
 }
-
 void imgui_render() {
-
+    ImGui::Begin("Debug menu");
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
+    ImGui::Text(buffer);
 
     static double fps_max = -1;
     static double max_timestamp;
@@ -554,18 +576,20 @@ void imgui_render() {
         min_timestamp = 0;
     }
 
+
     //lightSystem.showLightTree();
     ImGui::End();
     scene.showImGuiDetails(&camera);
 
     ztgk::console.imguiWindow();
 
-   // bloomSystem .showImguiOptions();
+    // bloomSystem .showImguiOptions();
 }
 
 void imgui_end() {
+    ImGui::End();
     ImGui::Render();
-  
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -627,7 +651,6 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
         ImGui::GetIO().MousePos = ImVec2(0,0);
     }
-
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -675,7 +698,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
         ImGuiIO &io = ImGui::GetIO();
         io.MousePos = ImVec2(uixpos, uiypos);
     }
-    
+
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
@@ -690,6 +713,20 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
+
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+        if(ray->getHitEntity() != nullptr){
+            spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
+        }
+        else{
+            spdlog::info("No hit entity");
+        }
+
+        wireRenderer.rayComponents.push_back(std::move(ray));
+    }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

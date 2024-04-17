@@ -6,10 +6,10 @@
 
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
-#include "Utils/Util.h"
+#include "ECS/Utils/Util.h"
 #include "ECS/HUD/Fonts.h"
 #include "AHUDComponent.h"
-#include "Utils/Globals.h"
+#include "ECS/Utils/Globals.h"
 
 enum TextStyle {
     NONE            = 0,

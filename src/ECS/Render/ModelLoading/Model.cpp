@@ -112,13 +112,13 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
     // Same applies to other texture as the following list summarizes:
 
-    Material material = Material(aiMaterial,this);
+    MaterialPhong material = MaterialPhong(aiMaterial, this);
     
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, material);
 }
 
-Model::Model(unsigned int VAO, Material material,vector<unsigned int> indices) {
+Model::Model(unsigned int VAO, MaterialPhong material, vector<unsigned int> indices) {
    meshes.push_back(Mesh(VAO,material, indices));
 }
 

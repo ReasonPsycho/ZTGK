@@ -11,8 +11,9 @@
 #include "glad/glad.h"
 #include "ECS/Component.h"
 #include "AHUDComponent.h"
-#include "Utils/Globals.h"
-#include "Utils/Util.h"
+#include "ECS/Utils/Globals.h"
+#include "ECS/Utils/Util.h"
+#include "stb_image.h"  // do not remove this!!
 
 struct Sprite : public AHUDComponent {
     explicit Sprite(const std::string & path);

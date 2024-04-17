@@ -9,14 +9,13 @@
 #include <vector>
 #include "Tile.h"
 #include "ECS/Component.h"
-#include "Utils/VectorUtils.h"
+#include "ECS/Utils/VectorUtils.h"
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
 
-
-class Grid : public Component{
+class CollisionSystem;
+class Grid : public System{
 public:
-    Entity* entity;
     //number of tiles in the grid
     int width;
     int height;
@@ -27,28 +26,48 @@ public:
     //2D array of tiles
     std::vector<std::vector<Tile*>> gridArray;
 
-    // Constructor
+    Scene* scene;
+    Vector3 Position;
+
+    // Constructors
     Grid() = default;
-    Grid(int width, int height, float tileSize, Entity* parentEntity);
+    Grid(Scene* scene ,int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
+    Grid(Grid* grid);
 
     // Destructor
     ~Grid();
 
-    void showImGuiDetails(Camera *camera) override;
+    //Other methods
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);
     Tile* getTileAt(Vector2Int index);
 
-    [[nodiscard]] Vector3 GridToWorldPosition(Vector2Int index) const;
-    [[nodiscard]] Vector3 GridToWorldPosition(int x, int z) const;
+    //get the tile at a specific world position
+    [[nodiscard]] const glm::vec3 GridToWorldPosition(Vector2Int index) const;
+    [[nodiscard]] const glm::vec3 GridToWorldPosition(int x, int z) const;
 
+    //get the index of a tile in specific world position
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
-  
-    void RenderTiles(Scene* scene, float scale, Model* tileModel);
+
+    //loads and distributes the tile entities in world space
+    void LoadTileEntities(float scale, CollisionSystem *collisionSystem);
+
+    void SetUpWallData();
+    //system methods
+    void addComponent(void *component) override;
+    void removeComponent(void *component) override;
+    const std::type_index *getComponentTypes() override;
+    int getNumComponentTypes() override;
+    void showImGuiDetails(Camera *camera) override;
+
 private:
     float offsetX = 0;
     float offsetZ = 0;
+
+    std::array<std::type_index, 1> componentTypes = {
+        std::type_index(typeid(Tile))
+    };
 };
 
 

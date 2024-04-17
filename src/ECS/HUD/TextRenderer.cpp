@@ -3,7 +3,7 @@
 //
 
 #include "TextRenderer.h"
-#include "Utils/Globals.h"
+#include "ECS/Utils/Globals.h"
 #include "HUD.h"
 
 using namespace ztgk;
