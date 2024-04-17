@@ -127,15 +127,15 @@ void Transform::ManipulateModelMatrix(Camera *camera) {
     switch (mCurrentGizmoOperation)
     {
         case ImGuizmo::TRANSLATE:
-            snap = config.mSnapTranslation;
+            snap = game.mSnapTranslation;
             ImGui::InputFloat3("Snap", &snap.x);
             break;
         case ImGuizmo::ROTATE:
-            snap = config.mSnapRotation;
+            snap = game.mSnapRotation;
             ImGui::InputFloat("Angle Snap", &snap.x);
             break;
         case ImGuizmo::SCALE:
-            snap = config.mSnapScale;
+            snap = game.mSnapScale;
             ImGui::InputFloat("Scale Snap", &snap.x);
             break;
     }
