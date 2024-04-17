@@ -46,7 +46,7 @@ void InstanceRenderSystem::Innit() {
     }
     
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(wallData), wallData.data(),
+    glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), wallData.data(),
                  GL_STREAM_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, wallDataBufferBindingPoint, wallDataBufferID);
 }
