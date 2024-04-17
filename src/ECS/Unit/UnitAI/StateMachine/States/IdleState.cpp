@@ -12,6 +12,8 @@ State *IdleState::RunCurrentState() {
 
     //from Idle to Movement
     if(unit->hasMovementTarget){
+        MoveState = new MovementState();
+        MoveState->unit = unit;
         return MoveState;
     }
     //from Idle to Combat
@@ -26,4 +28,8 @@ State *IdleState::RunCurrentState() {
 
     return this;
 
+}
+
+bool IdleState::isTargetInRange() {
+    return false;
 }

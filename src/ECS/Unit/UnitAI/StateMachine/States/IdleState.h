@@ -15,6 +15,8 @@ public:
     MovementState* MoveState;
     CombatState* CombatState;
     MiningState* MiningState;
+
+    bool isTargetInRange() override;
 };
 
 #endif //ZTGK_IDLESTATE_H

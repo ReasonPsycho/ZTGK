@@ -25,6 +25,7 @@
 #include "ECS/Utils/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
+#include "ECS/Unit/Unit.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
@@ -52,6 +53,8 @@
 #include "ECS/Render/WireRenderer.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Render/InstanceRenderSystem.h"
+#include "ECS/Unit/UnitAI/UnitAI.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 
 #pragma endregion Includes
 
@@ -68,11 +71,12 @@ Model gabka = Model(&modelPathGabka);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
+Unit *selectedUnit;
 HUD hud;
 unsigned bggroup, zmgroup;
 Sprite * zmspr;
 Text * zmtxt;
-
+StateManager* stateManager;
 
 Entity *box1;
 Entity *box2;
@@ -174,6 +178,8 @@ BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
 
 Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
+
+Entity *playerUnit;
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -374,6 +380,7 @@ void init_systems() {
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
+
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -445,6 +452,23 @@ void load_enteties() {
     fgelem->addComponent(make_unique<Sprite>("res/textures/puni.png"));
     zmspr = fgelem->getComponent<Sprite>();
     zmspr->groupID = zmgroup;
+
+
+    playerUnit = scene.addEntity("Player");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalPosition(glm::vec3(0, 0, 0));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(0.5, 0.5, 0.5), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    UnitStats stats = {100, 1, 1, 1, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(0, 0), stats, true));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
 }
 
 void init_imgui() {
@@ -494,7 +518,12 @@ void update() {
     lightSystem.Update(deltaTime);
 
     signalQueue.update();
+    playerUnit->updateSelfAndChild();
+    stateManager->RunStateMachine();
 
+//    spdlog::info(playerUnit->transform.getGlobalPosition().x);
+//    spdlog::info(playerUnit->transform.getGlobalPosition().y);
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
 }
 
 void render() {
@@ -516,7 +545,7 @@ void render() {
     
     renderSystem.DrawScene(&phongPipeline.phongShader);
     instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-    //wireRenderer.DrawColliders();
+    wireRenderer.DrawColliders();
     //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
@@ -721,7 +750,31 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             spdlog::info("No hit entity");
         }
 
+        if(ray->getHitEntity()->getComponent<Unit>() != nullptr){
+            if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
+                ray->getHitEntity()->getComponent<Unit>()->isSelected = false;
+                selectedUnit = nullptr;
+            } else {
+                ray->getHitEntity()->getComponent<Unit>()->isSelected = true;
+                selectedUnit = ray->getHitEntity()->getComponent<Unit>();
+            }
+            spdlog::info("Selected: {}", ray->getHitEntity()->getComponent<Unit>()->isSelected);
+        }
+
         wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+    if(selectedUnit != nullptr && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
+        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
+        selectedUnit->hasMovementTarget = true;
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+        Entity * hit = ray->getHitEntity();
+        if(hit != nullptr){
+            selectedUnit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+            selectedUnit->pathfinding.FindPath(selectedUnit->gridPosition, selectedUnit->movementTarget);
+        }
+        wireRenderer.rayComponents.push_back(std::move(ray));
+
+        spdlog::info("Movement target: {}", selectedUnit->movementTarget.x);
     }
 }
 

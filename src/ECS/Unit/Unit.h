@@ -19,7 +19,7 @@ struct UnitStats{
 class Unit : public Component {
 public:
 
-    bool isSelected;
+    bool isSelected = false;
 
     Vector2Int gridPosition;
     glm::vec3 worldPosition;

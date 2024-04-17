@@ -5,7 +5,7 @@
 #include "ECS/Component.h"
 class Unit;
 
-class StateManager : public Component {
+class StateManager{
 public:
     StateManager(Unit *pUnit);
 

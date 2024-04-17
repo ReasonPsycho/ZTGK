@@ -17,7 +17,9 @@ State *MovementState::RunCurrentState() {
 
     //from Movement to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
-        return IdleState;
+        Idlestate = new IdleState();
+        Idlestate->unit = unit;
+        return Idlestate;
     }
 
     //from Movement to Combat
@@ -58,4 +60,9 @@ void MovementState::MoveOnPath() {
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
         }
     }
+    unit->getEntity()->updateSelfAndChild();
+}
+
+bool MovementState::isTargetInRange() {
+    return false;
 }

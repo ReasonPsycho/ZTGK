@@ -99,6 +99,8 @@ AstarPathfinding::ReconstructPath(unordered_map<Vector2Int, Vector2Int> &cameFro
         totalPath.push_back(current);
     }
 
+    std::reverse(totalPath.begin(), totalPath.end());
+
     return totalPath;
 }
 
@@ -122,22 +124,22 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
 
 
     //right
-    if(grid->getTileAt(right) != nullptr && grid->getTileAt(right)->vacant){
+    if(right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr && grid->getTileAt(right)->vacant){
         neighbours.push_back(right);
     }
 
     //left
-    if(grid->getTileAt(left) != nullptr && grid->getTileAt(left)->vacant){
+    if(left.x >= 0 && left.z >=0 &&  grid->getTileAt(left) != nullptr && grid->getTileAt(left)->vacant){
         neighbours.push_back(left);
     }
 
     //up
-    if(grid->getTileAt(up) != nullptr && grid->getTileAt(up)->vacant){
+    if(up.x >= 0 && up.z >=0 &&grid->getTileAt(up) != nullptr && grid->getTileAt(up)->vacant){
         neighbours.push_back(up);
     }
 
     //down
-    if(grid->getTileAt(down) != nullptr && grid->getTileAt(down)->vacant){
+    if(down.x >= 0 && down.z >=0 &&grid->getTileAt(down) != nullptr && grid->getTileAt(down)->vacant){
         neighbours.push_back(down);
     }
 
@@ -145,33 +147,33 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
         return neighbours;
     }
     //UpRight
-    if((grid->getTileAt(right) != nullptr && grid->getTileAt(right)->vacant) && (grid->getTileAt(up) != nullptr && grid->getTileAt(up)->vacant)){
+    if((up.x >= 0 && up.z >=0 &&right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr && grid->getTileAt(right)->vacant) && (grid->getTileAt(up) != nullptr && grid->getTileAt(up)->vacant)){
         Vector2Int upRight = current + Vector2Int(1, 1);
-        if(grid->getTileAt(upRight) != nullptr && grid->getTileAt(upRight)->vacant){
+        if(upRight.x >= 0 && upRight.z >=0 && grid->getTileAt(upRight) != nullptr && grid->getTileAt(upRight)->vacant){
             neighbours.push_back(upRight);
         }
     }
 
     //DownRight
-    if((grid->getTileAt(right) != nullptr && grid->getTileAt(right)->vacant) && (grid->getTileAt(down) != nullptr && grid->getTileAt(down)->vacant)){
+    if((down.x >= 0 && down.z >=0 &&right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr && grid->getTileAt(right)->vacant) && (grid->getTileAt(down) != nullptr && grid->getTileAt(down)->vacant)){
         Vector2Int downRight = current + Vector2Int(1, -1);
-        if(grid->getTileAt(downRight) != nullptr && grid->getTileAt(downRight)->vacant){
+        if(downRight.x >= 0 && downRight.z >=0 &&grid->getTileAt(downRight) != nullptr && grid->getTileAt(downRight)->vacant){
             neighbours.push_back(downRight);
         }
     }
 
     //UpLeft
-    if((grid->getTileAt(left) != nullptr && grid->getTileAt(left)->vacant) && (grid->getTileAt(up) != nullptr && grid->getTileAt(up)->vacant)){
+    if((up.x >= 0 && up.z >=0 &&left.x >= 0 && left.z >=0 && grid->getTileAt(left) != nullptr && grid->getTileAt(left)->vacant) && (grid->getTileAt(up) != nullptr && grid->getTileAt(up)->vacant)){
         Vector2Int upLeft = current + Vector2Int(-1, 1);
-        if(grid->getTileAt(upLeft) != nullptr && grid->getTileAt(upLeft)->vacant){
+        if(upLeft.x >= 0 && upLeft.z >=0 &&grid->getTileAt(upLeft) != nullptr && grid->getTileAt(upLeft)->vacant){
             neighbours.push_back(upLeft);
         }
     }
 
     //DownLeft
-    if((grid->getTileAt(left) != nullptr && grid->getTileAt(left)->vacant) && (grid->getTileAt(down) != nullptr && grid->getTileAt(down)->vacant)){
+    if((down.x >= 0 && down.z >=0 &&left.x >= 0 && left.z >=0 && grid->getTileAt(left) != nullptr && grid->getTileAt(left)->vacant) && (grid->getTileAt(down) != nullptr && grid->getTileAt(down)->vacant)){
         Vector2Int downLeft = current + Vector2Int(-1, -1);
-        if(grid->getTileAt(downLeft) != nullptr && grid->getTileAt(downLeft)->vacant){
+        if(downLeft.x >= 0 && downLeft.z >=0 &&grid->getTileAt(downLeft) != nullptr && grid->getTileAt(downLeft)->vacant){
             neighbours.push_back(downLeft);
         }
     }
