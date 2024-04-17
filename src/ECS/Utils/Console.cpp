@@ -3,22 +3,34 @@
 //
 
 #include "Console.h"
+#include "Util.h"
 
-Console::Console() {}
+Console::Console(const std::string & name) : name(name) {}
+
+Console::Console(const custom_menus_t & custom_menus, const std::string & name)
+: name(name), custom_menus(custom_menus) {}
 
 void Console::imguiWindow() {
-    ImGui::Begin("Console", nullptr, ImGuiWindowFlags_MenuBar);
+    ImGui::Begin(std::format("{0}##Console_{0}", name).c_str(), nullptr, ImGuiWindowFlags_MenuBar);
     if (ImGui::BeginMenuBar()) {
-        if (ImGui::MenuItem("Clear")) {
+        for ( auto & cmenu : custom_menus ) {
+            if (ImGui::MenuItem(cmenu.first.c_str())) {
+                cmenu.second();
+            }
+        }
+        if ( !custom_menus.empty() )
+            ImGui::Separator();
+
+        if (ImGui::MenuItem("Clear##DefClear")) {
             clear();
         }
-        if (ImGui::MenuItem("Test")) {
+        if (ImGui::MenuItem("Test##DefTest")) {
             log(Entry{
                     "Test debug message.",
                     static_cast<spdlog::level::level_enum>(rand() % 7)
             });
         }
-        if (ImGui::MenuItem("Flood")) {
+        if (ImGui::MenuItem("Flood##DefFlood")) {
             for (int i = 0; i < 10000; ++i) {
                 log("Flood message.", spdlog::level::debug);
             }
@@ -61,15 +73,21 @@ void Console::imguiWindow() {
             ImGui::TextColored(clr, "%s", entry.text.c_str());
         }
 
+    if (scroll_down && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+        ImGui::SetScrollHereY(1.0f);
+        scroll_down = false;
+    }
     ImGui::End();
 }
 
 void Console::log(const Entry &entry) {
     entries.push_back(entry);
+    scroll_down = true;
 }
 
 void Console::log(const std::string &text, spdlog::level::level_enum severity) {
     log(Entry{text, severity});
+    scroll_down = true;
 }
 
 void Console::clear() {

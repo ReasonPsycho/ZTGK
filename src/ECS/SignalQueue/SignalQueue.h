@@ -10,6 +10,7 @@
 #include "Signal.h"
 #include "SignalReceiver.h"
 #include "ECS/System.h"
+#include "ECS/Utils/Console.h"
 
 class SignalQueue : public System {
 public:
@@ -47,11 +48,15 @@ public:
 
 
     // editor
+    struct editor_s_logging {
+        bool enable{false};
+        std::unique_ptr<Console> console;
+        std::unique_ptr<SignalReceiver> recv;
+        static SignalReceiver new_receiver();
+    };
+    static editor_s_logging editor_log;
     struct editor_s_new_signal_config {
         int choice{0};
-        bool enablelog{false};
-        SignalReceiver * logger;
-        std::vector<std::string> log{};
 
         const static int message_size = 100;
 
@@ -72,7 +77,12 @@ public:
         // audio
         char soundpath[message_size]{};
 
-        static SignalReceiver * new_logger();
+        // hud mapping
+        bool all{false};
+        int componentID{-1}, oldGroupID{-1}, newGroupID{-1};
+        int componentType{0};
+        // hud remove group
+        int groupId{-1};
     };
     static editor_s_new_signal_config editor_new_signal_config;
 };

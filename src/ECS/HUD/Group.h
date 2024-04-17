@@ -5,7 +5,7 @@
 #pragma once
 
 #include "glm/vec2.hpp"
-#include "ECS/Utils/Config.h"
+#include "ECS/Utils/Globals.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/fwd.hpp"
 #include "glm/detail/type_mat4x4.hpp"
@@ -15,6 +15,7 @@ struct Group {
     unsigned id;
 
     Group();
+    static Group default_group();
 
     bool isHidden() const;
     void setHidden(bool hidden);
@@ -23,4 +24,8 @@ struct Group {
 
     bool hidden = false; // don't set this directly
     glm::vec3 offset = {0, 0, 0 };
+
+private:
+    // for default_group()
+    explicit Group(/* ignored */ unsigned id);
 };
