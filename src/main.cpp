@@ -301,7 +301,7 @@ void cleanup() {
 
 bool init() {
     auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and logger name since it's null anyway)
+    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
     spdlog::get("")->sinks().push_back(sink);
 
     // Get current date and time
@@ -367,6 +367,8 @@ bool init() {
 
 
 void init_systems() {
+    ztgk::game::scene = &scene;
+
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&instanceRenderSystem);
@@ -435,16 +437,18 @@ void load_enteties() {
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!",ztgk::config::window_size / 5));
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
     fgelem = scene.addEntity(efg, "Variable Text");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2( ztgk::config::window_size.x * 0.5 - 300, ztgk::config::window_size.y * 0.5 )));
+    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300, ztgk::game::window_size.y * 0.5 ));
+    tx.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Text>( tx ));
     zmtxt = fgelem->getComponent<Text>();
-    zmtxt->groupID = zmgroup;
     fgelem = scene.addEntity(efg, "Animated Sprite");
-    fgelem->addComponent(make_unique<Sprite>("res/textures/puni.png"));
+    auto spr = Sprite("res/textures/puni.png");
+    spr.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Sprite>( spr ));
     zmspr = fgelem->getComponent<Sprite>();
-    zmspr->groupID = zmgroup;
 }
 
 void init_imgui() {
@@ -544,11 +548,6 @@ void imgui_begin() {
 
 }
 void imgui_render() {
-    ImGui::Begin("Debug menu");
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
-    ImGui::Text(buffer);
-
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -571,10 +570,10 @@ void imgui_render() {
         fps_min = 1000000;
         min_timestamp = 0;
     }
+    ImGui::End();
 
 
     //lightSystem.showLightTree();
-    ImGui::End();
     scene.showImGuiDetails(&camera);
 
     ztgk::console.imguiWindow();
