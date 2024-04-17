@@ -10,7 +10,7 @@
 #include "Signal.h"
 #include "SignalReceiver.h"
 #include "ECS/System.h"
-#include "Utils/Console.h"
+#include "ECS/Utils/Console.h"
 
 class SignalQueue : public System {
 public:
