@@ -56,8 +56,7 @@ void Scene::showImGuiDetails(Camera *camera) {
         ImGui::Begin(system.second->name.c_str());
         system.second->showImGuiDetails(camera);
         ImGui::End();
-    }   
-    ImGui::End();
+    }
     stopRenderingImgui = false;
 }
 

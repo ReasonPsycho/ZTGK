@@ -548,11 +548,6 @@ void imgui_begin() {
 
 }
 void imgui_render() {
-    ImGui::Begin("Debug menu");
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
-    ImGui::Text(buffer);
-
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -575,10 +570,10 @@ void imgui_render() {
         fps_min = 1000000;
         min_timestamp = 0;
     }
+    ImGui::End();
 
 
     //lightSystem.showLightTree();
-    ImGui::End();
     scene.showImGuiDetails(&camera);
 
     ztgk::console.imguiWindow();
