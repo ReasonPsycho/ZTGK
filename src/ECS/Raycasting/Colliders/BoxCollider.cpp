@@ -25,7 +25,7 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionSystem *collis
 }
 
 void BoxCollider::update() {
-//    center = getEntity()->transform.getGlobalPosition();
+      center = getEntity()->transform.getGlobalPosition();
 //    size = getEntity()->transform.getLocalScale();
 }
 

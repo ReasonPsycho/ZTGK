@@ -25,6 +25,7 @@
 #include "ECS/Utils/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
+#include "ECS/Unit/Unit.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
@@ -52,6 +53,9 @@
 #include "ECS/Render/WireRenderer.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Render/InstanceRenderSystem.h"
+#include "ECS/Unit/UnitAI/UnitAI.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "ECS/Unit/UnitSystem.h"
 
 #pragma endregion Includes
 
@@ -68,11 +72,12 @@ Model gabka = Model(&modelPathGabka);
 Model* cubeModel;
 Model* quadModel;
 Entity *gridEntity;
+Unit *selectedUnit;
 HUD hud;
 unsigned bggroup, zmgroup;
 Sprite * zmspr;
 Text * zmtxt;
-
+StateManager* stateManager;
 
 Entity *box1;
 Entity *box2;
@@ -96,6 +101,8 @@ bool init();
 void init_systems();
 
 void load_enteties();
+
+void load_units();
 
 void init_imgui();
 
@@ -172,8 +179,11 @@ InstanceRenderSystem instanceRenderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
+UnitSystem unitSystem;
 
 Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
+
+Entity *playerUnit;
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -243,6 +253,7 @@ int main(int, char **) {
         // Update game objects' state here
         update();
 
+        //spdlog::info(playerUnit->transform.getGlobalPosition().x);
         // OpenGL rendering code here
         render();
 
@@ -376,6 +387,9 @@ void init_systems() {
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
+    scene.systemManager.addSystem(&unitSystem);
+
+
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -399,7 +413,7 @@ void load_enteties() {
     
     model.loadModel();
     quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
-   // gabka.loadModel();
+    //gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
@@ -449,8 +463,30 @@ void load_enteties() {
     spr.groupID = zmgroup;
     fgelem->addComponent(make_unique<Sprite>( spr ));
     zmspr = fgelem->getComponent<Sprite>();
+    zmspr->groupID = zmgroup;
+
+    load_units();
+
+
+
 }
 
+void load_units() {
+    playerUnit = scene.addEntity("Player1");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    UnitStats stats = {100, 1, 1, 5, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(0, 0), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+}
 void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -499,6 +535,8 @@ void update() {
 
     signalQueue.update();
 
+    stateManager->RunStateMachine();
+    unitSystem.Update();
 }
 
 void render() {
@@ -715,12 +753,39 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
+            if(ray->getHitEntity()->getComponent<Tile>() != nullptr){
+                spdlog::info("Tile pos: {} {} {}", grid.GridToWorldPosition(ray->getHitEntity()->getComponent<Tile>()->index).x, grid.GridToWorldPosition(ray->getHitEntity()->getComponent<Tile>()->index).y, grid.GridToWorldPosition(ray->getHitEntity()->getComponent<Tile>()->index).z);
+            }
         }
         else{
             spdlog::info("No hit entity");
         }
 
+        if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr){
+            if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
+                ray->getHitEntity()->getComponent<Unit>()->isSelected = false;
+                selectedUnit = nullptr;
+            } else {
+                ray->getHitEntity()->getComponent<Unit>()->isSelected = true;
+                selectedUnit = ray->getHitEntity()->getComponent<Unit>();
+            }
+            spdlog::info("Selected: {}", ray->getHitEntity()->getComponent<Unit>()->isSelected);
+        }
+
         wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+    if(selectedUnit != nullptr && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
+        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
+        selectedUnit->hasMovementTarget = true;
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+        Entity * hit = ray->getHitEntity();
+        if(hit != nullptr){
+            selectedUnit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+            selectedUnit->pathfinding.FindPath(selectedUnit->gridPosition, selectedUnit->movementTarget);
+        }
+        wireRenderer.rayComponents.push_back(std::move(ray));
+
+        spdlog::info("Movement target: {}", selectedUnit->movementTarget.x);
     }
 }
 
