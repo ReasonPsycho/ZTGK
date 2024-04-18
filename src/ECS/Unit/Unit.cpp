@@ -3,10 +3,12 @@
 //
 
 #include "Unit.h"
+
+#include <utility>
 #include "UnitSystem.h"
 
 Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
-    this->name = name;
+    this->name = std::move(name);
     this->equipment = UnitEquipment();
     this->grid = grid;
     this->gridPosition = gridPosition;
@@ -17,7 +19,7 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
 
     UpdateStats();
 
-    unitSystem->addComponent(this);
+    //unitSystem->addComponent(this);
 }
 
 Unit::~Unit() {
@@ -61,6 +63,7 @@ UnitStats Unit::GetBaseStats() {
 }
 
 void Unit::showImGuiDetails(Camera *camera) {
+
     ImGui::Text("Unit: %s", name.c_str());
     ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
     ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);
@@ -70,6 +73,8 @@ void Unit::showImGuiDetails(Camera *camera) {
     ImGui::Text("Movement Speed: %f", stats.movementSpeed);
     ImGui::Text("Range: %f", stats.range);
     ImGui::Text("Ally: %s", isAlly ? "true" : "false");
+    ImGui::Text("Selected: %s", isSelected ? "true" : "false");
+
 
 }
 

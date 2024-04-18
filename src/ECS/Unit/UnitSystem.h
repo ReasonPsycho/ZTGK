@@ -19,6 +19,12 @@ public:
     void showImGuiDetails(Camera *camera) override;
 
     void Update();
+
+    void selectUnit(Unit* unit);
+    void deselectUnit(Unit* unit);
+    void deselectAllUnits();
+
+    std::vector<Unit* > selectedUnits;
 private:
     std::vector<Unit *> unitComponents;
     std::array<std::type_index, 1> componentTypes = {

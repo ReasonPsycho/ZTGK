@@ -26,7 +26,10 @@ const std::type_index *UnitSystem::getComponentTypes() {
 }
 
 void UnitSystem::showImGuiDetails(Camera *camera) {
-
+    ImGui::Begin("Unit System");
+    ImGui::Text("Units: %d", unitComponents.size());
+    ImGui::Text("Selected Units: %d", selectedUnits.size());
+    ImGui::End();
 }
 
 void UnitSystem::Update() {
@@ -35,4 +38,25 @@ void UnitSystem::Update() {
         unit->getEntity()->getComponent<UnitAI>()->Update();
         unit->getEntity()->getComponent<BoxCollider>()->update();
     }
+}
+
+void UnitSystem::selectUnit(Unit *unit) {
+    selectedUnits.push_back(unit);
+    unit->isSelected = true;
+}
+
+void UnitSystem::deselectUnit(Unit *unit) {
+    auto unit_iter = std::find(selectedUnits.begin(), selectedUnits.end(), unit);
+
+    if (unit_iter != selectedUnits.end()) {
+        selectedUnits.erase(unit_iter);
+        unit->isSelected = false;
+    }
+}
+
+void UnitSystem::deselectAllUnits() {
+    for (Unit* unit: selectedUnits) {
+        unit->isSelected = false;
+    }
+    selectedUnits.clear();
 }
