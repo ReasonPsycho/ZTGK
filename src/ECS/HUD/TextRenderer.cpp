@@ -3,7 +3,7 @@
 //
 
 #include "TextRenderer.h"
-#include "ECS/Utils/Config.h"
+#include "ECS/Utils/Globals.h"
 #include "HUD.h"
 
 using namespace ztgk;
@@ -25,7 +25,7 @@ TextRenderer::TextRenderer(HUD * hud) : hud(hud), shader("res/shaders/hud_text.v
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    projection = glm::ortho(0.0f, (float)config::window_size.x, 0.0f, (float)config::window_size.y);
+    projection = glm::ortho(0.0f, (float)game::window_size.x, 0.0f, (float)game::window_size.y);
     shader.init();
 
     if (FT_Init_FreeType(&ft)) {
@@ -145,5 +145,15 @@ TextRenderer::~TextRenderer() {
 }
 
 void TextRenderer::imgui_controls() {
-
+    ImGui::Text("%s", std::format("Shader ID: {}", shader.ID).c_str());
+    ImGui::Text("Loaded fonts:");
+    for ( auto & font : fonts ) {
+        if ( ImGui::SmallButton(std::format("Reload##Reload{}", font.first).c_str()) ) {
+            fonts.erase( font.first );
+            // render() will automatically load the font back in
+            return;
+        }
+        ImGui::SameLine();
+        ImGui::Text("%s", font.first.c_str());
+    }
 }

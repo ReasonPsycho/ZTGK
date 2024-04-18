@@ -3,6 +3,8 @@
 //
 
 #include "Text.h"
+#include "ECS/SignalQueue/SignalQueue.h"
+#include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
 
 Text::Text(const std::string &content, const glm::vec2 &pos, const glm::vec2 &scale, const glm::vec4 &color,
            const std::string &font, TextStyle style, unsigned int hudGroupId)
@@ -21,7 +23,15 @@ void Text::showImGuiDetails(Camera *camera) {
         content = editor_content_buffer;
         name = std::format("Text: {}###{}", content, uniqueID);
     }
+    static unsigned gid;
+    gid = groupID;
     ImGui::InputInt("Group ID", reinterpret_cast<int *>(&groupID));
+    if (gid != groupID) {
+        *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += HUDRemapGroupsSignalData::signal(
+            false, uniqueID, type, gid, groupID, "Editor event."
+        );
+        groupID = gid;
+    }
 
     ImGui::Text("Font");
 

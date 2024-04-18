@@ -5,7 +5,7 @@
 #include "SpriteRenderer.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "ECS/Utils/Config.h"
+#include "ECS/Utils/Globals.h"
 #include "HUD.h"
 
 using namespace ztgk;
@@ -27,7 +27,7 @@ SpriteRenderer::SpriteRenderer(HUD * hud) : hud(hud), shader("res/shaders/hud_sp
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    projection = glm::ortho(0.0f, (float)config::window_size.x, 0.0f, (float)config::window_size.y);
+    projection = glm::ortho(0.0f, (float)game::window_size.x, 0.0f, (float)game::window_size.y);
     shader.init();
 }
 
@@ -65,5 +65,5 @@ void SpriteRenderer::render(Sprite * sprite) {
 }
 
 void SpriteRenderer::imgui_controls() {
-
+    ImGui::Text("%s", std::format("Shader ID: {}", shader.ID).c_str());
 }

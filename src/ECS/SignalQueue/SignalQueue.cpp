@@ -1,5 +1,3 @@
-//
-
 #include "SignalQueue.h"
 #include "ECS/Utils/Util.h"
 #include "imgui.h"
@@ -9,12 +7,26 @@
 #include "DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "DataCargo/MouseEvents/MouseScrollSignalData.h"
 #include "DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDSortZDepthSignalData.h"
+#include "DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
 
 using namespace ztgk;
-//
-// Created by cheily on 20.03.2024.
 void SignalQueue::init() {
     update_delta();
+
+    editor_log.console = std::make_unique<Console>("Signal Queue");
+    editor_log.recv = std::make_unique<SignalReceiver>( editor_s_logging::new_receiver() );
+    editor_log.console->custom_menus = {
+        {
+            "Print Q",
+            [this](){
+                editor_log.console->log("Current queue:");
+                for (const auto &item: queue)
+                    editor_log.console->log("\t" + item.to_string());
+            }
+        },
+    };
 }
 
 long long SignalQueue::get_delta() {
@@ -101,46 +113,35 @@ void SignalQueue::addComponent(void *component) {
 
 // editor
 SignalQueue::editor_s_new_signal_config SignalQueue::editor_new_signal_config{};
+SignalQueue::editor_s_logging SignalQueue::editor_log{};
 
 void SignalQueue::showImGuiDetails(Camera *camera) {
     auto &cfg = editor_new_signal_config;
+    auto &log = editor_log;
 
-    if (ImGui::CollapsingHeader("Queue control")){
+    if (ImGui::Button("Toggle log")) {
+        log.enable = !log.enable;
 
-        ImGui::Text("dt: %lld", get_delta());
-        if (ImGui::Button("Toggle log")) {
-            cfg.enablelog = !cfg.enablelog;
-
-            if (cfg.enablelog) {
-                cfg.logger = editor_s_new_signal_config::new_logger();
-                *this += cfg.logger;
-            } else {
-                *this -= cfg.logger;
-                cfg.log.clear();
-                delete cfg.logger;
-            }
+        if (log.enable) {
+            *this += log.recv.get();
+        } else {
+            *this -= log.recv.get();
         }
-        if (cfg.enablelog) {
-            ImGui::SameLine();
-            if (ImGui::Button("Print")) {
-                cfg.log.emplace_back("Current queue:");
-                for (const auto &item: queue)
-                    cfg.log.push_back("\t" + item.to_string());
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Clear"))
-                cfg.log.clear();
+    }
+    ImGui::SameLine();
+    ImGui::Text("dt: %lld", get_delta());
+    if ( log.enable && ImGui::TreeNodeEx(std::format("Debug Receiver##{}", log.recv->receiver_uid).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth) ) {
+        log.recv->showImGuiDetails(camera);
+        ImGui::TreePop();
+    }
 
-            cfg.logger->showImGuiDetails(nullptr);
-        }
-
-        ImGui::Text("New Signal:");
+    if (ImGui::CollapsingHeader("Signal Spoofing")){
         if (ImGui::Button("Post")) {
             std::shared_ptr<SignalData> data;
             auto choicemask = 1 << cfg.choice;
-            if (choicemask == Signal::signal_types.test_signal) {
+            if (choicemask == Signal::signal_types.test) {
                 data = std::make_shared<TestSignalData>(cfg.message);
-            } else if (choicemask == Signal::signal_types.keyboard_signal) {
+            } else if (choicemask == Signal::signal_types.keyboard) {
                 data = std::make_shared<KeySignalData>(cfg.key, cfg.scancode, cfg.kaction, cfg.kmods, cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_button_signal) {
                 data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, cfg.message);
@@ -151,6 +152,12 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
                 data = std::make_shared<MouseScrollSignalData>(Vec2{cfg.xoff, cfg.yoff}, cfg.message);
             } else if (choicemask == Signal::signal_types.audio_signal) {
                 data = std::make_shared<AudioSignalData>(cfg.soundpath, cfg.message);
+            } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
+                data = std::make_shared<HUDSortZDepthSignalData>(cfg.message);
+            } else if (choicemask == Signal::signal_types.hud_update_group_mappings_signal) {
+                data = std::make_shared<HUDRemapGroupsSignalData>(cfg.all, cfg.componentID, (hudcType)cfg.componentType, cfg.oldGroupID, cfg.newGroupID, cfg.message);
+            } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
+                data = std::make_shared<HUDRemoveGroupSignalData>(cfg.groupId, cfg.message);
             } else {
                 data = std::make_shared<SignalData>(cfg.message);
             }
@@ -180,12 +187,13 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
                     "\nThat is the first event in order of subscription that matches the typemask or id."
                     "\nThis also means any log will only print this signal if no other receiver caught it.");
         }
-        const char *types[] = {"Test", "Keyboard", "Mouse Button", "Mouse Move", "Mouse Scroll", "Audio"};
-        ImGui::Combo("Type", &cfg.choice, types, 6);
+        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud update mappings", "Hud sort z depth", "Hud remove group"};
+        ImGui::Combo("Type", &cfg.choice, types, 9);
+        // assumes types are ordered the same way type id masks are initialized!!
         unsigned choicemask = 1 << cfg.choice;
 
-        if (choicemask == Signal::signal_types.test_signal) {
-        } else if (choicemask == Signal::signal_types.keyboard_signal) {
+        if (choicemask == Signal::signal_types.test) {
+        } else if (choicemask == Signal::signal_types.keyboard) {
             ImGui::InputInt("Key", &cfg.key);
             ImGui::InputInt("Scancode", &cfg.scancode);
             ImGui::InputInt("Action", &cfg.kaction);
@@ -204,39 +212,63 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
             ImGui::InputDouble("Y-offset", &cfg.yoff);
         } else if (choicemask == Signal::signal_types.audio_signal) {
             ImGui::InputText("Sound filepath", cfg.soundpath, editor_s_new_signal_config::message_size);
+        } else if (choicemask == Signal::signal_types.hud_update_group_mappings_signal) {
+            ImGui::Checkbox("All?", &cfg.all);
+            if ( !cfg.all ) {
+                ImGui::InputInt("Component ID", &cfg.componentID);
+                static const char *componentTypeLabels[] = {"UNDEFINED", "TEXT", "SPRITE"};
+                ImGui::Combo("Component Type", &cfg.componentType, componentTypeLabels, 3);
+                ImGui::InputInt("Old Group ID", &cfg.oldGroupID);
+                ImGui::InputInt("New Group ID", &cfg.newGroupID);
+            }
+        } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
+            ImGui::Text("No unique fields.");
+        } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
+            ImGui::InputInt("Group ID", &cfg.groupId);
         } else {
             ImGui::Text("Unimplemented - see SignalQueue::editor_control_window");
         }
     }
-    
-    if (cfg.enablelog) {
-        ImGui::Begin("Queue log");
-
-        for (auto &line: cfg.log) {
-            ImGui::Text("%s", line.c_str());
+    if ( ImGui::CollapsingHeader("Managed Components") ) {
+        for (auto & recv : receivers) {
+            if (ImGui::TreeNodeEx(std::format("ID {0}, RID {1}, Mask {2}##Recv{0}", recv->uniqueID, recv->receiver_uid, recv->receive_type_mask).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                recv->showImGuiDetails(camera);
+                ImGui::TreePop();
+            }
         }
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-            ImGui::SetScrollHereY(1.0f);
-
-        ImGui::End();
     }
+
+    // todo replace
+    if (log.enable)
+        log.console->imguiWindow();
+//    if (cfg.enablelog) {
+//        ImGui::Begin("Queue log");
+//
+//        for (auto &line: cfg.log) {
+//            ImGui::Text("%s", line.c_str());
+//        }
+//        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+//            ImGui::SetScrollHereY(1.0f);
+//
+//        ImGui::End();
+//    }
 }
 
 SignalQueue::SignalQueue() {
-name = "Signal Queue";
+    name = "Signal Queue";
 }
 
 void SignalQueue::removeComponent(void *component) {
     receivers.erase(std::remove(receivers.begin(), receivers.end(),reinterpret_cast<SignalReceiver *const>(component)), receivers.end());
 }
 
-SignalReceiver *SignalQueue::editor_s_new_signal_config::new_logger() {
-    return new SignalReceiver(
+SignalReceiver SignalQueue::editor_s_logging::new_receiver() {
+    return SignalReceiver(
             Signal::signal_types.all,
             [](const Signal &signal) {
-                editor_new_signal_config.log.emplace_back(std::format(
+                editor_log.console->log(std::format(
                         "[{}] received signal {}",
                         ztgk::time(), signal.to_string()
-                ).c_str());
+                ));
             });
 }
