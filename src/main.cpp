@@ -55,6 +55,7 @@
 #include "ECS/Render/InstanceRenderSystem.h"
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "ECS/Unit/UnitSystem.h"
 
 #pragma endregion Includes
 
@@ -100,6 +101,8 @@ bool init();
 void init_systems();
 
 void load_enteties();
+
+void load_units();
 
 void init_imgui();
 
@@ -176,6 +179,7 @@ InstanceRenderSystem instanceRenderSystem;
 WireRenderer wireRenderer(&primitives,& camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
+UnitSystem unitSystem;
 
 Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
 
@@ -381,6 +385,8 @@ void init_systems() {
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
+    scene.systemManager.addSystem(&unitSystem);
+
 
     primitives.Init();
     phongPipeline.Init();
@@ -405,7 +411,7 @@ void load_enteties() {
     
     model.loadModel();
     quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
-    gabka.loadModel();
+    //gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
@@ -454,9 +460,14 @@ void load_enteties() {
     zmspr = fgelem->getComponent<Sprite>();
     zmspr->groupID = zmgroup;
 
+    load_units();
 
-    playerUnit = scene.addEntity("Player");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
+
+}
+
+void load_units() {
+    playerUnit = scene.addEntity("Player1");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
     playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
@@ -464,14 +475,12 @@ void load_enteties() {
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     UnitStats stats = {100, 1, 1, 5, 1};
-    playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(0, 0), stats, true));
+    playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(0, 0), stats, true, &unitSystem));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState();
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
 }
-
 void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -519,13 +528,9 @@ void update() {
     lightSystem.Update(deltaTime);
 
     signalQueue.update();
-    playerUnit->updateSelfAndChild();
-    stateManager->RunStateMachine();
-    playerUnit->getComponent<Unit>()->Update();
 
-//    spdlog::info(playerUnit->transform.getGlobalPosition().x);
-//    spdlog::info(playerUnit->transform.getGlobalPosition().y);
-    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stateManager->RunStateMachine();
+    unitSystem.Update();
 }
 
 void render() {
@@ -547,7 +552,7 @@ void render() {
     
     renderSystem.DrawScene(&phongPipeline.phongShader);
     instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-    wireRenderer.DrawColliders();
+    //wireRenderer.DrawColliders();
     //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 

@@ -15,6 +15,7 @@ struct UnitStats{
     float range;
 };
 
+class UnitSystem;
 
 class Unit : public Component {
 public:
@@ -42,7 +43,7 @@ public:
     IMineable* miningTarget;
     UnitStats stats;
 
-    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
+    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly, UnitSystem* unitSystem);
     ~Unit();
 
     bool IsAlly() const;
