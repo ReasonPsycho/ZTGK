@@ -3,9 +3,9 @@
 //
 
 #include "Unit.h"
+#include "UnitSystem.h"
 
-
-Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) {
+Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
     this->name = name;
     this->equipment = UnitEquipment();
     this->grid = grid;
@@ -16,6 +16,8 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->isAlly = isAlly;
 
     UpdateStats();
+
+    unitSystem->addComponent(this);
 }
 
 Unit::~Unit() {
@@ -72,5 +74,9 @@ void Unit::showImGuiDetails(Camera *camera) {
 }
 
 void Unit::Update() {
+
+    getEntity()->transform.setLocalPosition(worldPosition);
+    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+    currentState = currentState->RunCurrentState();
 
 }

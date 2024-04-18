@@ -80,8 +80,11 @@ Tile *Grid::getTileAt(Vector2Int index) {
 
 
 const glm::vec3 Grid::GridToWorldPosition(Vector2Int index) const {
-    return glm::vec3(Position.x + index.x * tileSize + offsetX, Position.y, Position.z + index.z * tileSize + offsetZ);
-}
+
+    float worldPosX = Position.x + index.x * tileSize;
+    float worldPosY = Position.y;
+    float worldPosZ = Position.z + index.z * tileSize;
+    return glm::vec3(worldPosX, worldPosY, worldPosZ);}
 
 
 const glm::vec3 Grid::GridToWorldPosition(int x, int z) const {
@@ -89,8 +92,21 @@ const glm::vec3 Grid::GridToWorldPosition(int x, int z) const {
 }
 
 Vector2Int Grid::WorldToGridPosition(Vector3 position) const {
-    return Vector2Int((int) ((position.x - Position.x - offsetX) / tileSize),
-                      (int) ((position.z - Position.z - offsetZ) / tileSize));
+    // Calculate the offset from the grid's origin
+    float offsetX = position.x - Position.x;
+    float offsetZ = position.z - Position.z;
+
+    // Calculate the grid index based on the offset and tileSize
+    int gridX = static_cast<int>(offsetX / tileSize);
+    int gridZ = static_cast<int>(offsetZ / tileSize);
+
+    // Ensure the grid index is within bounds
+    if (gridX < 0) gridX = 0;
+    if (gridZ < 0) gridZ = 0;
+    if (gridX >= width) gridX = width - 1;
+    if (gridZ >= height) gridZ = height - 1;
+
+    return {gridX, gridZ};
 }
 
 void Grid::showImGuiDetails(Camera *camera) {

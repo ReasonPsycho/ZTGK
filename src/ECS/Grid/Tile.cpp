@@ -9,7 +9,7 @@
 
 Tile::~Tile() {
     vacant = true;
-    delete this;
+    //delete this;
 }
 
 Tile::Tile(Vector2Int index, bool vacant, std::string name){
