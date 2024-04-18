@@ -249,6 +249,7 @@ int main(int, char **) {
         // Update game objects' state here
         update();
 
+        //spdlog::info(playerUnit->transform.getGlobalPosition().x);
         // OpenGL rendering code here
         render();
 
@@ -404,7 +405,7 @@ void load_enteties() {
     
     model.loadModel();
     quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
-   // gabka.loadModel();
+    gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
@@ -455,14 +456,14 @@ void load_enteties() {
 
 
     playerUnit = scene.addEntity("Player");
-    playerUnit->addComponent(make_unique<Render>(cubeModel));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, 0, 0));
+    playerUnit->addComponent(make_unique<Render>(&gabka));
+    playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(0.5, 0.5, 0.5), &collisionSystem));
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    UnitStats stats = {100, 1, 1, 1, 1};
+    UnitStats stats = {100, 1, 1, 5, 1};
     playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(0, 0), stats, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState();
@@ -520,6 +521,7 @@ void update() {
     signalQueue.update();
     playerUnit->updateSelfAndChild();
     stateManager->RunStateMachine();
+    playerUnit->getComponent<Unit>()->Update();
 
 //    spdlog::info(playerUnit->transform.getGlobalPosition().x);
 //    spdlog::info(playerUnit->transform.getGlobalPosition().y);
@@ -745,12 +747,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
         if(ray->getHitEntity() != nullptr){
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
+            if(ray->getHitEntity()->getComponent<Tile>() != nullptr){
+                spdlog::info("Tile pos: {} {} {}", grid.GridToWorldPosition(ray->getHitEntity()->getComponent<Tile>()->index).x, grid.GridToWorldPosition(ray->getHitEntity()->getComponent<Tile>()->index).y, grid.GridToWorldPosition(ray->getHitEntity()->getComponent<Tile>()->index).z);
+            }
         }
         else{
             spdlog::info("No hit entity");
         }
 
-        if(ray->getHitEntity()->getComponent<Unit>() != nullptr){
+        if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr){
             if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
                 ray->getHitEntity()->getComponent<Unit>()->isSelected = false;
                 selectedUnit = nullptr;

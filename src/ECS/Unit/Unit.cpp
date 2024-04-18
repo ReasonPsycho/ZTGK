@@ -72,5 +72,5 @@ void Unit::showImGuiDetails(Camera *camera) {
 }
 
 void Unit::Update() {
-
+    getEntity()->transform.setLocalPosition(worldPosition);
 }
