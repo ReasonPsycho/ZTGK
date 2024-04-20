@@ -146,8 +146,10 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
 
             if (i >= width / 4 && i < (width - width / 4) && j >= height / 4 && j < (height - height / 4)) {
                 tileEntity->getComponent<Tile>()->isFloor = true;
+
             } else {
                 tileEntity->getComponent<Tile>()->isFloor = false;
+                tileEntity->getComponent<Tile>()->vacant = false;
             }
 
             tileEntity->updateSelfAndChild();

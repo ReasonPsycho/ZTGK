@@ -16,7 +16,8 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->pathfinding = AstarPathfinding(grid);
     this->baseStats = baseStats;
     this->isAlly = isAlly;
-
+    this->previousGridPosition = gridPosition;
+    grid->getTileAt(gridPosition)->vacant = false;
     UpdateStats();
 
     //unitSystem->addComponent(this);
@@ -80,8 +81,13 @@ void Unit::showImGuiDetails(Camera *camera) {
 
 void Unit::Update() {
 
+    if (gridPosition != previousGridPosition) {
+        grid->getTileAt(previousGridPosition)->vacant = true;
+        grid->getTileAt(gridPosition)->vacant = false;
+    }
     getEntity()->transform.setLocalPosition(worldPosition);
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
     currentState = currentState->RunCurrentState();
 
+    previousGridPosition = gridPosition;
 }
