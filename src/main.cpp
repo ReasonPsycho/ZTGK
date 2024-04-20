@@ -472,7 +472,6 @@ void load_enteties() {
 void load_units() {
     playerUnit = scene.addEntity("Player1");
     playerUnit->addComponent(make_unique<Render>(cubeModel));
-    //playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -487,7 +486,6 @@ void load_units() {
 
     playerUnit = scene.addEntity("Player2");
     playerUnit->addComponent(make_unique<Render>(cubeModel));
-    //playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -495,6 +493,34 @@ void load_units() {
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     stats = {100, 1, 1, 30, 1};
     playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    playerUnit = scene.addEntity("Player3");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 10, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    playerUnit = scene.addEntity("Player4");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 100, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), stats, true, &unitSystem));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState();
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -572,7 +598,7 @@ void render() {
     
     renderSystem.DrawScene(&phongPipeline.phongShader);
     instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-    wireRenderer.DrawColliders();
+    //wireRenderer.DrawColliders();
     //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
