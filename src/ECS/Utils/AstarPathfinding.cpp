@@ -208,7 +208,7 @@ Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int 
 
         for(Vector2Int dir : directions){
             Vector2Int next = current + dir;
-            if(grid->getTileAt(next)!= nullptr && !visited.contains(next) && grid->getTileAt(next)-> vacant){
+            if(grid->getTileAt(next)!= nullptr && !visited.contains(next)){
                 list.push_back(next);
                 visited.insert(next);
             }
