@@ -29,6 +29,7 @@ public:
 
     // Most important method
     void FindPath(Vector2Int start, Vector2Int target);
+    Vector2Int GetNearestVacantTile(Vector2Int target, Vector2Int origin);
 
 private:
     Grid* grid;
@@ -37,7 +38,6 @@ private:
     Vector2Int GetLowestFScore(std::unordered_set<Vector2Int>& openSet, std::unordered_map<Vector2Int, float>& fScore);
     std::vector<Vector2Int> ReconstructPath(std::unordered_map<Vector2Int, Vector2Int>& cameFrom, Vector2Int current);
     std::vector<Vector2Int> GetNeighbours(Vector2Int current, bool simple = false);
-    Vector2Int GetNearestVacantTile(Vector2Int target, Vector2Int origin);
 
 };
 

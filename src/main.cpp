@@ -573,7 +573,7 @@ void render() {
     
     renderSystem.DrawScene(&phongPipeline.phongShader);
     instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-    //wireRenderer.DrawColliders();
+    wireRenderer.DrawColliders();
     //wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 

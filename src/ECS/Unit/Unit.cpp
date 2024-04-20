@@ -81,13 +81,26 @@ void Unit::showImGuiDetails(Camera *camera) {
 
 void Unit::Update() {
 
+    if(hasMovementTarget){
+        if(!grid->getTileAt(movementTarget)->vacant){
+            movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
+        }
+    }
+
+    bool curTileVac = grid->getTileAt(gridPosition)->vacant;
+
+    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+
+
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->vacant = true;
         grid->getTileAt(gridPosition)->vacant = false;
     }
+
+    spdlog::info("Unit {} is on tile {} {}  vacant: {}", name, gridPosition.x, gridPosition.z, curTileVac);
+
     getEntity()->transform.setLocalPosition(worldPosition);
-    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
-    currentState = currentState->RunCurrentState();
+
 
     previousGridPosition = gridPosition;
 }

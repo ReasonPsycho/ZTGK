@@ -193,33 +193,32 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
 }
 
 Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int origin) {
-    std::vector<Vector2Int> directions = { Vector2Int(0, 1), Vector2Int(1, 0), Vector2Int(0, -1), Vector2Int(-1, 0) };
+    Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
     std::vector<Vector2Int> list;
     list.push_back(target);
     std::unordered_set<Vector2Int> visited;
     visited.insert(target);
 
-    while (!list.empty()) {
-        Vector2Int current = list.front();
+    while(list.size() > 0){
+        Vector2Int current = list[0];
         list.erase(list.begin());
-
-        if (grid->getTileAt(current)->vacant || current == origin) {
+        if(grid->getTileAt(current)->vacant || current == origin){
             return current;
         }
 
-        for (const auto& dir : directions) {
+        for(Vector2Int dir : directions){
             Vector2Int next = current + dir;
-            if (grid->getTileAt(next) != nullptr && visited.find(next) == visited.end()) {
+            if(grid->getTileAt(next)!= nullptr && !visited.contains(next) && grid->getTileAt(next)-> vacant){
                 list.push_back(next);
                 visited.insert(next);
             }
         }
-
-        std::sort(list.begin(), list.end(), [&](const Vector2Int& v1, const Vector2Int& v2) {
-            return VectorUtils::Distance(v1, origin) < VectorUtils::Distance(v2, origin);
+        std::sort(list.begin(), list.end(), [origin](Vector2Int a, Vector2Int b){
+            return VectorUtils::Distance(a, origin) < VectorUtils::Distance(b, origin);
         });
     }
-
     return target;
+
+
 }
 
