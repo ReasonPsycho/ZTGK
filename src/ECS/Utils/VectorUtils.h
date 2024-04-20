@@ -16,6 +16,17 @@ struct Vector2Int {
     Vector2Int(int x, int z) : x(x), z(z) {}
     Vector2Int() = default;
 
+    void normalize() {
+        int length = sqrt(x * x + z * z);
+        x /= length;
+        z /= length;
+    }
+
+    int dot(Vector2Int other) {
+        return x * other.x + z * other.z;
+    }
+
+
     bool operator==(const Vector2Int& other) const {
         return x == other.x && z == other.z;
     }
@@ -145,6 +156,14 @@ public:
     }
     static float Distance(Vector3 a, Vector3 b) {
         return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+    }
+
+    static float DistanceSquared(Vector2Int a, Vector2Int b) {
+        return pow(a.x - b.x, 2) + pow(a.z - b.z, 2);
+    }
+
+    static float DistanceSquared(Vector3 a, Vector3 b) {
+        return pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2);
     }
 
 

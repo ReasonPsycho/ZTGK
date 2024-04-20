@@ -59,7 +59,7 @@ public:
 
 private:
     bool isAlly;
-
+    Vector2Int previousGridPosition;
     UnitStats baseStats;
 };
 

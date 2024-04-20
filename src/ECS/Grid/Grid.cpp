@@ -139,15 +139,17 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
     Entity *gridEntity = scene->addEntity("Grid Entity");
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            Entity *tileEntity = scene->addEntity(gridEntity, "Tile" + std::to_string(i) + std::to_string(j));
+            Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
             tileEntity->addComponent(std::make_unique<Tile>(i, j));
             tileEntity->transform.setLocalPosition(GridToWorldPosition(i, j));
             tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
             if (i >= width / 4 && i < (width - width / 4) && j >= height / 4 && j < (height - height / 4)) {
                 tileEntity->getComponent<Tile>()->isFloor = true;
+
             } else {
                 tileEntity->getComponent<Tile>()->isFloor = false;
+                tileEntity->getComponent<Tile>()->vacant = false;
             }
 
             tileEntity->updateSelfAndChild();

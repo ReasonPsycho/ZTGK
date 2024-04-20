@@ -3,10 +3,12 @@
 //
 
 #include "Unit.h"
+
+#include <utility>
 #include "UnitSystem.h"
 
 Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
-    this->name = name;
+    this->name = std::move(name);
     this->equipment = UnitEquipment();
     this->grid = grid;
     this->gridPosition = gridPosition;
@@ -14,10 +16,11 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->pathfinding = AstarPathfinding(grid);
     this->baseStats = baseStats;
     this->isAlly = isAlly;
-
+    this->previousGridPosition = gridPosition;
+    grid->getTileAt(gridPosition)->vacant = false;
     UpdateStats();
 
-    unitSystem->addComponent(this);
+    //unitSystem->addComponent(this);
 }
 
 Unit::~Unit() {
@@ -61,6 +64,7 @@ UnitStats Unit::GetBaseStats() {
 }
 
 void Unit::showImGuiDetails(Camera *camera) {
+
     ImGui::Text("Unit: %s", name.c_str());
     ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
     ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);
@@ -70,13 +74,29 @@ void Unit::showImGuiDetails(Camera *camera) {
     ImGui::Text("Movement Speed: %f", stats.movementSpeed);
     ImGui::Text("Range: %f", stats.range);
     ImGui::Text("Ally: %s", isAlly ? "true" : "false");
+    ImGui::Text("Selected: %s", isSelected ? "true" : "false");
+
 
 }
 
 void Unit::Update() {
 
-    getEntity()->transform.setLocalPosition(worldPosition);
-    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
-    currentState = currentState->RunCurrentState();
+    if(hasMovementTarget){
+        if(!grid->getTileAt(movementTarget)->vacant){
+            movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
+            pathfinding.FindPath(gridPosition, movementTarget);
+        }
+    }
 
+    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+
+
+    if (gridPosition != previousGridPosition) {
+        grid->getTileAt(previousGridPosition)->vacant = true;
+        grid->getTileAt(gridPosition)->vacant = false;
+    }
+
+    getEntity()->transform.setLocalPosition(worldPosition);
+    
+    previousGridPosition = gridPosition;
 }
