@@ -60,7 +60,6 @@ void MovementState::MoveOnPath() {
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
         }
     }
-    unit->getEntity()->updateSelfAndChild();
 }
 
 bool MovementState::isTargetInRange() {

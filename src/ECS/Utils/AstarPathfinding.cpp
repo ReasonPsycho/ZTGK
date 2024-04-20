@@ -21,6 +21,17 @@ AstarPathfinding::AstarPathfinding(Grid *grid) {
  */
 void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
 
+    if (grid->getTileAt(target) == nullptr){
+        spdlog::error("PATHFINDING: Target tile is nullptr");
+    }
+    if (grid->getTileAt(start) == nullptr){
+        spdlog::error("PATHFINDING: Start tile is nullptr");
+    }
+
+    if(!grid->getTileAt(target)->vacant){
+        target = GetNearestVacantTile(target, start);
+    }
+
     std::unordered_set<Vector2Int> openSet;
     std::unordered_set<Vector2Int> closedSet;
     std::unordered_map<Vector2Int, Vector2Int> cameFrom;
@@ -43,7 +54,7 @@ void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
         closedSet.insert(current);
 
         for(auto neigh : GetNeighbours(current)){
-            if(closedSet.contains(neigh)){
+            if(closedSet.contains(neigh) || !grid->getTileAt(neigh)->vacant){
                 continue;
             }
 
@@ -180,3 +191,34 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
 
     return neighbours;
 }
+
+Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int origin) {
+    Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
+    std::vector<Vector2Int> list;
+    list.push_back(target);
+    std::unordered_set<Vector2Int> visited;
+    visited.insert(target);
+
+    while(list.size() > 0){
+        Vector2Int current = list[0];
+        list.erase(list.begin());
+        if(grid->getTileAt(current)->vacant || current == origin){
+            return current;
+        }
+
+        for(Vector2Int dir : directions){
+            Vector2Int next = current + dir;
+            if(grid->getTileAt(next)!= nullptr && !visited.contains(next) && grid->getTileAt(next)-> vacant){
+                list.push_back(next);
+                visited.insert(next);
+            }
+        }
+        std::sort(list.begin(), list.end(), [origin](Vector2Int a, Vector2Int b){
+            return VectorUtils::Distance(a, origin) < VectorUtils::Distance(b, origin);
+        });
+    }
+    return target;
+
+
+}
+
