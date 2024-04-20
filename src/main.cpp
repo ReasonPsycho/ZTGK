@@ -252,7 +252,6 @@ int main(int, char **) {
         // Update game objects' state here
         update();
 
-        //spdlog::info(playerUnit->transform.getGlobalPosition().x);
         // OpenGL rendering code here
         render();
 
@@ -479,8 +478,8 @@ void load_units() {
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    UnitStats stats = {100, 1, 1, 5, 1};
-    playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
+    UnitStats stats = {100, 1, 1, 20, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState();
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -494,7 +493,8 @@ void load_units() {
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    playerUnit->addComponent(make_unique<Unit>("Player", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
+    stats = {100, 1, 1, 30, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState();
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -550,7 +550,6 @@ void update() {
 
     signalQueue.update();
 
-    stateManager->RunStateMachine();
     unitSystem.Update();
 }
 

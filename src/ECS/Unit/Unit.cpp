@@ -84,10 +84,9 @@ void Unit::Update() {
     if(hasMovementTarget){
         if(!grid->getTileAt(movementTarget)->vacant){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
+            pathfinding.FindPath(gridPosition, movementTarget);
         }
     }
-
-    bool curTileVac = grid->getTileAt(gridPosition)->vacant;
 
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
 
@@ -97,10 +96,7 @@ void Unit::Update() {
         grid->getTileAt(gridPosition)->vacant = false;
     }
 
-    spdlog::info("Unit {} is on tile {} {}  vacant: {}", name, gridPosition.x, gridPosition.z, curTileVac);
-
     getEntity()->transform.setLocalPosition(worldPosition);
-
-
+    
     previousGridPosition = gridPosition;
 }
