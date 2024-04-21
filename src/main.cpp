@@ -397,8 +397,8 @@ void init_systems() {
     MaterialPhong materialPhong = MaterialPhong(myColor);
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,vector<GLuint>(pbrprimitives.cubeIndices,pbrprimitives.cubeIndices + 36));
 
-//    hud.init();
-//    scene.systemManager.addSystem(&hud);
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -433,9 +433,11 @@ void load_enteties() {
     grid.LoadTileEntities(1.0f, &collisionSystem);
     instanceRenderSystem.Innit();
 
+    hud.getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
     bggroup = hud.addGroup(glm::vec3(0, 0, 10));
+    hud.getGroupOrDefault(bggroup)->setHidden(true);
     auto bgelem = scene.addEntity(ebg, "Puni1");
     bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni2");
@@ -451,6 +453,7 @@ void load_enteties() {
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
+    hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300, ztgk::game::window_size.y * 0.5 ));
     tx.groupID = zmgroup;
