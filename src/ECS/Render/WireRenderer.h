@@ -41,7 +41,7 @@ private:
             std::type_index(typeid(Ray)) //Sphere isn't supported yet XD
     };
 
-    bool enabled = true;
+    bool enabled = false;
 };
 
 

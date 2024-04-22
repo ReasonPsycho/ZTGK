@@ -603,6 +603,8 @@ void imgui_begin() {
 
 }
 void imgui_render() {
+    scene.showImGuiDetails(&camera);
+
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -617,6 +619,7 @@ void imgui_render() {
         min_timestamp = Time::Instance().LastFrame();
     }
     ImGui::Begin(format("FPS: {:.2f} H: {:.2f} L: {:.2f}###FPS_COUNTER", fps, fps_max, fps_min).c_str());
+    ImGui::Text("%s", std::format("Time: {:.3f}", Time::Instance().LastFrame()).c_str());
     ImGui::Text("%s", std::format("High @ {:.3f}", max_timestamp).c_str());
     ImGui::Text("%s", std::format("Low @ {:.3f}", min_timestamp).c_str());
     if (ImGui::Button("Clear")) {
@@ -629,10 +632,7 @@ void imgui_render() {
 
 
     //lightSystem.showLightTree();
-    scene.showImGuiDetails(&camera);
-
     ztgk::console.imguiWindow();
-
     // bloomSystem .showImguiOptions();
 }
 

@@ -35,6 +35,16 @@ void Console::imguiWindow() {
                 log("Flood message.", spdlog::level::debug);
             }
         }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Top##DefTop")) {
+            ImGui::SetScrollFromPosY(clipper.StartPosY - ImGui::GetWindowPos().y);
+        }
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("This will not stop auto-scroll when logging fast. Scroll up once to break it and then press this.");
+        if (ImGui::MenuItem("Bottom##DefBottom")) {
+            float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * (entries.size());
+            ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
+        }
 
         ImGui::EndMenuBar();
     }
