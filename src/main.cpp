@@ -56,6 +56,8 @@
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "ECS/SaveSystem/Level.h"
+#include "ECS/SaveSystem/LevelSaving.h"
 
 #pragma endregion Includes
 
@@ -309,9 +311,9 @@ void cleanup() {
 }
 
 bool init() {
-    auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
-    spdlog::get("")->sinks().push_back(sink);
+    spdlog::set_level(spdlog::level::trace);
+    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
+    ztgk::console.level(spdlog::level::trace);
 
     // Get current date and time
     auto now = std::chrono::system_clock::now();
@@ -627,6 +629,15 @@ void imgui_render() {
         max_timestamp = 0;
         fps_min = 1000000;
         min_timestamp = 0;
+    }
+    ImGui::End();
+
+    ImGui::Begin("Save test");
+    if (ImGui::Button("save")) {
+        auto player = playerUnit->getComponent<Unit>();
+        LevelSaving::save({ &grid, {
+            { player->gridPosition.x, player->gridPosition.z, player->IsAlly() }
+        } });
     }
     ImGui::End();
 

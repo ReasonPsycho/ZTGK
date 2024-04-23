@@ -3,12 +3,24 @@
 //
 
 #include "Console.h"
-#include "Util.h"
+#include "spdlog/spdlog.h"
 
-Console::Console(const std::string & name) : name(name) {}
+Console::Console(const std::string & name) : name(name) {
+    sink = std::make_shared<ImGuiSpdlogSink>();
+    sink->console = this;
+    sink->set_pattern("");
+    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
+    if (name == "Console")
+        level(spdlog::level::trace);
+    else level(spdlog::level::off);
+    spdlog::get("")->sinks().push_back(sink);
+}
 
 Console::Console(const custom_menus_t & custom_menus, const std::string & name)
-: name(name), custom_menus(custom_menus) {}
+: Console(name) {
+    this->custom_menus = custom_menus;
+}
+
 
 void Console::imguiWindow() {
     ImGui::Begin(std::format("{0}##Console_{0}", name).c_str(), nullptr, ImGuiWindowFlags_MenuBar);
@@ -21,9 +33,33 @@ void Console::imguiWindow() {
         if ( !custom_menus.empty() )
             ImGui::Separator();
 
+        if ( name == "Console" ) {
+            static std::vector<spdlog::string_view_t> names(SPDLOG_LEVEL_NAMES);
+
+            if (ImGui::BeginMenu(names[level()].data())) {
+                for (int i = 0; i < spdlog::level::n_levels; ++i) {
+                    if (ImGui::MenuItem(names[i].data()))
+                        level(static_cast<spdlog::level::level_enum>(spdlog::level::trace + i));
+                }
+                ImGui::EndMenu();
+            }
+            if (ImGui::MenuItem("Off"))
+                level(spdlog::level::off);
+            ImGui::Separator();
+        }
         if (ImGui::MenuItem("Clear##DefClear")) {
             clear();
         }
+        if (ImGui::MenuItem("Top##DefTop")) {
+            ImGui::SetScrollFromPosY(clipper.StartPosY - ImGui::GetWindowPos().y);
+        }
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("This will not stop auto-scroll when logging fast. Scroll up once to break it and then press this.");
+        if (ImGui::MenuItem("Bottom##DefBottom")) {
+            float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * (entries.size());
+            ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
+        }
+        ImGui::Separator();
         if (ImGui::MenuItem("Test##DefTest")) {
             log(Entry{
                     "Test debug message.",
@@ -34,16 +70,6 @@ void Console::imguiWindow() {
             for (int i = 0; i < 10000; ++i) {
                 log("Flood message.", spdlog::level::debug);
             }
-        }
-        ImGui::Separator();
-        if (ImGui::MenuItem("Top##DefTop")) {
-            ImGui::SetScrollFromPosY(clipper.StartPosY - ImGui::GetWindowPos().y);
-        }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("This will not stop auto-scroll when logging fast. Scroll up once to break it and then press this.");
-        if (ImGui::MenuItem("Bottom##DefBottom")) {
-            float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * (entries.size());
-            ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
         }
 
         ImGui::EndMenuBar();
@@ -103,3 +129,12 @@ void Console::log(const std::string &text, spdlog::level::level_enum severity) {
 void Console::clear() {
     entries.clear();
 }
+
+spdlog::level::level_enum Console::level() {
+    return sink->level();
+}
+
+void Console::level(spdlog::level::level_enum level) {
+    sink->set_level(level);
+}
+
