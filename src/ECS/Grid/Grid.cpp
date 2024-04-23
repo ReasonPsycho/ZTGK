@@ -118,8 +118,8 @@ void Grid::showImGuiDetails(Camera *camera) {
         ImGui::Text("Offset X: %f", offsetX);
         ImGui::Text("Offset Z: %f", offsetZ);
     }
-    for (int j = 0; j < height; j++) {
-        for (int i = 0; i < width; i++) {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
             ImGui::PushID(gridArray[i][j]->uniqueID);
             if (ImGui::CollapsingHeader(("Tile " + std::to_string(i) + " " + std::to_string(j)).c_str())) {
                 gridArray[i][j]->showImGuiDetails(camera);
@@ -145,10 +145,10 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
             if (i >= width / 4 && i < (width - width / 4) && j >= height / 4 && j < (height - height / 4)) {
-                tileEntity->getComponent<Tile>()->isFloor = true;
+                tileEntity->getComponent<Tile>()->state = FLOOR;
 
             } else {
-                tileEntity->getComponent<Tile>()->isFloor = false;
+                tileEntity->getComponent<Tile>()->state = WALL;
                 tileEntity->getComponent<Tile>()->vacant = false;
             }
 
@@ -202,7 +202,7 @@ void Grid::SetUpWallData() {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Tile *currentTile = getTileAt(i, j);
-            if(currentTile->isFloor){
+            if(currentTile->state == FLOOR){
                 currentTile->walls.clear();
                 glm::mat4x4 floorMatrix = currentTile->getEntity()->transform.getModelMatrix();
                 floorMatrix = glm::translate(floorMatrix,glm::vec3(0,-translateLength,0));
@@ -212,7 +212,7 @@ void Grid::SetUpWallData() {
                 
                 
                 Tile *northNeighbour = getTileAt(i + 1, j);
-                if (northNeighbour == nullptr || northNeighbour->isFloor){
+                if (northNeighbour == nullptr || northNeighbour->state == FLOOR){
                     glm::mat4x4 northMatrix = currentTile->getEntity()->transform.getModelMatrix();
                     northMatrix = glm::translate(northMatrix,glm::vec3(translateLength,0,0));
                     northMatrix = glm::rotate(northMatrix,glm::radians(-90.0f),glm::vec3 (0,1,0));
@@ -221,14 +221,14 @@ void Grid::SetUpWallData() {
                     
                  
                 Tile *southNeighbour = getTileAt(i - 1, j);
-                if (southNeighbour == nullptr || southNeighbour->isFloor){
+                if (southNeighbour == nullptr || southNeighbour->state == FLOOR){
                     glm::mat4x4 southMatrix = currentTile->getEntity()->transform.getModelMatrix();
                     southMatrix = glm::translate(southMatrix,glm::vec3(-translateLength,0,0));
                     southMatrix = glm::rotate(southMatrix,glm::radians(90.0f),glm::vec3 (0,1,0));
                     currentTile->walls.push_back(WallData(southMatrix));
                 }
                 Tile *eastNeighbour = getTileAt(i, j + 1);
-                if (eastNeighbour == nullptr || eastNeighbour->isFloor){
+                if (eastNeighbour == nullptr || eastNeighbour->state == FLOOR){
                     glm::mat4x4 eastMatrix = currentTile->getEntity()->transform.getModelMatrix();
                     eastMatrix = glm::translate(eastMatrix,glm::vec3(0,0,translateLength));
                     eastMatrix = glm::rotate(eastMatrix,glm::radians(90.0f),glm::vec3 (0,0,1));
@@ -236,7 +236,7 @@ void Grid::SetUpWallData() {
                 }
                 
                 Tile *westNeighbour = getTileAt(i, j - 1);
-                if (westNeighbour == nullptr || westNeighbour->isFloor){
+                if (westNeighbour == nullptr || westNeighbour->state == FLOOR){
                     glm::mat4x4 westMatrix = currentTile->getEntity()->transform.getModelMatrix();
                     westMatrix = glm::translate(westMatrix,glm::vec3(0,0,-translateLength));
                   //  westMatrix = glm::rotate(westMatrix,glm::radians(-90.0f),glm::vec3 (1,0,0));

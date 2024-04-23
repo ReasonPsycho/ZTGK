@@ -28,5 +28,8 @@ void Tile::showImGuiDetails(Camera *camera) {
     ImGui::Text("Index: (%d, %d)", index.x, index.z);
     ImGui::Checkbox("Vacant", &vacant);
 
+    int state_select = state;
+    ImGui::Combo("State", &state_select, state_names, state_count);
+    state = (TileState)state_select;
 }
 

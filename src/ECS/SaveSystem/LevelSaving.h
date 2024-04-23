@@ -5,8 +5,7 @@
 #pragma once
 
 #include <string>
-#include "ECS/Grid/Grid.h"
-#include "Level.h"
+#include "ECS/Grid/Tile.h"
 
 namespace ztgk {
     const static std::string DEFAULT_SAVE_PATH = "save.txt";
@@ -18,20 +17,19 @@ namespace ztgk {
     const static char TOKEN_ERROR = '\0';
     const static char TOKEN_FLOOR = ' ';
     const static char TOKEN_WALL = 'O';
+    const static char TOKEN_TREASURE_CHEST = '*';
+    const static char TOKEN_CORE = 'c';
+    const static char TOKEN_ORE = '^';
     const static char TOKEN_PLAYER = '+';
     const static char TOKEN_ENEMY_BASIC = 'x';
-    const static char TOKEN_TREASURE_CHEST = '*';
-    const static char TOKEN_ORE = '^';
 
-    // todo match with tile state enum
-    enum SAVE_TOKEN : char {
-        ERROR = '\0',
-    };
+    char tile_state_to_token(TileState state, TileStateData data = {});
+    void tile_init_from_token(char token, Tile * tile);
 }
 
 struct LevelSaving {
 
-    static void save(Level from, const std::string& path = ztgk::DEFAULT_SAVE_PATH);
-    static void load(Level & to, const std::string& path = ztgk::DEFAULT_SAVE_PATH);
+    static void save(const std::string& path = ztgk::DEFAULT_SAVE_PATH);
+    static void load( const std::string& path = ztgk::DEFAULT_SAVE_PATH);
 
 };

@@ -56,7 +56,6 @@
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
-#include "ECS/SaveSystem/Level.h"
 #include "ECS/SaveSystem/LevelSaving.h"
 
 #pragma endregion Includes
@@ -634,17 +633,10 @@ void imgui_render() {
 
     ImGui::Begin("Save test");
     if (ImGui::Button("save")) {
-        auto player = playerUnit->getComponent<Unit>();
-        LevelSaving::save({ &grid, {
-            { player->gridPosition.x, player->gridPosition.z, player->IsAlly() }
-        } });
+        LevelSaving::save();
     }
     if (ImGui::Button("load")) {
-        auto player = playerUnit->getComponent<Unit>();
-        Level level = { &grid, {
-            { player->gridPosition.x, player->gridPosition.z, player->IsAlly() }
-        } };
-        LevelSaving::load(level);
+        LevelSaving::load();
     }
     ImGui::End();
 
