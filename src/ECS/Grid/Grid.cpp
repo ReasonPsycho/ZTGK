@@ -118,8 +118,8 @@ void Grid::showImGuiDetails(Camera *camera) {
         ImGui::Text("Offset X: %f", offsetX);
         ImGui::Text("Offset Z: %f", offsetZ);
     }
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
             ImGui::PushID(gridArray[i][j]->uniqueID);
             if (ImGui::CollapsingHeader(("Tile " + std::to_string(i) + " " + std::to_string(j)).c_str())) {
                 gridArray[i][j]->showImGuiDetails(camera);

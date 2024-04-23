@@ -312,7 +312,7 @@ void cleanup() {
 
 bool init() {
     spdlog::set_level(spdlog::level::trace);
-    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
+//    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
     ztgk::console.level(spdlog::level::trace);
 
     // Get current date and time
@@ -638,6 +638,13 @@ void imgui_render() {
         LevelSaving::save({ &grid, {
             { player->gridPosition.x, player->gridPosition.z, player->IsAlly() }
         } });
+    }
+    if (ImGui::Button("load")) {
+        auto player = playerUnit->getComponent<Unit>();
+        Level level = { &grid, {
+            { player->gridPosition.x, player->gridPosition.z, player->IsAlly() }
+        } };
+        LevelSaving::load(level);
     }
     ImGui::End();
 
