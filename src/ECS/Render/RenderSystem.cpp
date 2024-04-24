@@ -5,9 +5,10 @@
 #include "RenderSystem.h"
 
 
-void RenderSystem::DrawScene(Shader *regularShader) {
+void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
+    Frustum frustum = createFrustumFromCamera(*camera);
     for (auto &renderComponent: renderComponents) {
-        renderComponent->draw(*regularShader);
+        renderComponent->draw(*regularShader,&frustum);
     }
 }
 

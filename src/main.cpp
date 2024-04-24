@@ -641,8 +641,8 @@ void render() {
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
 
-    renderSystem.DrawScene(&phongPipeline.phongShader);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
+    renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
 //    wireRenderer.DrawColliders();
 //    wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");

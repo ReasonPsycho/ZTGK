@@ -16,7 +16,7 @@
 #include <array> //std::array
 #include <memory> //std::unique_ptr
 #include "ECS/Render/Camera/Camera.h"
-
+class SystemManager;
 
 class System {
 public:
@@ -31,8 +31,10 @@ public:
     virtual int getNumComponentTypes() = 0;
 
     virtual void showImGuiDetails(Camera *camera) = 0;
+    SystemManager *getSystemManager();
 
     unsigned uniqueID;     // Instance variable to store the unique ID for each object
+    SystemManager* systemManager;
 };
 
 
