@@ -22,12 +22,18 @@ public:
     void removeComponent(void* component) override;
     void showImGuiDetails(Camera *camera) override;
     void DrawTiles(Shader* regularShader);
+    void PushToSSBO();
     void Update();
 
     Model* tileModel;
 private:
     GLuint wallDataBufferID;
     GLuint wallDataBufferBindingPoint = 6;
+    GLuint tileTextureArray;
+    GLuint tileTextureBindingPoint = 10;
+    int numberOfTextures = 3;
+    
+    string tilePath =  "res/textures/tiles/Tile";
     
     std::vector<Tile *> tileComponents;
     std::vector<WallData> wallData;

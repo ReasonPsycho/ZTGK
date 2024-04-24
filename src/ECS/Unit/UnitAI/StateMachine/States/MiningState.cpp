@@ -13,23 +13,40 @@
 
 State *MiningState::RunCurrentState() {
     isTargetInRange();
-    Mine();
+
 
     //from Mining to Idle
     if(!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget){
-        return IdleState;
+        idleState = new IdleState(grid);
+        idleState->unit = unit;
+
+        return idleState;
     }
 
     //from Mining to Movement
     if(unit->hasMovementTarget){
-        return MoveState;
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+
+        return moveState;
     }
 
     //from Mining to Combat
-    if(!unit->hasMovementTarget && unit->hasCombatTarget && unit->isTargetInRange){
-        return CombatState;
+    if(unit->hasCombatTarget){
+        combatState = new CombatState(grid);
+        combatState->unit = unit;
+
+        if(combatState->isTargetInRange())
+            return combatState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->combatTarget->gridPosition;
+            return this;
+        }
     }
 
+    Mine();
     return this;
 }
 
@@ -39,23 +56,27 @@ bool MiningState::isTargetInRange() {
         unit->isTargetInRange = false;
         return false;
     }
-    // if(unit->miningTarget != nullptr && VectorUtils::Distance(unit->worldPosition, unit->miningTarget->worldPosition) <= unit->stats.range){
-    //     unit->isTargetInRange = true;
-    //     return true;
-    // }
+     if(VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(unit->worldPosition), VectorUtils::GlmVec3ToVector3(grid->GridToWorldPosition(unit->miningTarget->gridPosition))) <= unit->stats.range){
+         unit->isTargetInRange = true;
+         return true;
+     }
+     return false;
 }
 
 void MiningState::Mine() {
-    if(unit->miningTarget == nullptr){
+    if(unit->miningTarget->getTimeToMineRemaining() <= 0){
         unit->hasMiningTarget = false;
         return;
     }
     if(!unit->isTargetInRange){
         unit->hasMovementTarget = true;
-        //TODO: unit->movementTarget = unit->miningTarget->gridPosition;
+        unit -> movementTarget = unit->miningTarget->gridPosition;
         return;
     }
+        unit->miningTarget->Mine();
+}
 
-    unit->miningTarget->Mine();
+MiningState::MiningState(Grid *grid) {
+    this->grid = grid;
 }
 

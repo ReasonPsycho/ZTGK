@@ -12,11 +12,13 @@ class IdleState;
 class MovementState : public State{
 
 public:
+    MovementState(Grid* grid);
+
     State* RunCurrentState() override;
 
-    CombatState* CombatState;
-    MiningState* MiningState;
-    IdleState* Idlestate;
+    CombatState* combatState;
+    MiningState* miningState;
+    IdleState* idleState;
 
     bool isTargetInRange() override;
     bool hasCombatTarget{};

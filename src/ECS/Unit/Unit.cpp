@@ -98,6 +98,6 @@ void Unit::Update() {
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
-    
+
     previousGridPosition = gridPosition;
 }

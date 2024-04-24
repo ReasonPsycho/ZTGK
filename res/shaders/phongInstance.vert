@@ -7,6 +7,7 @@ layout (location = 2) in vec2 aTexCoords;
 struct WallData
 {
     mat4x4 matrix;
+    int[4] data;
 };
 
 
@@ -21,6 +22,7 @@ out VS_OUT {
      vec3 FragPos;
      vec2 TexCoords;
      vec3 WorldPos;
+    flat int textureType;
 }vs_out;
 
 void main()
@@ -31,4 +33,5 @@ void main()
     vs_out.TexCoords = aTexCoords;
     vs_out.WorldPos = vec3(wallData[index].matrix * vec4(aPos, 1.0));
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
+    vs_out.textureType = wallData[index].data[0];
 }
