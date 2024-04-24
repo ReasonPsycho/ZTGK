@@ -103,12 +103,15 @@ void LevelSaving::save(const std::string& path) {
         spdlog::trace("Serializing units");
         auto units = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
 
-//        node["units"].SetStyle(YAML::EmitterStyle::Flow);
         for (auto & unit : units) {
-            if (unit->IsAlly())
+            if (unit->IsAlly()) {
                 layout[unit->gridPosition.z][unit->gridPosition.x] = TOKEN_PLAYER;
-            else layout[unit->gridPosition.z][unit->gridPosition.x] = TOKEN_ENEMY_BASIC;
-//            unit->equipment.item1->name
+                node["allies"].push_back(*unit);
+            }
+            else {
+                layout[unit->gridPosition.z][unit->gridPosition.x] = TOKEN_ENEMY_BASIC;
+                node["enemies"].push_back(*unit);
+            }
         }
 
         std::ofstream out = std::ofstream(path);
@@ -130,12 +133,17 @@ void LevelSaving::load(const std::string& path) {
         spdlog::trace(std::format("Loading level from {}", path));
         auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
 
+        auto node = YAML::LoadFile(path);
+        spdlog::trace("Setting grid dimensions");
+        grid->width = node["grid"]["width"].as<int>();
+        grid->height = node["grid"]["height"].as<int>();
+
         spdlog::trace("Reading layout");
         int x = 0, z = 0;
         auto in = std::ifstream(path);
         std::string line;
         bool read = false;
-        while ( std::getline(in, line) && line != TOKEN_LAYOUT_END ) {
+        while ( std::getline(in, line) && line != TOKEN_LAYOUT_END && z < grid->height ) {
             if ( line == TOKEN_LAYOUT_START ) {
                 read = true;
                 continue;
@@ -144,15 +152,10 @@ void LevelSaving::load(const std::string& path) {
 
             line = line.substr(line.find_first_not_of(TOKEN_LAYOUT_LINE));
             for (char token : line) {
+                if ( x >= grid->width ) break;
                 auto tile = grid->getTileAt(x, z);
 
                 tile_init_from_token(token, tile);
-//                if ( token == TOKEN_FLOOR ) {
-//                    tile->vacant = true;
-//                }
-//                else if ( token == TOKEN_WALL ) {
-//                    tile->vacant = false;
-//                }
                 ++x;
                 if ( x == grid->width ) x = 0;
             }
@@ -161,6 +164,11 @@ void LevelSaving::load(const std::string& path) {
         }
 
         spdlog::trace("Reading node");
+        auto units = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
+        for ( auto unode : node["units"] ) {
+// todo newUnit
+// todo grid methods
+        }
         // todo
 
 //        spdlog::trace("Generating entities");

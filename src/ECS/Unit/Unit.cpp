@@ -32,6 +32,7 @@ bool Unit::IsAlly() const {
 }
 
 void Unit::EquipItem(Item item, short slot) {
+    // assigning address of copied item, use reference or pointer
     equipment.equipItem(&item, slot);
     UpdateStats();
 }
