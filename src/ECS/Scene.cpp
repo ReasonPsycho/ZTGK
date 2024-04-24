@@ -18,14 +18,15 @@ Entity *Scene::addEntity(std::string name) {
     return children.back().get();
 }
 void Scene::removeChild(Entity *child) {
-auto iter = std::find_if(children.begin(), children.end(),
-                         [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
-if (iter != children.end())
-{
-// Entity was found. Now remove it.
-// unique_ptr will automatically delete the Entity when erased.
-children.erase(iter);
-}
+    auto iter = std::find_if(children.begin(), children.end(),
+                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
+    if (iter != children.end())
+    {
+    // Entity was found. Now remove it.
+    // unique_ptr will automatically delete the Entity when erased.
+    children.erase(iter);
+    }
+    stopRenderingImgui = true;
 }
 
 

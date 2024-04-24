@@ -54,7 +54,8 @@ Entity* Entity::addChild(std::unique_ptr<Entity> child) {
 }
 
 void Entity::removeChild(Entity *child) {
-    std::erase_if(children, [&](const std::unique_ptr<Entity>& e) { return e->uniqueID == child->uniqueID; });
+    std::erase_if(children, [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
+    removedChild = true;
 //    
 //    auto iter = std::find_if(children.begin(), children.end(),
 //                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
@@ -70,6 +71,7 @@ void Entity::showImGuiDetails(Camera *camera) {
     Component* componentToDelete = nullptr;
     ImGui::PushID(uniqueID);
     ImGuiStorage* storage = ImGui::GetStateStorage();
+    removedChild = false;
 
     if (ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
@@ -83,7 +85,13 @@ void Entity::showImGuiDetails(Camera *camera) {
             }
 
         }
-        
+
+        for (const auto &child: children) {
+            child->showImGuiDetails(camera);
+            if (removedChild) {
+                break;
+            }
+        }
         if ( scene->selectedEntityNumber == uniqueID){
             ImVec2 window_pos = ImVec2(ImGui::GetIO().DisplaySize.x - 300, 40); // Top-Right
             ImGui::SetNextWindowPos(window_pos, ImGuiCond_FirstUseEver);
@@ -104,13 +112,9 @@ void Entity::showImGuiDetails(Camera *camera) {
             }
             
             if (ImGui::Button("Delete entity")) {
-                scene->stopRenderingImgui = true;
                 Destroy();
             }
             ImGui::End();
-        }
-        for (const auto &child: children) {
-            child->showImGuiDetails(camera);
         }
         ImGui::TreePop();
     }
