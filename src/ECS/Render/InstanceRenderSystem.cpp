@@ -34,11 +34,15 @@ void InstanceRenderSystem::showImGuiDetails(Camera *camera) {
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader) {
+  //it must be here bcs if we mine wall we need to update walls
+  //Innit();
+  
     PushToSSBO();
     tileModel->meshes[0].material.loadMaterial(regularShader);
     glActiveTexture(GL_TEXTURE0 + tileTextureBindingPoint);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tileTextureArray);
     glUniform1i(glGetUniformLocation(regularShader->ID, "diffuseTextureArray"),tileTextureBindingPoint);
+
 
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);

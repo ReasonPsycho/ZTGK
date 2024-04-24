@@ -14,22 +14,46 @@ State *MovementState::RunCurrentState() {
 
     MoveOnPath();
 
+    if(unit->hasMovementTarget){
+        return this;
+    }
 
     //from Movement to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
-        Idlestate = new IdleState();
-        Idlestate->unit = unit;
-        return Idlestate;
+        idleState = new IdleState(grid);
+        idleState->unit = unit;
+
+        return idleState;
     }
 
     //from Movement to Combat
-    if (!unit->hasMovementTarget && unit->hasCombatTarget && unit->isTargetInRange) {
-        return CombatState;
+    if (unit->hasCombatTarget) {
+        combatState = new CombatState(grid);
+        combatState->unit = unit;
+
+        if(combatState->isTargetInRange())
+            return combatState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->combatTarget->gridPosition;
+            return this;
+        }
     }
 
     //from Movement to Mining
-    if (!unit->hasMovementTarget && !unit->hasCombatTarget && unit->hasMiningTarget && unit->isTargetInRange) {
-        return MiningState;
+    if (unit->hasMiningTarget) {
+        miningState = new MiningState(grid);
+        miningState->unit = unit;
+
+        if(miningState->isTargetInRange())
+            return miningState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->miningTarget->gridPosition;
+            return this;
+        }
     }
 
     return this;
@@ -64,4 +88,9 @@ void MovementState::MoveOnPath() {
 
 bool MovementState::isTargetInRange() {
     return false;
+}
+
+MovementState::MovementState(Grid *grid) {
+    this->grid = grid;
+
 }

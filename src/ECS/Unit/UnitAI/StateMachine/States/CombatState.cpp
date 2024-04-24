@@ -12,24 +12,38 @@
 
 State *CombatState::RunCurrentState() {
 
-    isTargetInRange();
-    AttackTarget();
 
     //from Combat to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
-        return IdleState;
+        idleState = new IdleState(grid);
+        idleState->unit = unit;
+
+        return idleState;
     }
 
     //from Combat to Movement
     if (unit->hasMovementTarget) {
-        return MoveState;
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+
+        return moveState;
     }
 
     //from Combat to Mining
-    if (!unit->hasMovementTarget && !unit->hasCombatTarget && unit->hasMiningTarget && unit->isTargetInRange) {
-        return MiningState;
-    }
+    if (unit->hasMiningTarget) {
+        miningState = new MiningState(grid);
+        miningState->unit = unit;
 
+        if(miningState->isTargetInRange())
+            return miningState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->miningTarget->gridPosition;
+            return this;
+        }
+    }
+    AttackTarget();
     return this;
 }
 
@@ -59,4 +73,8 @@ void CombatState::AttackTarget() {
     }
     //TODO: attack target
     return;
+}
+
+CombatState::CombatState(Grid *grid) {
+    this->grid = grid;
 }
