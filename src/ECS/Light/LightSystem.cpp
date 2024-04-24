@@ -5,6 +5,7 @@
 
 #include "LightSystem.h"
 #include "ECS/Render/RenderSystem.h"
+#include "ECS/Render/InstanceRenderSystem.h"
 
 void LightSystem::PushToSSBO() {
     GLenum err;
@@ -172,14 +173,17 @@ void LightSystem::Update(double deltaTime) {
     int offset = 0;
     int index = 0;
     RenderSystem* renderSystem = scene->systemManager.getSystem<RenderSystem>();
+    InstanceRenderSystem* instanceRenderSystem = scene->systemManager.getSystem<InstanceRenderSystem>();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
         if (light->getIsDirty()) {  // Only push it if it's dirty
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,sizeof(DirLightData), &light->data);
         }
-        light->SetUpShadowBuffer(Normal, &planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT, planeShadowMaps, index++);
+        light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
+                                 planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
+        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader);
         offset += sizeof(light->data);
     }
 
@@ -190,8 +194,11 @@ void LightSystem::Update(double deltaTime) {
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,  sizeof(SpotLightData), &light->data);
         }
-        light->SetUpShadowBuffer(Normal, &planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT, planeShadowMaps, index++);
+        light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
+                                 planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
+        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader);
+        
         offset += sizeof(light->data);
     }
 
@@ -204,8 +211,10 @@ void LightSystem::Update(double deltaTime) {
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
             
         }
-        light->SetUpShadowBuffer(Normal, &cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT, cubeShadowMaps, index++);
+        light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
+                                 cubeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&cubeDepthShader);
+        instanceRenderSystem->DrawTiles(&instanceCubeDepthShader);
         offset += sizeof(light->data);
     }
 }

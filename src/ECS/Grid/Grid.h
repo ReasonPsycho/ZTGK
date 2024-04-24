@@ -57,6 +57,9 @@ public:
 
     void DestroyWallsOnTile(Vector2Int tileIndex);
 
+    void SetUpWalls();
+    void SetUpWall(Tile* tile);
+
     //system methods
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
