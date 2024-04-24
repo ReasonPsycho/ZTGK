@@ -198,11 +198,6 @@ Grid::Grid(Grid *grid) {
 
 }
 
-
-void Grid::SetUpWallData() {
-    float translateLength = tileSize / 2.0f;
-}
-
 void Grid::SetUpWalls() {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -266,8 +261,6 @@ void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     Tile* currentTile = getTileAt(tileIndex);
     currentTile->isFloor = true;
     currentTile->vacant = true;
-    SetUpWallData();
-
 }
 
 
