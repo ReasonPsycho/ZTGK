@@ -7,7 +7,7 @@
 
 Color normalColorlol = {128, 128, 128, 255};  // Normal map neutral
 Color specularColor = {255, 255, 255, 255};  // Black, no metallic
-Color shininessColor = {128, 128, 128, 255};  // 50% gray
+Color shininessColor = {0, 0, 0, 255};  // 50% gray
 
 void replaceAlllol(string &str, const string &from, const string &to) {
     size_t start_pos = 0;

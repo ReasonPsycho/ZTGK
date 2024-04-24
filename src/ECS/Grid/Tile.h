@@ -4,11 +4,19 @@
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Component.h"
 
+
 struct WallData {
     glm::mat4x4 matrix;
+    int data[4]{}; // for textures on x for exaple
 
     // Constructor
-    WallData(const glm::mat4x4 &matrixInput) : matrix(matrixInput) {}
+    WallData(const glm::mat4x4 &matrixInput, int d1, int d2, int d3, int d4)
+            : matrix(matrixInput) {
+        data[0] = d1;
+        data[1] = d2;
+        data[2] = d3;
+        data[3] = d4;
+    }
 };
 
 class Tile : public Component{

@@ -8,6 +8,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
+
 out VS_OUT {
      vec3 FragPos;
      vec2 TexCoords;
