@@ -48,8 +48,6 @@ private:
             std::type_index(typeid(BoxCollider)), //Sphere isn't supported yet XD
             std::type_index(typeid(Ray)) //Sphere isn't supported yet XD
     };
-
-    bool enabled = false;
 };
 
 
