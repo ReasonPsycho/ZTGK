@@ -27,13 +27,15 @@ public:
     //2D array of tiles
     std::vector<std::vector<Tile*>> gridArray;
     std::vector<std::vector<Chunk>> chunkArray;
+    // todo setSize
+    // todo clearAll
 
     Scene* scene;
     Vector3 Position;
 
     // Constructors
     Grid() = default;
-    Grid(Scene* scene ,int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
+    Grid(Scene* scene, int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
     Grid(Grid* grid);
 
     // Destructor

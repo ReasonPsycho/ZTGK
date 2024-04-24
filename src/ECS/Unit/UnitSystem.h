@@ -25,8 +25,9 @@ public:
     void deselectAllUnits();
 
     std::vector<Unit* > selectedUnits;
-private:
+
     std::vector<Unit *> unitComponents;
+private:
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Unit))
     };

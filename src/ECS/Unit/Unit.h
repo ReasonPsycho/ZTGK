@@ -57,10 +57,10 @@ public:
     void showImGuiDetails(Camera *camera) override;
     void Update() override;
 
-private:
     bool isAlly;
-    Vector2Int previousGridPosition;
     UnitStats baseStats;
+private:
+    Vector2Int previousGridPosition;
 };
 
 
