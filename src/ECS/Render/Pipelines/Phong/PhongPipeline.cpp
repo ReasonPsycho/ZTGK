@@ -15,6 +15,14 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     glm::mat4 view = camera->GetViewMatrix();
     glm::vec3 cameraPos = camera->Position;
 
+    phongInstanceShader.use();
+
+    phongInstanceShader.setBool("shadows", true);
+    phongInstanceShader.setMatrix4("projection", false, glm::value_ptr(projection));
+    phongInstanceShader.setMatrix4("view", false, glm::value_ptr(view));
+    phongInstanceShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    phongInstanceShader.setFloat("far_plane", 25.0f);
+    
     phongShader.use();
 
     phongShader.setBool("shadows", true);
@@ -23,11 +31,5 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongShader.setFloat("far_plane", 25.0f);
 
-    phongInstanceShader.use();
 
-    phongInstanceShader.setBool("shadows", true);
-    phongInstanceShader.setMatrix4("projection", false, glm::value_ptr(projection));
-    phongInstanceShader.setMatrix4("view", false, glm::value_ptr(view));
-    phongInstanceShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
-    phongInstanceShader.setFloat("far_plane", 25.0f);
 }

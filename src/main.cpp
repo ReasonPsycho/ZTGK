@@ -1,5 +1,6 @@
 
 #pragma region Includes
+
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
@@ -60,18 +61,21 @@
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
 string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
+string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
-Model* quad;
+Model *quad;
 Model gabka = Model(&modelPathGabka);
-Model* cubeModel;
-Model* quadModel;
+Model wall = Model(&modelPathWall);
+Model *cubeModel;
+Model *bathroomWAll;
+Model *quadModel;
 Entity *gridEntity;
 HUD hud;
 unsigned bggroup, zmgroup;
-Sprite * zmspr;
-Text * zmtxt;
+Sprite *zmspr;
+Text *zmtxt;
 
 
 Entity *box1;
@@ -79,7 +83,6 @@ Entity *box2;
 Text text = {};
 
 BoxCollider *boxCollider;
-
 
 
 shared_ptr<spdlog::logger> file_logger;
@@ -129,9 +132,9 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
 void processInput(GLFWwindow *window);
 
@@ -165,15 +168,15 @@ float lastY = 0;
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
-LightSystem lightSystem(&camera,&scene);
+LightSystem lightSystem(&camera, &scene);
 PhongPipeline phongPipeline;
 RenderSystem renderSystem;
 InstanceRenderSystem instanceRenderSystem;
-WireRenderer wireRenderer(&primitives,& camera);
+WireRenderer wireRenderer(&primitives, &camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
 
-Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
+Grid grid(&scene, 100, 100, 2.0f, Vector3(0, 0, 0));
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -194,7 +197,6 @@ bool timeStepKeyPressed = false;
 SignalQueue signalQueue = SignalQueue();
 
 #pragma endregion
-
 
 
 int main(int, char **) {
@@ -381,7 +383,12 @@ void init_systems() {
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
     MaterialPhong materialPhong = MaterialPhong(myColor);
-    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,vector<GLuint>(pbrprimitives.cubeIndices,pbrprimitives.cubeIndices + 36));
+    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
+                          vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36)); 
+    
+    
+    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
+                          vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
 
 //    hud.init();
 //    scene.systemManager.addSystem(&hud);
@@ -394,25 +401,57 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-    
+
     model.loadModel();
-    quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
-   // gabka.loadModel();
+    wall.loadModel();
+    
+    quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
+    // gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
-    //  gameObject = scene.addEntity("Dir light");
- //   gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
-     gameObject = scene.addEntity("Point Light");
-      gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(1,1,1,1), 1.0f, 0.09f, 0.032f)));
-    gameObject = scene.addEntity("Point Light 2");
-    gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-  //  Entity* gameObject = scene.addEntity("Spot Light");
- //   gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
+
+    gameObject = scene.addEntity("Wall");;
+    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+
+    gameObject = scene.addEntity("Wall1");;
+    gameObject->transform.setLocalPosition(glm::vec3(0,50,-100));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+    
+    gameObject = scene.addEntity("Wall2");;
+    gameObject->transform.setLocalPosition(glm::vec3(125,50,0));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+
+    gameObject = scene.addEntity("Wall3");;
+    gameObject->transform.setLocalPosition(glm::vec3(-100,50,0));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+    
+    
+//    gameObject = scene.addEntity("Dir light");
+  //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
+    gameObject = scene.addEntity("Point Light");;
+    gameObject->addComponent(make_unique<PointLight>(
+            PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
+                           0.032f)));
+    //  gameObject = scene.addEntity("Point Light 2");
+    // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+    gameObject = scene.addEntity("Spot Light");
+    gameObject->addComponent(make_unique<SpotLight>(
+            SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(0), glm::vec4(1),
+                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
     lightSystem.Init();
 
-    gameObject = scene.addEntity("Quad");
-    gameObject->addComponent(make_unique<Render>(quadModel));
+    //gameObject = scene.addEntity("Quad");
+   // gameObject->addComponent(make_unique<Render>(quadModel));
 
 
     instanceRenderSystem.tileModel = quadModel;
@@ -423,22 +462,28 @@ void load_enteties() {
     auto ebg = scene.addEntity(ehud, "Background");
     bggroup = hud.addGroup(glm::vec3(0, 0, 10));
     auto bgelem = scene.addEntity(ebg, "Puni1");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni2");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni3");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni4");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni5");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!",ztgk::config::window_size / 5));
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::config::window_size / 5));
     zmgroup = hud.addGroup();
     fgelem = scene.addEntity(efg, "Variable Text");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2( ztgk::config::window_size.x * 0.5 - 300, ztgk::config::window_size.y * 0.5 )));
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2(ztgk::config::window_size.x * 0.5 - 300,
+                                                                                ztgk::config::window_size.y * 0.5)));
     zmtxt = fgelem->getComponent<Text>();
     zmtxt->groupID = zmgroup;
     fgelem = scene.addEntity(efg, "Animated Sprite");
@@ -513,7 +558,7 @@ void render() {
 
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
-    
+
     renderSystem.DrawScene(&phongPipeline.phongShader);
     instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
     //wireRenderer.DrawColliders();
@@ -535,7 +580,7 @@ void imgui_begin() {
     } else {
         io.MouseDrawCursor = false;
     }
-    
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -543,6 +588,7 @@ void imgui_begin() {
 
 
 }
+
 void imgui_render() {
     ImGui::Begin("Debug menu");
     char buffer[64];
@@ -588,10 +634,9 @@ void imgui_end() {
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     ImGuiIO &io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+
+        GLFWwindow *backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
@@ -645,7 +690,7 @@ void processInput(GLFWwindow *window) {
     }
 
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        ImGui::GetIO().MousePos = ImVec2(0,0);
+        ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 }
 
@@ -673,8 +718,8 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    static float uixpos{ 1920/2 };
-    static float uiypos{ 1080/2 };
+    static float uixpos{1920 / 2};
+    static float uiypos{1080 / 2};
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
@@ -706,7 +751,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
@@ -714,10 +759,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
         std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        if(ray->getHitEntity() != nullptr){
+        if (ray->getHitEntity() != nullptr) {
             spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
-        }
-        else{
+        } else {
             spdlog::info("No hit entity");
         }
 
@@ -725,7 +769,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
