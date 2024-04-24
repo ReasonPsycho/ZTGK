@@ -36,36 +36,34 @@ void PointLight::Innit(int width, int height, int index) {
 
 }
 
-void PointLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
-                                   int height, GLuint ShadowMapArrayId, int index) {
+void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
+                                   GLuint ShadowMapArrayId, int index) {
 
     shadowMapShader->use();
-    for (unsigned int i = 0; i < 6; ++i)
-        if (shaderType == Normal) {
-            shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                        glm::value_ptr(shadowTransforms[i]));
-            shadowMapShader->setFloat("far_plane", far_plane);
-            shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-        } else {
-            shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                        glm::value_ptr(shadowTransforms[i]));
-            instanceShadowMapShader->setFloat("far_plane", near_plane);
-            instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-        }
+    for (unsigned int i = 0; i < 6; ++i){
+        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                    glm::value_ptr(shadowTransforms[i]));
+    shadowMapShader->setFloat("far_plane", far_plane);
+    shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+    shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                glm::value_ptr(shadowTransforms[i]));
+    instanceShadowMapShader->setFloat("far_plane", near_plane);
+    instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+}
 
     GLenum attachments[6];
 
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     for(int i = 0; i < 6; i++)
     {
-        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT + i, ShadowMapArrayId, 0, i * 6);
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, i + index * 6);
+        glClear(GL_DEPTH_BUFFER_BIT);
         attachments[i] = GL_DEPTH_ATTACHMENT + i;
     }
 
     glDrawBuffers(6, attachments);  
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
-    glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, width, height);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -112,9 +110,9 @@ PointLight::PointLight(PointLightData data):
 }
 
 void PointLight::showImGuiDetails(Camera *camera) {
-  
-        ImGui::InputFloat4("Color", glm::value_ptr(data.diffuse));
-        ImGui::InputFloat4("Color", glm::value_ptr(data.specular));
+
+    ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
+    ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
         ImGui::InputFloat("Constant", &data.constant);
         ImGui::InputFloat("Linear", &data.linear);
         ImGui::InputFloat("Quadratic", &data.quadratic);
