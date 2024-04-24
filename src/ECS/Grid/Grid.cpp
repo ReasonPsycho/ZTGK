@@ -8,7 +8,7 @@
 #include "ECS/Render/Primitives/Primitives.h"
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Raycasting/CollisionSystem.h"
-
+#include "ECS/Unit/Mining/IMineable.h"
 
 Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position) {
     this->name = "Grid";
@@ -150,6 +150,8 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             } else {
                 tileEntity->getComponent<Tile>()->isFloor = false;
                 tileEntity->getComponent<Tile>()->vacant = false;
+                tileEntity->addComponent(std::make_unique<IMineable>(1.0f));
+
             }
 
             tileEntity->updateSelfAndChild();

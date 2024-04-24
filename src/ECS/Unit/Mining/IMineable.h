@@ -6,13 +6,18 @@
 #define IMINEABLE_H
 
 
+#include "ECS/Component.h"
 
-class IMineable {
+class IMineable : public Component{
 public:
     float timeToMine;
     explicit  IMineable(float timeToMine);
     ~IMineable() = default;
     void Mine();
+
+    void Update() override;
+
+    void showImGuiDetails(Camera *camera) override;
 
 private:
     float timeToMineRemaining;
