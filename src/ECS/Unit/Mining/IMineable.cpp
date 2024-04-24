@@ -7,6 +7,7 @@
 #include "ECS/SignalQueue/SignalReceiver.h"
 #include "ECS/Utils/Time.h"
 #include "ECS/HUD/Components/Text.h"
+#include "ECS/Entity.h"
 
 IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->name = "IMineable";
@@ -17,13 +18,11 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
 }
 
 void IMineable::Mine() {
-    spdlog::info("Mining...");
     timeToMineRemaining -= Time::Instance().DeltaTime();
     spdlog::info(timeToMineRemaining);
-    spdlog::info("Mining tile at: {0}, {1}", gridPosition.x, gridPosition.z);
     if (timeToMineRemaining<=0) {
-        spdlog::info("Mined!");
         grid->DestroyWallsOnTile(gridPosition);
+        getEntity()->removeComponentFromMap(std::make_unique<IMineable>(this));
     }
 }
 
@@ -34,5 +33,14 @@ void IMineable::Update() {
 void IMineable::showImGuiDetails(Camera *camera) {
     ImGui::Text("Time to mine: %f", timeToMine);
     ImGui::Text("Time to mine remaining: %f", timeToMineRemaining);
+
+}
+
+IMineable::IMineable(IMineable *pMineable) {
+    this->name = "IMineable";
+    this->gridPosition = pMineable->gridPosition;
+    this->grid = pMineable->grid;
+    this->timeToMine = pMineable->timeToMine;
+    this->timeToMineRemaining = pMineable->timeToMineRemaining;
 
 }

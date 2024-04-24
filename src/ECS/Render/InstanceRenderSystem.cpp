@@ -22,6 +22,9 @@ void InstanceRenderSystem::showImGuiDetails(Camera *camera) {
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader) {
+    Innit();
+
+
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         tileModel->meshes[i].material.loadMaterial(regularShader);
         glBindVertexArray(tileModel->meshes[i].VAO);

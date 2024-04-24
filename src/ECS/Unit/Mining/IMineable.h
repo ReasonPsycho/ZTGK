@@ -12,6 +12,8 @@
 
 class IMineable : public Component{
 public:
+    IMineable(IMineable *pMineable);
+
     float timeToMine;
     Vector2Int gridPosition;
     Grid* grid;
