@@ -725,6 +725,7 @@ void imgui_render() {
         .minEnemies = 0,
         .maxEnemies = 2,
         .treasureChance = 0.05,
+        .unitCount = 3,
     };
     ImGui::Begin("Level generator");
     ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
@@ -734,6 +735,7 @@ void imgui_render() {
     ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
     ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
     ImGui::SliderFloat("Treasure chest chance", &levelGenConfig.treasureChance, 0.f, 1.f);
+    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 20);
     if (ImGui::Button("Generate")) {
         spdlog::trace("Generating level");
         levelGenConfig.seed = pcgRandomSeed();
