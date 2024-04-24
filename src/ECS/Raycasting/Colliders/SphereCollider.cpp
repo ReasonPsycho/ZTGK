@@ -14,7 +14,3 @@ SphereCollider::SphereCollider(const glm::vec3& center, float radius, CollisionS
 
     collisionSystem->addComponent(this);
 }
-
-void SphereCollider::drawWire(Shader *shader, Primitives *primitives) {
-
-}
