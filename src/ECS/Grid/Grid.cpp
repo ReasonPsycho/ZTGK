@@ -8,7 +8,7 @@
 #include "ECS/Render/Primitives/Primitives.h"
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Raycasting/CollisionSystem.h"
-
+#include "ECS/Unit/Mining/IMineable.h"
 
 Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position) {
     this->name = "Grid";
@@ -149,6 +149,8 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             } else {
                 tileEntity->getComponent<Tile>()->isFloor = false;
                 tileEntity->getComponent<Tile>()->vacant = false;
+                tileEntity->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
+
             }
 
             tileEntity->updateSelfAndChild();
@@ -196,6 +198,11 @@ Grid::Grid(Grid *grid) {
 
 }
 
+
+void Grid::SetUpWallData() {
+    float translateLength = tileSize / 2.0f;
+}
+
 void Grid::SetUpWalls() {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -208,52 +215,61 @@ void Grid::SetUpWalls() {
 void Grid::SetUpWall(Tile *tile) {
     float translateLength = tileSize / 2.0f;
     bool isDiagonal = ((tile->index.x + tile->index.z) % 2 == 0);
-    if(tile->isFloor){
+    if (tile->isFloor) {
         tile->walls.clear();
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
-        floorMatrix = glm::translate(floorMatrix,glm::vec3(0,-translateLength,0));
-        floorMatrix = glm::rotate(floorMatrix,glm::radians(90.0f),glm::vec3 (1,0,0));
-        tile->walls.push_back(WallData(floorMatrix,(isDiagonal ? 0 : 1 ),0,0,0));
-    }else{
+        floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
+        floorMatrix = glm::rotate(floorMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
+        tile->walls.push_back(WallData(floorMatrix, (isDiagonal ? 0 : 1), 0, 0, 0));
+    } else {
 
 
         Tile *northNeighbour = getTileAt(tile->index.x + 1, tile->index.z);
-        if (northNeighbour == nullptr || northNeighbour->isFloor){
+        if (northNeighbour == nullptr || northNeighbour->isFloor) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
-            northMatrix = glm::translate(northMatrix,glm::vec3(translateLength,0,0));
-            northMatrix = glm::rotate(northMatrix,glm::radians(-90.0f),glm::vec3 (0,1,0));
-            tile->walls.push_back(WallData(northMatrix,2,0,0,0));
+            northMatrix = glm::translate(northMatrix, glm::vec3(translateLength, 0, 0));
+            northMatrix = glm::rotate(northMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+            tile->walls.push_back(WallData(northMatrix, 2, 0, 0, 0));
         }
 
         Tile *southNeighbour = getTileAt(tile->index.x - 1, tile->index.z);
-        if (southNeighbour == nullptr || southNeighbour->isFloor){
+        if (southNeighbour == nullptr || southNeighbour->isFloor) {
             glm::mat4x4 southMatrix = tile->getEntity()->transform.getModelMatrix();
-            southMatrix = glm::translate(southMatrix,glm::vec3(-translateLength,0,0));
-            southMatrix = glm::rotate(southMatrix,glm::radians(90.0f),glm::vec3 (0,1,0));
-            tile->walls.push_back(WallData(southMatrix,2,0,0,0));
+            southMatrix = glm::translate(southMatrix, glm::vec3(-translateLength, 0, 0));
+            southMatrix = glm::rotate(southMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
+            tile->walls.push_back(WallData(southMatrix, 2, 0, 0, 0));
         }
         Tile *eastNeighbour = getTileAt(tile->index.x, tile->index.z + 1);
-        if (eastNeighbour == nullptr || eastNeighbour->isFloor){
+        if (eastNeighbour == nullptr || eastNeighbour->isFloor) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
-            eastMatrix = glm::translate(eastMatrix,glm::vec3(0,0,translateLength));
-            eastMatrix = glm::rotate(eastMatrix,glm::radians(90.0f),glm::vec3 (0,0,1));
-            tile->walls.push_back(WallData(eastMatrix,2,0,0,0));
+            eastMatrix = glm::translate(eastMatrix, glm::vec3(0, 0, translateLength));
+            eastMatrix = glm::rotate(eastMatrix, glm::radians(90.0f), glm::vec3(0, 0, 1));
+            tile->walls.push_back(WallData(eastMatrix, 2, 0, 0, 0));
         }
 
         Tile *westNeighbour = getTileAt(tile->index.x, tile->index.z - 1);
-        if (westNeighbour == nullptr || westNeighbour->isFloor){
+        if (westNeighbour == nullptr || westNeighbour->isFloor) {
             glm::mat4x4 westMatrix = tile->getEntity()->transform.getModelMatrix();
-            westMatrix = glm::translate(westMatrix,glm::vec3(0,0,-translateLength));
+            westMatrix = glm::translate(westMatrix, glm::vec3(0, 0, -translateLength));
             //  westMatrix = glm::rotate(westMatrix,glm::radians(-90.0f),glm::vec3 (1,0,0));
-            tile->walls.push_back(WallData(westMatrix,2,0,0,0));
+            tile->walls.push_back(WallData(westMatrix, 2, 0, 0, 0));
         }
 
         glm::mat4x4 topMatrix = tile->getEntity()->transform.getModelMatrix();
-        topMatrix = glm::translate(topMatrix,glm::vec3(0,translateLength,0));
-        topMatrix = glm::rotate(topMatrix,glm::radians(90.0f),glm::vec3 (1,0,0));
-        tile->walls.push_back(WallData(topMatrix,2,0,0,0));
+        topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
+        topMatrix = glm::rotate(topMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
+        tile->walls.push_back(WallData(topMatrix, 2, 0, 0, 0));
     }
 }
+
+void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
+    Tile* currentTile = getTileAt(tileIndex);
+    currentTile->isFloor = true;
+    currentTile->vacant = true;
+    SetUpWallData();
+
+}
+
 
 
 
