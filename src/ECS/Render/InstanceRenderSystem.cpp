@@ -35,7 +35,7 @@ void InstanceRenderSystem::showImGuiDetails(Camera *camera) {
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader) {
   //it must be here bcs if we mine wall we need to update walls
-  Innit();
+  //Innit();
   
     PushToSSBO();
     tileModel->meshes[0].material.loadMaterial(regularShader);
