@@ -17,12 +17,14 @@ layout (std430, binding = 6) buffer WallDataBuffer {
 
 uniform mat4 projection;
 uniform mat4 view;
+uniform mat4 gridMatrix;
 
 out VS_OUT {
      vec3 FragPos;
      vec2 TexCoords;
      vec3 WorldPos;
-    flat int textureType;
+     flat int textureType;
+     flat bool inFogOfWar;
 }vs_out;
 
 void main()
@@ -31,7 +33,8 @@ void main()
 
     vs_out.FragPos = aPos;
     vs_out.TexCoords = aTexCoords;
-    vs_out.WorldPos = vec3(wallData[index].matrix * vec4(aPos, 1.0));
+    vs_out.WorldPos = vec3(wallData[index].matrix * vec4(aPos, 1.0) * gridMatrix);
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
     vs_out.textureType = wallData[index].data[0];
+    vs_out.inFogOfWar = wallData[index].data[1] == 1;
 }

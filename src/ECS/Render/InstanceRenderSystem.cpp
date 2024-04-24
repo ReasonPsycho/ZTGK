@@ -2,6 +2,7 @@
 // Created by redkc on 16/04/2024.
 //
 
+#include "ECS/SystemManager.h"
 #include "InstanceRenderSystem.h"
 
 unsigned char* LoadTileTexture(const std::string& file_name, int& width, int& height, int& nrChannels)
@@ -17,33 +18,31 @@ unsigned char* LoadTileTexture(const std::string& file_name, int& width, int& he
 }
 
 void InstanceRenderSystem::addComponent(void *component) {
-    tileComponents.push_back(reinterpret_cast<Tile *const>(component));
 
 }
 
 void InstanceRenderSystem::removeComponent(void *component) {
-    auto component_iter = std::find(tileComponents.begin(), tileComponents.end(), reinterpret_cast<Tile *const>(component));
 
-    if (component_iter != tileComponents.end()) {
-        tileComponents.erase(component_iter);
-    }
 }
 
 void InstanceRenderSystem::showImGuiDetails(Camera *camera) {
-
+    ImGui::Checkbox("Update WallData",&updateWallData);
 }
 
-void InstanceRenderSystem::DrawTiles(Shader *regularShader) {
+void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
   //it must be here bcs if we mine wall we need to update walls
   //Innit();
   
-    PushToSSBO();
+    PushToSSBO(camera);
     tileModel->meshes[0].material.loadMaterial(regularShader);
     glActiveTexture(GL_TEXTURE0 + tileTextureBindingPoint);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tileTextureArray);
     glUniform1i(glGetUniformLocation(regularShader->ID, "diffuseTextureArray"),tileTextureBindingPoint);
-
-
+    Grid* grid = systemManager->getSystem<Grid>();
+    
+    glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));
+    regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
+    
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[i].indices.size()),
@@ -87,21 +86,27 @@ void InstanceRenderSystem::Innit() {
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     
     glGenBuffers(1, &wallDataBufferID);
-    
-    PushToSSBO();
 }
 
 InstanceRenderSystem::InstanceRenderSystem() {
     name = "InstanceRenderSystem";
 }
 
-void InstanceRenderSystem::PushToSSBO() {
-    wallData.clear();
-    for (const Tile *tile: tileComponents) {
-        for (int i = 0; i < tile->walls.size(); ++i) {
-            wallData.push_back(tile->walls[i]);
-        }
-    }
+void InstanceRenderSystem::PushToSSBO(Camera* camera) {
+
+   Frustum frustum =  createFrustumFromCamera(*camera);
+   if(updateWallData){
+       wallData.clear();
+       Grid* grid = systemManager->getSystem<Grid>();
+       for (int x = 0; x < grid->width/10; ++x) {
+           for (int z = 0; z < grid->height/10; ++z) {
+               Chunk * chunk = &grid->chunkArray[x][z];
+               if(chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)){
+                   wallData.insert(wallData.end(),grid->chunkArray[x][z].wallDataArray.begin(), grid->chunkArray[x][z].wallDataArray.end()); //This is unsafe but bypasses checks lol
+               }
+           }
+       } 
+  
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), nullptr, //Orphaning buffer
@@ -109,5 +114,7 @@ void InstanceRenderSystem::PushToSSBO() {
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), wallData.data(),
                  GL_STREAM_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, wallDataBufferBindingPoint, wallDataBufferID);
+   }
+   
 }
 
