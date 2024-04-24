@@ -13,20 +13,20 @@ class PcgEngine {
 public:
 	using seed_type = std::pair<std::uint64_t, std::uint64_t>;
 	using result_type = std::uint32_t;
-	PcgEngine() {}
-	PcgEngine(seed_type value)
+	PcgEngine() noexcept {}
+	PcgEngine(seed_type value) noexcept
 		: state {value.first}, inc {value.second} {}
-	static constexpr result_type min() {
+	static constexpr result_type min() noexcept {
 		return std::numeric_limits<result_type>::min();
 	}
-	static constexpr result_type max() {
+	static constexpr result_type max() noexcept {
 		return std::numeric_limits<result_type>::max();
 	}
-	inline void seed(seed_type value) {
+	inline void seed(seed_type value) noexcept {
 		state = value.first;
 		inc = value.second;
 	}
-	inline result_type operator()() {
+	inline result_type operator()() noexcept {
 		std::uint32_t x = static_cast<std::uint32_t>((state >> 18 ^ state) >> 27);
 		std::uint32_t s = state >> 59;
 		state = state * 0x5851F42D4C957F2DuLL + (inc | 1);
