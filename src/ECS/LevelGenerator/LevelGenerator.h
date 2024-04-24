@@ -42,6 +42,7 @@ public:
 	struct Config {
 		PcgEngine::seed_type seed {};
 		glm::ivec2 size {};
+		float wallThickness {};
 		float baseRadius {};
 		float keyRadius {};
 		float pocketRadius {};
@@ -50,8 +51,8 @@ public:
 		int keyEnemies {};
 		int minEnemies {};
 		int maxEnemies {};
-		float treasureChance {};
 		int unitCount {};
+		int chestCount {};
 	};
 
 	inline LevelGenerator(LevelLayout& level) noexcept : level(level) {}
@@ -66,7 +67,9 @@ private:
 			base,
 		};
 		Type type = Type::standard;
-		glm::ivec2 center {};
+		glm::vec2 center {};
+		float radius {};
+		bool hasChest {};
 	};
 
 	bool inBounds(glm::ivec2 pos) const noexcept;
@@ -87,12 +90,12 @@ private:
 	int tryMakePocket(glm::vec2 pos, float radius, Pocket::Type type) noexcept;
 
 	bool isTileSafeToHollowOut(glm::ivec2 pos) const noexcept;
-	void hollowOutPocket(int index) noexcept;
+	void hollowOutPocket(int index, float padding) noexcept;
 
 	template<class Pred>
-	void addAtRandomToPocket(int index, int count, LevelLayout::Tile::Type type, PcgEngine& rand, Pred&& predicate) noexcept(noexcept(predicate(glm::ivec2 {})));
+	int addAtRandomToPocket(int index, int count, LevelLayout::Tile::Type type, PcgEngine& rand, Pred&& predicate) noexcept(noexcept(predicate(glm::ivec2 {})));
 	void addEnemiesToPocket(int index, int count, PcgEngine& rand) noexcept;
-	void addChestToPocket(int index, PcgEngine& rand) noexcept;
+	bool addChestToPocket(int index, PcgEngine& rand) noexcept;
 
 	static constexpr glm::ivec2 directions[4] {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
@@ -125,7 +128,7 @@ inline void LevelGenerator::dfs(glm::ivec2 pos, int index, F&& f) noexcept(noexc
 
 template<class F>
 inline void LevelGenerator::forEachPocketTile(int index, F&& f) noexcept(noexcept(f(glm::ivec2 {}))) {
-	auto pos = pockets[index].center;
+	glm::ivec2 pos(pockets[index].center);
 	dfs(pos, index, std::forward<F>(f));
 	clearDfsVisitedFlags(pos);
 }
@@ -151,11 +154,12 @@ inline std::vector<glm::ivec2> LevelGenerator::reservoirSamplePocket(int index, 
 }
 
 template<class Pred>
-inline void LevelGenerator::addAtRandomToPocket(int index, int count, LevelLayout::Tile::Type type, PcgEngine& rand, Pred&& predicate) noexcept(noexcept(predicate(glm::ivec2 {}))) {
+inline int LevelGenerator::addAtRandomToPocket(int index, int count, LevelLayout::Tile::Type type, PcgEngine& rand, Pred&& predicate) noexcept(noexcept(predicate(glm::ivec2 {}))) {
 	auto positions = reservoirSamplePocket(index, count, rand, [&](glm::ivec2 pos) {
 		return getTile(pos)->type == Tile::Type::floor && predicate(pos);
 	});
 	for (const auto& pos : positions) {
 		getTile(pos)->type = type;
 	}
+	return positions.size();
 }

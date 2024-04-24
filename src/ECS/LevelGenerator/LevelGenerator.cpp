@@ -50,12 +50,12 @@ void LevelGenerator::operator()(const Config& config) {
 	std::uniform_real_distribution<float> heightDist(0.f, 1.f * config.size.y);
 	std::uniform_real_distribution<float> angleDist(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 	std::uniform_int_distribution<int> enemyDist(config.minEnemies, config.maxEnemies);
-	std::bernoulli_distribution chestDist(config.treasureChance);
-	auto center = glm::vec2(config.size) * 0.5f;
-	auto basePocketIndex = tryMakePocket(center, config.baseRadius, Pocket::Type::base);
+	auto padding = config.wallThickness * 0.5f;
+	auto center = glm::floor(glm::vec2(config.size) * 0.5f) + 0.5f;
+	auto basePocketIndex = tryMakePocket(center, config.baseRadius + padding, Pocket::Type::base);
 	if (basePocketIndex >= 0) {
-		hollowOutPocket(basePocketIndex);
-		getTile(pockets[basePocketIndex].center)->type = Tile::Type::core;
+		hollowOutPocket(basePocketIndex, padding);
+		getTile(glm::ivec2(pockets[basePocketIndex].center))->type = Tile::Type::core;
 		addAtRandomToPocket(basePocketIndex, config.unitCount, Tile::Type::unit, rand, [this](glm::ivec2 pos) {
 			return !isTileAdjacentTo(pos, [this](glm::ivec2 otherPos) {
 				auto other = getTile(otherPos);
@@ -68,28 +68,40 @@ void LevelGenerator::operator()(const Config& config) {
 		auto angle = angleDist(rand);
 		auto distance = config.keyDistances[i] + distanceMod;
 		glm::vec2 pos {distance * glm::cos(angle), distance * glm::sin(angle)};
-		auto index = tryMakePocket(center + pos, config.keyRadius, Pocket::Type::key);
+		auto index = tryMakePocket(center + pos, config.keyRadius + padding, Pocket::Type::key);
 		if (index >= 0) {
-			hollowOutPocket(index);
-			getTile(pockets[index].center)->type = Tile::Type::ore;
+			hollowOutPocket(index, padding);
+			getTile(glm::ivec2(pockets[index].center))->type = Tile::Type::ore;
 			addEnemiesToPocket(index, config.keyEnemies, rand);
 			i++;
 		} else {
 			distanceMod += 0.1f;
-			if (distanceMod > config.size.x + config.size.y)
-				break;
+			if (distanceMod > config.size.x + config.size.y) {
+				distanceMod = 0.f;
+				i++;
+			}
 		}
 	}
+	int firstExtra = pockets.size();
 	for (int i = 0; i < config.extraPocketAttempts; i++) {
 		auto x = widthDist(rand);
 		auto y = heightDist(rand);
-		auto index = tryMakePocket({x, y}, config.pocketRadius, Pocket::Type::standard);
+		auto index = tryMakePocket({x, y}, config.pocketRadius + padding, Pocket::Type::standard);
 		if (index >= 0) {
-			hollowOutPocket(index);
-			if (chestDist(rand))
-				addChestToPocket(index, rand);
+			hollowOutPocket(index, padding);
 			addEnemiesToPocket(index, enemyDist(rand), rand);
 		}
+	}
+	int lastExtra = pockets.size() - 1;
+	if (firstExtra <= lastExtra) {
+		std::uniform_int_distribution<int> chestDist(firstExtra, lastExtra);
+		for (int i = 0, j = 0; i < config.chestCount && j < config.chestCount * 10; j++) {
+			auto index = chestDist(rand);
+			if (!pockets[index].hasChest) {
+				if (addChestToPocket(index, rand))
+					i++;
+			}
+		};
 	}
 }
 
@@ -140,7 +152,8 @@ int LevelGenerator::tryMakePocket(glm::vec2 pos, float radius, Pocket::Type type
 	}
 	auto& pocket = pockets.emplace_back();
 	pocket.type = type;
-	pocket.center = glm::ivec2(pos);
+	pocket.center = pos;
+	pocket.radius = radius;
 	return index;
 }
 
@@ -164,9 +177,11 @@ void LevelGenerator::clearDfsVisitedFlags(glm::ivec2 pos) noexcept {
 	}
 }
 
-void LevelGenerator::hollowOutPocket(int index) noexcept {
-	forEachPocketTile(index, [this](glm::ivec2 pos) {
-		if (isTileSafeToHollowOut(pos))
+void LevelGenerator::hollowOutPocket(int index, float padding) noexcept {
+	const auto& pocket = pockets[index];
+	forEachPocketTile(index, [&](glm::ivec2 pos) {
+		auto d = glm::distance(glm::vec2(pos) + glm::vec2(0.5f), pocket.center);
+		if (d < pocket.radius - padding && isTileSafeToHollowOut(pos))
 			getTile(pos)->type = Tile::Type::floor;
 	});
 }
@@ -177,11 +192,15 @@ void LevelGenerator::addEnemiesToPocket(int index, int count, PcgEngine& rand) n
 	});
 }
 
-void LevelGenerator::addChestToPocket(int index, PcgEngine& rand) noexcept {
-	addAtRandomToPocket(index, 1, Tile::Type::chest, rand, [this](glm::ivec2 pos) {
+bool LevelGenerator::addChestToPocket(int index, PcgEngine& rand) noexcept {
+	auto added = addAtRandomToPocket(index, 1, Tile::Type::chest, rand, [this](glm::ivec2 pos) {
 		return isTileAdjacentTo(pos, [this](glm::ivec2 otherPos) {
 			auto other = getTile(otherPos);
 			return other != nullptr && other->type == Tile::Type::wall;
 		});
 	});
+	if (added == 0)
+		return false;
+	pockets[index].hasChest = true;
+	return true;
 }

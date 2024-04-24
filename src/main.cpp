@@ -716,6 +716,7 @@ void imgui_render() {
     static LevelGenerator::Config levelGenConfig {
         .seed {},
         .size {100, 100},
+        .wallThickness = 0.f,
         .baseRadius = 4.5f,
         .keyRadius = 4.f,
         .pocketRadius = 2.5f,
@@ -724,20 +725,21 @@ void imgui_render() {
         .keyEnemies = 3,
         .minEnemies = 0,
         .maxEnemies = 2,
-        .treasureChance = 0.05,
         .unitCount = 3,
+        .chestCount = 10,
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
     ImGui::InputText("Seed (empty = random)", seedString, std::size(seedString));
+    ImGui::SliderFloat("Wall thickness", &levelGenConfig.wallThickness, 0.f, 20.f);
     ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
     ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
     ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
     ImGui::SliderInt("Enemies in ore room", &levelGenConfig.keyEnemies, 0, 20);
     ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
     ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
-    ImGui::SliderFloat("Treasure chest chance", &levelGenConfig.treasureChance, 0.f, 1.f);
-    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 20);
+    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 10);
+    ImGui::SliderInt("Chest count", &levelGenConfig.chestCount, 0, 30);
     if (ImGui::Button("Generate")) {
         spdlog::trace("Generating level");
         std::string_view sv = seedString;
