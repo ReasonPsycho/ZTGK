@@ -25,11 +25,9 @@ public:
 
     //2D array of tiles
     std::vector<std::vector<Tile*>> gridArray;
-    // todo setSize
-    // todo clearAll
-
     Scene* scene;
     Vector3 Position;
+    unsigned entityId = (unsigned)-1;
 
     // Constructors
     Grid() = default;
@@ -39,7 +37,11 @@ public:
     // Destructor
     ~Grid();
 
-    //Other methods
+    // todo setSize
+    // todo clearAll
+    void reinitWithSize(glm::ivec2 size);
+    void clear();
+
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);
@@ -59,6 +61,7 @@ public:
 
     void DestroyWallsOnTile(Vector2Int tileIndex);
 
+    void ClearAllWallData();
     void SetUpWalls();
     void SetUpWall(Tile* tile);
 

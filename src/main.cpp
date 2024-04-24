@@ -784,7 +784,7 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// glfw: whenever the window size changed (by OS or user reinitWithSize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -888,7 +888,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 void end_frame() {
-    // Poll and handle events (inputs, window resize, etc.)
+    // Poll and handle events (inputs, window reinitWithSize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
     // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
     // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.

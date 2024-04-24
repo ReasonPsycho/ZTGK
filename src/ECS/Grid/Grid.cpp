@@ -48,6 +48,31 @@ Grid::~Grid() {
     delete this;
 }
 
+void Grid::clear() {
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            auto tile = gridArray[i][j];
+            if ( tile == nullptr ) continue;
+            tile->parentEntity->Destroy();
+            gridArray[i][j] = nullptr;
+        }
+    }
+}
+
+void Grid::reinitWithSize(glm::ivec2 size) {
+    clear();
+    width = size.x; height = size.y;
+    gridArray.resize(width);
+    for (auto & col : gridArray) {
+        col.resize(height);
+    }
+    auto entity = std::find_if(scene->getChildren().begin(), scene->getChildren().end(), [this](std::unique_ptr<Entity> & child){ return child->uniqueID == entityId; });
+    if ( entity != scene->getChildren().end() )
+        (*entity)->Destroy();
+
+    LoadTileEntities(1.0f, scene->systemManager.getSystem<CollisionSystem>());
+}
+
 /**
  * @brief Returns the tile at the specified index.
  *
@@ -112,14 +137,27 @@ Vector2Int Grid::WorldToGridPosition(Vector3 position) const {
 void Grid::showImGuiDetails(Camera *camera) {
     ImGui::PushID(uniqueID);
     if (ImGui::CollapsingHeader("Grid")) {
+        if (ImGui::Button("Reload walls")) {
+            ClearAllWallData();
+            SetUpWalls();
+        }
         ImGui::Text("Width: %d", width);
         ImGui::Text("Height: %d", height);
         ImGui::Text("Tile Size: %f", tileSize);
         ImGui::Text("Offset X: %f", offsetX);
         ImGui::Text("Offset Z: %f", offsetZ);
+        static glm::ivec2 newSize { width, height };
+        ImGui::InputInt2("New size", glm::value_ptr(newSize));
+        if (ImGui::Button("Resize"))
+            reinitWithSize(newSize);
     }
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
+            if (gridArray[i][j] == nullptr) {
+                ImGui::Text("No tile @ x%d y%d", i, i);
+                continue;
+            }
+
             ImGui::PushID(gridArray[i][j]->uniqueID);
             if (ImGui::CollapsingHeader(("Tile " + std::to_string(i) + " " + std::to_string(j)).c_str())) {
                 gridArray[i][j]->showImGuiDetails(camera);
@@ -137,6 +175,7 @@ void Grid::showImGuiDetails(Camera *camera) {
 
 void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
     Entity *gridEntity = scene->addEntity("Grid Entity");
+    entityId = gridEntity->uniqueID;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
@@ -203,7 +242,8 @@ void Grid::SetUpWalls() {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Tile *currentTile = getTileAt(i, j);
-            SetUpWall(currentTile);
+            if (currentTile != nullptr)
+                SetUpWall(currentTile);
         }
     }
 }
@@ -264,6 +304,14 @@ void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     currentTile->vacant = true;
 }
 
-
+void Grid::ClearAllWallData() {
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            auto tile = gridArray[i][j];
+            if ( tile != nullptr )
+                tile->walls.clear();
+        }
+    }
+}
 
 
