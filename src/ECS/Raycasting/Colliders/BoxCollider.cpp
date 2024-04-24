@@ -20,20 +20,15 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionSystem *collis
     this->size = size;
     this->type = ColliderType::BOX;
 
-    collisionSystem->addComponent(this);
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
 
+    this-> boxColliderData = BoxColliderData(translation * scale,glm::vec4(1,0,0,0));
 }
 
 void BoxCollider::update() {
       center = getEntity()->transform.getGlobalPosition();
-//    size = getEntity()->transform.getLocalScale();
+      size = getEntity()->transform.getLocalScale();
 }
 
-void BoxCollider::drawWire(Shader *shader, Primitives *primitives) {
-    glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
-
-    shader->setMatrix4("model", false, glm::value_ptr(translation * scale));
-    primitives->renderCube();
-}
 
