@@ -727,7 +727,9 @@ void imgui_render() {
         .treasureChance = 0.05,
         .unitCount = 3,
     };
+    static char seedString[64] = "";
     ImGui::Begin("Level generator");
+    ImGui::InputText("Seed (empty = random)", seedString, std::size(seedString));
     ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
     ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
     ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
@@ -738,7 +740,13 @@ void imgui_render() {
     ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 20);
     if (ImGui::Button("Generate")) {
         spdlog::trace("Generating level");
-        levelGenConfig.seed = pcgRandomSeed();
+        std::string_view sv = seedString;
+        if (sv.empty()) {
+            levelGenConfig.seed = pcgRandomSeed();
+        } else {
+            std::hash<std::string_view> hash;
+            levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+        }
         auto level = generateLevel(levelGenConfig);
         std::ofstream("save.txt") << level;
         spdlog::trace("New level saved to save.txt");
