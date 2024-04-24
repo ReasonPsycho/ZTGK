@@ -50,7 +50,7 @@ public:
 		int keyEnemies {};
 		int minEnemies {};
 		int maxEnemies {};
-		double treasureChance {};
+		float treasureChance {};
 		int unitCount {};
 	};
 

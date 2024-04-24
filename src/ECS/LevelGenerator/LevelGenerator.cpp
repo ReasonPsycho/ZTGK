@@ -27,8 +27,9 @@ std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 	os << '\n';
 	os << "# ---LAYOUT END---" << '\n';
 	os << "seed: " << std::hex << level.seed.first << level.seed.second << std::dec << '\n';
-	os << "  width: " << level.size.x;
-	os << "  height: " << level.size.y;
+	os << "grid:\n";
+	os << "  width: " << level.size.x << '\n';
+	os << "  height: " << level.size.y << '\n';
 	return os;
 }
 
