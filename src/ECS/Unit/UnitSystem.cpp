@@ -26,10 +26,8 @@ const std::type_index *UnitSystem::getComponentTypes() {
 }
 
 void UnitSystem::showImGuiDetails(Camera *camera) {
-    ImGui::Begin("Unit System");
     ImGui::Text("Units: %d", unitComponents.size());
     ImGui::Text("Selected Units: %d", selectedUnits.size());
-    ImGui::End();
 }
 
 void UnitSystem::Update() {

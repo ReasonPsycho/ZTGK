@@ -5,6 +5,8 @@
 #include "WireRenderer.h"
 
 void WireRenderer::DrawColliders() {
+    if (!enabled) return;
+
     wireShader.use();
     camera->GetProjectionMatrix();
     glm::mat4 projection = camera->GetProjectionMatrix();
@@ -32,7 +34,7 @@ void WireRenderer::removeComponent(void *component) {
 }
 
 void WireRenderer::showImGuiDetails(Camera *camera) {
-
+    ImGui::Checkbox("Enabled?", &enabled);
 }
 
 WireRenderer::WireRenderer(Primitives *primitives, Camera *camera) : primitives(primitives),camera(camera){
@@ -45,6 +47,8 @@ void WireRenderer::Innit() {
 }
 
 void WireRenderer::DrawRays() {
+    if (!enabled) return;
+
     wireShader.use();
     camera->GetProjectionMatrix();
     glm::mat4 projection = camera->GetProjectionMatrix();

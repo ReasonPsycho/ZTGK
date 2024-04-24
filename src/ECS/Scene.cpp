@@ -35,7 +35,6 @@ Entity *Scene::addEntity(Entity *parent, std::string name) {
 
 void Scene::showImGuiDetails(Camera *camera) {
 // Begin main window
-    ImGui::SetNextWindowPos(ImVec2(40, 40), ImGuiCond_Once);
     ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
 
 // Provide the 'dockspace' into which other ImGui windows can be docked

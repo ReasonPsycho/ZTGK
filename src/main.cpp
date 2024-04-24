@@ -57,6 +57,7 @@
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "ECS/SaveSystem/LevelSaving.h"
 
 #pragma endregion Includes
 
@@ -311,9 +312,9 @@ void cleanup() {
 }
 
 bool init() {
-    auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
-    spdlog::get("")->sinks().push_back(sink);
+    spdlog::set_level(spdlog::level::trace);
+//    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
+    ztgk::console.level(spdlog::level::trace);
 
     // Get current date and time
     auto now = std::chrono::system_clock::now();
@@ -404,8 +405,8 @@ void init_systems() {
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
                           vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
 
-//    hud.init();
-//    scene.systemManager.addSystem(&hud);
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -472,9 +473,11 @@ void load_enteties() {
     grid.LoadTileEntities(1.0f, &collisionSystem);
     instanceRenderSystem.Innit();
 
+    hud.getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
     bggroup = hud.addGroup(glm::vec3(0, 0, 10));
+    hud.getGroupOrDefault(bggroup)->setHidden(true);
     auto bgelem = scene.addEntity(ebg, "Puni1");
     bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
                                              "res/textures/puni.png"));
@@ -495,6 +498,7 @@ void load_enteties() {
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
+    hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
                                                                                 ztgk::game::window_size.y * 0.5));
@@ -672,6 +676,8 @@ void imgui_begin() {
 }
 
 void imgui_render() {
+    scene.showImGuiDetails(&camera);
+
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -686,6 +692,7 @@ void imgui_render() {
         min_timestamp = Time::Instance().LastFrame();
     }
     ImGui::Begin(format("FPS: {:.2f} H: {:.2f} L: {:.2f}###FPS_COUNTER", fps, fps_max, fps_min).c_str());
+    ImGui::Text("%s", std::format("Time: {:.3f}", Time::Instance().LastFrame()).c_str());
     ImGui::Text("%s", std::format("High @ {:.3f}", max_timestamp).c_str());
     ImGui::Text("%s", std::format("Low @ {:.3f}", min_timestamp).c_str());
     if (ImGui::Button("Clear")) {
@@ -696,12 +703,18 @@ void imgui_render() {
     }
     ImGui::End();
 
+    ImGui::Begin("Save test");
+    if (ImGui::Button("save")) {
+        LevelSaving::save();
+    }
+    if (ImGui::Button("load")) {
+        LevelSaving::load();
+    }
+    ImGui::End();
+
 
     //lightSystem.showLightTree();
-    scene.showImGuiDetails(&camera);
-
     ztgk::console.imguiWindow();
-
     // bloomSystem .showImguiOptions();
 }
 
