@@ -80,8 +80,11 @@ Tile *Grid::getTileAt(Vector2Int index) {
 
 
 const glm::vec3 Grid::GridToWorldPosition(Vector2Int index) const {
-    return glm::vec3(Position.x + index.x * tileSize + offsetX, Position.y, Position.z + index.z * tileSize + offsetZ);
-}
+
+    float worldPosX = Position.x + index.x * tileSize;
+    float worldPosY = Position.y;
+    float worldPosZ = Position.z + index.z * tileSize;
+    return glm::vec3(worldPosX, worldPosY, worldPosZ);}
 
 
 const glm::vec3 Grid::GridToWorldPosition(int x, int z) const {
@@ -89,8 +92,21 @@ const glm::vec3 Grid::GridToWorldPosition(int x, int z) const {
 }
 
 Vector2Int Grid::WorldToGridPosition(Vector3 position) const {
-    return Vector2Int((int) ((position.x - Position.x - offsetX) / tileSize),
-                      (int) ((position.z - Position.z - offsetZ) / tileSize));
+    // Calculate the offset from the grid's origin
+    float offsetX = position.x - Position.x;
+    float offsetZ = position.z - Position.z;
+
+    // Calculate the grid index based on the offset and tileSize
+    int gridX = static_cast<int>(offsetX / tileSize);
+    int gridZ = static_cast<int>(offsetZ / tileSize);
+
+    // Ensure the grid index is within bounds
+    if (gridX < 0) gridX = 0;
+    if (gridZ < 0) gridZ = 0;
+    if (gridX >= width) gridX = width - 1;
+    if (gridZ >= height) gridZ = height - 1;
+
+    return {gridX, gridZ};
 }
 
 void Grid::showImGuiDetails(Camera *camera) {
@@ -123,18 +139,16 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
     Entity *gridEntity = scene->addEntity("Grid Entity");
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            Entity *tileEntity = scene->addEntity(gridEntity, "Tile" + std::to_string(i) + std::to_string(j));
+            Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
             tileEntity->addComponent(std::make_unique<Tile>(i, j));
             tileEntity->transform.setLocalPosition(GridToWorldPosition(i, j));
             tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
             if (i >= width / 4 && i < (width - width / 4) && j >= height / 4 && j < (height - height / 4)) {
                 tileEntity->getComponent<Tile>()->isFloor = true;
-                if(i == width/2 || j == height/2){
-                    tileEntity->getComponent<Tile>()->isFloor = false;
-                }
             } else {
                 tileEntity->getComponent<Tile>()->isFloor = false;
+                tileEntity->getComponent<Tile>()->vacant = false;
             }
 
             tileEntity->updateSelfAndChild();

@@ -16,8 +16,9 @@ public:
 
     CombatState* CombatState;
     MiningState* MiningState;
-    IdleState* IdleState;
+    IdleState* Idlestate;
 
+    bool isTargetInRange() override;
     bool hasCombatTarget{};
     bool isAttackTargetInRange{};
 

@@ -15,11 +15,12 @@ struct UnitStats{
     float range;
 };
 
+class UnitSystem;
 
 class Unit : public Component {
 public:
 
-    bool isSelected;
+    bool isSelected = false;
 
     Vector2Int gridPosition;
     glm::vec3 worldPosition;
@@ -42,7 +43,7 @@ public:
     IMineable* miningTarget;
     UnitStats stats;
 
-    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
+    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly, UnitSystem* unitSystem);
     ~Unit();
 
     bool IsAlly() const;
@@ -58,7 +59,7 @@ public:
 
 private:
     bool isAlly;
-
+    Vector2Int previousGridPosition;
     UnitStats baseStats;
 };
 

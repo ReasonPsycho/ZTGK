@@ -16,11 +16,17 @@ struct Entry {
 class Console {
     std::vector<Entry> entries;
     ImGuiListClipper clipper;
+    std::string name;
+    bool scroll_down{true};
 
 public:
-    Console();
+    using custom_menus_t = std::unordered_map<std::string, std::function<void()>>;
+    custom_menus_t custom_menus;
+
+    explicit Console(const std::string & name = "Console");
+    explicit Console(const custom_menus_t & custom_menus, const std::string & name = "Console");
     void imguiWindow();
     void log(const Entry& entry);
-    void log(const std::string & text, spdlog::level::level_enum severity);
+    void log(const std::string & text, spdlog::level::level_enum severity = spdlog::level::info);
     void clear();
 };

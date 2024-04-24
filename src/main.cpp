@@ -26,6 +26,7 @@
 #include "ECS/Utils/Util.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
+#include "ECS/Unit/Unit.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
@@ -53,6 +54,9 @@
 #include "ECS/Render/WireRenderer.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Render/InstanceRenderSystem.h"
+#include "ECS/Unit/UnitAI/UnitAI.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "ECS/Unit/UnitSystem.h"
 
 #pragma endregion Includes
 
@@ -76,7 +80,7 @@ HUD hud;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
-
+StateManager* stateManager;
 
 Entity *box1;
 Entity *box2;
@@ -99,6 +103,8 @@ bool init();
 void init_systems();
 
 void load_enteties();
+
+void load_units();
 
 void init_imgui();
 
@@ -175,8 +181,11 @@ InstanceRenderSystem instanceRenderSystem;
 WireRenderer wireRenderer(&primitives, &camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
+UnitSystem unitSystem;
 
 Grid grid(&scene, 100, 100, 2.0f, Vector3(0, 0, 0));
+
+Entity *playerUnit;
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -303,7 +312,7 @@ void cleanup() {
 
 bool init() {
     auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and logger name since it's null anyway)
+    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
     spdlog::get("")->sinks().push_back(sink);
 
     // Get current date and time
@@ -369,6 +378,8 @@ bool init() {
 
 
 void init_systems() {
+    ztgk::game::scene = &scene;
+
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&instanceRenderSystem);
@@ -376,6 +387,9 @@ void init_systems() {
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
+    scene.systemManager.addSystem(&unitSystem);
+
+
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -406,7 +420,7 @@ void load_enteties() {
     wall.loadModel();
     
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    // gabka.loadModel();
+    //gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
@@ -479,19 +493,86 @@ void load_enteties() {
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::config::window_size / 5));
+    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
     fgelem = scene.addEntity(efg, "Variable Text");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest zmienny!", glm::vec2(ztgk::config::window_size.x * 0.5 - 300,
-                                                                                ztgk::config::window_size.y * 0.5)));
+    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
+                                                                                ztgk::game::window_size.y * 0.5));
+    tx.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Text>( tx ));
     zmtxt = fgelem->getComponent<Text>();
-    zmtxt->groupID = zmgroup;
     fgelem = scene.addEntity(efg, "Animated Sprite");
-    fgelem->addComponent(make_unique<Sprite>("res/textures/puni.png"));
+    auto spr = Sprite("res/textures/puni.png");
+    spr.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Sprite>( spr ));
     zmspr = fgelem->getComponent<Sprite>();
     zmspr->groupID = zmgroup;
+
+    load_units();
+
+
+
 }
 
+void load_units() {
+    playerUnit = scene.addEntity("Player1");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    UnitStats stats = {100, 1, 1, 20, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    playerUnit = scene.addEntity("Player2");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 30, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    playerUnit = scene.addEntity("Player3");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 10, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    playerUnit = scene.addEntity("Player4");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 100, 1};
+    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState();
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+
+}
 void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -540,6 +621,7 @@ void update() {
 
     signalQueue.update();
 
+    unitSystem.Update();
 }
 
 void render() {
@@ -590,11 +672,6 @@ void imgui_begin() {
 }
 
 void imgui_render() {
-    ImGui::Begin("Debug menu");
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%.2f", 1.0f / deltaTime);
-    ImGui::Text(buffer);
-
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -617,10 +694,10 @@ void imgui_render() {
         fps_min = 1000000;
         min_timestamp = 0;
     }
+    ImGui::End();
 
 
     //lightSystem.showLightTree();
-    ImGui::End();
     scene.showImGuiDetails(&camera);
 
     ztgk::console.imguiWindow();
@@ -759,12 +836,28 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
         std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        if (ray->getHitEntity() != nullptr) {
-            spdlog::info("Hit entity: {}", ray->getHitEntity()->name);
-        } else {
-            spdlog::info("No hit entity");
+        if (ray->getHitEntity() != nullptr&& ray->getHitEntity()->getComponent<Unit>() != nullptr){
+            if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
+                unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>() );
+            } else {
+                unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
+        } }else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
+            unitSystem.deselectAllUnits();
         }
 
+        wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+    if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
+        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
+        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+        Entity * hit = ray->getHitEntity();
+        if(hit != nullptr){
+            for(auto unit : unitSystem.selectedUnits){
+                unit->hasMovementTarget = true;
+                unit->pathfinding.path.clear();
+                unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+            }
+        }
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
 }

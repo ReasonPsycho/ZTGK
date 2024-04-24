@@ -10,14 +10,20 @@
 #include "DataCargo/SignalData.h"
 
 struct s_signal_types {
-    unsigned test_signal;
-    unsigned keyboard_signal;
+    unsigned test;
+    unsigned keyboard;
+    unsigned audio_signal;
+
+        unsigned all_mouse;
     unsigned mouse_button_signal;
     unsigned mouse_move_signal;
     unsigned mouse_scroll_signal;
-    unsigned audio_signal;
 
-    unsigned all_mouse;
+        unsigned all_hud;
+    unsigned hud_sort_z_depth_signal;
+    unsigned hud_update_group_mappings_signal;
+    unsigned hud_remove_group_signal;
+
     unsigned all;
     s_signal_types();
 };
