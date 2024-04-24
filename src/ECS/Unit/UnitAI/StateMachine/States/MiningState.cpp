@@ -60,6 +60,7 @@ bool MiningState::isTargetInRange() {
          unit->isTargetInRange = true;
          return true;
      }
+     return false;
 }
 
 void MiningState::Mine() {
