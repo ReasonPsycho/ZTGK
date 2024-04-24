@@ -8,16 +8,22 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/HUD/Components/Text.h"
 
-IMineable::IMineable(float timeToMine) {
+IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->name = "IMineable";
+    this->gridPosition = gridPosition;
+    this->grid = grid;
     this->timeToMine = timeToMine;
     this->timeToMineRemaining = timeToMine;
 }
 
 void IMineable::Mine() {
+    spdlog::info("Mining...");
     timeToMineRemaining -= Time::Instance().DeltaTime();
+    spdlog::info(timeToMineRemaining);
+    spdlog::info("Mining tile at: {0}, {1}", gridPosition.x, gridPosition.z);
     if (timeToMineRemaining<=0) {
-        delete this;
+        spdlog::info("Mined!");
+        grid->DestroyWallsOnTile(gridPosition);
     }
 }
 

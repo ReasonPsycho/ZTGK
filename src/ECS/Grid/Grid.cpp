@@ -150,7 +150,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             } else {
                 tileEntity->getComponent<Tile>()->isFloor = false;
                 tileEntity->getComponent<Tile>()->vacant = false;
-                tileEntity->addComponent(std::make_unique<IMineable>(1.0f));
+                tileEntity->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
 
             }
 
@@ -201,6 +201,7 @@ Grid::Grid(Grid *grid) {
 
 void Grid::SetUpWallData() {
     float translateLength = tileSize / 2.0f;
+
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Tile *currentTile = getTileAt(i, j);
@@ -253,6 +254,14 @@ void Grid::SetUpWallData() {
             }
         }
     }
+}
+
+void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
+    Tile* currentTile = getTileAt(tileIndex);
+    currentTile->isFloor = true;
+    currentTile->vacant = true;
+    SetUpWallData();
+
 }
 
 

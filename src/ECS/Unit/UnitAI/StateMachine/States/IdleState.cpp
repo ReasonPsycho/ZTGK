@@ -12,18 +12,38 @@ State *IdleState::RunCurrentState() {
 
     //from Idle to Movement
     if(unit->hasMovementTarget){
-        MoveState = new MovementState();
-        MoveState->unit = unit;
-        return MoveState;
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+        return moveState;
     }
     //from Idle to Combat
-    if(!unit->hasMovementTarget && unit->hasCombatTarget && unit->isTargetInRange){
-        return CombatState;
+    if(unit->hasCombatTarget){
+        combatState = new CombatState(grid);
+        combatState->unit = unit;
+
+        if(combatState->isTargetInRange())
+            return combatState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->combatTarget->gridPosition;
+            return this;
+        }
     }
 
     //from Idle to Mining
-    if(!unit->hasMovementTarget && !unit->hasCombatTarget && unit->hasMiningTarget && unit->isTargetInRange){
-        return MiningState;
+    if(unit->hasMiningTarget){
+        miningState = new MiningState(grid);
+        miningState->unit = unit;
+
+        if(miningState->isTargetInRange())
+            return miningState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->miningTarget->gridPosition;
+            return this;
+        }
     }
 
     return this;
@@ -32,4 +52,9 @@ State *IdleState::RunCurrentState() {
 
 bool IdleState::isTargetInRange() {
     return false;
+}
+
+IdleState::IdleState(Grid *grid) {
+    this->grid = grid;
+
 }
