@@ -173,7 +173,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             tileEntity->addComponent(
                     std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5, 0.5, 0.5), collisionSystem));
             tileEntity->getComponent<BoxCollider>()->center =
-                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);   
         }
     }
 
@@ -235,6 +235,7 @@ void Grid::SetUpWall(Tile *tile) {
 
         // Remove the last element from the vector
         tile->walls.pop_back();
+
     }
     tile->walls.clear();
     bool isSurrounded = true;
@@ -262,7 +263,6 @@ void Grid::SetUpWall(Tile *tile) {
             tile->walls.push_back(wallChunk->addWallData(WallData(southMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
-
 
         Tile *eastNeighbour = getTileAt(tile->index.x, tile->index.z + 1);
         if (eastNeighbour == nullptr || eastNeighbour->state == FLOOR) {
@@ -306,6 +306,9 @@ void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     }
 
 }
+
+
+
 Chunk *Grid::getChunkAt(int x, int z) {
     if( x/10 < width && x/10 >= 0){
         if( z/10 < height && z/10 >= 0) {

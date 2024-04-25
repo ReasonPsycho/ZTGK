@@ -140,6 +140,10 @@ glm::vec3 Camera::getDirFromCameraToCursor(float mouseX, float mouseY, int scree
     return ray_wor;
 }
 
+float Camera::GetAspectRatio() {
+    return (float ) saved_display_w/(float )saved_display_h;
+}
+
 
 
 

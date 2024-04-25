@@ -57,6 +57,8 @@
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "ECS/SaveSystem/LevelSaving.h"
+#include "ECS/LevelGenerator/LevelGenerator.h"
 
 #pragma endregion Includes
 
@@ -311,9 +313,9 @@ void cleanup() {
 }
 
 bool init() {
-    auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
-    spdlog::get("")->sinks().push_back(sink);
+    spdlog::set_level(spdlog::level::trace);
+//    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
+    ztgk::console.level(spdlog::level::trace);
 
     // Get current date and time
     auto now = std::chrono::system_clock::now();
@@ -393,7 +395,6 @@ void init_systems() {
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
     MaterialPhong materialPhong = MaterialPhong(myColor);
@@ -403,9 +404,11 @@ void init_systems() {
     
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
                           vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
+    wireRenderer.boxModel = cubeModel;
+    wireRenderer.Innit();
 
-//    hud.init();
-//    scene.systemManager.addSystem(&hud);
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -472,9 +475,11 @@ void load_enteties() {
     grid.LoadTileEntities(1.0f, &collisionSystem);
     instanceRenderSystem.Innit();
 
+    hud.getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
     bggroup = hud.addGroup(glm::vec3(0, 0, 10));
+    hud.getGroupOrDefault(bggroup)->setHidden(true);
     auto bgelem = scene.addEntity(ebg, "Puni1");
     bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
                                              "res/textures/puni.png"));
@@ -495,6 +500,7 @@ void load_enteties() {
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
+    hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
                                                                                 ztgk::game::window_size.y * 0.5));
@@ -641,10 +647,10 @@ void render() {
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
 
-    renderSystem.DrawScene(&phongPipeline.phongShader);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-//    wireRenderer.DrawColliders();
-//    wireRenderer.DrawRays();
+    renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
+    wireRenderer.DrawColliders();
+    wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -672,6 +678,8 @@ void imgui_begin() {
 }
 
 void imgui_render() {
+    scene.showImGuiDetails(&camera);
+
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -686,6 +694,7 @@ void imgui_render() {
         min_timestamp = Time::Instance().LastFrame();
     }
     ImGui::Begin(format("FPS: {:.2f} H: {:.2f} L: {:.2f}###FPS_COUNTER", fps, fps_max, fps_min).c_str());
+    ImGui::Text("%s", std::format("Time: {:.3f}", Time::Instance().LastFrame()).c_str());
     ImGui::Text("%s", std::format("High @ {:.3f}", max_timestamp).c_str());
     ImGui::Text("%s", std::format("Low @ {:.3f}", min_timestamp).c_str());
     if (ImGui::Button("Clear")) {
@@ -696,12 +705,59 @@ void imgui_render() {
     }
     ImGui::End();
 
+    ImGui::Begin("Save test");
+    if (ImGui::Button("save")) {
+        LevelSaving::save();
+    }
+    if (ImGui::Button("load")) {
+        LevelSaving::load();
+    }
+    ImGui::End();
+
+    static LevelGenerator::Config levelGenConfig {
+        .seed {},
+        .size {100, 100},
+        .wallThickness = 0.f,
+        .baseRadius = 4.5f,
+        .keyRadius = 4.f,
+        .pocketRadius = 2.5f,
+        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+        .extraPocketAttempts = 10000,
+        .keyEnemies = 3,
+        .minEnemies = 0,
+        .maxEnemies = 2,
+        .unitCount = 3,
+        .chestCount = 10,
+    };
+    static char seedString[64] = "";
+    ImGui::Begin("Level generator");
+    ImGui::InputText("Seed (empty = random)", seedString, std::size(seedString));
+    ImGui::SliderFloat("Wall thickness", &levelGenConfig.wallThickness, 0.f, 20.f);
+    ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
+    ImGui::SliderInt("Enemies in ore room", &levelGenConfig.keyEnemies, 0, 20);
+    ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
+    ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
+    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 10);
+    ImGui::SliderInt("Chest count", &levelGenConfig.chestCount, 0, 30);
+    if (ImGui::Button("Generate")) {
+        spdlog::trace("Generating level");
+        std::string_view sv = seedString;
+        if (sv.empty()) {
+            levelGenConfig.seed = pcgRandomSeed();
+        } else {
+            std::hash<std::string_view> hash;
+            levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+        }
+        auto level = generateLevel(levelGenConfig);
+        std::ofstream("save.txt") << level;
+        spdlog::trace("New level saved to save.txt");
+    }
+    ImGui::End();
 
     //lightSystem.showLightTree();
-    scene.showImGuiDetails(&camera);
-
     ztgk::console.imguiWindow();
-
     // bloomSystem .showImguiOptions();
 }
 
