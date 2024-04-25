@@ -3,7 +3,7 @@
 //
 
 #include "LevelGenerator.h"
-#include <iomanip>
+#include <format>
 #include <map>
 #include <numbers>
 
@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 	}
 	os << '\n';
 	os << "# ---LAYOUT END---" << '\n';
-	os << "seed: " << std::hex << level.seed.first << level.seed.second << std::dec << '\n';
+	os << "seed: " << std::format("{:016x}{:016x}", level.seed.first, level.seed.second) << '\n';
 	os << "grid:\n";
 	os << "  width: " << level.size.x << '\n';
 	os << "  height: " << level.size.y << '\n';
