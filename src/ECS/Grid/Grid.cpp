@@ -226,8 +226,16 @@ void Grid::SetUpWall(Tile *tile) {
     Chunk* wallChunk = getChunkAt(tile->index);
     float translateLength = tileSize / 2.0f;
     bool isDiagonal = ((tile->index.x + tile->index.z) % 2 == 0);
-    while(!tile->walls.empty()){
-        wallChunk->removeWallData(tile->walls[0]);
+    while (!tile->walls.empty()) {
+        // Get the index of the last element in the vector
+        size_t lastIndex = tile->walls.size() - 1;
+
+        // Remove the wall data using the last element of the vector
+        wallChunk->removeWallData(tile->walls[lastIndex]);
+
+        // Remove the last element from the vector
+        tile->walls.pop_back();
+
     }
     tile->walls.clear();
     bool isSurrounded = true;
@@ -255,8 +263,7 @@ void Grid::SetUpWall(Tile *tile) {
             tile->walls.push_back(wallChunk->addWallData(WallData(southMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
-        
-        
+
         Tile *eastNeighbour = getTileAt(tile->index.x, tile->index.z + 1);
         if (eastNeighbour == nullptr || eastNeighbour->state == FLOOR) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
@@ -286,8 +293,21 @@ void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     Tile* currentTile = getTileAt(tileIndex);
     currentTile->state = FLOOR;
     currentTile->vacant = true;
+    vector<Tile*> neighbours;
+
+    neighbours.push_back(getTileAt(tileIndex.x + 1, tileIndex.z));
+    neighbours.push_back(getTileAt(tileIndex.x - 1, tileIndex.z));
+    neighbours.push_back(getTileAt(tileIndex.x, tileIndex.z + 1));
+    neighbours.push_back(getTileAt(tileIndex.x, tileIndex.z -1));
     SetUpWall(currentTile);
+    for(Tile* neigh : neighbours){
+        if(neigh != nullptr)
+            SetUpWall(neigh);
+    }
+
 }
+
+
 
 Chunk *Grid::getChunkAt(int x, int z) {
     if( x/10 < width && x/10 >= 0){
