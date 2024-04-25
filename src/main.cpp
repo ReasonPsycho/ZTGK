@@ -747,8 +747,16 @@ void imgui_render() {
         if (sv.empty()) {
             levelGenConfig.seed = pcgRandomSeed();
         } else {
-            std::hash<std::string_view> hash;
-            levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+            bool isRealSeed = sv.size() == 32 && std::all_of(sv.begin(), sv.end(), [](char c) {
+                return std::isxdigit(static_cast<unsigned char>(c));
+            });
+            if (isRealSeed) {
+                std::from_chars(sv.data(), sv.data() + 16, levelGenConfig.seed.first, 16);
+                std::from_chars(sv.data() + 16, sv.data() + 32, levelGenConfig.seed.second, 16);
+            } else {
+                std::hash<std::string_view> hash;
+                levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+            }
         }
         auto level = generateLevel(levelGenConfig);
         std::ofstream("save.txt") << level;
