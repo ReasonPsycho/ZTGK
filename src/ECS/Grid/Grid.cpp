@@ -36,7 +36,7 @@ Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position
         for (int j = 0; j < height/10; j++) {
             chunkLine.push_back(Chunk(Vector2Int(i,j), this));  // Populate the line
         }
-        chunkArray.push_back(chunkLine);  // Add the line to the array
+        chunkArray.push_back(std::move(chunkLine));  // Add the line to the array
     }
 }
 
@@ -173,7 +173,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             tileEntity->addComponent(
                     std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5, 0.5, 0.5), collisionSystem));
             tileEntity->getComponent<BoxCollider>()->center =
-                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);   
+                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
         }
     }
 
@@ -226,24 +226,26 @@ void Grid::SetUpWall(Tile *tile) {
     Chunk* wallChunk = getChunkAt(tile->index);
     float translateLength = tileSize / 2.0f;
     bool isDiagonal = ((tile->index.x + tile->index.z) % 2 == 0);
-    while(!tile->walls.empty()){
-        wallChunk->removeWallData(tile->walls[0]);
+    while (!tile->walls.empty()) {
+        // Remove the wall data using the last element of the vector
+        wallChunk->removeWallData(tile->walls.back());
+        // Remove the last element from the vector
+        tile->walls.pop_back();
     }
     tile->walls.clear();
     bool isSurrounded = true;
     if (tile->state == FLOOR) {
-        tile->walls.clear();
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
         floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
         floorMatrix = glm::rotate(floorMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
-        tile->walls.push_back(wallChunk->addWallData(WallData(floorMatrix, (isDiagonal ? 0 : 1), 0, 0, 0)));
+        tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(floorMatrix, (isDiagonal ? 0 : 1), 0, 0, 0)));
     } else {
         Tile *northNeighbour = getTileAt(tile->index.x + 1, tile->index.z);
         if (northNeighbour == nullptr || northNeighbour->state == FLOOR) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
             northMatrix = glm::translate(northMatrix, glm::vec3(translateLength, 0, 0));
             northMatrix = glm::rotate(northMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-            tile->walls.push_back(wallChunk->addWallData(WallData(northMatrix, 2, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(northMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
 
@@ -252,17 +254,16 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 southMatrix = tile->getEntity()->transform.getModelMatrix();
             southMatrix = glm::translate(southMatrix, glm::vec3(-translateLength, 0, 0));
             southMatrix = glm::rotate(southMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
-            tile->walls.push_back(wallChunk->addWallData(WallData(southMatrix, 2, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(southMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
-        
-        
+
         Tile *eastNeighbour = getTileAt(tile->index.x, tile->index.z + 1);
         if (eastNeighbour == nullptr || eastNeighbour->state == FLOOR) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
             eastMatrix = glm::translate(eastMatrix, glm::vec3(0, 0, translateLength));
             eastMatrix = glm::rotate(eastMatrix, glm::radians(90.0f), glm::vec3(0, 0, 1));
-            tile->walls.push_back(wallChunk->addWallData(WallData(eastMatrix, 2, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(eastMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
 
@@ -271,14 +272,14 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 westMatrix = tile->getEntity()->transform.getModelMatrix();
             westMatrix = glm::translate(westMatrix, glm::vec3(0, 0, -translateLength));
             //  westMatrix = glm::rotate(westMatrix,glm::radians(-90.0f),glm::vec3 (1,0,0));
-            tile->walls.push_back(wallChunk->addWallData(WallData(westMatrix, 2, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(westMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
 
         glm::mat4x4 topMatrix = tile->getEntity()->transform.getModelMatrix();
         topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
         topMatrix = glm::rotate(topMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
-        tile->walls.push_back(wallChunk->addWallData(WallData(topMatrix, 2, (isSurrounded ? 1 : 0), 0, 0)));
+        tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(topMatrix, 2, (isSurrounded ? 1 : 0), 0, 0)));
     }
 }
 
@@ -286,8 +287,21 @@ void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     Tile* currentTile = getTileAt(tileIndex);
     currentTile->state = FLOOR;
     currentTile->vacant = true;
+    vector<Tile*> neighbours;
+
+    neighbours.push_back(getTileAt(tileIndex.x + 1, tileIndex.z));
+    neighbours.push_back(getTileAt(tileIndex.x - 1, tileIndex.z));
+    neighbours.push_back(getTileAt(tileIndex.x, tileIndex.z + 1));
+    neighbours.push_back(getTileAt(tileIndex.x, tileIndex.z -1));
     SetUpWall(currentTile);
+    for(Tile* neigh : neighbours){
+        if(neigh != nullptr)
+            SetUpWall(neigh);
+    }
+
 }
+
+
 
 Chunk *Grid::getChunkAt(int x, int z) {
     if( x/10 < width && x/10 >= 0){
@@ -306,6 +320,7 @@ Chunk *Grid::getChunkAt(Vector2Int index) {
     }
     return nullptr;
 }
+
 
 
 
