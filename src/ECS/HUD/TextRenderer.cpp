@@ -90,6 +90,7 @@ void TextRenderer::loadFont(std::string font) {
 
     fonts[font] = _glyphs;
     spdlog::trace("Loaded font  " + font);
+    glDisable(GL_BLEND);
 }
 
 void TextRenderer::render(Text * text) {
