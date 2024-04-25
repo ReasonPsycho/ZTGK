@@ -8,21 +8,23 @@
 
 
 #include "ECS/Render/Camera/Camera.h"
-#include "ECS/Grid/Tile.h"
+#include "ECS/Grid/Grid.h"
 #include "ECS/System.h"
 #include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Utils/VectorUtils.h"
+#include "ECS/Render/FrustumCulling/Frustum.h"
 
 class InstanceRenderSystem : public System {
 public:
     InstanceRenderSystem();
     void Innit();
-    const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
-    int getNumComponentTypes() override { return 1;};
+    const std::type_index* getComponentTypes() override { return nullptr; };
+    int getNumComponentTypes() override { return 0;};
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
     void showImGuiDetails(Camera *camera) override;
-    void DrawTiles(Shader* regularShader);
-    void PushToSSBO();
+    void DrawTiles(Shader* regularShader,Camera * camera);
+    void PushToSSBO(Camera* camera);
     void Update();
 
     Model* tileModel;
@@ -33,13 +35,11 @@ private:
     GLuint tileTextureBindingPoint = 10;
     int numberOfTextures = 3;
     
+    bool updateWallData = true;
+    
     string tilePath =  "res/textures/tiles/Tile";
     
-    std::vector<Tile *> tileComponents;
     std::vector<WallData> wallData;
-    std::array<std::type_index, 1> componentTypes = {
-            std::type_index(typeid(Tile))
-    };
 };
 
 

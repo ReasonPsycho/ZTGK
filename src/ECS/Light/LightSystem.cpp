@@ -183,7 +183,7 @@ void LightSystem::Update(double deltaTime) {
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
-        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader);
+        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader,camera);
         offset += sizeof(light->data);
     }
 
@@ -197,7 +197,7 @@ void LightSystem::Update(double deltaTime) {
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
-        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader);
+        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader,camera);
         
         offset += sizeof(light->data);
     }
@@ -214,7 +214,7 @@ void LightSystem::Update(double deltaTime) {
         light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  cubeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&cubeDepthShader);
-        instanceRenderSystem->DrawTiles(&instanceCubeDepthShader);
+        instanceRenderSystem->DrawTiles(&instanceCubeDepthShader,camera);
         offset += sizeof(light->data);
     }
 }

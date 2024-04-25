@@ -39,7 +39,7 @@ struct TileStateData {
 class Tile : public Component{
 public:
     Vector2Int index{};
-    std::vector<WallData> walls;
+    std::vector<WallData*> walls;
     bool vacant;
     TileState state;
     TileStateData stateData;

@@ -395,7 +395,6 @@ void init_systems() {
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
     MaterialPhong materialPhong = MaterialPhong(myColor);
@@ -405,6 +404,8 @@ void init_systems() {
     
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
                           vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
+    wireRenderer.boxModel = cubeModel;
+    wireRenderer.Innit();
 
     hud.init();
     scene.systemManager.addSystem(&hud);
@@ -646,10 +647,10 @@ void render() {
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
 
-    renderSystem.DrawScene(&phongPipeline.phongShader);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-//    wireRenderer.DrawColliders();
-//    wireRenderer.DrawRays();
+    renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
+    wireRenderer.DrawColliders();
+    wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
