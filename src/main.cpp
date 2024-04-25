@@ -58,6 +58,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
 #include "ECS/SaveSystem/LevelSaving.h"
+#include "ECS/LevelGenerator/LevelGenerator.h"
 
 #pragma endregion Includes
 
@@ -713,6 +714,47 @@ void imgui_render() {
     }
     ImGui::End();
 
+    static LevelGenerator::Config levelGenConfig {
+        .seed {},
+        .size {100, 100},
+        .wallThickness = 0.f,
+        .baseRadius = 4.5f,
+        .keyRadius = 4.f,
+        .pocketRadius = 2.5f,
+        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+        .extraPocketAttempts = 10000,
+        .keyEnemies = 3,
+        .minEnemies = 0,
+        .maxEnemies = 2,
+        .unitCount = 3,
+        .chestCount = 10,
+    };
+    static char seedString[64] = "";
+    ImGui::Begin("Level generator");
+    ImGui::InputText("Seed (empty = random)", seedString, std::size(seedString));
+    ImGui::SliderFloat("Wall thickness", &levelGenConfig.wallThickness, 0.f, 20.f);
+    ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
+    ImGui::SliderInt("Enemies in ore room", &levelGenConfig.keyEnemies, 0, 20);
+    ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
+    ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
+    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 10);
+    ImGui::SliderInt("Chest count", &levelGenConfig.chestCount, 0, 30);
+    if (ImGui::Button("Generate")) {
+        spdlog::trace("Generating level");
+        std::string_view sv = seedString;
+        if (sv.empty()) {
+            levelGenConfig.seed = pcgRandomSeed();
+        } else {
+            std::hash<std::string_view> hash;
+            levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+        }
+        auto level = generateLevel(levelGenConfig);
+        std::ofstream("save.txt") << level;
+        spdlog::trace("New level saved to save.txt");
+    }
+    ImGui::End();
 
     //lightSystem.showLightTree();
     ztgk::console.imguiWindow();
