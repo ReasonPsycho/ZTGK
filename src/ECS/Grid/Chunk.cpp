@@ -6,22 +6,21 @@
 #include "Grid.h"
 #include "Chunk.h"
 
-WallData* Chunk::addWallData(WallData wallData) {
+WallData* Chunk::addWallData(std::unique_ptr<WallData> wallData) {
     // Push the WallData to the vector
-    this->wallDataArray.push_back(wallData);
-
+    
+    this->wallDataArray.push_back(std::move(wallData));
     // Return the pointer to the last WallData object pushed into the vector
-    return &this->wallDataArray.back();
+    return this->wallDataArray.back().get();
 }
 
 void Chunk::removeWallData(WallData* wallData) {
-    // Iterate through the wallDataArray vector
-    for (auto it = this->wallDataArray.begin(); it != this->wallDataArray.end(); ++it) {
-        if (&(*it) == wallData) {
-            // Remove the WallData element
-            this->wallDataArray.erase(it);
-            break;
-        }
+    auto it = std::find_if(wallDataArray.begin(), wallDataArray.end(), [&](const std::unique_ptr<WallData>& ptr) {
+        return ptr.get() == wallData;
+    });
+
+    if (it != wallDataArray.end()) {
+        wallDataArray.erase(it);
     }
 }
 

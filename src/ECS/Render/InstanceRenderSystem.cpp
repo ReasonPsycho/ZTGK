@@ -27,6 +27,7 @@ void InstanceRenderSystem::removeComponent(void *component) {
 
 void InstanceRenderSystem::showImGuiDetails(Camera *camera) {
     ImGui::Checkbox("Update WallData",&updateWallData);
+    ImGui::Text("Wall amount %d",wallData.size());
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
@@ -102,13 +103,15 @@ void InstanceRenderSystem::PushToSSBO(Camera* camera) {
            for (int z = 0; z < grid->height/10; ++z) {
                Chunk * chunk = &grid->chunkArray[x][z];
                if(chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)){
-                   wallData.insert(wallData.end(),grid->chunkArray[x][z].wallDataArray.begin(), grid->chunkArray[x][z].wallDataArray.end()); //This is unsafe but bypasses checks lol
+                   for (auto &wallDataPtr : grid->chunkArray[x][z].wallDataArray) {
+                       wallData.push_back(*wallDataPtr);
+                   }
                }
            }
-       } 
-  
+       }
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
+
+       glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), nullptr, //Orphaning buffer
                  GL_STREAM_DRAW);
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), wallData.data(),
