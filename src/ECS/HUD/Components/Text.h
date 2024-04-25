@@ -23,7 +23,7 @@ class Text : public AHUDComponent {
 public:
 //todo ctor
     Text(const std::string &content = "",
-          const glm::vec2 &pos = ztgk::game::window_size / 2,
+         const glm::vec2 &pos = ztgk::game::window_size / 2,
          const glm::vec2 &scale = { 1, 1 },
          const glm::vec4 &color = ztgk::color.WHITE,
          const std::string &font = ztgk::font.default_font,

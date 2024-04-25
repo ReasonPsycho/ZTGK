@@ -8,8 +8,11 @@
 #include "../SignalData.h"
 
 struct MouseButtonSignalData : public SignalData {
+    // GLFW_MOUSE_BUTTON_XXXXX
     int button;
+    // GLFW_PRESS, etc
     int action;
+    // GLFW_MOD_XXXXX
     int mods;
 
     MouseButtonSignalData(int button, int action, int mods, const std::string & message = "");
