@@ -14,8 +14,8 @@ void WireRenderer::DrawColliders() {
         glm::mat4 view = camera->GetViewMatrix();
         boxShader.setMatrix4("projection", false, glm::value_ptr(projection));
         boxShader.setMatrix4("view", false, glm::value_ptr(view));
-        
-        
+
+        glDisable(GL_BLEND);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // to draw only lines of polygons
         PushToSSBO(camera);
 
@@ -74,6 +74,7 @@ void WireRenderer::DrawRays() {
         rayShader.setMatrix4("projection", false, glm::value_ptr(projection));
         rayShader.setMatrix4("view", false, glm::value_ptr(view));
 
+        glDisable(GL_BLEND);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // to draw only lines of polygons
         for (auto &rayComponent: rayComponents) {
             rayComponent->drawWire(&rayShader);
