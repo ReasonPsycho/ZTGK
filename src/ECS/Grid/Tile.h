@@ -7,7 +7,7 @@
 
 struct WallData {
     glm::mat4x4 matrix;
-    int data[4]{}; // for textures on x for exaple
+    int data[4]{}; // for textures on x for example
 
     // Constructor
     WallData(const glm::mat4x4 &matrixInput, int d1, int d2, int d3, int d4)
