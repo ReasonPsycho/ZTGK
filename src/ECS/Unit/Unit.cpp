@@ -98,6 +98,13 @@ void Unit::Update() {
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
+    if(currentRotation > rotation){
+        currentRotation -= 0.1f;
+    }
+    if(currentRotation < rotation){
+        currentRotation += 0.1f;
+    }
+    getEntity()->transform.setLocalRotation(glm::vec3(0, currentRotation, 0));
 
     previousGridPosition = gridPosition;
 }
