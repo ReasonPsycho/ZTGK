@@ -6,8 +6,10 @@
 
 #include <cstdint>
 #include <limits>
+#include <numbers>
 #include <random>
 #include <utility>
+#include <glm/glm.hpp>
 
 class PcgEngine {
 public:
@@ -45,4 +47,11 @@ inline PcgEngine::seed_type pcgRandomSeed() {
 		seed = seed << 32 | dev();
 	}
 	return {seeds[0], seeds[1]};
+}
+
+template<std::uniform_random_bit_generator URBG>
+glm::vec2 randomUnitVec2(URBG& rand) {
+	thread_local std::uniform_real_distribution<float> dist(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+	auto angle = dist(rand);
+	return {glm::cos(angle), glm::sin(angle)};
 }

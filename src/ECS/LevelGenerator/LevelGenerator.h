@@ -46,6 +46,7 @@ public:
 		float baseRadius {};
 		float keyRadius {};
 		float pocketRadius {};
+		float noiseImpact {};
 		std::vector<float> keyDistances {};
 		int extraPocketAttempts {};
 		int keyEnemies {};
@@ -72,6 +73,9 @@ private:
 		bool hasChest {};
 	};
 
+	void generatePerlinNoiseGrid(glm::ivec2 size, PcgEngine& rand) noexcept;
+	float getPerlinNoise(glm::vec2 pos) const noexcept;
+
 	bool inBounds(glm::ivec2 pos) const noexcept;
 	const Tile* getTile(glm::ivec2 pos) const noexcept;
 	Tile* getTile(glm::ivec2 pos) noexcept;
@@ -90,7 +94,7 @@ private:
 	int tryMakePocket(glm::vec2 pos, float radius, Pocket::Type type) noexcept;
 
 	bool isTileSafeToHollowOut(glm::ivec2 pos) const noexcept;
-	void hollowOutPocket(int index, float padding) noexcept;
+	void hollowOutPocket(int index, float padding, float noiseImpact) noexcept;
 
 	template<class Pred>
 	int addAtRandomToPocket(int index, int count, LevelLayout::Tile::Type type, PcgEngine& rand, Pred&& predicate) noexcept(noexcept(predicate(glm::ivec2 {})));
@@ -101,6 +105,8 @@ private:
 
 	LevelLayout& level;
 	std::vector<Pocket> pockets;
+	std::vector<glm::vec2> perlinNoiseGrid;
+	glm::ivec2 perlinNoiseGridSize;
 };
 
 LevelLayout generateLevel(const LevelGenerator::Config& config);
@@ -161,5 +167,5 @@ inline int LevelGenerator::addAtRandomToPocket(int index, int count, LevelLayout
 	for (const auto& pos : positions) {
 		getTile(pos)->type = type;
 	}
-	return positions.size();
+	return static_cast<int>(positions.size());
 }

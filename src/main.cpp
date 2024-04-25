@@ -717,10 +717,11 @@ void imgui_render() {
     static LevelGenerator::Config levelGenConfig {
         .seed {},
         .size {100, 100},
-        .wallThickness = 0.f,
+        .wallThickness = 1.f,
         .baseRadius = 4.5f,
         .keyRadius = 4.f,
         .pocketRadius = 2.5f,
+        .noiseImpact = 1.f,
         .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
         .extraPocketAttempts = 10000,
         .keyEnemies = 3,
@@ -736,6 +737,7 @@ void imgui_render() {
     ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
     ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
     ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Noise impact", &levelGenConfig.noiseImpact, 0.f, 10.f);
     ImGui::SliderInt("Enemies in ore room", &levelGenConfig.keyEnemies, 0, 20);
     ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
     ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
