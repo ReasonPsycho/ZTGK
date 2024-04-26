@@ -701,16 +701,6 @@ void imgui_render() {
     }
     ImGui::End();
 
-    ImGui::Begin("Save test");
-    if (ImGui::Button("save")) {
-        LevelSaving::save();
-    }
-    if (ImGui::Button("load")) {
-        LevelSaving::load();
-    }
-    ImGui::End();
-
-
     //lightSystem.showLightTree();
     ztgk::console.imguiWindow();
     // bloomSystem .showImguiOptions();

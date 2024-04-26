@@ -6,6 +6,7 @@
 #include "../ECS/Raycasting/Collider.h"
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Colliders/SphereCollider.h"
+#include "ECS/SaveSystem/LevelSaving.h"
 
 void Scene::updateScene() {
     for (auto &&child: children) {
@@ -37,6 +38,15 @@ Entity *Scene::addEntity(Entity *parent, std::string name) {
 void Scene::showImGuiDetails(Camera *camera) {
 // Begin main window
     ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::MenuItem("Save")) {
+            LevelSaving::save();
+        }
+        if (ImGui::MenuItem("Load")) {
+            LevelSaving::load();
+        }
+        ImGui::EndMenuBar();
+    }
 
 // Provide the 'dockspace' into which other ImGui windows can be docked
     ImGuiID dockspace_id = ImGui::GetID("Scene");
