@@ -12,6 +12,7 @@
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
+#include "Chunk.h"
 
 class CollisionSystem;
 class Grid : public System{
@@ -25,6 +26,7 @@ public:
 
     //2D array of tiles
     std::vector<std::vector<Tile*>> gridArray;
+    std::vector<std::vector<Chunk>> chunkArray;
     Scene* scene;
     Vector3 Position;
     unsigned entityId = (unsigned)-1;
@@ -53,6 +55,11 @@ public:
     Tile* getTileAt(int x, int z);
     Tile* getTileAt(Vector2Int index);
 
+    //get the tile at a specific index
+    Chunk* getChunkAt(int x, int z);
+    Chunk* getChunkAt(Vector2Int index);
+    
+    
     //get the tile at a specific world position
     [[nodiscard]] const glm::vec3 GridToWorldPosition(Vector2Int index) const;
     [[nodiscard]] const glm::vec3 GridToWorldPosition(int x, int z) const;
@@ -62,9 +69,7 @@ public:
 
     //loads and distributes the tile entities in world space
     void LoadTileEntities(float scale, CollisionSystem *collisionSystem);
-
-    void SetUpWallData();
-
+    
     void DestroyWallsOnTile(Vector2Int tileIndex);
 
     void ClearAllWallData();

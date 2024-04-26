@@ -58,6 +58,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
 #include "ECS/SaveSystem/LevelSaving.h"
+#include "ECS/LevelGenerator/LevelGenerator.h"
 
 #pragma endregion Includes
 
@@ -395,13 +396,14 @@ void init_systems() {
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
     MaterialPhong materialPhong = MaterialPhong(myColor);
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
                           vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
     ztgk::game::cube_model = cubeModel;
+    wireRenderer.boxModel = cubeModel;
+    wireRenderer.Innit();
 
     hud.init();
     scene.systemManager.addSystem(&hud);
@@ -643,10 +645,10 @@ void render() {
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
 
-    renderSystem.DrawScene(&phongPipeline.phongShader);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
-//    wireRenderer.DrawColliders();
-//    wireRenderer.DrawRays();
+    renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
+    wireRenderer.DrawColliders();
+    wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -698,6 +700,58 @@ void imgui_render() {
         max_timestamp = 0;
         fps_min = 1000000;
         min_timestamp = 0;
+    }
+    ImGui::End();
+
+    static LevelGenerator::Config levelGenConfig {
+        .seed {},
+        .size {100, 100},
+        .wallThickness = 1.f,
+        .baseRadius = 4.5f,
+        .keyRadius = 4.f,
+        .pocketRadius = 2.5f,
+        .noiseImpact = 1.f,
+        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+        .extraPocketAttempts = 10000,
+        .keyEnemies = 3,
+        .minEnemies = 0,
+        .maxEnemies = 2,
+        .unitCount = 3,
+        .chestCount = 10,
+    };
+    static char seedString[64] = "";
+    ImGui::Begin("Level generator");
+    ImGui::InputText("Seed (empty = random)", seedString, std::size(seedString));
+    ImGui::SliderFloat("Wall thickness", &levelGenConfig.wallThickness, 0.f, 20.f);
+    ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Noise impact", &levelGenConfig.noiseImpact, 0.f, 10.f);
+    ImGui::SliderInt("Enemies in ore room", &levelGenConfig.keyEnemies, 0, 20);
+    ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
+    ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
+    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 10);
+    ImGui::SliderInt("Chest count", &levelGenConfig.chestCount, 0, 30);
+    if (ImGui::Button("Generate")) {
+        spdlog::trace("Generating level");
+        std::string_view sv = seedString;
+        if (sv.empty()) {
+            levelGenConfig.seed = pcgRandomSeed();
+        } else {
+            bool isRealSeed = sv.size() == 32 && std::all_of(sv.begin(), sv.end(), [](char c) {
+                return std::isxdigit(static_cast<unsigned char>(c));
+            });
+            if (isRealSeed) {
+                std::from_chars(sv.data(), sv.data() + 16, levelGenConfig.seed.first, 16);
+                std::from_chars(sv.data() + 16, sv.data() + 32, levelGenConfig.seed.second, 16);
+            } else {
+                std::hash<std::string_view> hash;
+                levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+            }
+        }
+        auto level = generateLevel(levelGenConfig);
+        std::ofstream("save.txt") << level;
+        spdlog::trace("New level saved to save.txt");
     }
     ImGui::End();
 
