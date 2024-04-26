@@ -59,6 +59,14 @@ public:
 
     bool isAlly;
     UnitStats baseStats;
+
+    // serializer
+    // only use this with serializer!
+    Unit() = default;
+    // completes the serialization started by the new entity func
+    void serializer_init(Grid * pGrid);
+    // partially sets up the required components, always call serializer_init after this, before returning to the main loop!!
+    static Entity * serializer_newUnitEntity(Scene * scene, const std::string & name);
 private:
     Vector2Int previousGridPosition;
 };

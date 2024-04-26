@@ -27,11 +27,9 @@ public:
     //2D array of tiles
     std::vector<std::vector<Tile*>> gridArray;
     std::vector<std::vector<Chunk>> chunkArray;
-    // todo setSize
-    // todo clearAll
-
     Scene* scene;
     Vector3 Position;
+    unsigned entityId = (unsigned)-1;
 
     // Constructors
     Grid() = default;
@@ -41,7 +39,17 @@ public:
     // Destructor
     ~Grid();
 
-    //Other methods
+    // save loading
+    // clears all entities, changes size, regenerates entities for size
+    void reinitWithSize(glm::ivec2 size);
+    // removes all related entities, used by reinit
+    void clear();
+    // generates empty tile entities, used by reinit
+    void GenerateTileEntities(float scale);
+
+    // initializes tile entities with the state loaded by the serializer, used by the serializer
+    void InitializeTileEntities();
+    // save loading
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);
@@ -64,6 +72,7 @@ public:
     
     void DestroyWallsOnTile(Vector2Int tileIndex);
 
+    void ClearAllWallData();
     void SetUpWalls();
     void SetUpWall(Tile* tile);
 
