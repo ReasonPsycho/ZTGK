@@ -69,9 +69,6 @@ void ztgk::tile_state_from_token(char token, Tile * tile) {
             tile->state = UNIT;
             break;
     }
-    
-    // todo remove this with vacant
-    tile->vacant = tile->state == FLOOR;
 }
 
 void LevelSaving::save(const std::string& path) {

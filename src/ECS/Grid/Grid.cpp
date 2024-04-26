@@ -225,7 +225,7 @@ void Grid::InitializeTileEntities() {
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
                 case WALL:
-
+                    tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
                     break;
             }
         }
@@ -247,7 +247,6 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
 
             } else {
                 tileEntity->getComponent<Tile>()->state = WALL;
-                tileEntity->getComponent<Tile>()->vacant = false;
                 tileEntity->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
 
             }
@@ -367,13 +366,14 @@ void Grid::SetUpWall(Tile *tile) {
         topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
         topMatrix = glm::rotate(topMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(topMatrix, 2, (isSurrounded ? 1 : 0), 0, 0)));
+
+        spdlog::debug("Setup wall::Tile x{} z{} state {}, SET {}", tile->index.x, tile->index.z, Tile::state_names[tile->state], isSurrounded);
     }
 }
 
 void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     Tile* currentTile = getTileAt(tileIndex);
     currentTile->state = FLOOR;
-    currentTile->vacant = true;
     vector<Tile*> neighbours;
 
     neighbours.push_back(getTileAt(tileIndex.x + 1, tileIndex.z));

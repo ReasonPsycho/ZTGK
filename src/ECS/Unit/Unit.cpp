@@ -21,7 +21,7 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->baseStats = baseStats;
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
-    grid->getTileAt(gridPosition)->vacant = false;
+    grid->getTileAt(gridPosition)->state = UNIT;
     UpdateStats();
 }
 
@@ -85,7 +85,7 @@ void Unit::showImGuiDetails(Camera *camera) {
 void Unit::Update() {
 
     if(hasMovementTarget){
-        if(!grid->getTileAt(movementTarget)->vacant){
+        if(!grid->getTileAt(movementTarget)->vacant()){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
             pathfinding.FindPath(gridPosition, movementTarget);
         }
@@ -95,8 +95,8 @@ void Unit::Update() {
 
 
     if (gridPosition != previousGridPosition) {
-        grid->getTileAt(previousGridPosition)->vacant = true;
-        grid->getTileAt(gridPosition)->vacant = false;
+        grid->getTileAt(previousGridPosition)->state = FLOOR;
+        grid->getTileAt(gridPosition)->state = UNIT;
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
@@ -116,7 +116,6 @@ void Unit::serializer_init(Grid * pGrid) {
     this->worldPosition = pGrid->GridToWorldPosition(gridPosition);
     this->pathfinding = AstarPathfinding(pGrid);
     this->previousGridPosition = gridPosition;
-    pGrid->getTileAt(gridPosition)->vacant = false;
     UpdateStats();
 }
 
