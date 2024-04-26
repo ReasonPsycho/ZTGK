@@ -257,7 +257,8 @@ int main(int, char **) {
         update();
 
         // OpenGL rendering code here
-        render();
+        if (!ztgk::game::pause_render)
+            render();
 
         // Draw ImGui
         imgui_begin();
@@ -399,11 +400,8 @@ void init_systems() {
     pbrprimitives.Init();
     MaterialPhong materialPhong = MaterialPhong(myColor);
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
-                          vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36)); 
-    
-    
-    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
                           vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
+    ztgk::game::cube_model = cubeModel;
     wireRenderer.boxModel = cubeModel;
     wireRenderer.Innit();
 
@@ -536,7 +534,7 @@ void load_units() {
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 //    playerUnit = scene.addEntity("Player2");
-//    playerUnit->addComponent(make_unique<Render>(cubeModel));
+//    playerUnit->addComponent(make_unique<Render>(cube_model));
 //    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
 //    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
 //    playerUnit->updateSelfAndChild();
@@ -550,7 +548,7 @@ void load_units() {
 //    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 //
 //    playerUnit = scene.addEntity("Player3");
-//    playerUnit->addComponent(make_unique<Render>(cubeModel));
+//    playerUnit->addComponent(make_unique<Render>(cube_model));
 //    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
 //    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
 //    playerUnit->updateSelfAndChild();
@@ -564,7 +562,7 @@ void load_units() {
 //    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 //
 //    playerUnit = scene.addEntity("Player4");
-//    playerUnit->addComponent(make_unique<Render>(cubeModel));
+//    playerUnit->addComponent(make_unique<Render>(cube_model));
 //    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
 //    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
 //    playerUnit->updateSelfAndChild();
@@ -705,15 +703,6 @@ void imgui_render() {
     }
     ImGui::End();
 
-    ImGui::Begin("Save test");
-    if (ImGui::Button("save")) {
-        LevelSaving::save();
-    }
-    if (ImGui::Button("load")) {
-        LevelSaving::load();
-    }
-    ImGui::End();
-
     static LevelGenerator::Config levelGenConfig {
         .seed {},
         .size {100, 100},
@@ -837,7 +826,7 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// glfw: whenever the window size changed (by OS or user reinitWithSize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -941,7 +930,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 void end_frame() {
-    // Poll and handle events (inputs, window resize, etc.)
+    // Poll and handle events (inputs, window reinitWithSize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
     // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
     // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.

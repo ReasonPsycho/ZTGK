@@ -23,6 +23,7 @@ class Camera;
 class Component {
 public:
     Component();
+    virtual ~Component() = default;
 
     std::string name;
     void setEntity(Entity* newParentEntity);

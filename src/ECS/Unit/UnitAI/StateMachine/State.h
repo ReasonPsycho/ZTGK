@@ -12,6 +12,7 @@ class Unit;
 
 class State {
 public:
+    virtual ~State() = default;
 
      Unit* unit;
      Grid* grid;

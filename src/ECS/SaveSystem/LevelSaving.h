@@ -24,7 +24,7 @@ namespace ztgk {
     const static char TOKEN_ENEMY_BASIC = 'x';
 
     char tile_state_to_token(TileState state, TileStateData data = {});
-    void tile_init_from_token(char token, Tile * tile);
+    void tile_state_from_token(char token, Tile * tile);
 }
 
 struct LevelSaving {

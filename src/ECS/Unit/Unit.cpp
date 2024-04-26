@@ -6,6 +6,10 @@
 
 #include <utility>
 #include "UnitSystem.h"
+#include "ECS/Utils/Globals.h"
+#include "ECS/Raycasting/CollisionSystem.h"
+#include "ECS/Unit/UnitAI/UnitAI.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 
 Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
     this->name = std::move(name);
@@ -17,10 +21,8 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->baseStats = baseStats;
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
-    grid->getTileAt(gridPosition)->vacant = false;
+    grid->getTileAt(gridPosition)->state = UNIT;
     UpdateStats();
-
-    //unitSystem->addComponent(this);
 }
 
 Unit::~Unit() {
@@ -32,7 +34,7 @@ bool Unit::IsAlly() const {
 }
 
 void Unit::EquipItem(Item item, short slot) {
-    // assigning address of copied item, use reference or pointer
+    // todo assigning address of copied item, take by reference or pointer instead
     equipment.equipItem(&item, slot);
     UpdateStats();
 }
@@ -83,7 +85,7 @@ void Unit::showImGuiDetails(Camera *camera) {
 void Unit::Update() {
 
     if(hasMovementTarget){
-        if(!grid->getTileAt(movementTarget)->vacant){
+        if(!grid->getTileAt(movementTarget)->vacant()){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
             pathfinding.FindPath(gridPosition, movementTarget);
         }
@@ -93,11 +95,38 @@ void Unit::Update() {
 
 
     if (gridPosition != previousGridPosition) {
-        grid->getTileAt(previousGridPosition)->vacant = true;
-        grid->getTileAt(gridPosition)->vacant = false;
+        grid->getTileAt(previousGridPosition)->state = FLOOR;
+        grid->getTileAt(gridPosition)->state = UNIT;
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
 
     previousGridPosition = gridPosition;
+}
+
+void Unit::serializer_init(Grid * pGrid) {
+    auto playerUnit = getEntity();
+    auto stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState(pGrid);
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    // the rest is taken care of by the serializer, all we set here are extra assignments that aren't just a param copy (except for the pGrid ptr)
+    this->grid = pGrid;
+    this->worldPosition = pGrid->GridToWorldPosition(gridPosition);
+    this->pathfinding = AstarPathfinding(pGrid);
+    this->previousGridPosition = gridPosition;
+    UpdateStats();
+}
+
+Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) {
+    auto playerUnit = scene->addEntity(name);
+    playerUnit->addComponent(make_unique<Render>(ztgk::game::cube_model));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    playerUnit->addComponent(make_unique<Unit>());
+    return playerUnit;
 }
