@@ -26,13 +26,13 @@ enum TileState {
     ORE,
     CORE,   // washing machine
     UNIT,
-    state_count
+    state_count // for ImGui
 };
 // initializer list
 #define TILE_STATE_NAMES { "FLOOR", "WALL", "CHEST", "ORE", "CORE", "UNIT" }
 
 struct TileStateData {
-    unsigned unitId = (unsigned)-1;
+    // this is only necessary if items are serialized as numbers, if they're saved in the node instead it can be loaded straight into the relevant entity
     unsigned chestItemTypeId = (unsigned)-1;
 };
 

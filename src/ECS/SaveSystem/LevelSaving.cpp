@@ -39,7 +39,7 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
     }
 }
 
-void ztgk::tile_init_from_token(char token, Tile * tile) {
+void ztgk::tile_state_from_token(char token, Tile * tile) {
     switch (token) {
         default:
         case TOKEN_ERROR:
@@ -54,7 +54,7 @@ void ztgk::tile_init_from_token(char token, Tile * tile) {
             break;
         case TOKEN_TREASURE_CHEST:
             tile->state = CHEST;
-            // todo itemId
+            // todo itemTypeId, once relevant
             break;
         case TOKEN_CORE:
             tile->state = CORE;
@@ -62,10 +62,11 @@ void ztgk::tile_init_from_token(char token, Tile * tile) {
         case TOKEN_ORE:
             tile->state = ORE;
             break;
-        case TOKEN_ENEMY_BASIC: // todo enemy types
+        case TOKEN_ENEMY_BASIC:
         case TOKEN_PLAYER:
+            // tile doesn't hold any unit reference anymore (ID serialization is unreliable, some other type of manually assigned ID would be necessary)
+            //  todo if there are other tokens for unit types, add them here, tile is unaware of any specifics about the unit standing on it
             tile->state = UNIT;
-            // todo unitId
             break;
     }
     
@@ -74,7 +75,7 @@ void ztgk::tile_init_from_token(char token, Tile * tile) {
 }
 
 void LevelSaving::save(const std::string& path) {
-    auto thr = std::thread([path](){
+//    auto thr = std::thread([path](){
         auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
 
         spdlog::trace(std::format("Saving to {}", path));
@@ -124,22 +125,24 @@ void LevelSaving::save(const std::string& path) {
         spdlog::trace("Writing node");
         out << node;
         spdlog::trace("Save complete");
-    });
-    thr.detach();
+//    });
+//    thr.detach();
 }
 
 void LevelSaving::load(const std::string& path) {
-    auto thr = std::thread([path](){
+//    auto thr = std::thread([path](){
+//        ztgk::game::pause_render = true;
         spdlog::trace(std::format("Loading level from {}", path));
         auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
 
         auto node = YAML::LoadFile(path);
-        spdlog::trace("Setting grid dimensions");
-        grid->width = node["grid"]["width"].as<int>();
-        grid->height = node["grid"]["height"].as<int>();
+        spdlog::trace("Clearing grid");
+        grid->ClearAllWallData();
+        spdlog::trace("Re-generating grid entities");
+        grid->reinitWithSize({node["grid"]["width"].as<int>(), node["grid"]["height"].as<int>()});
 
-        spdlog::trace("Reading layout");
-        int x = 0, z = 0;
+        spdlog::trace("Reading grid layout to tile state");
+        int z = 0;
         auto in = std::ifstream(path);
         std::string line;
         bool read = false;
@@ -151,30 +154,39 @@ void LevelSaving::load(const std::string& path) {
             if ( !read ) continue;
 
             line = line.substr(line.find_first_not_of(TOKEN_LAYOUT_LINE));
+            int x = 0;
             for (char token : line) {
                 if ( x >= grid->width ) break;
                 auto tile = grid->getTileAt(x, z);
 
-                tile_init_from_token(token, tile);
+                tile_state_from_token(token, tile);
                 ++x;
-                if ( x == grid->width ) x = 0;
             }
 
             ++z;
         }
 
+        spdlog::trace("Initializing tiles with loaded state");
+        grid->InitializeTileEntities();
+        grid->SetUpWalls();
+
         spdlog::trace("Reading node");
         auto units = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
-        for ( auto unode : node["units"] ) {
-// todo newUnit
-// todo grid methods
+        if (!units.empty()) {
+            spdlog::warn("Units already existing! Aborting!");
+            return;
         }
-        // todo
+        spdlog::trace("Loading unit entities");
+        for ( auto unode : node["allies"] ) {
+            auto name = unode[nameof(quote(Entity::name))].as<std::string>();
 
-//        spdlog::trace("Generating entities");
-//        grid->LoadTileEntities(1.0f, ztgk::game::scene->systemManager.getSystem<CollisionSystem>());
+            auto entity = Unit::serializer_newUnitEntity(ztgk::game::scene, name);
+            YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
+        }
+        // todo chests and stuff, once relevant
+
         spdlog::trace("Finished loading");
-
-    });
-    thr.detach();
+//        ztgk::game::pause_render = false;
+//    });
+//    thr.detach();
 }

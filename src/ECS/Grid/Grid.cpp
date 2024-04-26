@@ -9,6 +9,7 @@
 #include "ECS/Render/Primitives/PBRPrimitives.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Unit/Mining/IMineable.h"
+#include "ECS/Utils/Globals.h"
 
 Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position) {
     this->name = "Grid";
@@ -70,7 +71,7 @@ void Grid::reinitWithSize(glm::ivec2 size) {
     if ( entity != scene->getChildren().end() )
         (*entity)->Destroy();
 
-    LoadTileEntities(1.0f, scene->systemManager.getSystem<CollisionSystem>());
+    GenerateTileEntities(1.0f);
 }
 
 /**
@@ -171,6 +172,50 @@ void Grid::showImGuiDetails(Camera *camera) {
 
     ImGui::PopID();
 
+}
+
+void Grid::GenerateTileEntities(float scale) {
+    Entity *gridEntity = scene->addEntity("Grid Entity");
+    entityId = gridEntity->uniqueID;
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
+            tileEntity->addComponent(std::make_unique<Tile>(i, j));
+            tileEntity->transform.setLocalPosition(GridToWorldPosition(i, j));
+            tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
+
+            tileEntity->updateSelfAndChild();
+
+            tileEntity->addComponent(
+                    std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5, 0.5, 0.5), ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+            tileEntity->getComponent<BoxCollider>()->center =
+                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+        }
+    }
+}
+
+void Grid::InitializeTileEntities() {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            auto tile = getTileAt(i, j);
+
+            switch( tile->state ) {
+                // todo these once relevant
+                // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
+                default:
+                case FLOOR:
+                case CHEST:
+                case ORE:
+                case CORE:
+                case UNIT:
+                case state_count:   // keep this one empty or signal error, this is unreachable
+                    break;
+                case WALL:
+
+                    break;
+            }
+        }
+    }
 }
 
 void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {

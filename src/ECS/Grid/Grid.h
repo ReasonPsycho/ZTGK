@@ -37,11 +37,17 @@ public:
     // Destructor
     ~Grid();
 
-    // todo setSize
-    // todo clearAll
+    // save loading
+    // clears all entities, changes size, regenerates entities for size
     void reinitWithSize(glm::ivec2 size);
+    // removes all related entities, used by reinit
     void clear();
+    // generates empty tile entities, used by reinit
+    void GenerateTileEntities(float scale);
 
+    // initializes tile entities with the state loaded by the serializer, used by the serializer
+    void InitializeTileEntities();
+    // save loading
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);
