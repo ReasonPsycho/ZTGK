@@ -157,6 +157,7 @@ void LevelSaving::load(const std::string& path) {
                 auto tile = grid->getTileAt(x, z);
 
                 tile_state_from_token(token, tile);
+                spdlog::debug("LevelSaving::load::Tile x{} z{} state {}", tile->index.x, tile->index.z, Tile::state_names[tile->state]);
                 ++x;
             }
 
