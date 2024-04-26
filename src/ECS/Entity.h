@@ -91,6 +91,8 @@ public:
 
     unsigned uniqueID;     // Instance variable to store the unique ID for each object
 
+    bool removedChild = false;
+
 };
 
 
