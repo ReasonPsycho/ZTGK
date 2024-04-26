@@ -321,7 +321,7 @@ void Grid::SetUpWall(Tile *tile) {
     }
     tile->walls.clear();
     bool isSurrounded = true;
-    if (tile->state == FLOOR) {
+    if (tile->state != WALL) {
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
         floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
         floorMatrix = glm::rotate(floorMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
