@@ -27,7 +27,9 @@ State *IdleState::RunCurrentState() {
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
-            return this;
+            moveState = new MovementState(grid);
+            moveState->unit = unit;
+            return moveState;
         }
     }
 
@@ -56,5 +58,6 @@ bool IdleState::isTargetInRange() {
 
 IdleState::IdleState(Grid *grid) {
     this->grid = grid;
+    this->name = "Idle";
 
 }

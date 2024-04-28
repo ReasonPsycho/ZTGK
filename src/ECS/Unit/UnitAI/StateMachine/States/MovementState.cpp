@@ -96,5 +96,6 @@ bool MovementState::isTargetInRange() {
 
 MovementState::MovementState(Grid *grid) {
     this->grid = grid;
+    this->name = "Movement";
 
 }
