@@ -593,7 +593,6 @@ void load_units() {
 //    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
 //    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-
 }
 void init_imgui() {
     // Setup Dear ImGui binding
@@ -941,6 +940,10 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
                     spdlog::info("Mining target set");
                 }
                 else{
+                    unit->hasMiningTarget = false;
+                    unit->miningTarget = nullptr;
+                    unit->hasCombatTarget = false;
+                    unit->combatTarget = nullptr;
                     unit->hasMovementTarget = true;
                     unit->pathfinding.path.clear();
                     unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
