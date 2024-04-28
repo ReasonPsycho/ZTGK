@@ -21,6 +21,8 @@ public:
     MiningState* miningState;
     IdleState* idleState;
 
+    bool isAttackOnCooldown();
+
 private:
     void AttackTarget();
 };

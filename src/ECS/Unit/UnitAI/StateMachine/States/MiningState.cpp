@@ -78,5 +78,6 @@ void MiningState::Mine() {
 
 MiningState::MiningState(Grid *grid) {
     this->grid = grid;
+    this->name = "Mining";
 }
 

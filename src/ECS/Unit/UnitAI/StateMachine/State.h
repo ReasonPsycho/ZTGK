@@ -13,6 +13,7 @@ class Unit;
 class State {
 public:
 
+     string name;
      Unit* unit;
      Grid* grid;
      virtual State* RunCurrentState() = 0;
