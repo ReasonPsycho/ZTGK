@@ -429,25 +429,25 @@ void load_enteties() {
 
 
     gameObject = scene.addEntity("Wall");;
-    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
+    gameObject->transform.setLocalPosition(glm::vec3(100,50,0));
     gameObject->transform.setLocalScale(glm::vec3(100,50,10));
     gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
     gameObject = scene.addEntity("Wall1");;
-    gameObject->transform.setLocalPosition(glm::vec3(0,50,-100));
+    gameObject->transform.setLocalPosition(glm::vec3(100,50,200));
     gameObject->transform.setLocalScale(glm::vec3(100,50,10));
     gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
-    
+//
     gameObject = scene.addEntity("Wall2");;
-    gameObject->transform.setLocalPosition(glm::vec3(125,50,0));
+    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
     gameObject->transform.setLocalScale(glm::vec3(100,50,10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
-
+//
     gameObject = scene.addEntity("Wall3");;
-    gameObject->transform.setLocalPosition(glm::vec3(-100,50,0));
+    gameObject->transform.setLocalPosition(glm::vec3(200,50,100));
     gameObject->transform.setLocalScale(glm::vec3(100,50,10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;

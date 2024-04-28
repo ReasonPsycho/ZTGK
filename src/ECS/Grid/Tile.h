@@ -3,8 +3,8 @@
 
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Component.h"
-#include "ECS/Unit/Unit.h"
 
+class Unit;
 
 struct WallData {
     glm::mat4x4 matrix;
