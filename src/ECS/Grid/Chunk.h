@@ -21,12 +21,12 @@ public:
     const int height = 10;
     Vector2Int index{};
 
-    std::vector<WallData> wallDataArray;
+    std::vector<std::unique_ptr<WallData>> wallDataArray;
 
 
     glm::vec3 chunkRealPosition();
     AABB getBoundingVolume(); //TODO cash it somewhere
-    WallData *addWallData(WallData wallData);
+    WallData *addWallData(std::unique_ptr<WallData>  wallData);
     void removeWallData(WallData *wallData);
     
     Grid *grid;
