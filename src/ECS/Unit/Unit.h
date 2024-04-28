@@ -24,6 +24,8 @@ public:
 
     Vector2Int gridPosition;
     glm::vec3 worldPosition;
+    float rotation = 0;
+    float currentRotation = 0;
 
     State* currentState;
     AstarPathfinding pathfinding;
