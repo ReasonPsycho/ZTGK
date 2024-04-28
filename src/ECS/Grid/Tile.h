@@ -3,6 +3,7 @@
 
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Component.h"
+#include "ECS/Unit/Unit.h"
 
 
 struct WallData {
@@ -43,6 +44,7 @@ public:
     bool vacant;
     TileState state;
     TileStateData stateData;
+    Unit* unit = nullptr;
 
     // Constructors
     explicit Tile(Vector2Int index, bool vacant = true, std::string name = "Tile");

@@ -62,6 +62,8 @@ bool CombatState::isTargetInRange() {
 }
 
 void CombatState::AttackTarget() {
+    if(isAttackOnCooldown()) return;
+
     if (unit-> combatTarget == nullptr) {
         unit->hasCombatTarget = false;
         return;
@@ -71,10 +73,38 @@ void CombatState::AttackTarget() {
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;
     }
-    //TODO: attack target
-    return;
+
+    auto target = unit->combatTarget;
+    float totalAttackDamage = unit->stats.attackDamage;
+    if(unit->equipment.item1 != nullptr){
+        totalAttackDamage += unit->equipment.item1->stats.addAttackDamage;
+    }
+    if(unit->equipment.item2 != nullptr){
+        totalAttackDamage += unit->equipment.item2->stats.addAttackDamage;
+    }
+
+    unit->attackCooldown = 0;
+    target->stats.health -= totalAttackDamage;
+
+
+    if(target->stats.health <= 0){
+        unit->hasCombatTarget = false;
+        unit->combatTarget = nullptr;
+    }
 }
+
+
+
 
 CombatState::CombatState(Grid *grid) {
     this->grid = grid;
+}
+
+bool CombatState::isAttackOnCooldown() {
+    float time = unit->attackCooldown;
+
+    if(time > 1 / unit->stats.attackSpeed){
+        return false;
+    }
+    return true;
 }

@@ -43,6 +43,9 @@ public:
     IMineable* miningTarget;
     UnitStats stats;
 
+    float attackCooldown = 0;
+
+
     Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly, UnitSystem* unitSystem);
     ~Unit();
 
@@ -59,6 +62,8 @@ public:
 
     bool isAlly;
     UnitStats baseStats;
+
+    Unit* findEnemy();
 private:
     Vector2Int previousGridPosition;
 };
