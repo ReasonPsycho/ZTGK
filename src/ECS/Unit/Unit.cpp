@@ -19,6 +19,7 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
     grid->getTileAt(gridPosition)->vacant = false;
+    grid->getTileAt(gridPosition)->unit = this;
     UpdateStats();
 
     //unitSystem->addComponent(this);
@@ -93,6 +94,12 @@ void Unit::Update() {
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
 
     combatTarget = findEnemy();
+    if(combatTarget != nullptr){
+        hasCombatTarget = true;
+    }
+    else{
+        hasCombatTarget = false;
+    }
 
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->vacant = true;
@@ -121,7 +128,5 @@ Unit *Unit::findEnemy() {
             }
         }
     }
-
-
     return nullptr;
 }

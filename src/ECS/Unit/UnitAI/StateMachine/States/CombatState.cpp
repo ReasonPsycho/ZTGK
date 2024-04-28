@@ -85,7 +85,7 @@ void CombatState::AttackTarget() {
 
     unit->attackCooldown = 0;
     target->stats.health -= totalAttackDamage;
-
+    spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
 
     if(target->stats.health <= 0){
         unit->hasCombatTarget = false;
@@ -98,6 +98,7 @@ void CombatState::AttackTarget() {
 
 CombatState::CombatState(Grid *grid) {
     this->grid = grid;
+    name = "Combat";
 }
 
 bool CombatState::isAttackOnCooldown() {

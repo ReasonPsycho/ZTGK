@@ -535,6 +535,22 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
+    Entity* enemyUnit = scene.addEntity("Enemy1");
+    enemyUnit->addComponent(make_unique<Render>(cubeModel));
+    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    enemyUnit->updateSelfAndChild();
+    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 20, 3};
+    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), stats, false, &unitSystem));
+    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState(&grid);
+    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
+    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
+
+
+
 //    playerUnit = scene.addEntity("Player2");
 //    playerUnit->addComponent(make_unique<Render>(cubeModel));
 //    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -902,7 +918,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
         std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        if (ray->getHitEntity() != nullptr&& ray->getHitEntity()->getComponent<Unit>() != nullptr){
+        if (ray->getHitEntity() != nullptr&& ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly){
             if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
                 unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>() );
             } else {
