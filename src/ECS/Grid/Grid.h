@@ -74,7 +74,9 @@ public:
 
     void ClearAllWallData();
     void SetUpWalls();
+    void ClearWalls();
     void SetUpWall(Tile* tile);
+    void ClearWall(Tile* tile);
 
     //system methods
     void addComponent(void *component) override;

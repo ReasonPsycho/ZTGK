@@ -312,20 +312,14 @@ void Grid::SetUpWall(Tile *tile) {
     Chunk* wallChunk = getChunkAt(tile->index);
     float translateLength = tileSize / 2.0f;
     bool isDiagonal = ((tile->index.x + tile->index.z) % 2 == 0);
-    while (!tile->walls.empty()) {
-        // Remove the wall data using the last element of the vector
-        wallChunk->removeWallData(tile->walls.back());
-        // Remove the last element from the vector
-        tile->walls.pop_back();
-    }
-    tile->walls.clear();
+    ClearWall(tile);
     bool isSurrounded = true;
-    if (tile->state != WALL) {
+    if (tile->state == FLOOR) {
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
         floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
         floorMatrix = glm::rotate(floorMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(floorMatrix, (isDiagonal ? 0 : 1), 0, 0, 0)));
-    } else {
+    } else if (tile->state == WALL) {
         Tile *northNeighbour = getTileAt(tile->index.x + 1, tile->index.z);
         if (northNeighbour == nullptr || northNeighbour->state != WALL) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
@@ -414,6 +408,28 @@ void Grid::ClearAllWallData() {
             auto tile = gridArray[i][j];
             if ( tile != nullptr )
                 tile->walls.clear();
+        }
+    }
+}
+
+void Grid::ClearWall(Tile *tile) {
+    Chunk* wallChunk = getChunkAt(tile->index);
+    while (!tile->walls.empty()) {
+        // Remove the wall data using the last element of the vector
+        wallChunk->removeWallData(tile->walls.back());
+        // Remove the last element from the vector
+        tile->walls.pop_back();
+    }
+    tile->walls.clear();
+}
+
+void Grid::ClearWalls() {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            Tile *currentTile = getTileAt(i, j);
+            if (currentTile != nullptr)
+                ClearWall(
+                        currentTile);
         }
     }
 }

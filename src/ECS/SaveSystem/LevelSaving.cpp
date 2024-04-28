@@ -134,6 +134,7 @@ void LevelSaving::load(const std::string& path) {
 
         auto node = YAML::LoadFile(path);
         spdlog::trace("Clearing grid");
+        grid->ClearWalls();
         grid->ClearAllWallData();
         spdlog::trace("Re-generating grid entities");
         grid->reinitWithSize({node["grid"]["width"].as<int>(), node["grid"]["height"].as<int>()});
