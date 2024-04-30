@@ -85,6 +85,8 @@ public:
     int getNumComponentTypes() override;
     void showImGuiDetails(Camera *camera) override;
 
+    bool isInBounds(Vector2Int anInt);
+
 private:
     float offsetX = 0;
     float offsetZ = 0;

@@ -24,6 +24,8 @@ public:
 
     Vector2Int gridPosition;
     glm::vec3 worldPosition;
+    float rotation = 0;
+    float currentRotation = 0;
 
     State* currentState;
     AstarPathfinding pathfinding;
@@ -43,6 +45,9 @@ public:
     IMineable* miningTarget;
     UnitStats stats;
 
+    float attackCooldown = 0;
+
+
     Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly, UnitSystem* unitSystem);
     ~Unit();
 
@@ -59,6 +64,8 @@ public:
 
     bool isAlly;
     UnitStats baseStats;
+
+    Unit* findEnemy();
 
     // serializer
     // only use this with serializer!

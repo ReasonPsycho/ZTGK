@@ -4,6 +4,7 @@
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Component.h"
 
+class Unit;
 
 struct WallData {
     glm::mat4x4 matrix;
@@ -42,6 +43,7 @@ public:
     std::vector<WallData*> walls;
     TileState state;
     TileStateData stateData;
+    Unit* unit = nullptr;
 
     // Constructors
     explicit Tile(Vector2Int index, TileState state = FLOOR, std::string name = "Tile");

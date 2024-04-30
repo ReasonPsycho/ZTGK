@@ -10,6 +10,7 @@
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "ECS/Utils/Time.h"
 
 Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
     this->name = std::move(name);
@@ -22,6 +23,7 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
     grid->getTileAt(gridPosition)->state = UNIT;
+    grid->getTileAt(gridPosition)->unit = this;
     UpdateStats();
 }
 
@@ -93,15 +95,49 @@ void Unit::Update() {
 
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
 
+    combatTarget = findEnemy();
+    if(combatTarget != nullptr){
+        hasCombatTarget = true;
+    }
+    else{
+        hasCombatTarget = false;
+    }
 
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->state = FLOOR;
         grid->getTileAt(gridPosition)->state = UNIT;
+        grid->getTileAt(previousGridPosition)->unit = nullptr;
+        grid->getTileAt(gridPosition)->unit = this;
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
+    if(currentRotation > rotation){
+        currentRotation -= 0.1f;
+    }
+    if(currentRotation < rotation){
+        currentRotation += 0.1f;
+    }
+    getEntity()->transform.setLocalRotation(glm::vec3(0, currentRotation, 0));
 
     previousGridPosition = gridPosition;
+
+    attackCooldown += Time::Instance().DeltaTime();
+}
+
+Unit *Unit::findEnemy() {
+    int sightRange = 5 + stats.range;
+    for (int i = -sightRange; i < sightRange; i++) {
+        for (int j = -sightRange; j < sightRange; j++) {
+            Vector2Int pos = Vector2Int(gridPosition.x + i, gridPosition.z + j);
+            if (grid->isInBounds(pos)) {
+                Tile *tile = grid->getTileAt(pos);
+                if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
+                    return tile->unit;
+                }
+            }
+        }
+    }
+    return nullptr;
 }
 
 void Unit::serializer_init(Grid * pGrid) {

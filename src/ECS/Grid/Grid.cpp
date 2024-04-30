@@ -433,6 +433,10 @@ void Grid::ClearWalls() {
         }
     }
 }
+bool Grid::isInBounds(Vector2Int anInt) {
+    return anInt.x >= 0 && anInt.x < width && anInt.z >= 0 && anInt.z < height;
+}
+
 
 
 

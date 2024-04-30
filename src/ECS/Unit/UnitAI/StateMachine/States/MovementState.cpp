@@ -78,10 +78,14 @@ void MovementState::MoveOnPath() {
             }
         }
         else{
+            float rotationAngle = atan2(nextTileWorldPosition.x - unit->worldPosition.x, nextTileWorldPosition.z - unit->worldPosition.z);
+
+
             Vector3 worldPos = Vector3(unit->worldPosition.x, unit->worldPosition.y, unit->worldPosition.z);
             Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, nextTileWorldPosition.y, nextTileWorldPosition.z);
             Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, unit->stats.movementSpeed * Time::Instance().DeltaTime());
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
+            unit->rotation = rotationAngle;
         }
     }
 }
@@ -92,5 +96,6 @@ bool MovementState::isTargetInRange() {
 
 MovementState::MovementState(Grid *grid) {
     this->grid = grid;
+    this->name = "Movement";
 
 }
