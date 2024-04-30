@@ -55,7 +55,7 @@ public:
 
     // Methods
     [[nodiscard]] bool vacant() const { return state == FLOOR; };
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
 };

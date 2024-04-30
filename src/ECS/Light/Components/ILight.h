@@ -31,7 +31,7 @@ public:
     enum LightType lightType;
 
 
-    virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
+    virtual void showImGuiDetailsImpl(Camera *camera) = 0; // Pure virtual function
 
     virtual void
     SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,

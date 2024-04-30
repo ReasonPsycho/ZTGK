@@ -160,7 +160,7 @@ void LightSystem::PushDepthMapsToShader(Shader *shader) {
     glUniform1i(glGetUniformLocation(shader->ID, "cubeShadowMaps"),CUBE_SHADOW_INDEX);
 }
 
-void LightSystem::Update(double deltaTime) {
+void LightSystem::UpdateImpl() {
 
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
@@ -248,7 +248,7 @@ void LightSystem::addComponent(void *component) {
     lights.push_back(light);
 }
 
-void LightSystem::showImGuiDetails(Camera *camera){
+void LightSystem::showImGuiDetailsImpl(Camera *camera){
 
 }
 

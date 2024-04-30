@@ -32,7 +32,7 @@ public:
     void Init();
 
     void PushToSSBO();
-    void Update(double deltaTime);
+    void UpdateImpl() override;
 
     void GenerateShadowBuffers();
 
@@ -45,7 +45,7 @@ public:
     void removeComponent(void* component) override;
     void PushDepthMapsToShader(Shader *shader);
 
-    void showImGuiDetails(Camera *camera);
+    void showImGuiDetailsImpl(Camera *camera);
 
     //Vectors
     std::vector<ILight *> lights;

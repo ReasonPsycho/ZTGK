@@ -33,7 +33,7 @@ struct Sprite : public AHUDComponent {
     // editor
     static const unsigned editor_path_len = 100;
     char editor_path[editor_path_len];
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
 private:
     void loadColor();

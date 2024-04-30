@@ -7,8 +7,8 @@
 #include "ECS/Entity.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 
-void BoxCollider::showImGuiDetails(Camera *camera) {
-//    Collider::showImGuiDetails(camera);
+void BoxCollider::showImGuiDetailsImpl(Camera *camera) {
+//    Collider::showImGuiDetailsImpl(camera);
 //
     ImGui::InputFloat3("Center:",glm::value_ptr(center)) ;
     ImGui::InputFloat3("Size: ", glm::value_ptr(size));

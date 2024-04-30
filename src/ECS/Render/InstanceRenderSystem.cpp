@@ -25,13 +25,12 @@ void InstanceRenderSystem::removeComponent(void *component) {
 
 }
 
-void InstanceRenderSystem::showImGuiDetails(Camera *camera) {
-    ImGui::Checkbox("Update WallData",&updateWallData);
+void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Wall amount %d",wallData.size());
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
-  //it must be here bcs if we mine wall we need to update walls
+  //it must be here bcs if we mine wall we need to UpdateImpl walls
   //Innit();
   
     PushToSSBO(camera);
@@ -52,8 +51,20 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
     }
 }
 
-void InstanceRenderSystem::Update() {
-    
+void InstanceRenderSystem::UpdateImpl() {
+    Frustum frustum =  createFrustumFromCamera(*camera);
+    wallData.clear();
+    Grid* grid = systemManager->getSystem<Grid>();
+    for (int x = 0; x < grid->width/10; ++x) {
+        for (int z = 0; z < grid->height/10; ++z) {
+            Chunk * chunk = &grid->chunkArray[x][z];
+            if(chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)){
+                for (auto &wallDataPtr : grid->chunkArray[x][z].wallDataArray) {
+                    wallData.push_back(*wallDataPtr);
+                }
+            }
+        }
+    }
 }
 
 void InstanceRenderSystem::Innit() {
@@ -89,26 +100,13 @@ void InstanceRenderSystem::Innit() {
     glGenBuffers(1, &wallDataBufferID);
 }
 
-InstanceRenderSystem::InstanceRenderSystem() {
+InstanceRenderSystem::InstanceRenderSystem(Camera * camera): camera(camera) {
     name = "InstanceRenderSystem";
 }
 
 void InstanceRenderSystem::PushToSSBO(Camera* camera) {
 
-   Frustum frustum =  createFrustumFromCamera(*camera);
-   if(updateWallData){
-       wallData.clear();
-       Grid* grid = systemManager->getSystem<Grid>();
-       for (int x = 0; x < grid->width/10; ++x) {
-           for (int z = 0; z < grid->height/10; ++z) {
-               Chunk * chunk = &grid->chunkArray[x][z];
-               if(chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)){
-                   for (auto &wallDataPtr : grid->chunkArray[x][z].wallDataArray) {
-                       wallData.push_back(*wallDataPtr);
-                   }
-               }
-           }
-       }
+
 
 
        glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
@@ -117,7 +115,7 @@ void InstanceRenderSystem::PushToSSBO(Camera* camera) {
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), wallData.data(),
                  GL_STREAM_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, wallDataBufferBindingPoint, wallDataBufferID);
-   }
+   
    
 }
 

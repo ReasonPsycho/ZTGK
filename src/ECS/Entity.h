@@ -39,10 +39,10 @@ public:
     void removeChild(Entity *child);
     void Destroy();
     
-    //Update transform if it was changed
+    //UpdateImpl transform if it was changed
     void updateSelfAndChild();
 
-    //Force update of transform even if local space don't change
+    //Force UpdateImpl of transform even if local space don't change
     void forceUpdateSelfAndChild();
 
 

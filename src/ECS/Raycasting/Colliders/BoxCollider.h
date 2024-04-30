@@ -31,7 +31,7 @@ public:
     // Debug methods
 
     // ImGui methods
-    void showImGuiDetails(Camera* camera) override;
+    void showImGuiDetailsImpl(Camera* camera) override;
 
     // Other methods
     void update();

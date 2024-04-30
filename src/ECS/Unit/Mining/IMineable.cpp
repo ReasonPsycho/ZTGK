@@ -26,11 +26,11 @@ void IMineable::Mine() {
     }
 }
 
-void IMineable::Update() {
+void IMineable::UpdateImpl() {
 
 }
 
-void IMineable::showImGuiDetails(Camera *camera) {
+void IMineable::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Time to mine: %f", timeToMine);
     ImGui::Text("Time to mine remaining: %f", timeToMineRemaining);
 

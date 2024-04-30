@@ -66,7 +66,7 @@ public:
 
     SpotLightData data;
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
     
     void Innit(int width, int height, int index) override;
 

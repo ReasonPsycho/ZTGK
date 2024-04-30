@@ -23,7 +23,7 @@ Tile::Tile(int index_x, int index_z, TileState state, std::string name) {
     this->name = std::move(name);
 }
 
-void Tile::showImGuiDetails(Camera *camera) {
+void Tile::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Index: (%d, %d)", index.x, index.z);
     ImGui::Text("%s", std::format("Vacant? {}", vacant() ? "YES" : "NO").c_str());
 

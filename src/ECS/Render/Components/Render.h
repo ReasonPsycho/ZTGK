@@ -8,6 +8,8 @@
 #include "ECS/Component.h"
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Render/FrustumCulling/BoundingVolume.h"
+#include <tracy/Tracy.hpp >
+
 
 class Render : public Component {
 public:
@@ -15,7 +17,7 @@ public:
     void draw(Shader &regularShader);
     void draw(Shader &regularShader,Frustum * frustum);
     void simpleDraw(Shader &regularShader);
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
 private:
     Model *pModel{};

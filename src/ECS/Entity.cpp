@@ -4,6 +4,8 @@
 
 #include "Entity.h"
 #include "Utils/Util.h"
+#include "tracy/Tracy.hpp"
+
 using namespace ztgk;
 
 Entity::Entity(Scene* scene, std::string name): uniqueID(id<ID_POOL_ENTITY>()), scene(scene) , name(name) {}
@@ -68,6 +70,7 @@ void Entity::removeChild(Entity *child) {
 }
 
 void Entity::showImGuiDetails(Camera *camera) {
+    ZoneTransientN(zoneName,(name).c_str(),true);
     Component* componentToDelete = nullptr;
     ImGui::PushID(uniqueID);
     ImGuiStorage* storage = ImGui::GetStateStorage();

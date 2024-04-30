@@ -116,7 +116,7 @@ void TextRenderer::render(Text * text) {
 
         float w = ch.Size.x * text->scale.x;
         float h = ch.Size.y * text->scale.y;
-        // update VBO for each character
+        // UpdateImpl VBO for each character
         float vertices[6][4] = {
                 xpos,     ypos + h, 0.0f, 0.0f,
                 xpos,     ypos,     0.0f, 1.0f,
@@ -128,7 +128,7 @@ void TextRenderer::render(Text * text) {
         };
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-        // update content of VBO memory
+        // UpdateImpl content of VBO memory
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);

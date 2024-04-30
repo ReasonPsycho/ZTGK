@@ -16,26 +16,25 @@
 
 class InstanceRenderSystem : public System {
 public:
-    InstanceRenderSystem();
+    InstanceRenderSystem(Camera * camera);
     void Innit();
     const std::type_index* getComponentTypes() override { return nullptr; };
     int getNumComponentTypes() override { return 0;};
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
     void DrawTiles(Shader* regularShader,Camera * camera);
     void PushToSSBO(Camera* camera);
-    void Update();
+    void UpdateImpl();
 
     Model* tileModel;
 private:
+    Camera * camera;
     GLuint wallDataBufferID;
     GLuint wallDataBufferBindingPoint = 6;
     GLuint tileTextureArray;
     GLuint tileTextureBindingPoint = 10;
     int numberOfTextures = 3;
-    
-    bool updateWallData = true;
     
     string tilePath =  "res/textures/tiles/Tile";
     

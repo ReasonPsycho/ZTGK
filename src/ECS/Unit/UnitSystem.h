@@ -16,9 +16,9 @@ public:
     const std::type_index *getComponentTypes() override;
     int getNumComponentTypes() override {return 1;};
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
-    void Update();
+    void UpdateImpl() override;
 
     void selectUnit(Unit* unit);
     void deselectUnit(Unit* unit);

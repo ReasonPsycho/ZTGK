@@ -21,9 +21,9 @@ public:
     ~IMineable() = default;
     void Mine();
 
-    void Update() override;
+    void UpdateImpl() override;
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
     float getTimeToMineRemaining() const {
         return timeToMineRemaining;

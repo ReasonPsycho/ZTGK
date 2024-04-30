@@ -83,7 +83,7 @@ public:
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override;
     int getNumComponentTypes() override;
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
     bool isInBounds(Vector2Int anInt);
 
@@ -91,6 +91,8 @@ private:
     float offsetX = 0;
     float offsetZ = 0;
 
+    bool showTilesInImgui = false;
+    
     std::array<std::type_index, 1> componentTypes = {
         std::type_index(typeid(Tile))
     };

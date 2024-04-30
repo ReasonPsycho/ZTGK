@@ -4,6 +4,8 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Utils/Util.h"
+#include "tracy/Tracy.hpp"
+
 using namespace ztgk;
 
 
@@ -23,4 +25,14 @@ bool Component::getIsDirty() {
 
 void Component::setEntity(Entity *newParentEntity) {
 parentEntity = newParentEntity;
+}
+
+void Component::showImGuiDetails(Camera *camera) {
+    ZoneTransientN(zoneName,(name).c_str(),true);
+    showImGuiDetailsImpl(camera);
+}
+
+void Component::Update() {
+    ZoneTransientN(zoneName,(name).c_str(),true);
+    UpdateImpl();
 }

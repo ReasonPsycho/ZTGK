@@ -92,7 +92,7 @@ SpotLight::SpotLight(SpotLightData data) : data(data) {
     lightType = Spot;
 }
 
-void SpotLight::showImGuiDetails(Camera *camera) {
+void SpotLight::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
     ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
         ImGui::InputFloat("Constant", &data.constant);

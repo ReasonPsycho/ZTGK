@@ -23,9 +23,7 @@ public:
     long long get_delta();
     long long update_delta();
 
-    void update() {
-        process_all();
-    }
+    void UpdateImpl() override;
     void process_one(long long delta_time);
     void process_all();
 
@@ -44,7 +42,7 @@ public:
 
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&component_types); };
     int getNumComponentTypes() override { return 1; };
-    void showImGuiDetails(Camera *camera);
+    void showImGuiDetailsImpl(Camera *camera);
 
 
     // editor

@@ -68,7 +68,7 @@ UnitStats Unit::GetBaseStats() {
     return this->baseStats;
 }
 
-void Unit::showImGuiDetails(Camera *camera) {
+void Unit::showImGuiDetailsImpl(Camera *camera) {
 
     ImGui::Text("Unit: %s", name.c_str());
     ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
@@ -84,7 +84,7 @@ void Unit::showImGuiDetails(Camera *camera) {
 
 }
 
-void Unit::Update() {
+void Unit::UpdateImpl() {
 
 
     if(hasMovementTarget){

@@ -121,7 +121,7 @@ void HUD::removeComponent(void *component) {
     }
 }
 
-void HUD::showImGuiDetails(Camera *camera) {
+void HUD::showImGuiDetailsImpl(Camera *camera) {
     if (ImGui::Button("Sort Z Depth"))
         sort_z();
     ImGui::SameLine();
@@ -144,7 +144,7 @@ void HUD::showImGuiDetails(Camera *camera) {
             for (auto & pair : sprites) {
                 for (auto & spr : sprites[pair.first]) {
                     if (ImGui::TreeNodeEx(std::format("ID {0}, '{1}'##Sprite{0}", spr->uniqueID, spr->editor_path).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
-                        spr->showImGuiDetails(camera);
+                        spr->showImGuiDetailsImpl(camera);
                         ImGui::TreePop();
                     }
                 }
@@ -155,7 +155,7 @@ void HUD::showImGuiDetails(Camera *camera) {
             for (auto & pair : texts) {
                 for (auto & txt : texts[pair.first]) {
                     if (ImGui::TreeNodeEx(std::format("ID {0}, '{1}'##Text{0}", txt->uniqueID, txt->content).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
-                        txt->showImGuiDetails(camera);
+                        txt->showImGuiDetailsImpl(camera);
                         ImGui::TreePop();
                     }
                 }

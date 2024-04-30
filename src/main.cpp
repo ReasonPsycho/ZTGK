@@ -189,7 +189,7 @@ PBRPrimitives pbrprimitives;
 LightSystem lightSystem(&camera, &scene);
 PhongPipeline phongPipeline;
 RenderSystem renderSystem;
-InstanceRenderSystem instanceRenderSystem;
+InstanceRenderSystem instanceRenderSystem(&camera);
 WireRenderer wireRenderer(&primitives, &camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
@@ -265,7 +265,7 @@ int main(int, char **) {
         // Process I/O operations here
         input();
 
-        // Update game objects' state here
+        // UpdateImpl game objects' state here
         update();
 
         // OpenGL rendering code here
@@ -302,7 +302,7 @@ int main(int, char **) {
 
 
         // End frame and swap buffers (double buffering)
-        file_logger->info("End frame");
+
         end_frame();
         
     }
@@ -649,14 +649,16 @@ void input() {
 void update() {
     ZoneScopedN("Update");
 
-    //update mouse position
+    //UpdateImpl mouse position
     mouseX = mouseio.MousePos.x;
     mouseY = mouseio.MousePos.y;
 
     scene.updateScene();
-    lightSystem.Update(deltaTime);
+    lightSystem.Update();
+    instanceRenderSystem.Update();
+    wireRenderer.Update();
 
-    signalQueue.update();
+    signalQueue.Update();
 
     unitSystem.Update();
 }

@@ -17,9 +17,9 @@ struct HUDRemapGroupsSignalData : public SignalData {
 
     // main ctor
     HUDRemapGroupsSignalData(bool all, unsigned componentId, hudcType componentType, unsigned oldGroup, unsigned newGroup, const std::string & message = "");
-    // update all ctor
+    // UpdateImpl all ctor
     explicit HUDRemapGroupsSignalData(const std::string & message = "");
-    // update one selected ctor
+    // UpdateImpl one selected ctor
     HUDRemapGroupsSignalData(unsigned componentID, hudcType componentType, unsigned oldGroup, unsigned newGroup, const std::string & message = "");
 
     [[nodiscard]] std::string to_string() const override {

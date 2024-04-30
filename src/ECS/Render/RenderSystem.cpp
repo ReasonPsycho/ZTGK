@@ -18,7 +18,7 @@ void RenderSystem::SimpleDrawScene(Shader *regularShader) {
     }
 }
 
-void RenderSystem::showImGuiDetails(Camera *camera) {
+void RenderSystem::showImGuiDetailsImpl(Camera *camera) {
 
 }
 

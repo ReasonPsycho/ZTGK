@@ -21,6 +21,10 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          toolset: 17.0
+      
       - name: Install vcpkg packages
         run: vcpkg integrate install
 

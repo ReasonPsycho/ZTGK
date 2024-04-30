@@ -7,8 +7,11 @@
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Colliders/SphereCollider.h"
 #include "ECS/SaveSystem/LevelSaving.h"
+#include "tracy/Tracy.hpp"
 
 void Scene::updateScene() {
+    ZoneScopedN("Update scene");
+
     for (auto &&child: children) {
         child->updateSelfAndChild();
     }
@@ -35,7 +38,9 @@ Entity *Scene::addEntity(Entity *parent, std::string name) {
     return parent->addChild(make_unique<Entity>(this, parent, name));
 }
 
-void Scene::showImGuiDetails(Camera *camera) {
+void Scene::showImGuiDetails(Camera *camera) {  
+    ZoneScopedN("ShowImGuiDetails Scene");
+
 // Begin main window
     ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
     if (ImGui::BeginMenuBar()) {

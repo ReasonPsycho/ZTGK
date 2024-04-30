@@ -14,7 +14,7 @@ Text::Text(const std::string &content, const glm::vec2 &pos, const glm::vec2 &sc
     strcpy_s(editor_font_buffer, font.c_str());
 }
 
-void Text::showImGuiDetails(Camera *camera) {
+void Text::showImGuiDetailsImpl(Camera *camera) {
     ImGui::DragFloat2("Pos", glm::value_ptr(pos));
     ImGui::DragFloat2("Scale", glm::value_ptr(scale), 0.01);
     ImGui::ColorEdit4("Color", glm::value_ptr(color));

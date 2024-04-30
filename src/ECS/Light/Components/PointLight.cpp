@@ -109,7 +109,7 @@ PointLight::PointLight(PointLightData data):
     lightType = Point;
 }
 
-void PointLight::showImGuiDetails(Camera *camera) {
+void PointLight::showImGuiDetailsImpl(Camera *camera) {
 
     ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
     ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));

@@ -9,7 +9,6 @@
 #include "ECS/Render/ModelLoading/Model.h"
 
 
-const char* const tracyFrameStart = "Frame start";
 
 namespace ztgk::game {
 
