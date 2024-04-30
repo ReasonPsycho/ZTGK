@@ -72,6 +72,8 @@ void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
 
 
     }
+    spdlog::error("PATHFINDING: No path found");
+    path.clear();
 }
 //________________________________________________HELPER FUNCTIONS_____________________________________________________
 /**

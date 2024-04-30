@@ -254,9 +254,9 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             tileEntity->updateSelfAndChild();
 
             tileEntity->addComponent(
-                    std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5, 0.5, 0.5), collisionSystem));
+                    std::make_unique<BoxCollider>(tileEntity, glm::vec3(1, 0.01, 1), collisionSystem));
             tileEntity->getComponent<BoxCollider>()->center =
-                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0);
         }
     }
 
