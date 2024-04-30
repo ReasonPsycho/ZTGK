@@ -535,19 +535,19 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-    Entity* enemyUnit = scene.addEntity("Enemy1");
-    enemyUnit->addComponent(make_unique<Render>(cubeModel));
-    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    enemyUnit->updateSelfAndChild();
-    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
-    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    stats = {100, 1, 1, 20, 3};
-    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), stats, false, &unitSystem));
-    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(&grid);
-    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
-    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
+//    Entity* enemyUnit = scene.addEntity("Enemy1");
+//    enemyUnit->addComponent(make_unique<Render>(cubeModel));
+//    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    enemyUnit->updateSelfAndChild();
+//    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
+//    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+//    stats = {100, 1, 1, 20, 3};
+//    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), stats, false, &unitSystem));
+//    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState(&grid);
+//    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
+//    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
 
 
 
@@ -937,7 +937,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
                 if(hit->getComponent<IMineable>()!=nullptr){
                     unit->miningTarget = hit->getComponent<IMineable>();
                     unit->hasMiningTarget = true;
-                    spdlog::info("Mining target set");
+                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
                 }
                 else{
                     unit->hasMiningTarget = false;

@@ -84,6 +84,7 @@ void Unit::showImGuiDetails(Camera *camera) {
 
 void Unit::Update() {
 
+
     if(hasMovementTarget){
         if(!grid->getTileAt(movementTarget)->vacant){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
@@ -137,3 +138,11 @@ Unit *Unit::findEnemy() {
     }
     return nullptr;
 }
+
+bool Unit::canFindPathToTarget(Vector2Int target) {
+    pathfinding.FindPath(gridPosition, target);
+    return !pathfinding.path.empty();
+}
+
+
+

@@ -66,6 +66,10 @@ public:
     UnitStats baseStats;
 
     Unit* findEnemy();
+    bool canFindPathToTarget(Vector2Int target);
+    std::vector<IMineable> miningPath;
+
+
 private:
     Vector2Int previousGridPosition;
 };
