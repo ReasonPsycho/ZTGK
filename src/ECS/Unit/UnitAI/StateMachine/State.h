@@ -12,6 +12,7 @@ class Unit;
 
 class State {
 public:
+    virtual ~State() = default;
 
      string name;
      Unit* unit;
