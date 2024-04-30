@@ -360,8 +360,6 @@ void Grid::SetUpWall(Tile *tile) {
         topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
         topMatrix = glm::rotate(topMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(topMatrix, 2, (isSurrounded ? 1 : 0), 0, 0)));
-
-        spdlog::debug("Setup wall::Tile x{} z{} state {}, fog {}", tile->index.x, tile->index.z, Tile::state_names[tile->state], isSurrounded);
     }
 }
 

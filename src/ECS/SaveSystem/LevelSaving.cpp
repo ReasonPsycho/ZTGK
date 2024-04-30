@@ -75,7 +75,7 @@ void LevelSaving::save(const std::string& path) {
 //    auto thr = std::thread([path](){
         auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
 
-        spdlog::trace(std::format("Saving to {}", path));
+        spdlog::info(std::format("Saving to {}", path));
         YAML::Node node;
         std::vector<std::string> layout(grid->height, "");
 
@@ -121,7 +121,7 @@ void LevelSaving::save(const std::string& path) {
         out << TOKEN_LAYOUT_END << '\n';
         spdlog::trace("Writing node");
         out << node;
-        spdlog::trace("Save complete");
+        spdlog::info("Save complete");
 //    });
 //    thr.detach();
 }
@@ -129,7 +129,7 @@ void LevelSaving::save(const std::string& path) {
 void LevelSaving::load(const std::string& path) {
 //    auto thr = std::thread([path](){
 //        ztgk::game::pause_render = true;
-        spdlog::trace(std::format("Loading level from {}", path));
+        spdlog::info(std::format("Loading level from {}", path));
         auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
 
         auto node = YAML::LoadFile(path);
@@ -158,7 +158,6 @@ void LevelSaving::load(const std::string& path) {
                 auto tile = grid->getTileAt(x, z);
 
                 tile_state_from_token(token, tile);
-                spdlog::debug("LevelSaving::load::Tile x{} z{} state {}", tile->index.x, tile->index.z, Tile::state_names[tile->state]);
                 ++x;
             }
 
@@ -173,18 +172,18 @@ void LevelSaving::load(const std::string& path) {
         auto units = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
         if (!units.empty()) {
             spdlog::warn("Units already existing! Aborting!");
-            return;
-        }
-        spdlog::trace("Loading unit entities");
-        for ( auto unode : node["allies"] ) {
-            auto name = unode[nameof(quote(Entity::name))].as<std::string>();
+        } else {
+            spdlog::trace("Loading unit entities");
+            for (auto unode: node["allies"]) {
+                auto name = unode[nameof(quote(Entity::name))].as<std::string>();
 
-            auto entity = Unit::serializer_newUnitEntity(ztgk::game::scene, name);
-            YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
+                auto entity = Unit::serializer_newUnitEntity(ztgk::game::scene, name);
+                YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
+            }
         }
         // todo chests and stuff, once relevant
 
-        spdlog::trace("Finished loading");
+        spdlog::info("Finished loading");
 //        ztgk::game::pause_render = false;
 //    });
 //    thr.detach();
