@@ -86,6 +86,7 @@ void Unit::showImGuiDetails(Camera *camera) {
 
 void Unit::Update() {
 
+
     if(hasMovementTarget){
         if(!grid->getTileAt(movementTarget)->vacant()){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
@@ -140,6 +141,15 @@ Unit *Unit::findEnemy() {
     return nullptr;
 }
 
+
+bool Unit::canFindPathToTarget(Vector2Int target) {
+    pathfinding.FindPath(gridPosition, target);
+    return !pathfinding.path.empty();
+}
+
+
+
+
 void Unit::serializer_init(Grid * pGrid) {
     auto playerUnit = getEntity();
     auto stateManager = new StateManager(playerUnit->getComponent<Unit>());
@@ -166,3 +176,4 @@ Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) 
     playerUnit->addComponent(make_unique<Unit>());
     return playerUnit;
 }
+

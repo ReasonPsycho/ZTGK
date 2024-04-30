@@ -67,6 +67,10 @@ public:
 
     Unit* findEnemy();
 
+    bool canFindPathToTarget(Vector2Int target);
+    std::vector<IMineable> miningPath;
+
+
     // serializer
     // only use this with serializer!
     Unit() = default;
@@ -74,6 +78,7 @@ public:
     void serializer_init(Grid * pGrid);
     // partially sets up the required components, always call serializer_init after this, before returning to the main loop!!
     static Entity * serializer_newUnitEntity(Scene * scene, const std::string & name);
+
 private:
     Vector2Int previousGridPosition;
 };
