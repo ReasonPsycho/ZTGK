@@ -27,13 +27,13 @@ enum TileState {
     ORE,
     CORE,   // washing machine
     UNIT,
-    state_count
+    state_count // for ImGui
 };
 // initializer list
 #define TILE_STATE_NAMES { "FLOOR", "WALL", "CHEST", "ORE", "CORE", "UNIT" }
 
 struct TileStateData {
-    unsigned unitId = (unsigned)-1;
+    // this is only necessary if items are serialized as numbers, if they're saved in the node instead it can be loaded straight into the relevant entity
     unsigned chestItemTypeId = (unsigned)-1;
 };
 
@@ -41,21 +41,22 @@ class Tile : public Component{
 public:
     Vector2Int index{};
     std::vector<WallData*> walls;
-    bool vacant;
     TileState state;
     TileStateData stateData;
     Unit* unit = nullptr;
 
     // Constructors
-    explicit Tile(Vector2Int index, bool vacant = true, std::string name = "Tile");
-    Tile(int index_x, int index_z, bool vacant = true, std::string name = "Tile");
+    explicit Tile(Vector2Int index, TileState state = FLOOR, std::string name = "Tile");
+    Tile(int index_x, int index_z, TileState state = FLOOR, std::string name = "Tile");
     Tile() = default;
     
     // Destructor
     ~Tile();
 
     // Methods
+    [[nodiscard]] bool vacant() const { return state == FLOOR; };
     void showImGuiDetails(Camera *camera) override;
+
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
 };
 

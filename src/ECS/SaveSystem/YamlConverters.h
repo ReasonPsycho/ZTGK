@@ -8,9 +8,12 @@
 #include "glm/ext/vector_int3.hpp"
 #include <yaml-cpp/yaml.h>
 #include "ECS/Unit/Unit.h"
+#include "ECS/Utils/Globals.h"
 
 inline std::string nameof(const std::string & full_name) {
-    return full_name.substr(full_name.find_last_of('.') + 1);
+    auto pos = full_name.find_last_of('.');
+    if (pos == std::string::npos) pos = full_name.find_last_of(':');
+    return full_name.substr(pos + 1);
 }
 
 
@@ -161,8 +164,8 @@ struct convert<Unit> {
         rhs.isAlly = node[nameof(quote(rhs.isAlly))].as<bool>();
         rhs.baseStats = node[nameof(quote(rhs.baseStats))].as<UnitStats>();
         rhs.equipment = node[nameof(quote(rhs.equipment))].as<UnitEquipment>();
-        rhs.UpdateStats();
-        return false;
+        rhs.serializer_init(ztgk::game::scene->systemManager.getSystem<Grid>());
+        return true;
     }
 };
 
