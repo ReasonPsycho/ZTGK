@@ -314,7 +314,7 @@ void Grid::SetUpWall(Tile *tile) {
     bool isDiagonal = ((tile->index.x + tile->index.z) % 2 == 0);
     ClearWall(tile);
     bool isSurrounded = true;
-    if (tile->state == FLOOR) {
+    if (tile->state != WALL) {
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
         floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
         floorMatrix = glm::rotate(floorMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));

@@ -11,7 +11,7 @@
     "name" : "glfw3"
   }, {
     "name" : "imgui",
-    "features" : [ "docking-experimental","opengl3-binding", "glfw-binding" ]
+    "features" : [ "docking-experimental", "opengl3-binding", "glfw-binding" ]
   }, {
     "name" : "imguizmo"
   }, {
@@ -26,5 +26,7 @@
     "name" : "miniaudio"
   }, {
     "name" : "yaml-cpp"
+  }, {
+    "name" : "tracy"
   } ]
 }
