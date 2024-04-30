@@ -161,13 +161,10 @@ void LightSystem::PushDepthMapsToShader(Shader *shader) {
 }
 
 void LightSystem::UpdateImpl() {
-
-
     glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,dirLights.size() + spotLights.size(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, cubeShadowMaps);
     glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size() * 6 , 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-  
   
     GLenum err;
     int offset = 0;

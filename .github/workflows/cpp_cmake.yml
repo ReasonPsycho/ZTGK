@@ -24,7 +24,6 @@ jobs:
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x64
-          toolset: 17.0
       
       - name: Install vcpkg packages
         run: vcpkg integrate install
