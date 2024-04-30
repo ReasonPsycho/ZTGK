@@ -173,6 +173,8 @@ void LightSystem::UpdateImpl() {
     InstanceRenderSystem* instanceRenderSystem = scene->systemManager.getSystem<InstanceRenderSystem>();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
+        ZoneScopedN("DirLight");
+        
         if (light->getIsDirty()) {  // Only push it if it's dirty
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,sizeof(DirLightData), &light->data);
@@ -187,6 +189,8 @@ void LightSystem::UpdateImpl() {
     offset = 0;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
     for (auto &light: spotLights) {
+        ZoneScopedN("SpotLight");
+
         if (light->getIsDirty()) {  // Only push it if it's dirty
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,  sizeof(SpotLightData), &light->data);
@@ -203,6 +207,8 @@ void LightSystem::UpdateImpl() {
     offset = 0;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
     for (auto &light: pointLights) {
+        ZoneScopedN("PointLight");
+
         if (light->getIsDirty()) {  // Only push it if it's dirty
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);

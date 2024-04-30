@@ -28,5 +28,7 @@
     "name" : "yaml-cpp"
   }, {
     "name" : "tracy"
+  }, {
+    "name" : "pthreads"
   } ]
 }

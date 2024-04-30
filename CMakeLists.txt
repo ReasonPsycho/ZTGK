@@ -32,10 +32,13 @@ cmake_policy(SET CMP0072 NEW) # for GLVND
 
 add_definitions(-D GLM_ENABLE_EXPERIMENTAL)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w") # supress warnings XDE
+
 # ---- Main project's files ----
 # Add source files
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/res)
+
 
 # Gather source and header files
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp") #SIDE note u need to rerun CMAKE each time u add class manually since it doesn't need to change to add file.
@@ -66,6 +69,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(freetype-gl CONFIG REQUIRED)
 find_path(MINIAUDIO_INCLUDE_DIRS "miniaudio.h")
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(PThreads4W REQUIRED) #Required by Tracy not on win but on git workflow
 find_package(Tracy CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_opengl_LIBRARY})
@@ -80,7 +84,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE freetype-gl)
 target_include_directories(${PROJECT_NAME} PRIVATE ${MINIAUDIO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
-target_link_libraries(${PROJECT_NAME}  PRIVATE Tracy::TracyClient)
+target_link_libraries(${PROJECT_NAME} PRIVATE PThreads4W::PThreads4W)
+target_link_libraries(${PROJECT_NAME}  PRIVATE Tracy::TracyClient) #Required by Tracy not on win but on git workflow
 
 #Asssimp config
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE)
