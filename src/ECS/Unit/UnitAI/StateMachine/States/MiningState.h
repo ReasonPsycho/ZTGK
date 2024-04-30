@@ -7,6 +7,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
 #include "ECS/Grid/Grid.h"
 #include "ECS/Unit/Mining/IMineable.h"
+#include <unordered_set>
 
 class MovementState;
 class CombatState;
