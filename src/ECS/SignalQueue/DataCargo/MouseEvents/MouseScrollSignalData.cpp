@@ -8,8 +8,8 @@
 
 using namespace ztgk;
 
-MouseScrollSignalData::MouseScrollSignalData(Vec2<double> offset, const std::string & message) : SignalData(message), offset(offset) {}
+MouseScrollSignalData::MouseScrollSignalData(glm::vec2 offset, const std::string & message) : SignalData(message), offset(offset) {}
 
-Signal MouseScrollSignalData::signal(Vec2<double> offset, const std::string & message) {
+Signal MouseScrollSignalData::signal(glm::vec2 offset, const std::string & message) {
     return {Signal::signal_types.mouse_scroll_signal, std::make_shared<MouseScrollSignalData>(offset, message)};
 }

@@ -8,12 +8,17 @@
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
 
-
+struct Cursor;
+class SignalQueue;
 
 namespace ztgk::game {
 
     extern Scene * scene;
     extern Model * cube_model;
+    extern Camera * camera;
+    extern SignalQueue * signalQueue;
+
+    extern Cursor cursor;
 
     extern std::atomic<bool> pause;
     extern std::atomic<bool> pause_render;

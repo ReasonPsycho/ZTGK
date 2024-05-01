@@ -17,6 +17,7 @@
 #include <ImGuizmo.h>
 #include <cstdio>
 
+#include "ECS/Utils/Cursor.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
@@ -396,6 +397,9 @@ bool init() {
 
 void init_systems() {
     ztgk::game::scene = &scene;
+    ztgk::game::camera = &camera;
+    ztgk::game::signalQueue = &signalQueue;
+    ztgk::game::cursor.init();
 
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
@@ -869,7 +873,7 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-// glfw: whenever the window size changed (by OS or user reinitWithSize) this callback function executes
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -920,9 +924,11 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
+    ztgk::game::cursor.scroll({xoffset, yoffset});
 
-    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
+//    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
+//
+//    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
