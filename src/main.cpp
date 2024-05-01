@@ -402,10 +402,11 @@ void init_systems() {
     ztgk::game::window = window;
     ztgk::game::cursor.init();
 
+    scene.systemManager.addSystem(&signalQueue);
+
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&instanceRenderSystem);
-    scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
@@ -426,6 +427,8 @@ void init_systems() {
 
     hud.init();
     scene.systemManager.addSystem(&hud);
+
+    unitSystem.init();
 }
 
 void load_enteties() {
@@ -882,6 +885,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     display_h = height;
     display_w = width;
+    ztgk::game::window_size = {width, height};
     camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
 }
@@ -900,48 +904,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
-    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
-
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        if (ray->getHitEntity() != nullptr&& ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly){
-            if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
-                unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>() );
-            } else {
-                unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
-        } }else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
-            unitSystem.deselectAllUnits();
-        }
-
-        wireRenderer.rayComponents.push_back(std::move(ray));
-    }
-    if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
-        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        Entity * hit = ray->getHitEntity();
-        if(hit != nullptr){
-            for(auto unit : unitSystem.selectedUnits){
-                if(hit->getComponent<IMineable>()!=nullptr){
-                    unit->miningTarget = hit->getComponent<IMineable>();
-                    unit->hasMiningTarget = true;
-                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
-                }
-                else{
-                    unit->hasMiningTarget = false;
-                    unit->miningTarget = nullptr;
-                    unit->hasCombatTarget = false;
-                    unit->combatTarget = nullptr;
-                    unit->hasMovementTarget = true;
-                    unit->pathfinding.path.clear();
-                    unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
-                }
-            }
-        }
-        wireRenderer.rayComponents.push_back(std::move(ray));
-    }
+    ztgk::game::cursor.click(button, action, mods);
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {

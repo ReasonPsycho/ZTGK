@@ -11,6 +11,7 @@
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
 #include "imgui_impl_glfw.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 
 void Cursor::init() {
     mouseio = &ImGui::GetIO();
@@ -25,7 +26,7 @@ void Cursor::init() {
             auto data = std::dynamic_pointer_cast<KeySignalData>(signal.data);
             if (data->key == GLFW_KEY_GRAVE_ACCENT && data->action == GLFW_PRESS) {
                 config.capture_move = !config.capture_move;
-                config.capture_press = !config.capture_press;
+                config.capture_click = !config.capture_click;
                 config.capture_scroll = !config.capture_scroll;
             }
             if (data->key == GLFW_KEY_R && data->mods == GLFW_MOD_CONTROL && data->action == GLFW_PRESS) {
@@ -55,12 +56,16 @@ void Cursor::scroll(glm::vec2 offset) {
     if (config.capture_scroll) {
         ImGui_ImplGlfw_ScrollCallback(ztgk::game::window, offset.x, offset.y);
         if (config.forward_scroll)
-            *ztgk::game::signalQueue += MouseScrollSignalData::signal(offset, "Cursor forwarding SCROLL");
+            *ztgk::game::signalQueue += MouseScrollSignalData::signal(offset, ui_pos, "Cursor forwarding SCROLL");
     } else {
         ztgk::game::camera->ProcessMouseScroll(static_cast<float>(offset.y), Time::Instance().DeltaTime());
     }
 }
 
-void Cursor::press(int button, int action, int mods) {
-    if (!config.capture_press) return;
+void Cursor::click(int button, int action, int mods) {
+    if (config.capture_click) {
+        ImGui_ImplGlfw_MouseButtonCallback(ztgk::game::window, button, action, mods);
+        if (config.forward_click)
+            *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods, ui_pos, "Cursor forwarding CLICK");
+    }
 }

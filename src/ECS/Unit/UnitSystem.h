@@ -5,11 +5,14 @@
 #ifndef ZTGK_UNITSYSTEM_H
 #define ZTGK_UNITSYSTEM_H
 #include "ECS/System.h"
+#include "ECS/SignalQueue/SignalReceiver.h"
 #include "Unit.h"
 
 class UnitSystem : public System{
 public:
     UnitSystem();
+
+    void init();
 
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
@@ -31,6 +34,8 @@ private:
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Unit))
     };
+
+    std::unique_ptr<SignalReceiver> raycastSelectionHandler;
 };
 
 

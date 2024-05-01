@@ -6,8 +6,10 @@
 
 
 #include "../SignalData.h"
+#include "glm/vec2.hpp"
 
 struct MouseButtonSignalData : public SignalData {
+    glm::vec2 pos;
     // GLFW_MOUSE_BUTTON_XXXXX
     int button;
     // GLFW_PRESS, etc
@@ -15,12 +17,12 @@ struct MouseButtonSignalData : public SignalData {
     // GLFW_MOD_XXXXX
     int mods;
 
-    MouseButtonSignalData(int button, int action, int mods, const std::string & message = "");
+    MouseButtonSignalData(int button, int action, int mods, glm::vec2 pos, const std::string & message = "");
 
     [[nodiscard]] std::string to_string() const override {
-        return std::format("{{message=\"{}\", button={}, action={}, mods={}}}",
-                           message, button, action, mods);
+        return std::format("{{message=\"{}\", button={}, action={}, mods={}, pos=({}, {})}}",
+                           message, button, action, mods, pos.x, pos.y);
     }
 
-    static Signal signal(int button, int action, int mods, const std::string & message = "");
+    static Signal signal(int button, int action, int mods, glm::vec2 pos, const std::string & message = "");
 };
