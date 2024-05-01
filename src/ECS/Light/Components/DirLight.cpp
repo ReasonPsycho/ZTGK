@@ -12,21 +12,22 @@ void DirLight::Innit(int width, int height, int index) {
 
     float scale_factor = 25.0f;
 // assume data.direction contains Euler angles (yaw, pitch, roll)
-    glm::vec3 forward = glm::vec3(1,0,0);
-    data.direction =  glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward),1);
+    glm::vec3 forward = glm::vec3(1, 0, 0);
+    data.direction = glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward), 1);
     glm::vec3 translatedPos = -scale_factor * data.direction; //adjust the sign and scale
     lightView = glm::lookAt(translatedPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-    data.lightSpaceMatrix = lightProjection * lightView;
-;
+    data.lightSpaceMatrix = lightProjection * lightView;;
 }
 
 void
 DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
                             GLuint ShadowMapArrayId, int index) {
-        shadowMapShader->use();
-        shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-        instanceShadowMapShader->use();
-        instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    ZoneScopedN("SetUpShadowBuffer");
+
+    shadowMapShader->use();
+    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    instanceShadowMapShader->use();
+    instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
 
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
@@ -34,7 +35,6 @@ DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapSh
     glReadBuffer(GL_NONE);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, width, height);
-
 
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -80,8 +80,8 @@ DirLight::DirLight(DirLightData data) :
 }
 
 void DirLight::showImGuiDetailsImpl(Camera *camera) {
-        ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
-        ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
+    ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
+    ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
 }
 
 void DirLight::UpdateData(int height, int width) {
@@ -91,8 +91,8 @@ void DirLight::UpdateData(int height, int width) {
 
     float scale_factor = 25.0f;
     // assume data.direction contains Euler angles (yaw, pitch, roll)
-    glm::vec3 forward = glm::vec3(1,0,0);
-    data.direction =  glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward),1);
+    glm::vec3 forward = glm::vec3(1, 0, 0);
+    data.direction = glm::vec4(glm::rotate(getEntity()->transform.getLocalRotation(), forward), 1);
     glm::vec3 translatedPos = -scale_factor * data.direction; //adjust the sign and scale
     lightView = glm::lookAt(translatedPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     data.lightSpaceMatrix = lightProjection * lightView;

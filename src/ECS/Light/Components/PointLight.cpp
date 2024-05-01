@@ -38,6 +38,7 @@ void PointLight::Innit(int width, int height, int index) {
 
 void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
                                    GLuint ShadowMapArrayId, int index) {
+    ZoneScopedN("SetUpShadowBuffer");
 
     for (unsigned int i = 0; i < 6; ++i) {
         shadowMapShader->use();
