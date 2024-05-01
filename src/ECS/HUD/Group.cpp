@@ -41,7 +41,7 @@ void Group::imgui_controls() {
             *ztgk::game::scene->systemManager.getSystem<SignalQueue>()
                     += HUDRemoveGroupSignalData::signal(id,"Editor event");
         }
-        // no id input because groups are a map, so it doesn't really update anything, vector would work
+        // no id input because groups are a map, so it doesn't really UpdateImpl anything, vector would work
 //        ImGui::SameLine();
 //        ImGui::InputInt(std::format("ID##{}", id).c_str(), reinterpret_cast<int *>(&id));
 //        if (ImGui::IsItemHovered())

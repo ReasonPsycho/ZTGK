@@ -9,7 +9,7 @@
 
 
 
-void Collider::showImGuiDetails(Camera *camera) {
+void Collider::showImGuiDetailsImpl(Camera *camera) {
 //    ImGui::Text("Collider ");
 //    ImGui::SameLine(); ImGui::Text("Type: %d", type);
 //    ImGui::Text("UID: %d", uniqueID);

@@ -59,7 +59,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPi
             Pitch = -89.0f;
     }
 
-    // update Front, Right and Up Vectors using the updated Euler angles
+    // UpdateImpl Front, Right and Up Vectors using the updated Euler angles
     updateCameraVectors();
 }
 
@@ -138,6 +138,10 @@ glm::vec3 Camera::getDirFromCameraToCursor(float mouseX, float mouseY, int scree
     ray_wor = glm::normalize(ray_wor);
 
     return ray_wor;
+}
+
+float Camera::GetAspectRatio() {
+    return (float ) saved_display_w/(float )saved_display_h;
 }
 
 

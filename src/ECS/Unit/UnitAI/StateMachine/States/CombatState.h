@@ -12,12 +12,16 @@ class IdleState;
 
 class CombatState : public State{
 public:
+    CombatState(Grid* grid);
+
     State* RunCurrentState() override;
     bool isTargetInRange() override;
 
-    MovementState *MoveState;
-    MiningState* MiningState;
-    IdleState* IdleState;
+    MovementState *moveState;
+    MiningState* miningState;
+    IdleState* idleState;
+
+    bool isAttackOnCooldown();
 
 private:
     void AttackTarget();

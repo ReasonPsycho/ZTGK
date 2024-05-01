@@ -12,24 +12,38 @@
 
 State *CombatState::RunCurrentState() {
 
-    isTargetInRange();
-    AttackTarget();
 
     //from Combat to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
-        return IdleState;
+        idleState = new IdleState(grid);
+        idleState->unit = unit;
+
+        return idleState;
     }
 
     //from Combat to Movement
     if (unit->hasMovementTarget) {
-        return MoveState;
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+
+        return moveState;
     }
 
     //from Combat to Mining
-    if (!unit->hasMovementTarget && !unit->hasCombatTarget && unit->hasMiningTarget && unit->isTargetInRange) {
-        return MiningState;
-    }
+    if (unit->hasMiningTarget) {
+        miningState = new MiningState(grid);
+        miningState->unit = unit;
 
+        if(miningState->isTargetInRange())
+            return miningState;
+        else
+        {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->miningTarget->gridPosition;
+            return this;
+        }
+    }
+    AttackTarget();
     return this;
 }
 
@@ -48,6 +62,8 @@ bool CombatState::isTargetInRange() {
 }
 
 void CombatState::AttackTarget() {
+    if(isAttackOnCooldown()) return;
+
     if (unit-> combatTarget == nullptr) {
         unit->hasCombatTarget = false;
         return;
@@ -57,6 +73,39 @@ void CombatState::AttackTarget() {
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;
     }
-    //TODO: attack target
-    return;
+
+    auto target = unit->combatTarget;
+    float totalAttackDamage = unit->stats.attackDamage;
+    if(unit->equipment.item1 != nullptr){
+        totalAttackDamage += unit->equipment.item1->stats.addAttackDamage;
+    }
+    if(unit->equipment.item2 != nullptr){
+        totalAttackDamage += unit->equipment.item2->stats.addAttackDamage;
+    }
+
+    unit->attackCooldown = 0;
+    target->stats.health -= totalAttackDamage;
+    spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
+
+    if(target->stats.health <= 0){
+        unit->hasCombatTarget = false;
+        unit->combatTarget = nullptr;
+    }
+}
+
+
+
+
+CombatState::CombatState(Grid *grid) {
+    this->grid = grid;
+    name = "Combat";
+}
+
+bool CombatState::isAttackOnCooldown() {
+    float time = unit->attackCooldown;
+
+    if(time > 1 / unit->stats.attackSpeed){
+        return false;
+    }
+    return true;
 }

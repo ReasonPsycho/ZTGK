@@ -11,6 +11,7 @@
 #include "glm/vec4.hpp"
 #include "ILight.h"
 #include "glm/gtx/quaternion.hpp"
+#include "LightHelpers.h"
 
 struct SpotLightData {
     glm::vec4 diffuse;
@@ -56,7 +57,7 @@ struct SpotLightData {
 
 class SpotLight : public ILight {
 private:
-    float near_plane = 0.1f, far_plane = 25.0f;
+    float near_plane = 0.1f, far_plane = 1.0f;
 
 public:
     SpotLight(SpotLightData data);
@@ -65,12 +66,12 @@ public:
 
     SpotLightData data;
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
     
     void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
-                           int height, GLuint ShadowMapArrayId, int index) override; // Pure virtual function
+    void SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
+                           GLuint ShadowMapArrayId, int index) override; // Pure virtual function
     void UpdateData(int height, int width) override;
 
 };

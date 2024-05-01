@@ -11,21 +11,27 @@
 
 class CollisionSystem;
 
+struct BoxColliderData{
+    glm::mat4x4 matrix;
+    glm::vec4 color;
+
+    BoxColliderData(const glm::mat4x4 &matrixInput, glm::vec4 color) : matrix(matrixInput),color(color) {}
+};
+
 class BoxCollider : public Collider
 {
 public:
 
     glm::vec3 center{};
     glm::vec3 size{};
-
+    BoxColliderData boxColliderData = BoxColliderData(glm::mat4x4(1.0f), glm::vec4(1));
     // Constructors
     BoxCollider(Entity* entity, glm::vec3 size, CollisionSystem* collisionSystem);
 
     // Debug methods
-    void drawWire(Shader *shader, Primitives *primitives) override;
 
     // ImGui methods
-    void showImGuiDetails(Camera* camera) override;
+    void showImGuiDetailsImpl(Camera* camera) override;
 
     // Other methods
     void update();

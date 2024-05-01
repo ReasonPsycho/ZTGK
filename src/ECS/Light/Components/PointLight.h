@@ -47,12 +47,12 @@ public:
     PointLightData data;
 
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
     
     void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
-                           int height, GLuint ShadowMapArrayId, int index) override; // Pure virtual function
+    void SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
+                           GLuint ShadowMapArrayId, int index) override; // Pure virtual function
     void UpdateData(int height, int width) override;
 
 private:

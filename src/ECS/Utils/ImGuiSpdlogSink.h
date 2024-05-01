@@ -7,7 +7,11 @@
 #include "spdlog/sinks/base_sink.h"
 #include <mutex>
 
+class Console;
+
 class ImGuiSpdlogSink : public spdlog::sinks::base_sink <std::mutex> {
+public:
+    Console * console;
 
 protected:
     void sink_it_(const spdlog::details::log_msg &msg) override;

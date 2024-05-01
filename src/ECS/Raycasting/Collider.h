@@ -25,11 +25,8 @@ public:
     // Destructor
     virtual ~Collider() = default;
 
-    // Debug methods
-    virtual void drawWire(Shader *shader, Primitives *primitives) = 0;
-
     // ImGui methods
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
 };
 

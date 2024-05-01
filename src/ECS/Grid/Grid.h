@@ -12,6 +12,7 @@
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
+#include "Chunk.h"
 
 class CollisionSystem;
 class Grid : public System{
@@ -25,24 +26,40 @@ public:
 
     //2D array of tiles
     std::vector<std::vector<Tile*>> gridArray;
-
+    std::vector<std::vector<Chunk>> chunkArray;
     Scene* scene;
     Vector3 Position;
+    unsigned entityId = (unsigned)-1;
 
     // Constructors
     Grid() = default;
-    Grid(Scene* scene ,int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
+    Grid(Scene* scene, int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
     Grid(Grid* grid);
 
     // Destructor
     ~Grid();
 
-    //Other methods
+    // save loading
+    // clears all entities, changes size, regenerates entities for size
+    void reinitWithSize(glm::ivec2 size);
+    // removes all related entities, used by reinit
+    void clear();
+    // generates empty tile entities, used by reinit
+    void GenerateTileEntities(float scale);
+
+    // initializes tile entities with the state loaded by the serializer, used by the serializer
+    void InitializeTileEntities();
+    // save loading
 
     //get the tile at a specific index
     Tile* getTileAt(int x, int z);
     Tile* getTileAt(Vector2Int index);
 
+    //get the tile at a specific index
+    Chunk* getChunkAt(int x, int z);
+    Chunk* getChunkAt(Vector2Int index);
+    
+    
     //get the tile at a specific world position
     [[nodiscard]] const glm::vec3 GridToWorldPosition(Vector2Int index) const;
     [[nodiscard]] const glm::vec3 GridToWorldPosition(int x, int z) const;
@@ -52,19 +69,30 @@ public:
 
     //loads and distributes the tile entities in world space
     void LoadTileEntities(float scale, CollisionSystem *collisionSystem);
+    
+    void DestroyWallsOnTile(Vector2Int tileIndex);
 
-    void SetUpWallData();
+    void ClearAllWallData();
+    void SetUpWalls();
+    void ClearWalls();
+    void SetUpWall(Tile* tile);
+    void ClearWall(Tile* tile);
+
     //system methods
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override;
     int getNumComponentTypes() override;
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
+
+    bool isInBounds(Vector2Int anInt);
 
 private:
     float offsetX = 0;
     float offsetZ = 0;
 
+    bool showTilesInImgui = false;
+    
     std::array<std::type_index, 1> componentTypes = {
         std::type_index(typeid(Tile))
     };

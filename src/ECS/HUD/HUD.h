@@ -43,7 +43,7 @@ public:
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&componentTypes); }
     int getNumComponentTypes() override { return 2; }
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
     std::unordered_map<unsigned, std::vector<Sprite*>> sprites;
     std::unordered_map<unsigned, std::vector<Text*>> texts;

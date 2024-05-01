@@ -11,7 +11,6 @@ StateManager::StateManager(Unit *unit) {
 
 }
 
-//This should be in an Update function
 void StateManager::RunStateMachine() {
     if (currentState != nullptr) {
         State *nextState = currentState->RunCurrentState();

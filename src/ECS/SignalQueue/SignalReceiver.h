@@ -23,7 +23,7 @@ struct SignalReceiver : Component {
     virtual ~SignalReceiver() = default;
 
     // editor
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 };
 
 

@@ -1,5 +1,16 @@
 
 #pragma region Includes
+
+
+#pragma region Tracy
+#if defined( __clang__ ) || defined(__GNUC__)
+# define TracyFunction __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+# define TracyFunction __FUNCSIG__
+#endif
+#include <tracy/Tracy.hpp >
+#pragma endregion Tracy
+
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
@@ -56,6 +67,8 @@
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "ECS/SaveSystem/LevelSaving.h"
+#include "ECS/LevelGenerator/LevelGenerator.h"
 
 #pragma endregion Includes
 
@@ -64,18 +77,21 @@
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
 string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
+string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
-Model* quad;
+Model *quad;
 Model gabka = Model(&modelPathGabka);
-Model* cubeModel;
-Model* quadModel;
+Model wall = Model(&modelPathWall);
+Model *cubeModel;
+Model *bathroomWAll;
+Model *quadModel;
 Entity *gridEntity;
 HUD hud;
 unsigned bggroup, zmgroup;
-Sprite * zmspr;
-Text * zmtxt;
+Sprite *zmspr;
+Text *zmtxt;
 StateManager* stateManager;
 
 Entity *box1;
@@ -83,7 +99,6 @@ Entity *box2;
 Text text = {};
 
 BoxCollider *boxCollider;
-
 
 
 shared_ptr<spdlog::logger> file_logger;
@@ -135,9 +150,9 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
 void processInput(GLFWwindow *window);
 
@@ -171,16 +186,16 @@ float lastY = 0;
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
-LightSystem lightSystem(&camera,&scene);
+LightSystem lightSystem(&camera, &scene);
 PhongPipeline phongPipeline;
 RenderSystem renderSystem;
-InstanceRenderSystem instanceRenderSystem;
-WireRenderer wireRenderer(&primitives,& camera);
+InstanceRenderSystem instanceRenderSystem(&camera);
+WireRenderer wireRenderer(&primitives, &camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
 UnitSystem unitSystem;
 
-Grid grid(&scene, 100, 100, 2.5f, Vector3(0, 0, 0));
+Grid grid(&scene, 100, 100, 2.0f, Vector3(0, 0, 0));
 
 Entity *playerUnit;
 
@@ -203,7 +218,6 @@ bool timeStepKeyPressed = false;
 SignalQueue signalQueue = SignalQueue();
 
 #pragma endregion
-
 
 
 int main(int, char **) {
@@ -229,6 +243,7 @@ int main(int, char **) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
+    glfwSwapInterval(1); 
 
     signalQueue.init();
     spdlog::info("Initialized signal queue.");
@@ -243,17 +258,20 @@ int main(int, char **) {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+
+
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-
+        
         // Process I/O operations here
         input();
 
-        // Update game objects' state here
+        // UpdateImpl game objects' state here
         update();
 
         // OpenGL rendering code here
-        render();
+        if (!ztgk::game::pause_render)
+            render();
 
         // Draw ImGui
         imgui_begin();
@@ -285,8 +303,9 @@ int main(int, char **) {
 
 
         // End frame and swap buffers (double buffering)
-        file_logger->info("End frame");
+
         end_frame();
+        
     }
 
     file_logger->info("Cleanup");
@@ -309,9 +328,9 @@ void cleanup() {
 }
 
 bool init() {
-    auto sink = make_shared<ImGuiSpdlogSink>();
-    sink->set_pattern("[%H:%M:%S.%e] [%l] %v"); // remove the full date (and recv name since it's null anyway)
-    spdlog::get("")->sinks().push_back(sink);
+    spdlog::set_level(spdlog::level::trace);
+//    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
+    ztgk::console.level(spdlog::level::trace);
 
     // Get current date and time
     auto now = std::chrono::system_clock::now();
@@ -391,14 +410,17 @@ void init_systems() {
     primitives.Init();
     phongPipeline.Init();
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
-    wireRenderer.Innit();
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
     MaterialPhong materialPhong = MaterialPhong(myColor);
-    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,vector<GLuint>(pbrprimitives.cubeIndices,pbrprimitives.cubeIndices + 36));
+    cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
+                          vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
+    ztgk::game::cube_model = cubeModel;
+    wireRenderer.boxModel = cubeModel;
+    wireRenderer.Innit();
 
-//    hud.init();
-//    scene.systemManager.addSystem(&hud);
+    hud.init();
+    scene.systemManager.addSystem(&hud);
 }
 
 void load_enteties() {
@@ -408,51 +430,92 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-    
+
     model.loadModel();
-    quadModel =  new Model(pbrprimitives.quadVAO,MaterialPhong(color),vec);
+    wall.loadModel();
+    
+    quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     //gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
 
-    //  gameObject = scene.addEntity("Dir light");
- //   gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255),1), glm::vec4(1))));
-     gameObject = scene.addEntity("Point Light");
-      gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(1,1,1,1), 1.0f, 0.09f, 0.032f)));
-    gameObject = scene.addEntity("Point Light 2");
-    gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-  //  Entity* gameObject = scene.addEntity("Spot Light");
- //   gameObject->addComponent(make_unique<SpotLight>(SpotLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1), glm::vec4(0), glm::vec4(1),glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(15.0f)),1.0f,0.09f,0.032f)));
+
+    gameObject = scene.addEntity("Wall");;
+    gameObject->transform.setLocalPosition(glm::vec3(100,50,0));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+
+    gameObject = scene.addEntity("Wall1");;
+    gameObject->transform.setLocalPosition(glm::vec3(100,50,200));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+//
+    gameObject = scene.addEntity("Wall2");;
+    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+//
+    gameObject = scene.addEntity("Wall3");;
+    gameObject->transform.setLocalPosition(glm::vec3(200,50,100));
+    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
+    gameObject->addComponent(make_unique<Render>(&wall));;
+    
+    
+//    gameObject = scene.addEntity("Dir light");
+  //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
+    gameObject = scene.addEntity("Point Light");;
+    gameObject->addComponent(make_unique<PointLight>(
+            PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
+                           0.032f)));
+    //  gameObject = scene.addEntity("Point Light 2");
+    // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+    gameObject = scene.addEntity("Spot Light");
+    gameObject->addComponent(make_unique<SpotLight>(
+            SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(0), glm::vec4(1),
+                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
     lightSystem.Init();
 
-    gameObject = scene.addEntity("Quad");
-    gameObject->addComponent(make_unique<Render>(quadModel));
+    //gameObject = scene.addEntity("Quad");
+   // gameObject->addComponent(make_unique<Render>(quadModel));
 
 
     instanceRenderSystem.tileModel = quadModel;
     grid.LoadTileEntities(1.0f, &collisionSystem);
     instanceRenderSystem.Innit();
 
+    hud.getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
     bggroup = hud.addGroup(glm::vec3(0, 0, 10));
+    hud.getGroupOrDefault(bggroup)->setHidden(true);
     auto bgelem = scene.addEntity(ebg, "Puni1");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni2");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni3");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni4");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
     bgelem = scene.addEntity(ebg, "Puni5");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup, "res/textures/puni.png"));
+    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup,
+                                             "res/textures/puni.png"));
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup = hud.addGroup();
+    hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
-    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300, ztgk::game::window_size.y * 0.5 ));
+    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
+                                                                                ztgk::game::window_size.y * 0.5));
     tx.groupID = zmgroup;
     fgelem->addComponent(make_unique<Text>( tx ));
     zmtxt = fgelem->getComponent<Text>();
@@ -472,34 +535,75 @@ void load_enteties() {
 void load_units() {
     playerUnit = scene.addEntity("Player1");
     playerUnit->addComponent(make_unique<Render>(cubeModel));
-    //playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    UnitStats stats = {100, 1, 1, 20, 1};
+    UnitStats stats = {100, 1, 1, 20, 3};
     playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState();
+    stateManager->currentState = new IdleState(&grid);
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-    playerUnit = scene.addEntity("Player2");
-    playerUnit->addComponent(make_unique<Render>(cubeModel));
-    //playerUnit->transform.setLocalPosition(glm::vec3(50, 0, 50));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    stats = {100, 1, 1, 30, 1};
-    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState();
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//    Entity* enemyUnit = scene.addEntity("Enemy1");
+//    enemyUnit->addComponent(make_unique<Render>(cubeModel));
+//    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    enemyUnit->updateSelfAndChild();
+//    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
+//    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+//    stats = {100, 1, 1, 20, 3};
+//    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), stats, false, &unitSystem));
+//    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState(&grid);
+//    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
+//    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
 
+
+
+//    playerUnit = scene.addEntity("Player2");
+//    playerUnit->addComponent(make_unique<Render>(cube_model));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+//    stats = {100, 1, 1, 30, 1};
+//    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new idleState();
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
+//    playerUnit = scene.addEntity("Player3");
+//    playerUnit->addComponent(make_unique<Render>(cube_model));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+//    stats = {100, 1, 1, 10, 1};
+//    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), stats, true, &unitSystem));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new idleState();
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
+//    playerUnit = scene.addEntity("Player4");
+//    playerUnit->addComponent(make_unique<Render>(cube_model));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+//    stats = {100, 1, 1, 100, 1};
+//    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), stats, true, &unitSystem));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new idleState();
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 }
 void init_imgui() {
@@ -523,12 +627,15 @@ void init_imgui() {
 
 void before_frame() {
     // Setting up update_delta time
+    ZoneScopedN("Before frame");
     Time::Instance().Update();
     deltaTime = Time::Instance().DeltaTime();
 }
 
 
 void input() {
+    ZoneScopedN("Input");
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -541,19 +648,24 @@ void input() {
 }
 
 void update() {
-    //update mouse position
+    ZoneScopedN("Update");
+
+    //UpdateImpl mouse position
     mouseX = mouseio.MousePos.x;
     mouseY = mouseio.MousePos.y;
 
     scene.updateScene();
-    lightSystem.Update(deltaTime);
+    lightSystem.Update();
+    instanceRenderSystem.Update();
+    wireRenderer.Update();
 
-    signalQueue.update();
+    signalQueue.Update();
 
     unitSystem.Update();
 }
 
 void render() {
+    ZoneScopedN("Render");
 
     lightSystem.PushDepthMapsToShader(&phongPipeline.phongShader);
     lightSystem.PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
@@ -569,11 +681,11 @@ void render() {
 
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
-    
-    renderSystem.DrawScene(&phongPipeline.phongShader);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader);
+
+    renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
     wireRenderer.DrawColliders();
-    //wireRenderer.DrawRays();
+    wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
@@ -583,6 +695,8 @@ void render() {
 }
 
 void imgui_begin() {
+    ZoneScopedN("Imgui begin");
+
     ImGuiIO &io = ImGui::GetIO();
     mouseio = io;
     // Start the Dear ImGui frame
@@ -591,7 +705,7 @@ void imgui_begin() {
     } else {
         io.MouseDrawCursor = false;
     }
-    
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -599,7 +713,12 @@ void imgui_begin() {
 
 
 }
+
 void imgui_render() {
+    ZoneScopedN("Imgui render");
+
+    scene.showImGuiDetails(&camera);
+
     static double fps_max = -1;
     static double max_timestamp;
     static double fps_min = 1000000;
@@ -614,6 +733,7 @@ void imgui_render() {
         min_timestamp = Time::Instance().LastFrame();
     }
     ImGui::Begin(format("FPS: {:.2f} H: {:.2f} L: {:.2f}###FPS_COUNTER", fps, fps_max, fps_min).c_str());
+    ImGui::Text("%s", std::format("Time: {:.3f}", Time::Instance().LastFrame()).c_str());
     ImGui::Text("%s", std::format("High @ {:.3f}", max_timestamp).c_str());
     ImGui::Text("%s", std::format("Low @ {:.3f}", min_timestamp).c_str());
     if (ImGui::Button("Clear")) {
@@ -624,25 +744,74 @@ void imgui_render() {
     }
     ImGui::End();
 
+    static LevelGenerator::Config levelGenConfig {
+        .seed {},
+        .size {100, 100},
+        .wallThickness = 1.f,
+        .baseRadius = 4.5f,
+        .keyRadius = 4.f,
+        .pocketRadius = 2.5f,
+        .noiseImpact = 1.f,
+        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+        .extraPocketAttempts = 10000,
+        .keyEnemies = 3,
+        .minEnemies = 0,
+        .maxEnemies = 2,
+        .unitCount = 3,
+        .chestCount = 10,
+    };
+    static char seedString[64] = "";
+    ImGui::Begin("Level generator");
+    ImGui::InputText("Seed (empty = random)", seedString, std::size(seedString));
+    ImGui::SliderFloat("Wall thickness", &levelGenConfig.wallThickness, 0.f, 20.f);
+    ImGui::SliderFloat("Base radius", &levelGenConfig.baseRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Ore room radius", &levelGenConfig.keyRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Generic room radius", &levelGenConfig.pocketRadius, 1.f, 20.f);
+    ImGui::SliderFloat("Noise impact", &levelGenConfig.noiseImpact, 0.f, 10.f);
+    ImGui::SliderInt("Enemies in ore room", &levelGenConfig.keyEnemies, 0, 20);
+    ImGui::SliderInt("Min enemies in generic room", &levelGenConfig.minEnemies, 0, 20);
+    ImGui::SliderInt("Max enemies in generic room", &levelGenConfig.maxEnemies, 0, 20);
+    ImGui::SliderInt("Unit count", &levelGenConfig.unitCount, 0, 10);
+    ImGui::SliderInt("Chest count", &levelGenConfig.chestCount, 0, 30);
+    if (ImGui::Button("Generate")) {
+        spdlog::trace("Generating level");
+        std::string_view sv = seedString;
+        if (sv.empty()) {
+            levelGenConfig.seed = pcgRandomSeed();
+        } else {
+            bool isRealSeed = sv.size() == 32 && std::all_of(sv.begin(), sv.end(), [](char c) {
+                return std::isxdigit(static_cast<unsigned char>(c));
+            });
+            if (isRealSeed) {
+                std::from_chars(sv.data(), sv.data() + 16, levelGenConfig.seed.first, 16);
+                std::from_chars(sv.data() + 16, sv.data() + 32, levelGenConfig.seed.second, 16);
+            } else {
+                std::hash<std::string_view> hash;
+                levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+            }
+        }
+        auto level = generateLevel(levelGenConfig);
+        std::ofstream("save.txt") << level;
+        spdlog::trace("New level saved to save.txt");
+    }
+    ImGui::End();
 
     //lightSystem.showLightTree();
-    scene.showImGuiDetails(&camera);
-
     ztgk::console.imguiWindow();
-
     // bloomSystem .showImguiOptions();
 }
 
 void imgui_end() {
+    ZoneScopedN("Imgui end");
+
     ImGui::End();
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     ImGuiIO &io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+
+        GLFWwindow *backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
@@ -696,11 +865,11 @@ void processInput(GLFWwindow *window) {
     }
 
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        ImGui::GetIO().MousePos = ImVec2(0,0);
+        ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// glfw: whenever the window size changed (by OS or user reinitWithSize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -724,8 +893,8 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    static float uixpos{ 1920/2 };
-    static float uiypos{ 1080/2 };
+    static float uixpos{1920 / 2};
+    static float uiypos{1080 / 2};
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
@@ -757,7 +926,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
@@ -765,14 +934,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
 
         std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-
-        if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr){
+        if (ray->getHitEntity() != nullptr&& ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly){
             if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
-                unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>() );
             } else {
                 unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
-            }
-        }else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
+        } }else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
             unitSystem.deselectAllUnits();
         }
 
@@ -784,28 +951,45 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         Entity * hit = ray->getHitEntity();
         if(hit != nullptr){
             for(auto unit : unitSystem.selectedUnits){
-                unit->hasMovementTarget = true;
-                unit->pathfinding.path.clear();
-                unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                if(hit->getComponent<IMineable>()!=nullptr){
+                    unit->miningTarget = hit->getComponent<IMineable>();
+                    unit->hasMiningTarget = true;
+                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
+                }
+                else{
+                    unit->hasMiningTarget = false;
+                    unit->miningTarget = nullptr;
+                    unit->hasCombatTarget = false;
+                    unit->combatTarget = nullptr;
+                    unit->hasMovementTarget = true;
+                    unit->pathfinding.path.clear();
+                    unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                }
             }
         }
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
 
 void end_frame() {
-    // Poll and handle events (inputs, window resize, etc.)
+    ZoneScopedN("End frame");
+
+    // Poll and handle events (inputs, window reinitWithSize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
     // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
     // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
     // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
     glfwPollEvents();
-    glfwSwapBuffers(window);
+    {
+        ZoneScopedN("VSync buffer");
+        glfwSwapBuffers(window);
+    }
+    FrameMark;
 }
 
 void init_camera() {

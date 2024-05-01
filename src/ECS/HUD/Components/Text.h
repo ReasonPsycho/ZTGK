@@ -41,5 +41,5 @@ public:
     static const unsigned editor_buffer_size = 100;
     char editor_content_buffer[editor_buffer_size];
     char editor_font_buffer[editor_buffer_size];
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 };

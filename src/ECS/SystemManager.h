@@ -51,6 +51,7 @@ public:
     template <typename T>
     void addSystem(T* system) {
         std::type_index typeIndex(typeid(*system));
+        dynamic_cast<System*>(system)->systemManager = this;   
         systems[typeIndex] = system;
     }
     

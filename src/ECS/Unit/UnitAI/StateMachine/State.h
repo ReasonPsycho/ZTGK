@@ -6,12 +6,17 @@
 #define ZTGK_STATE_H
 
 
+#include "ECS/Grid/Grid.h"
+
 class Unit;
 
 class State {
 public:
+    virtual ~State() = default;
 
+     string name;
      Unit* unit;
+     Grid* grid;
      virtual State* RunCurrentState() = 0;
      virtual bool isTargetInRange() = 0;
 };

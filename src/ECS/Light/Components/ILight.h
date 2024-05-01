@@ -10,6 +10,7 @@
 #include "ECS/Render/Camera/Camera.h"
 
 
+
 enum LightType {
     Directional,
     Spot,
@@ -30,11 +31,11 @@ public:
     enum LightType lightType;
 
 
-    virtual void showImGuiDetails(Camera *camera) = 0; // Pure virtual function
+    virtual void showImGuiDetailsImpl(Camera *camera) = 0; // Pure virtual function
 
     virtual void
-    SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
-                      int height, GLuint ShadowMapArrayId, int index) = 0; // Pure virtual function
+    SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
+                      GLuint ShadowMapArrayId, int index) = 0; // Pure virtual function
     virtual void Innit(int width, int height, int index) = 0;
     virtual void UpdateData(int height, int width) = 0;
     unsigned int depthMap{};

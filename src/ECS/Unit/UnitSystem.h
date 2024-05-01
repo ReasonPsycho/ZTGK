@@ -16,17 +16,18 @@ public:
     const std::type_index *getComponentTypes() override;
     int getNumComponentTypes() override {return 1;};
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
-    void Update();
+    void UpdateImpl() override;
 
     void selectUnit(Unit* unit);
     void deselectUnit(Unit* unit);
     void deselectAllUnits();
 
     std::vector<Unit* > selectedUnits;
-private:
+
     std::vector<Unit *> unitComponents;
+private:
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Unit))
     };

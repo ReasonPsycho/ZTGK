@@ -26,7 +26,7 @@ public:
     const std::type_index* getComponentTypes() override;
     int getNumComponentTypes() override;
 
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
 
     std::vector<Collider*> getColliders();

@@ -29,24 +29,22 @@ void SpotLight::Innit(int width, int height, int index) {
     // render scene from light's point of view
 }
 
-void SpotLight::SetUpShadowBuffer(ShaderType shaderType, Shader *shadowMapShader, Shader *instanceShadowMapShader, int width,
-                                  int height, GLuint ShadowMapArrayId, int index) {
+void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
+                                  GLuint ShadowMapArrayId, int index) {
+    ZoneScopedN("SetUpShadowBuffer");
 
-    if (shaderType == Normal) {
-        shadowMapShader->use();
-        shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-    } else {
-        instanceShadowMapShader->use();
-        instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    shadowMapShader->use();
+    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(glm::mat4(1)));
 
-    }
+    instanceShadowMapShader->use();
+    instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, width, height);
-
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -91,21 +89,21 @@ SpotLight::SpotLight(SpotLightData data) : data(data) {
     lightType = Spot;
 }
 
-void SpotLight::showImGuiDetails(Camera *camera) {
-        ImGui::InputFloat4("Color", glm::value_ptr(data.diffuse));
-        ImGui::InputFloat4("Color", glm::value_ptr(data.specular));
-        ImGui::InputFloat("Constant", &data.constant);
-        ImGui::InputFloat("Linear", &data.linear);
-        ImGui::InputFloat("Quadratic", &data.quadratic);
-        ImGui::InputFloat("Cut off", &data.cutOff);
-        ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
+void SpotLight::showImGuiDetailsImpl(Camera *camera) {
+    ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
+    ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
+    ImGui::InputFloat("Constant", &data.constant);
+    ImGui::InputFloat("Linear", &data.linear);
+    ImGui::InputFloat("Quadratic", &data.quadratic);
+    ImGui::InputFloat("Cut off", &data.cutOff);
+    ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
 }
 
 void SpotLight::UpdateData(int height, int width) {
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::perspective(data.outerCutOff, (GLfloat) width / (GLfloat) height, near_plane, far_plane);
 
-    glm::vec3 forward = glm::vec3(1,0,0);
+    glm::vec3 forward = glm::vec3(1, 0, 0);
     glm::quat globalRotation = getEntity()->transform.getGlobalRotation();
 
     data.position = glm::vec4(getEntity()->transform.getGlobalPosition(), 1.0f);
@@ -122,6 +120,8 @@ void SpotLight::UpdateData(int height, int width) {
     lightView = glm::lookAt(lightPos, target, up);
 
     data.lightSpaceMatrix = lightProjection * lightView;
+
+    far_plane = ComputeFarPlane(data.constant, data.linear, data.quadratic);
 
     this->setIsDirty(false);
 }

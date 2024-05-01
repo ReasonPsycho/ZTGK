@@ -62,7 +62,7 @@ void Sprite::load(const std::string &path) {
     }
 }
 
-void Sprite::showImGuiDetails(Camera *camera) {
+void Sprite::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputText("Path", editor_path, editor_path_len);
     ImGui::SameLine();
     if (ImGui::Button("Load")) {

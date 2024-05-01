@@ -25,17 +25,15 @@ const std::type_index *UnitSystem::getComponentTypes() {
     return componentTypes.data();
 }
 
-void UnitSystem::showImGuiDetails(Camera *camera) {
-    ImGui::Begin("Unit System");
+void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Units: %d", unitComponents.size());
     ImGui::Text("Selected Units: %d", selectedUnits.size());
-    ImGui::End();
 }
 
-void UnitSystem::Update() {
+void UnitSystem::UpdateImpl() {
     for (Unit* unit: unitComponents) {
-        unit->Update();
-        unit->getEntity()->getComponent<UnitAI>()->Update();
+        unit->UpdateImpl();
+        unit->getEntity()->getComponent<UnitAI>()->UpdateImpl();
         unit->getEntity()->getComponent<BoxCollider>()->update();
     }
 }
