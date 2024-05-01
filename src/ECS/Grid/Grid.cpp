@@ -199,6 +199,7 @@ void Grid::showImGuiDetailsImpl(Camera *camera) {
 void Grid::GenerateTileEntities(float scale) {
     Entity *gridEntity = scene->addEntity("Grid Entity");
     entityId = gridEntity->uniqueID;
+    gridEntity->updateChildren = false;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
@@ -244,6 +245,8 @@ void Grid::InitializeTileEntities() {
 void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
     Entity *gridEntity = scene->addEntity("Grid Entity");
     entityId = gridEntity->uniqueID;
+    gridEntity->updateChildren = false;
+            
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));

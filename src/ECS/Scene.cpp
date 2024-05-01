@@ -12,6 +12,7 @@
 void Scene::updateScene() {
     ZoneScopedN("Update scene");
 
+    
     for (auto &&child: children) {
         child->updateSelfAndChild();
     }

@@ -108,8 +108,9 @@ void LightSystem::Init() {
     float borderColor[] = {1.0, 1.0, 1.0, 1.0};
 
     glGenTextures(1, &planeShadowMaps);
+
     glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB8, SHADOW_WIDTH, SHADOW_HEIGHT, dirLights.size() + spotLights.size()); //TODO gonna need optimilize it giving IDK a 100 lights to start
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,dirLights.size() + spotLights.size(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     for(GLsizei layer = 0; layer <  dirLights.size() + spotLights.size(); layer++) {
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE, whiteImage);
     }
@@ -123,8 +124,7 @@ void LightSystem::Init() {
     
     glGenTextures(1, &cubeShadowMaps);
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, cubeShadowMaps);
-
-    glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_RGB8, SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size() * 6); //TODO gonna need optimilize it giving IDK a 100 lights to start
+    glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size() * 6 , 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     for(unsigned int light = 0; light < pointLights.size(); ++light)
     {
         for(unsigned int face = 0; face < 6; ++face)
@@ -161,11 +161,7 @@ void LightSystem::PushDepthMapsToShader(Shader *shader) {
 }
 
 void LightSystem::UpdateImpl() {
-    glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,dirLights.size() + spotLights.size(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, cubeShadowMaps);
-    glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size() * 6 , 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-  
+ 
     GLenum err;
     int offset = 0;
     int index = 0;
@@ -198,7 +194,7 @@ void LightSystem::UpdateImpl() {
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&planeDepthShader);
-        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader,camera);
+        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader,camera);
         
         offset += sizeof(light->data);
     }
@@ -217,7 +213,7 @@ void LightSystem::UpdateImpl() {
         light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  cubeShadowMaps, index++);
         renderSystem->SimpleDrawScene(&cubeDepthShader);
-        instanceRenderSystem->DrawTiles(&instanceCubeDepthShader,camera);
+        instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader,camera);
         offset += sizeof(light->data);
     }
 }

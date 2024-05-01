@@ -32,7 +32,7 @@ cmake_policy(SET CMP0072 NEW) # for GLVND
 
 add_definitions(-D GLM_ENABLE_EXPERIMENTAL)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w") # supress warnings XDE
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1") # supress warnings XDE
 
 # ---- Main project's files ----
 # Add source files
@@ -69,7 +69,6 @@ find_package(glm CONFIG REQUIRED)
 find_package(freetype-gl CONFIG REQUIRED)
 find_path(MINIAUDIO_INCLUDE_DIRS "miniaudio.h")
 find_package(yaml-cpp CONFIG REQUIRED)
-find_package(PThreads4W REQUIRED) #Required by Tracy not on win but on git workflow
 find_package(Tracy CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_opengl_LIBRARY})
@@ -84,8 +83,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE freetype-gl)
 target_include_directories(${PROJECT_NAME} PRIVATE ${MINIAUDIO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE PThreads4W::PThreads4W)
-target_link_libraries(${PROJECT_NAME}  PRIVATE Tracy::TracyClient) #Required by Tracy not on win but on git workflow
+target_link_libraries(${PROJECT_NAME}  PRIVATE Tracy::TracyClient)
 
 #Asssimp config
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE)

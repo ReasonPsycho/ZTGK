@@ -13,6 +13,7 @@
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Render/FrustumCulling/Frustum.h"
+#include "tracy/Tracy.hpp"
 
 class InstanceRenderSystem : public System {
 public:
@@ -24,6 +25,7 @@ public:
     void removeComponent(void* component) override;
     void showImGuiDetailsImpl(Camera *camera) override;
     void DrawTiles(Shader* regularShader,Camera * camera);
+    void SimpleDrawTiles(Shader* regularShader,Camera * camera);
     void PushToSSBO(Camera* camera);
     void UpdateImpl();
 

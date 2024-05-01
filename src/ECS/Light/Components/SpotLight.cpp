@@ -31,6 +31,7 @@ void SpotLight::Innit(int width, int height, int index) {
 
 void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
                                   GLuint ShadowMapArrayId, int index) {
+    ZoneScopedN("SetUpShadowBuffer-SpotLight");
 
         shadowMapShader->use();
         shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));   

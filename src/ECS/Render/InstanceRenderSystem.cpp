@@ -32,7 +32,7 @@ void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
   //it must be here bcs if we mine wall we need to UpdateImpl walls
   //Innit();
-  
+    ZoneScopedN("Draw tiles");
     PushToSSBO(camera);
     tileModel->meshes[0].material.loadMaterial(regularShader);
     glActiveTexture(GL_TEXTURE0 + tileTextureBindingPoint);
@@ -50,6 +50,24 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
         glBindVertexArray(0);
     }
 }
+
+
+void InstanceRenderSystem::SimpleDrawTiles(Shader *regularShader, Camera *camera) {
+    ZoneScopedN("Simple draw tiles");
+    PushToSSBO(camera);
+    Grid* grid = systemManager->getSystem<Grid>();
+
+    glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));
+    regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
+    
+    for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
+        glBindVertexArray(tileModel->meshes[i].VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[i].indices.size()),
+                                GL_UNSIGNED_INT, 0, wallData.size());
+        glBindVertexArray(0);
+    }
+}
+
 
 void InstanceRenderSystem::UpdateImpl() {
     Frustum frustum =  createFrustumFromCamera(*camera);
