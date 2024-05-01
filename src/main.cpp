@@ -945,22 +945,27 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods){
 
+    //calculate ray every mouse press
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
                                                                  display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
 
+    //if left mouse button is pressed, start timer and save position of the mouse press
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
         mouseHeldStartTime = glfwGetTime();
-
+        isLeftMouseButtonHeld = true;
         if(ray->getHitEntity() != nullptr){
             mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
         }
     }
 
+    //if left mouse button is released, check if it was a click or a drag
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
         mouseHeldReleaseTime = glfwGetTime();
+        isLeftMouseButtonHeld = false;
 
-        if(mouseHeldReleaseTime - mouseHeldStartTime < 0.5f) {
+        //if mouse was held for less than 0.2 seconds, consider it a click
+        if(mouseHeldReleaseTime - mouseHeldStartTime < 0.2f) {
 
             // if ray hits an allied unit
             if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr &&
@@ -982,25 +987,28 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 unitSystem.deselectAllUnits();
             }
         }
+
+        //if mouse was held for more than 0.2 seconds, consider it a drag
         else{
             if(ray->getHitEntity() != nullptr){
                 mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
                 Vector2Int mouseHeldStartGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
                 Vector2Int mouseHeldEndGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
 
-//                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
-//                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
+                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
+                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
 
 
                 std::vector<Collider*> collidersInArea = collisionSystem.getCollidersInArea(mouseHeldStartPos, mouseHeldEndPos);
-//                if(!collidersInArea.empty()){
-//                    spdlog::info("Colliders in area: {}", collidersInArea.size());
-//                    for(auto col : collidersInArea){
-//                        spdlog::info("Collider: {}", col->getEntity()->name);
-//                    }
-//                }
+                if(!collidersInArea.empty()){
+                    spdlog::info("Colliders in area: {}", collidersInArea.size());
+                    for(auto col : collidersInArea){
+                        spdlog::info("Collider: {}", col->getEntity()->name);
+                    }
+                }
             }
             else{
+                isLeftMouseButtonHeld = false;
                 return;
             }
         }

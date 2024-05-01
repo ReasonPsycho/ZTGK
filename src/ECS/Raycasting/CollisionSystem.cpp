@@ -68,21 +68,10 @@ std::vector<Collider *> CollisionSystem::getCollidersInArea(glm::vec3 p1, glm::v
     //calculate the bounding box                                                // 1      3
                                                                                 //
     float y = p1.y;                                                             //
-    glm::vec3 diagonal = p2 - p1;
-    glm::vec3 p3 = p1;
-    glm::vec3 p4 = p1;                                                                       // 4      2
-    if(diagonal == glm::vec3(0.0f, 0.0f, 0.0f)){
-        p3 = p1;
-        p4 = p1;
-    }
-    else {
-        glm::vec3 unitDiagonal = glm::normalize(diagonal);
-        glm::vec3 normal(0.0f, 1.0f, 0.0f);
-        glm::vec3 parallel = glm::cross(normal, unitDiagonal);
+                                                                                // 2      4
+    glm::vec3 p3 = glm::vec3(p2.x, y, p1.z);
+    glm::vec3 p4 = glm::vec3(p1.x, y, p2.z);
 
-        p3 = p1 + parallel;
-        p4 = p2 + parallel;
-    }
     spdlog::info("p1: {} {} {}, p2: {} {} {}, p3: {} {} {}, p4: {} {} {}", p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z, p4.x, p4.y, p4.z);
 
 
