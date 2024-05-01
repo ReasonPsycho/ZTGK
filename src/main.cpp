@@ -231,14 +231,14 @@ int main(int, char **) {
     }
     spdlog::info("Initialized OpenGL.");
 
-    init_systems();
-    spdlog::info("Initialized textures and vertices.");
-
     init_imgui();
     spdlog::info("Initialized ImGui.");
 
     init_camera();
     spdlog::info("Initialized camera and viewport.");
+
+    init_systems();
+    spdlog::info("Initialized textures and vertices.");
 
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
