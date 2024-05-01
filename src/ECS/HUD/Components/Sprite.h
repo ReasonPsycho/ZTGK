@@ -23,7 +23,6 @@ struct Sprite : public AHUDComponent {
            unsigned int hudGroupId = 0,
            const std::string & path = "");
 
-    glm::vec2 pos;
     glm::vec2 size;
     GLuint texture;
     glm::vec4 color;

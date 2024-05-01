@@ -8,7 +8,8 @@
 
 Text::Text(const std::string &content, const glm::vec2 &pos, const glm::vec2 &scale, const glm::vec4 &color,
            const std::string &font, TextStyle style, unsigned int hudGroupId)
-: AHUDComponent(TEXT, hudGroupId), content(content), pos(pos), scale(scale), color(color), font(font), style(style) {
+: AHUDComponent(TEXT, hudGroupId), content(content), scale(scale), color(color), font(font), style(style) {
+    AHUDComponent::pos = pos;
     name = std::format("Text: {}###{}", content, uniqueID);
     strcpy_s(editor_content_buffer, content.c_str());
     strcpy_s(editor_font_buffer, font.c_str());

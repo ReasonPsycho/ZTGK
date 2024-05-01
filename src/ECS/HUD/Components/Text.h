@@ -32,7 +32,6 @@ public:
 
     std::string content;
     std::string font;
-    glm::vec2 pos;
     glm::vec2 scale;
     glm::vec4 color;
     unsigned style;
