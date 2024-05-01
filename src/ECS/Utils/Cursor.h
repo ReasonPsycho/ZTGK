@@ -17,6 +17,7 @@ struct Cursor {
     void press(int button, int action, int mods);
 
     struct cursor_conf {
+        // capturing mouse will use it for ui navigation, otherwise it will be used for camera handling
         glm::bvec3 capture{true, true, true};
         bool & capture_move = capture.x;
         bool & capture_scroll = capture.y;
@@ -29,10 +30,9 @@ struct Cursor {
     };
     cursor_conf config;
 
-    bool capture = true;
-    bool captureButton = true;
-    glm::vec2 pos = ztgk::game::window_size / 2;
-    glm::vec2 prev_pos = ztgk::game::window_size / 2;
+    glm::vec2 glfw_prev_pos {0};
+    glm::vec2 ui_pos = ztgk::game::window_size / 2;
+    glm::vec2 ui_prev_pos = ztgk::game::window_size / 2;
     ImGuiIO * mouseio;
     SignalReceiver toggleHandler;
 };

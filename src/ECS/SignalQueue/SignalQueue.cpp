@@ -146,7 +146,7 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
             } else if (choicemask == Signal::signal_types.mouse_button_signal) {
                 data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_move_signal) {
-                data = std::make_shared<MouseMoveSignalData>(Vec2{cfg.xnew, cfg.ynew}, Vec2{cfg.xold, cfg.yold},
+                data = std::make_shared<MouseMoveSignalData>(glm::vec2{cfg.xnew, cfg.ynew}, glm::vec2{cfg.xold, cfg.yold},
                                                              cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_scroll_signal) {
                 data = std::make_shared<MouseScrollSignalData>(glm::vec2{cfg.xoff, cfg.yoff}, cfg.message);

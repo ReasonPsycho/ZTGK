@@ -10,9 +10,11 @@
 
 struct Cursor;
 class SignalQueue;
+struct GLFWwindow;
 
 namespace ztgk::game {
 
+    extern GLFWwindow * window;
     extern Scene * scene;
     extern Model * cube_model;
     extern Camera * camera;

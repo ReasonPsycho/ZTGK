@@ -234,6 +234,12 @@ int main(int, char **) {
     init_imgui();
     spdlog::info("Initialized ImGui.");
 
+    init_time();
+    spdlog::info("Initialized system timer.");
+
+    signalQueue.init();
+    spdlog::info("Initialized signal queue.");
+
     init_camera();
     spdlog::info("Initialized camera and viewport.");
 
@@ -244,13 +250,7 @@ int main(int, char **) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
-    glfwSwapInterval(1); 
-
-    signalQueue.init();
-    spdlog::info("Initialized signal queue.");
-
-    init_time();
-    spdlog::info("Initialized system timer.");
+    glfwSwapInterval(1);
 
     load_enteties();
     spdlog::info("Initialized entities.");
@@ -399,6 +399,7 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::signalQueue = &signalQueue;
+    ztgk::game::window = window;
     ztgk::game::cursor.init();
 
     scene.systemManager.addSystem(&lightSystem);
@@ -889,47 +890,13 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
-    signalQueue += MouseMoveSignalData::signal(
-            {xposIn, yposIn}, {lastX, lastY},
-            "Forwarding GLFW event."
-    );
-
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    static float uixpos{1920 / 2};
-    static float uiypos{1080 / 2};
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    if (captureMouse) {
-        if (timeStep != 0) {
-            camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
-        } else {
-            camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
-        }
-    } else {
-        uixpos += xoffset;
-        uiypos -= yoffset;
-        ImGuiIO &io = ImGui::GetIO();
-        io.MousePos = ImVec2(uixpos, uiypos);
-    }
-
+    ztgk::game::cursor.move({xposIn, yposIn});
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ztgk::game::cursor.scroll({xoffset, yoffset});
-
-//    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
-//
-//    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
