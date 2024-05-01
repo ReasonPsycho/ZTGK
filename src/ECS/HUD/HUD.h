@@ -15,11 +15,11 @@ struct HUDRemapGroupsSignalData;
 
 class HUD : public System {
 public:
-    struct btn_callback_ctx {
-        HUD * hud = nullptr;
-        Entity * entity = nullptr;
-    };
-    using btn_callback = std::function<void(btn_callback_ctx context)>;
+//    struct btn_callback_ctx {
+//        HUD * hud = nullptr;
+//        Entity * entity = nullptr;
+//    };
+//    using btn_callback = std::function<void(btn_callback_ctx context)>;
 
     std::unordered_map<unsigned, Group> groups;
     std::vector<Group *> z_sorted_groups;
@@ -35,8 +35,10 @@ public:
     unsigned addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
     bool removeGroup(unsigned groupID);
 
-    Entity * newButton(const std::string & text, const btn_callback & callback, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
-    Entity * newCheckbox(const btn_callback & callbackOn, const btn_callback & callbackOff, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
+    std::vector<AHUDComponent *> getOfGroup(unsigned groupID);
+
+//    Entity * newButton(const std::string & text, const btn_callback & callback, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
+//    Entity * newCheckbox(const btn_callback & callbackOn, const btn_callback & callbackOff, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
 
     void init();
     void addComponent(void *component) override;
