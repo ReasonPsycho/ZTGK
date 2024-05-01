@@ -39,29 +39,30 @@ void PointLight::Innit(int width, int height, int index) {
 void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
                                    GLuint ShadowMapArrayId, int index) {
 
-    shadowMapShader->use();
-    for (unsigned int i = 0; i < 6; ++i){
+    for (unsigned int i = 0; i < 6; ++i) {
+        shadowMapShader->use();
+
         shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
                                     glm::value_ptr(shadowTransforms[i]));
-    shadowMapShader->setFloat("far_plane", far_plane);
-    shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-    shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                glm::value_ptr(shadowTransforms[i]));
-    instanceShadowMapShader->setFloat("far_plane", near_plane);
-    instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-}
+        shadowMapShader->setFloat("far_plane", far_plane);
+        shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
+                                    glm::value_ptr(shadowTransforms[i]));
+        instanceShadowMapShader->use();
+        instanceShadowMapShader->setFloat("far_plane", near_plane);
+        instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
+    }
 
     GLenum attachments[6];
 
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    for(int i = 0; i < 6; i++)
-    {
+    for (int i = 0; i < 6; i++) {
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, i + index * 6);
         glClear(GL_DEPTH_BUFFER_BIT);
         attachments[i] = GL_DEPTH_ATTACHMENT + i;
     }
 
-    glDrawBuffers(6, attachments);  
+    glDrawBuffers(6, attachments);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glViewport(0, 0, width, height);
@@ -102,8 +103,8 @@ void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShad
     }
 }
 
-PointLight::PointLight(PointLightData data):
-                                                                    data(data) {
+PointLight::PointLight(PointLightData data) :
+        data(data) {
     name = "Point light";
 
     lightType = Point;
@@ -113,9 +114,9 @@ void PointLight::showImGuiDetailsImpl(Camera *camera) {
 
     ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
     ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
-        ImGui::InputFloat("Constant", &data.constant);
-        ImGui::InputFloat("Linear", &data.linear);
-        ImGui::InputFloat("Quadratic", &data.quadratic);
+    ImGui::InputFloat("Constant", &data.constant);
+    ImGui::InputFloat("Linear", &data.linear);
+    ImGui::InputFloat("Quadratic", &data.quadratic);
 
 }
 
@@ -148,6 +149,6 @@ void PointLight::UpdateData(int height, int width) {
             glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, 0.0f, -1.0f),
                         glm::vec3(0.0f, -1.0f, 0.0f)));
 
-    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(),0);
+    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), 0);
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
