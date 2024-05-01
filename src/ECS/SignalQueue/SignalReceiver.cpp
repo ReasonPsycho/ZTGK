@@ -18,7 +18,7 @@ SignalReceiver::SignalReceiver() : SignalReceiver(0) {}
 SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal & signal)> onSignal)
         : receiver_uid(id<ID_POOL_SIGNAL_RECEIVER>()), receive_type_mask(receiveTypeMask), receive(onSignal) {}
 
-void SignalReceiver::showImGuiDetails(Camera *camera) {
+void SignalReceiver::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("RID: ");
     ImGui::SameLine(); ImGui::InputInt("", reinterpret_cast<int *>(&receiver_uid));
     ImGui::Text("Typemask: %d", receive_type_mask);
@@ -31,7 +31,7 @@ void SignalReceiver::showImGuiDetails(Camera *camera) {
         ImGui::CheckboxFlags("Mouse move", &receive_type_mask, Signal::signal_types.mouse_move_signal);
         ImGui::CheckboxFlags("Scroll", &receive_type_mask, Signal::signal_types.mouse_scroll_signal);
         ImGui::CheckboxFlags("Audio", &receive_type_mask, Signal::signal_types.audio_signal);
-        ImGui::CheckboxFlags("Hud mapping update", &receive_type_mask, Signal::signal_types.hud_update_group_mappings_signal);
+        ImGui::CheckboxFlags("Hud mapping UpdateImpl", &receive_type_mask, Signal::signal_types.hud_update_group_mappings_signal);
         ImGui::CheckboxFlags("Hud trigger z sort", &receive_type_mask, Signal::signal_types.hud_sort_z_depth_signal);
         ImGui::CheckboxFlags("Hud remove group", &receive_type_mask, Signal::signal_types.hud_remove_group_signal);
         ImGui::CheckboxFlags("All", &receive_type_mask, Signal::signal_types.all);

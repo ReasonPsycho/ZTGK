@@ -59,8 +59,8 @@ public:
 
     UnitStats GetBaseStats();
 
-    void showImGuiDetails(Camera *camera) override;
-    void Update() override;
+    void showImGuiDetailsImpl(Camera *camera) override;
+    void UpdateImpl() override;
 
     bool isAlly;
     UnitStats baseStats;

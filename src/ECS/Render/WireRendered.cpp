@@ -8,16 +8,9 @@
 void WireRenderer::DrawColliders() {
     
     if(renderBoxes){
-        boxShader.use();
-        camera->GetProjectionMatrix();
-        glm::mat4 projection = camera->GetProjectionMatrix();
-        glm::mat4 view = camera->GetViewMatrix();
-        boxShader.setMatrix4("projection", false, glm::value_ptr(projection));
-        boxShader.setMatrix4("view", false, glm::value_ptr(view));
-
+        
         glDisable(GL_BLEND);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // to draw only lines of polygons
-        PushToSSBO(camera);
 
         for (unsigned int i = 0; i < boxModel->meshes.size(); i++) {
             glBindVertexArray(boxModel->meshes[i].VAO);
@@ -43,7 +36,7 @@ void WireRenderer::removeComponent(void *component) {
     }
 }
 
-void WireRenderer::showImGuiDetails(Camera *camera) {
+void WireRenderer::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Checkbox("Render boxes",&renderBoxes);
     ImGui::Checkbox("Render rays",&renderRays);
     if(ImGui::Button("Clear rays")){
@@ -99,4 +92,11 @@ void WireRenderer::PushToSSBO(Camera *camera) {
                  GL_STREAM_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, wireBoxDataBufferBindingPoint, wireBoxBufferID);
 
+}
+
+void WireRenderer::UpdateImpl() {
+    if(renderRays) {
+
+       PushToSSBO(camera);
+    }
 }

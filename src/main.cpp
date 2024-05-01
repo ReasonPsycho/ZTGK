@@ -1,6 +1,16 @@
 
 #pragma region Includes
 
+
+#pragma region Tracy
+#if defined( __clang__ ) || defined(__GNUC__)
+# define TracyFunction __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+# define TracyFunction __FUNCSIG__
+#endif
+#include <tracy/Tracy.hpp >
+#pragma endregion Tracy
+
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
@@ -179,7 +189,7 @@ PBRPrimitives pbrprimitives;
 LightSystem lightSystem(&camera, &scene);
 PhongPipeline phongPipeline;
 RenderSystem renderSystem;
-InstanceRenderSystem instanceRenderSystem;
+InstanceRenderSystem instanceRenderSystem(&camera);
 WireRenderer wireRenderer(&primitives, &camera);
 BloomPostProcess bloomSystem;
 CollisionSystem collisionSystem;
@@ -247,13 +257,15 @@ int main(int, char **) {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+
+
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-
+        
         // Process I/O operations here
         input();
 
-        // Update game objects' state here
+        // UpdateImpl game objects' state here
         update();
 
         // OpenGL rendering code here
@@ -290,8 +302,9 @@ int main(int, char **) {
 
 
         // End frame and swap buffers (double buffering)
-        file_logger->info("End frame");
+
         end_frame();
+        
     }
 
     file_logger->info("Cleanup");
@@ -613,12 +626,15 @@ void init_imgui() {
 
 void before_frame() {
     // Setting up update_delta time
+    ZoneScopedN("Before frame");
     Time::Instance().Update();
     deltaTime = Time::Instance().DeltaTime();
 }
 
 
 void input() {
+    ZoneScopedN("Input");
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -631,19 +647,24 @@ void input() {
 }
 
 void update() {
-    //update mouse position
+    ZoneScopedN("Update");
+
+    //UpdateImpl mouse position
     mouseX = mouseio.MousePos.x;
     mouseY = mouseio.MousePos.y;
 
     scene.updateScene();
-    lightSystem.Update(deltaTime);
+    lightSystem.Update();
+    instanceRenderSystem.Update();
+    wireRenderer.Update();
 
-    signalQueue.update();
+    signalQueue.Update();
 
     unitSystem.Update();
 }
 
 void render() {
+    ZoneScopedN("Render");
 
     lightSystem.PushDepthMapsToShader(&phongPipeline.phongShader);
     lightSystem.PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
@@ -673,6 +694,8 @@ void render() {
 }
 
 void imgui_begin() {
+    ZoneScopedN("Imgui begin");
+
     ImGuiIO &io = ImGui::GetIO();
     mouseio = io;
     // Start the Dear ImGui frame
@@ -691,6 +714,8 @@ void imgui_begin() {
 }
 
 void imgui_render() {
+    ZoneScopedN("Imgui render");
+
     scene.showImGuiDetails(&camera);
 
     static double fps_max = -1;
@@ -776,6 +801,8 @@ void imgui_render() {
 }
 
 void imgui_end() {
+    ZoneScopedN("Imgui end");
+
     ImGui::End();
     ImGui::Render();
 
@@ -949,6 +976,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 void end_frame() {
+    ZoneScopedN("End frame");
+
     // Poll and handle events (inputs, window reinitWithSize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
     // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -956,6 +985,7 @@ void end_frame() {
     // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
     glfwPollEvents();
     glfwSwapBuffers(window);
+    FrameMark;
 }
 
 void init_camera() {

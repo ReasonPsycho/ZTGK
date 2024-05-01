@@ -36,7 +36,7 @@ int CollisionSystem::getNumComponentTypes() {
     return componentTypes.size();
 }
 
-void CollisionSystem::showImGuiDetails(Camera *camera) {
+void CollisionSystem::showImGuiDetailsImpl(Camera *camera) {
 
     ImGui::Begin("Collision System");
     ImGui::Text("Box Colliders: %zu", BoxColliders.size());

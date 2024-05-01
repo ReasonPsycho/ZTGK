@@ -31,23 +31,36 @@ void SpotLight::Innit(int width, int height, int index) {
 
 void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
                                   GLuint ShadowMapArrayId, int index) {
+    ZoneScopedN("SetUpShadowBuffer-SpotLight");
 
-        shadowMapShader->use();
-        shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));   
-        shadowMapShader->setFloat("near_plane",far_plane);    
-        shadowMapShader->setFloat("far_plane",near_plane);
-        instanceShadowMapShader->use();
-        instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-    instanceShadowMapShader->setFloat("near_plane",far_plane);
-    instanceShadowMapShader->setFloat("far_plane",near_plane);
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, width, height);
+    {
+        ZoneScopedN("mapShaders-SpotLight");
+        {
+            ZoneScopedN("shadowMapShader-SpotLight");
+            { ZoneScopedN("use-SpotLight");
+                shadowMapShader->use();
+            }
+            { ZoneScopedN("setMatrix4-SpotLight");
+                shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(glm::mat4(1)));
+            }
 
+        }
+        {
+            ZoneScopedN("instanceShadowMapShader-SpotLight");
+            instanceShadowMapShader->use();
+            instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+        }
+     }
+
+    {
+        ZoneScopedN("glBindFramebuffer-SpotLight");
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glViewport(0, 0, width, height);
+    }
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -92,21 +105,21 @@ SpotLight::SpotLight(SpotLightData data) : data(data) {
     lightType = Spot;
 }
 
-void SpotLight::showImGuiDetails(Camera *camera) {
+void SpotLight::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
     ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
-        ImGui::InputFloat("Constant", &data.constant);
-        ImGui::InputFloat("Linear", &data.linear);
-        ImGui::InputFloat("Quadratic", &data.quadratic);
-        ImGui::InputFloat("Cut off", &data.cutOff);
-        ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
+    ImGui::InputFloat("Constant", &data.constant);
+    ImGui::InputFloat("Linear", &data.linear);
+    ImGui::InputFloat("Quadratic", &data.quadratic);
+    ImGui::InputFloat("Cut off", &data.cutOff);
+    ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
 }
 
 void SpotLight::UpdateData(int height, int width) {
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::perspective(data.outerCutOff, (GLfloat) width / (GLfloat) height, near_plane, far_plane);
 
-    glm::vec3 forward = glm::vec3(1,0,0);
+    glm::vec3 forward = glm::vec3(1, 0, 0);
     glm::quat globalRotation = getEntity()->transform.getGlobalRotation();
 
     data.position = glm::vec4(getEntity()->transform.getGlobalPosition(), 1.0f);
@@ -124,7 +137,7 @@ void SpotLight::UpdateData(int height, int width) {
 
     data.lightSpaceMatrix = lightProjection * lightView;
 
-    far_plane = ComputeFarPlane(data.constant,data.linear,data.quadratic);
-    
+    far_plane = ComputeFarPlane(data.constant, data.linear, data.quadratic);
+
     this->setIsDirty(false);
 }

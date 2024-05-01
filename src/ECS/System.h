@@ -24,17 +24,29 @@ public:
     std::string name;
     
     virtual ~System() = default;
-    
+
+    //Component system
     virtual void addComponent(void* component) = 0;
     virtual void removeComponent(void* component) = 0;
     virtual const std::type_index* getComponentTypes() = 0;
     virtual int getNumComponentTypes() = 0;
 
-    virtual void showImGuiDetails(Camera *camera) = 0;
+    //Imgui
+    void showImGuiDetails(Camera *camera);
+    
+    //Logic
+
+    void Update();
+
     SystemManager *getSystemManager();
 
     unsigned uniqueID;     // Instance variable to store the unique ID for each object
     SystemManager* systemManager;
+protected:
+    virtual void UpdateImpl(){};
+
+    virtual void showImGuiDetailsImpl(Camera *camera) = 0;
+    
 };
 
 

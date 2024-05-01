@@ -79,7 +79,7 @@ DirLight::DirLight(DirLightData data) :
     lightType = Directional;
 }
 
-void DirLight::showImGuiDetails(Camera *camera) {
+void DirLight::showImGuiDetailsImpl(Camera *camera) {
         ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
         ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
 }

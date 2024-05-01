@@ -19,9 +19,9 @@ public:
     void DrawRays();
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
     void Innit();
-    
+    void UpdateImpl() override;
     
     const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
     int getNumComponentTypes() override { return 3;};

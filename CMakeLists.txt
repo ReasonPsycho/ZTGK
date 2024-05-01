@@ -32,10 +32,13 @@ cmake_policy(SET CMP0072 NEW) # for GLVND
 
 add_definitions(-D GLM_ENABLE_EXPERIMENTAL)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1") # supress warnings XDE
+
 # ---- Main project's files ----
 # Add source files
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/res)
+
 
 # Gather source and header files
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp") #SIDE note u need to rerun CMAKE each time u add class manually since it doesn't need to change to add file.
@@ -54,9 +57,6 @@ add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
 # Treat asset files as headers (prevents them from being compiled)
 set_source_files_properties(${ASSETS_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE)
-set(ASSIMP_BUILD_FBX_IMPORTER TRUE)
-
 find_package(OpenGL  REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(Stb REQUIRED)
@@ -69,6 +69,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(freetype-gl CONFIG REQUIRED)
 find_path(MINIAUDIO_INCLUDE_DIRS "miniaudio.h")
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(Tracy CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_opengl_LIBRARY})
 target_link_libraries(${PROJECT_NAME} PRIVATE glad::glad)
@@ -82,11 +83,26 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE freetype-gl)
 target_include_directories(${PROJECT_NAME} PRIVATE ${MINIAUDIO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
+target_link_libraries(${PROJECT_NAME}  PRIVATE Tracy::TracyClient)
+
+#Asssimp config
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE)
+set(ASSIMP_BUILD_FBX_IMPORTER TRUE)
+
+# tracey config
+option( TRACY_ENABLE "" ON)
+option( TRACY_ON_DEMAND "" ON)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink
         ${CMAKE_SOURCE_DIR}/res
         ${CMAKE_CURRENT_BINARY_DIR}/res)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/tracey
+        ${CMAKE_CURRENT_BINARY_DIR}/tracey)
+
 
 if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)

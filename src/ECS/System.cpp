@@ -5,6 +5,8 @@
 #include "SystemManager.h"
 #include "System.h"
 #include "Utils/Util.h"
+#include "tracy/Tracy.hpp"
+
 using namespace ztgk;
 
 System::System() {
@@ -13,5 +15,15 @@ System::System() {
 
 SystemManager *System::getSystemManager() {
     return systemManager;
+}
+
+void System::showImGuiDetails(Camera *camera) {
+    ZoneTransientN(zoneName,(name).c_str(),true);
+    showImGuiDetailsImpl(camera);
+}
+
+void System::Update() {
+    ZoneTransientN(zoneName,(name).c_str(),true);
+    UpdateImpl();
 }
 

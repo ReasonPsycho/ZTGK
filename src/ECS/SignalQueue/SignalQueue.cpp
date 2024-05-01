@@ -115,7 +115,7 @@ void SignalQueue::addComponent(void *component) {
 SignalQueue::editor_s_new_signal_config SignalQueue::editor_new_signal_config{};
 SignalQueue::editor_s_logging SignalQueue::editor_log{};
 
-void SignalQueue::showImGuiDetails(Camera *camera) {
+void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
     auto &cfg = editor_new_signal_config;
     auto &log = editor_log;
 
@@ -131,7 +131,7 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
     ImGui::SameLine();
     ImGui::Text("dt: %lld", get_delta());
     if ( log.enable && ImGui::TreeNodeEx(std::format("Debug Receiver##{}", log.recv->receiver_uid).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth) ) {
-        log.recv->showImGuiDetails(camera);
+        log.recv->showImGuiDetailsImpl(camera);
         ImGui::TreePop();
     }
 
@@ -187,7 +187,7 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
                     "\nThat is the first event in order of subscription that matches the typemask or id."
                     "\nThis also means any log will only print this signal if no other receiver caught it.");
         }
-        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud update mappings", "Hud sort z depth", "Hud remove group"};
+        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud UpdateImpl mappings", "Hud sort z depth", "Hud remove group"};
         ImGui::Combo("Type", &cfg.choice, types, 9);
         // assumes types are ordered the same way type id masks are initialized!!
         unsigned choicemask = 1 << cfg.choice;
@@ -232,7 +232,7 @@ void SignalQueue::showImGuiDetails(Camera *camera) {
     if ( ImGui::CollapsingHeader("Managed Components") ) {
         for (auto & recv : receivers) {
             if (ImGui::TreeNodeEx(std::format("ID {0}, RID {1}, Mask {2}##Recv{0}", recv->uniqueID, recv->receiver_uid, recv->receive_type_mask).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
-                recv->showImGuiDetails(camera);
+                recv->showImGuiDetailsImpl(camera);
                 ImGui::TreePop();
             }
         }
@@ -260,6 +260,10 @@ SignalQueue::SignalQueue() {
 
 void SignalQueue::removeComponent(void *component) {
     receivers.erase(std::remove(receivers.begin(), receivers.end(),reinterpret_cast<SignalReceiver *const>(component)), receivers.end());
+}
+
+void SignalQueue::UpdateImpl() {
+    process_all();
 }
 
 SignalReceiver SignalQueue::editor_s_logging::new_receiver() {

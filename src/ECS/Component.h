@@ -29,14 +29,17 @@ public:
     void setEntity(Entity* newParentEntity);
     Entity *getEntity();
 
-    virtual void Update() {}
-    
+    void Update();
     void setIsDirty(bool dirtValue);
     bool getIsDirty();
-    virtual void showImGuiDetails(Camera *camera) = 0;
+    void showImGuiDetails(Camera *camera);
 
     unsigned uniqueID;     // Instance variable to store the unique ID for each object
     Entity *parentEntity = nullptr;
+protected:
+    virtual void showImGuiDetailsImpl(Camera *camera) {};
+    virtual void UpdateImpl() {};
+
 
 private:
     bool isDirty = false;

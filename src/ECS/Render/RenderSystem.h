@@ -19,7 +19,7 @@ public:
     int getNumComponentTypes() override { return 1;};
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
     void DrawScene(Shader *regularShader, Camera *camera);
     void SimpleDrawScene(Shader* regularShader);
 

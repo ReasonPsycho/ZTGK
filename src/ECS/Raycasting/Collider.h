@@ -26,7 +26,7 @@ public:
     virtual ~Collider() = default;
 
     // ImGui methods
-    void showImGuiDetails(Camera *camera) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
 };
 

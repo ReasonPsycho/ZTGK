@@ -14,8 +14,8 @@ public:
     UnitAI(Unit* pUnit, StateManager* pStateManager);
     ~UnitAI();
 
-    void Update() override;
-    void showImGuiDetails(Camera *camera) override;
+    void UpdateImpl() override;
+    void showImGuiDetailsImpl(Camera *camera) override;
 
     
     private:

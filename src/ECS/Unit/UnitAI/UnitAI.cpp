@@ -12,11 +12,11 @@ UnitAI::~UnitAI() {
     delete stateManager;
 }
 
-void UnitAI::Update() {
+void UnitAI::UpdateImpl() {
     stateManager->RunStateMachine();
     unit->currentState = stateManager->currentState;
 }
 
-void UnitAI::showImGuiDetails(Camera *camera) {
+void UnitAI::showImGuiDetailsImpl(Camera *camera) {
 
 }
