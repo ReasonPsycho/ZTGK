@@ -144,12 +144,12 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
             } else if (choicemask == Signal::signal_types.keyboard) {
                 data = std::make_shared<KeySignalData>(cfg.key, cfg.scancode, cfg.kaction, cfg.kmods, cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_button_signal) {
-                data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, cfg.message);
+                data = std::make_shared<MouseButtonSignalData>(cfg.button, cfg.maction, cfg.mmods, glm::vec2{cfg.xnew, cfg.ynew}, cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_move_signal) {
-                data = std::make_shared<MouseMoveSignalData>(Vec2{cfg.xnew, cfg.ynew}, Vec2{cfg.xold, cfg.yold},
+                data = std::make_shared<MouseMoveSignalData>(glm::vec2{cfg.xnew, cfg.ynew}, glm::vec2{cfg.xold, cfg.yold},
                                                              cfg.message);
             } else if (choicemask == Signal::signal_types.mouse_scroll_signal) {
-                data = std::make_shared<MouseScrollSignalData>(Vec2{cfg.xoff, cfg.yoff}, cfg.message);
+                data = std::make_shared<MouseScrollSignalData>(glm::vec2{cfg.xoff, cfg.yoff}, glm::vec2{cfg.xnew, cfg.ynew}, cfg.message);
             } else if (choicemask == Signal::signal_types.audio_signal) {
                 data = std::make_shared<AudioSignalData>(cfg.soundpath, cfg.message);
             } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
@@ -199,6 +199,8 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
             ImGui::InputInt("Action", &cfg.kaction);
             ImGui::InputInt("Mods", &cfg.kmods);
         } else if (choicemask == Signal::signal_types.mouse_button_signal) {
+            ImGui::InputDouble("Cursor X", &cfg.xnew);
+            ImGui::InputDouble("Cursor Y", &cfg.ynew);
             ImGui::InputInt("Button", &cfg.button);
             ImGui::InputInt("Action", &cfg.maction);
             ImGui::InputInt("Mods", &cfg.mmods);
@@ -208,6 +210,8 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
             ImGui::InputDouble("Old X", &cfg.xold);
             ImGui::InputDouble("Old Y", &cfg.yold);
         } else if (choicemask == Signal::signal_types.mouse_scroll_signal) {
+            ImGui::InputDouble("Cursor X", &cfg.xnew);
+            ImGui::InputDouble("Cursor Y", &cfg.ynew);
             ImGui::InputDouble("X-offset", &cfg.xoff);
             ImGui::InputDouble("Y-offset", &cfg.yoff);
         } else if (choicemask == Signal::signal_types.audio_signal) {

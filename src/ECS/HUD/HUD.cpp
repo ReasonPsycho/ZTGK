@@ -3,9 +3,11 @@
 //
 
 #include "HUD.h"
+#include "ECS/Entity.h"
 #include "ECS/SignalQueue/Signal.h"
 #include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
 #include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include <ranges>
 #include <algorithm>
@@ -86,6 +88,53 @@ bool HUD::removeGroup(unsigned int groupID) {
     // Return value - The number of erased elements.
     return groups.erase(groupID) != 0;
 }
+
+std::vector<AHUDComponent *> HUD::getOfGroup(unsigned int groupID) {
+    std::vector<AHUDComponent *> ret;
+    ret.append_range(texts[groupID]);
+    ret.append_range(sprites[groupID]);
+    return ret;
+}
+
+//Entity *
+//HUD::newButton(const string &text, const HUD::btn_callback &callback, glm::vec2 pos, glm::vec2 size, Entity *parent) {
+//    auto scene = ztgk::game::scene;
+//    Entity * entity;
+//    if (parent == nullptr)
+//        entity = scene->addEntity(format("HUD Button: {0}##HUD_BUTTON_{0}", text));
+//    else
+//        entity = scene->addEntity(parent, format("HUD Button: {0}##HUD_BUTTON_{0}", text));
+//
+//    auto group = addGroup();
+//    entity->addComponent(make_unique<Text>(
+//        text, pos, glm::vec2(1, 1),
+//        ztgk::color.WHITE,
+//        ztgk::font.default_font,NONE,
+//        group
+//    ));
+//    entity->addComponent(make_unique<Sprite>(
+//        pos, size,
+//        ztgk::color.TEAL,
+//        group,
+//        ""
+//    ));
+//    entity->addComponent(make_unique<SignalReceiver>(
+//        Signal::signal_types.mouse_button_signal,
+//        [this, entity, callback](const Signal & signal){
+//            auto data = dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+//            if ( data->button == GLFW_MOUSE_BUTTON_LEFT && data->action == GLFW_PRESS )
+//
+//            callback({ this, entity });
+//        }
+//    ));
+//
+//    return nullptr;
+//}
+//
+//Entity *HUD::newCheckbox(const HUD::btn_callback &callbackOn, const HUD::btn_callback &callbackOff, glm::vec2 pos,
+//                         glm::vec2 size, Entity *parent) {
+//    return nullptr;
+//}
 
 void HUD::addComponent(void *component) {
     auto c = static_cast<AHUDComponent*>(component);

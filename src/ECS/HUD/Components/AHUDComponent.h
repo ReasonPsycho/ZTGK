@@ -17,4 +17,5 @@ struct AHUDComponent : public Component {
 
     hudcType type;
     unsigned groupID;
+    glm::vec2 pos;
 };

@@ -96,6 +96,7 @@ void TextRenderer::loadFont(std::string font) {
 void TextRenderer::render(Text * text) {
     if ( !fonts.contains(text->font) )
         loadFont(text->font);
+    glEnable(GL_BLEND);
 
     // activate corresponding render state
     shader.use();
@@ -139,6 +140,7 @@ void TextRenderer::render(Text * text) {
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_BLEND);
 }
 
 TextRenderer::~TextRenderer() {
