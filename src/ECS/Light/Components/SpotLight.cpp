@@ -33,22 +33,34 @@ void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShado
                                   GLuint ShadowMapArrayId, int index) {
     ZoneScopedN("SetUpShadowBuffer-SpotLight");
 
-    shadowMapShader->use();
-    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-    shadowMapShader->setFloat("near_plane", far_plane);
-    shadowMapShader->setFloat("far_plane", near_plane);
-    instanceShadowMapShader->use();
-    instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-    instanceShadowMapShader->setFloat("near_plane", far_plane);
-    instanceShadowMapShader->setFloat("far_plane", near_plane);
+    {
+        ZoneScopedN("mapShaders-SpotLight");
+        {
+            ZoneScopedN("shadowMapShader-SpotLight");
+            { ZoneScopedN("use-SpotLight");
+                shadowMapShader->use();
+            }
+            { ZoneScopedN("setMatrix4-SpotLight");
+                shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(glm::mat4(1)));
+            }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, width, height);
+        }
+        {
+            ZoneScopedN("instanceShadowMapShader-SpotLight");
+            instanceShadowMapShader->use();
+            instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+        }
+     }
 
+    {
+        ZoneScopedN("glBindFramebuffer-SpotLight");
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glViewport(0, 0, width, height);
+    }
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
