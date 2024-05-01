@@ -31,36 +31,20 @@ void SpotLight::Innit(int width, int height, int index) {
 
 void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
                                   GLuint ShadowMapArrayId, int index) {
-    ZoneScopedN("SetUpShadowBuffer-SpotLight");
+    ZoneScopedN("SetUpShadowBuffer");
 
-    {
-        ZoneScopedN("mapShaders-SpotLight");
-        {
-            ZoneScopedN("shadowMapShader-SpotLight");
-            { ZoneScopedN("use-SpotLight");
-                shadowMapShader->use();
-            }
-            { ZoneScopedN("setMatrix4-SpotLight");
-                shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(glm::mat4(1)));
-            }
+    shadowMapShader->use();
+    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(glm::mat4(1)));
 
-        }
-        {
-            ZoneScopedN("instanceShadowMapShader-SpotLight");
-            instanceShadowMapShader->use();
-            instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-        }
-     }
+    instanceShadowMapShader->use();
+    instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
 
-    {
-        ZoneScopedN("glBindFramebuffer-SpotLight");
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, width, height);
-    }
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, width, height);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {

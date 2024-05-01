@@ -243,6 +243,7 @@ int main(int, char **) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
+    glfwSwapInterval(1); 
 
     signalQueue.init();
     spdlog::info("Initialized signal queue.");
@@ -984,7 +985,10 @@ void end_frame() {
     // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
     // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
     glfwPollEvents();
-    glfwSwapBuffers(window);
+    {
+        ZoneScopedN("VSync buffer");
+        glfwSwapBuffers(window);
+    }
     FrameMark;
 }
 
