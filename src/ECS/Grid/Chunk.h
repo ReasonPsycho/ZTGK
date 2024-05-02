@@ -15,15 +15,27 @@ class Grid;
 class Chunk {
 
 public:
-     Chunk(Vector2Int index,Grid* grid);
-    //number of tiles in the grid
-    const int width = 10;
-    const int height = 10;
+     Chunk(Vector2Int index,Grid* grid,int width,int height);
+
+     //Data
+    int width;
+    int height;
+    
     Vector2Int index{};
-
+    
     std::vector<std::unique_ptr<WallData>> wallDataArray;
+    std::vector<std::vector<Tile*>> chunkTileArray;
 
+    //Tiles
+    Tile *getTileAt(int x, int z);
+    Tile *getTileAt(Vector2Int index);
 
+    void setTileAt(int x, int z, Tile *tile);
+    void setTileAt(Vector2Int index, Tile *tile);
+    void removeTileAt(int x, int z);
+    void removeTileAt(Vector2Int index);
+    
+    
     glm::vec3 chunkRealPosition();
     AABB getBoundingVolume(); //TODO cash it somewhere
     WallData *addWallData(std::unique_ptr<WallData>  wallData);
