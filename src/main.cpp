@@ -8,7 +8,9 @@
 #elif defined(_MSC_VER)
 # define TracyFunction __FUNCSIG__
 #endif
+
 #include <tracy/Tracy.hpp >
+
 #pragma endregion Tracy
 
 #include "imgui.h"
@@ -93,7 +95,7 @@ HUD hud;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
-StateManager* stateManager;
+StateManager *stateManager;
 
 Entity *box1;
 Entity *box2;
@@ -272,7 +274,7 @@ int main(int, char **) {
 
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-        
+
         // Process I/O operations here
         input();
 
@@ -315,7 +317,7 @@ int main(int, char **) {
         // End frame and swap buffers (double buffering)
 
         end_frame();
-        
+
     }
 
     file_logger->info("Cleanup");
@@ -450,7 +452,7 @@ void load_enteties() {
 
     model.loadModel();
     wall.loadModel();
-    
+
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     //gabka.loadModel();
     tileModel.loadModel();
@@ -458,32 +460,32 @@ void load_enteties() {
 
 
     gameObject = scene.addEntity("Wall");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,50,0));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
-    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
     gameObject = scene.addEntity("Wall1");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,50,200));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
-    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 200));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 //
     gameObject = scene.addEntity("Wall2");;
-    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalPosition(glm::vec3(0, 50, 100));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
 //
     gameObject = scene.addEntity("Wall3");;
-    gameObject->transform.setLocalPosition(glm::vec3(200,50,100));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalPosition(glm::vec3(200, 50, 100));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
-    
-    
+
+
 //    gameObject = scene.addEntity("Dir light");
-  //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
+    //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
     gameObject->addComponent(make_unique<PointLight>(
             PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
@@ -497,7 +499,7 @@ void load_enteties() {
     lightSystem.Init();
 
     //gameObject = scene.addEntity("Quad");
-   // gameObject->addComponent(make_unique<Render>(quadModel));
+    // gameObject->addComponent(make_unique<Render>(quadModel));
 
 
     instanceRenderSystem.tileModel = quadModel;
@@ -532,19 +534,18 @@ void load_enteties() {
     hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
-                                                                                ztgk::game::window_size.y * 0.5));
+                                                        ztgk::game::window_size.y * 0.5));
     tx.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Text>( tx ));
+    fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
     fgelem = scene.addEntity(efg, "Animated Sprite");
     auto spr = Sprite("res/textures/puni.png");
     spr.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Sprite>( spr ));
+    fgelem->addComponent(make_unique<Sprite>(spr));
     zmspr = fgelem->getComponent<Sprite>();
     zmspr->groupID = zmgroup;
 
     load_units();
-
 
 
 }
@@ -623,6 +624,7 @@ void load_units() {
 //    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 }
+
 void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -700,7 +702,7 @@ void render() {
     phongPipeline.PrebindPipeline(&camera);
 
     renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader, &camera);
     wireRenderer.DrawColliders();
     wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
@@ -761,21 +763,21 @@ void imgui_render() {
     }
     ImGui::End();
 
-    static LevelGenerator::Config levelGenConfig {
-        .seed {},
-        .size {100, 100},
-        .wallThickness = 1.f,
-        .baseRadius = 4.5f,
-        .keyRadius = 4.f,
-        .pocketRadius = 2.5f,
-        .noiseImpact = 1.f,
-        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
-        .extraPocketAttempts = 10000,
-        .keyEnemies = 3,
-        .minEnemies = 0,
-        .maxEnemies = 2,
-        .unitCount = 3,
-        .chestCount = 10,
+    static LevelGenerator::Config levelGenConfig{
+            .seed {},
+            .size {100, 100},
+            .wallThickness = 1.f,
+            .baseRadius = 4.5f,
+            .keyRadius = 4.f,
+            .pocketRadius = 2.5f,
+            .noiseImpact = 1.f,
+            .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+            .extraPocketAttempts = 10000,
+            .keyEnemies = 3,
+            .minEnemies = 0,
+            .maxEnemies = 2,
+            .unitCount = 3,
+            .chestCount = 10,
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -915,7 +917,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
 
     ztgk::game::cursor.click(button, action, mods);
-
+}
     /*
    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
@@ -997,7 +999,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
 
-*/
 
     //if there are selected units and right mouse button is pressed, set target for selected units
     if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
@@ -1029,9 +1030,11 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         }
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
+     
+     
+   
 }
-
-
+  */
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
