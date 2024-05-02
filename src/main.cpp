@@ -917,14 +917,10 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
 
     ztgk::game::cursor.click(button, action, mods);
-}
-    /*
-   signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-
     handle_picking(window, button, action, mods);
-
+    
 }
+
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods){
 
@@ -986,6 +982,10 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 if(!collidersInArea.empty()){
                     spdlog::info("Colliders in area: {}", collidersInArea.size());
                     for(auto col : collidersInArea){
+                        Tile* checkTile = col->getEntity()->getComponent<Tile>();
+                        if(checkTile != nullptr){
+                            checkTile->setTileSelectionState(POINTED_AT);
+                        }
                         spdlog::info("Collider: {}", col->getEntity()->name);
                     }
                 }
@@ -1012,6 +1012,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 //if hit entity is mineable, set it as mining target
                 if(hit->getComponent<IMineable>()!=nullptr){
                     unit->miningTarget = hit->getComponent<IMineable>();
+                    Tile* hitTile = hit->getComponent<Tile>();
+                    hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
                     spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
                 }
@@ -1030,11 +1032,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         }
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
-     
-     
-   
 }
-  */
+  
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");

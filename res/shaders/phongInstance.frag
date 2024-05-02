@@ -1,13 +1,17 @@
 #version 460
 out vec4 FragColor;
 
+
 in VS_OUT {
     vec3 FragPos;
     vec2 TexCoords;
     vec3 WorldPos;
     flat int textureType;
     flat bool inFogOfWar;
+    flat int typeOfSelection;
+    flat int CheckVector2Int;
 }vs_out;
+
 
 
 
@@ -78,6 +82,15 @@ uniform Material material;
 uniform vec3 camPos;
 uniform float far_plane;
 
+vec3 selectionColor[5] = vec3[]
+(
+vec3(1, 1, 1), //Just here to simplyfiy the logic
+vec3(0, 1, 0),
+vec3(0, 0, 1),
+vec3(1, 0, 0),
+vec3(1, 0, 1)
+);
+
 vec3 gridSamplingDisk[20] = vec3[]
 (
 vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
@@ -105,9 +118,10 @@ void main()
     vec3 norm = vec3(texture(material.normal, vs_out.TexCoords));
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
 
+    vec3 result = vec3(0);
     if (!vs_out.inFogOfWar){
 
-        vec3 result = 0.4f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
+        result = 0.4f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLights.length(); ++i) {
             result += CalcDirLight(dirLights[i], norm, viewDir, index++);
@@ -122,11 +136,17 @@ void main()
             result += CalcPointLight(pointLights[i], norm, vs_out.WorldPos, viewDir, index++);
         }
 
-        FragColor = vec4(result, 1.0);
-    } else {
-        FragColor = vec4(0.5, 0.5, 0.5, 1.0);
+    }
+    else {
+
+        result = vec3(0.5, 0.5, 0.5);
     }
 
+    if(vs_out.typeOfSelection != 0){
+        result = mix(result, selectionColor[vs_out.typeOfSelection], 0.5);
+    }
+    
+    FragColor = vec4(result, 1.0);
 }
 
 // calculates the color when using a directional light.

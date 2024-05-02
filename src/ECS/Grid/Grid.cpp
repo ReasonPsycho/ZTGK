@@ -165,7 +165,7 @@ void Grid::GenerateTileEntities(float scale) {
             tileEntity->updateSelfAndChild();
 
             tileEntity->addComponent(
-                    std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5, 0.5, 0.5),
+                    std::make_unique<BoxCollider>(tileEntity, glm::vec4(0.5, 0.5, 0.5,1),
                                                   ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
             tileEntity->getComponent<BoxCollider>()->center =
                     tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);

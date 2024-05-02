@@ -65,7 +65,7 @@ void Cursor::scroll(glm::vec2 offset) {
 void Cursor::click(int button, int action, int mods) {
     if (config.capture_click) {
         ImGui_ImplGlfw_MouseButtonCallback(ztgk::game::window, button, action, mods);
-        if (config.forward_click)
+        if (config.forward_click){}
             *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods, ui_pos, "Cursor forwarding CLICK");
     }
 }
