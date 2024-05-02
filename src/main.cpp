@@ -17,6 +17,7 @@
 #include <ImGuizmo.h>
 #include <cstdio>
 
+#include "ECS/Utils/Cursor.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
@@ -230,26 +231,26 @@ int main(int, char **) {
     }
     spdlog::info("Initialized OpenGL.");
 
-    init_systems();
-    spdlog::info("Initialized textures and vertices.");
-
     init_imgui();
     spdlog::info("Initialized ImGui.");
 
+    init_time();
+    spdlog::info("Initialized system timer.");
+
+    signalQueue.init();
+    spdlog::info("Initialized signal queue.");
+
     init_camera();
     spdlog::info("Initialized camera and viewport.");
+
+    init_systems();
+    spdlog::info("Initialized textures and vertices.");
 
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
-    glfwSwapInterval(1); 
-
-    signalQueue.init();
-    spdlog::info("Initialized signal queue.");
-
-    init_time();
-    spdlog::info("Initialized system timer.");
+    glfwSwapInterval(1);
 
     load_enteties();
     spdlog::info("Initialized entities.");
@@ -396,11 +397,16 @@ bool init() {
 
 void init_systems() {
     ztgk::game::scene = &scene;
+    ztgk::game::camera = &camera;
+    ztgk::game::signalQueue = &signalQueue;
+    ztgk::game::window = window;
+    ztgk::game::cursor.init();
+
+    scene.systemManager.addSystem(&signalQueue);
 
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&instanceRenderSystem);
-    scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
@@ -421,6 +427,8 @@ void init_systems() {
 
     hud.init();
     scene.systemManager.addSystem(&hud);
+
+    unitSystem.init();
 }
 
 void load_enteties() {
@@ -869,7 +877,7 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-// glfw: whenever the window size changed (by OS or user reinitWithSize) this callback function executes
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -877,6 +885,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     display_h = height;
     display_w = width;
+    ztgk::game::window_size = {width, height};
     camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
 }
@@ -885,90 +894,17 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
-    signalQueue += MouseMoveSignalData::signal(
-            {xposIn, yposIn}, {lastX, lastY},
-            "Forwarding GLFW event."
-    );
-
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    static float uixpos{1920 / 2};
-    static float uiypos{1080 / 2};
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    if (captureMouse) {
-        if (timeStep != 0) {
-            camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
-        } else {
-            camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
-        }
-    } else {
-        uixpos += xoffset;
-        uiypos -= yoffset;
-        ImGuiIO &io = ImGui::GetIO();
-        io.MousePos = ImVec2(uixpos, uiypos);
-    }
-
+    ztgk::game::cursor.move({xposIn, yposIn});
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
-
-    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+    ztgk::game::cursor.scroll({xoffset, yoffset});
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
-    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
-
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        if (ray->getHitEntity() != nullptr&& ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly){
-            if(ray->getHitEntity()->getComponent<Unit>()->isSelected){
-                unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>() );
-            } else {
-                unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
-        } }else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
-            unitSystem.deselectAllUnits();
-        }
-
-        wireRenderer.rayComponents.push_back(std::move(ray));
-    }
-    if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
-        glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w, display_h);
-        std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
-        Entity * hit = ray->getHitEntity();
-        if(hit != nullptr){
-            for(auto unit : unitSystem.selectedUnits){
-                if(hit->getComponent<IMineable>()!=nullptr){
-                    unit->miningTarget = hit->getComponent<IMineable>();
-                    unit->hasMiningTarget = true;
-                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
-                }
-                else{
-                    unit->hasMiningTarget = false;
-                    unit->miningTarget = nullptr;
-                    unit->hasCombatTarget = false;
-                    unit->combatTarget = nullptr;
-                    unit->hasMovementTarget = true;
-                    unit->pathfinding.path.clear();
-                    unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
-                }
-            }
-        }
-        wireRenderer.rayComponents.push_back(std::move(ray));
-    }
+    ztgk::game::cursor.click(button, action, mods);
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
