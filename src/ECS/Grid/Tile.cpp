@@ -32,3 +32,18 @@ void Tile::showImGuiDetailsImpl(Camera *camera) {
     state = (TileState)state_select;
 }
 
+void Tile::changeHitWallsState(TileSelectionState state) {
+    for(auto wall : walls){
+        wall->data[2] = state;
+    }
+}
+
+void Tile::setTileSelectionState(TileSelectionState state) {
+    changeHitWallsState(state);
+    tileSelectionState = state;
+}
+
+TileSelectionState Tile::getTileSelectionState() {
+    return tileSelectionState;
+}
+

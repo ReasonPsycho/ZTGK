@@ -33,6 +33,7 @@ public:
     void setIsDirty(bool dirtValue);
     bool getIsDirty();
     void showImGuiDetails(Camera *camera);
+    void Remove();
 
     unsigned uniqueID;     // Instance variable to store the unique ID for each object
     Entity *parentEntity = nullptr;

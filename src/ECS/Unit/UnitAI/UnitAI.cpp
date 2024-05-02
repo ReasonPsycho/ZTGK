@@ -1,6 +1,7 @@
 #include "UnitAI.h"
 
 UnitAI::UnitAI(Unit *pUnit, StateManager *pStateManager) {
+    name = "Unit AI";
     unit = pUnit;
     stateManager = pStateManager;
     stateManager->unit = unit;

@@ -29,6 +29,13 @@ enum TileState {
     UNIT,
     state_count // for ImGui
 };
+
+enum TileSelectionState {
+    NOT_SELECTED,
+    POINTED_AT,
+   SELECTED //lol
+};
+
 // initializer list
 #define TILE_STATE_NAMES { "FLOOR", "WALL", "CHEST", "ORE", "CORE", "UNIT" }
 
@@ -45,6 +52,8 @@ public:
     TileStateData stateData;
     Unit* unit = nullptr;
 
+    void setTileSelectionState(TileSelectionState state );
+    TileSelectionState getTileSelectionState();
     // Constructors
     explicit Tile(Vector2Int index, TileState state = FLOOR, std::string name = "Tile");
     Tile(int index_x, int index_z, TileState state = FLOOR, std::string name = "Tile");
@@ -56,8 +65,12 @@ public:
     // Methods
     [[nodiscard]] bool vacant() const { return state == FLOOR; };
     void showImGuiDetailsImpl(Camera *camera) override;
-
+    void changeHitWallsState(TileSelectionState state);
+    
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
+    
+private:
+    TileSelectionState tileSelectionState = NOT_SELECTED;
 };
 
 #endif //ZTGK_TILE_H

@@ -25,6 +25,8 @@ out VS_OUT {
      vec3 WorldPos;
      flat int textureType;
      flat bool inFogOfWar;
+     flat int typeOfSelection;
+     flat int CheckVector2Int;
 }vs_out;
 
 void main()
@@ -37,4 +39,6 @@ void main()
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
     vs_out.textureType = wallData[index].data[0];
     vs_out.inFogOfWar = wallData[index].data[1] == 1;
+    vs_out.typeOfSelection = wallData[index].data[2];
+    vs_out.CheckVector2Int = wallData[index].data[3];
 }

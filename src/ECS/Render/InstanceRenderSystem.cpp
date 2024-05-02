@@ -73,8 +73,8 @@ void InstanceRenderSystem::UpdateImpl() {
     Frustum frustum =  createFrustumFromCamera(*camera);
     wallData.clear();
     Grid* grid = systemManager->getSystem<Grid>();
-    for (int x = 0; x < grid->width/10; ++x) {
-        for (int z = 0; z < grid->height/10; ++z) {
+    for (int x = 0; x < grid->width/grid->chunkWidth; ++x) {
+        for (int z = 0; z < grid->height/grid->chunkHeight; ++z) {
             Chunk * chunk = &grid->chunkArray[x][z];
             if(chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)){
                 for (auto &wallDataPtr : grid->chunkArray[x][z].wallDataArray) {
