@@ -25,9 +25,6 @@ void Chunk::removeWallData(WallData* wallData) {
 }
 
 
-Chunk::Chunk(Vector2Int index, Grid *grid) :index(index),grid(grid){
-
-}
 
 glm::vec3 Chunk::chunkRealPosition() {
     return glm::vec3 (
@@ -40,3 +37,42 @@ glm::vec3 Chunk::chunkRealPosition() {
 AABB Chunk::getBoundingVolume() {
     return AABB(chunkRealPosition(), width * grid->tileSize,2,height * grid->tileSize );
 }
+
+Chunk::Chunk(Vector2Int index, Grid *grid, int width, int height) :index(index),grid(grid),width(width),height(height) {
+    chunkTileArray.resize(width);
+    for (int i = 0; i < width; i++) {
+        chunkTileArray[i].resize(height);
+    }
+
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            chunkTileArray[i][j] = nullptr;
+        }
+    }
+}
+
+Tile *Chunk::getTileAt(int x, int z) {
+    return chunkTileArray[x][z];
+}
+
+Tile *Chunk::getTileAt(Vector2Int index) {
+    return  chunkTileArray[index.x][index.z];
+}
+
+void Chunk::setTileAt(int x, int z, Tile *tile) {
+    chunkTileArray[x][z] = tile;
+}
+
+void Chunk::setTileAt(Vector2Int index, Tile *tile) {
+    chunkTileArray[index.x][index.z] = tile;
+}
+
+void Chunk::removeTileAt(Vector2Int index) {
+    chunkTileArray[index.x][index.z]->Remove();
+}
+
+void Chunk::removeTileAt(int x, int z) {
+    chunkTileArray[x][z]->Remove();
+    chunkTileArray[x][z] = nullptr;
+}
+

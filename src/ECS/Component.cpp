@@ -36,3 +36,7 @@ void Component::Update() {
     ZoneTransientN(zoneName,(name).c_str(),true);
     UpdateImpl();
 }
+
+void Component::Remove() {
+    parentEntity->removeComponentFromMap(std::unique_ptr<Component>(this)); //TODO check if this works
+}

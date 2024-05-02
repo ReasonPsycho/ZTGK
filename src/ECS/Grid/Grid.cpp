@@ -22,21 +22,14 @@ Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position
     offsetX = -width * tileSize / 2.0f;
     offsetZ = -height * tileSize / 2.0f;
 
-    gridArray.resize(width);
-    for (int i = 0; i < width; i++) {
-        gridArray[i].resize(height);
-    }
+    int chunkSize = CalculateOptimalChunkSize(width,height);
+    chunkHeight = chunkSize;
+    chunkWidth = chunkHeight;
 
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            gridArray[i][j] = nullptr;
-        }
-    }
-
-    for (int i = 0; i < width / 10; i++) {
+    for (int i = 0; i < width / chunkWidth; i++) {
         std::vector<Chunk> chunkLine;    // Create a new line
-        for (int j = 0; j < height / 10; j++) {
-            chunkLine.push_back(Chunk(Vector2Int(i, j), this));  // Populate the line
+        for (int j = 0; j < height / chunkHeight; j++) {
+            chunkLine.push_back(Chunk(Vector2Int(i, j), this,chunkWidth,chunkHeight));  // Populate the line
         }
         chunkArray.push_back(std::move(chunkLine));  // Add the line to the array
     }
@@ -48,34 +41,29 @@ Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position
  * The Grid destructor deletes the gridArray member variable and all of its elements.
  */
 Grid::~Grid() {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            delete gridArray[i][j]; //CHECK if this is necessary
-        }
-    }
 
-    delete this;
 }
 
-void Grid::clear() {
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++j) {
-            auto tile = gridArray[i][j];
-            if (tile == nullptr) continue;
-            tile->parentEntity->Destroy();
-            gridArray[i][j] = nullptr;
-        }
-    }
+void Grid::Clear() {
+    gridEntity->Destroy();
 }
 
 void Grid::reinitWithSize(glm::ivec2 size) {
-    clear();
+    Clear();
     width = size.x;
     height = size.y;
-    gridArray.resize(width);
-    for (auto &col: gridArray) {
-        col.resize(height);
+    int chunkSize = CalculateOptimalChunkSize(size.x,size.x);
+    chunkHeight = chunkSize;
+    chunkWidth = chunkHeight;
+
+    for (int i = 0; i < width / chunkWidth; i++) {
+        std::vector<Chunk> chunkLine;    // Create a new line
+        for (int j = 0; j < height / chunkHeight; j++) {
+            chunkLine.push_back(Chunk(Vector2Int(i, j), this,chunkWidth,chunkHeight));  // Populate the line
+        }
+        chunkArray.push_back(std::move(chunkLine));  // Add the line to the array
     }
+    
     auto entity = std::find_if(scene->getChildren().begin(), scene->getChildren().end(),
                                [this](std::unique_ptr<Entity> &child) { return child->uniqueID == entityId; });
     if (entity != scene->getChildren().end())
@@ -96,7 +84,7 @@ void Grid::reinitWithSize(glm::ivec2 size) {
 Tile *Grid::getTileAt(int x, int z) {
     if (x < width && x >= 0) {
         if (z < height && z >= 0) {
-            return gridArray[x][z];
+            return chunkArray[x/chunkWidth][z/chunkHeight].getTileAt(x%chunkWidth,z%chunkHeight);
         }
     }
     return nullptr;
@@ -114,7 +102,7 @@ Tile *Grid::getTileAt(Vector2Int index) {
 
     if (index.x < width && index.x >= 0) {
         if (index.z < height && index.z >= 0) {
-            return gridArray[index.x][index.z];
+            return chunkArray[index.x/chunkWidth][index.z/chunkHeight].getTileAt(index.x%chunkWidth,index.z%chunkHeight);
         }
     }
     return nullptr;
@@ -155,49 +143,16 @@ Vector2Int Grid::WorldToGridPosition(Vector3 position) const {
 void Grid::showImGuiDetailsImpl(Camera *camera) {
     ZoneScopedN("ShowImGuiDetails Grid");
 
-    ImGui::Checkbox("Show tiles in Imgui", &showTilesInImgui);
-    if (showTilesInImgui) {
-        ImGui::PushID(uniqueID);
-        if (ImGui::CollapsingHeader("Grid")) {
-            if (ImGui::Button("Reload walls")) {
-                ClearAllWallData();
-                SetUpWalls();
-            }
-            ImGui::Text("Width: %d", width);
-            ImGui::Text("Height: %d", height);
-            ImGui::Text("Tile Size: %f", tileSize);
-            ImGui::Text("Offset X: %f", offsetX);
-            ImGui::Text("Offset Z: %f", offsetZ);
-            static glm::ivec2 newSize{width, height};
-            ImGui::InputInt2("New size", glm::value_ptr(newSize));
-            if (ImGui::Button("Resize"))
-                reinitWithSize(newSize);
-        }
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                if (gridArray[i][j] == nullptr) {
-                    ImGui::Text("No tile @ x%d y%d", i, i);
-                    continue;
-                }
-
-                ImGui::PushID(gridArray[i][j]->uniqueID);
-                if (ImGui::CollapsingHeader(("Tile " + std::to_string(i) + " " + std::to_string(j)).c_str())) {
-                    gridArray[i][j]->showImGuiDetailsImpl(camera);
-                    glm::vec3 worldPos = GridToWorldPosition(i, j);
-                    ImGui::Text("World Position: (%f, %f, %f)", worldPos.x, worldPos.y, worldPos.z);
-
-                }
-                ImGui::PopID();
-            }
-        }
-
-        ImGui::PopID();
-    }
-
+    // Display each variable as text:
+    ImGui::Text("Width: %d", width);
+    ImGui::Text("Height: %d", height);
+    ImGui::Text("Chunk Width: %d", chunkWidth);
+    ImGui::Text("Chunk Height: %d", chunkHeight);
+    ImGui::Text("Tile Size: %.2f", tileSize);
 }
 
 void Grid::GenerateTileEntities(float scale) {
-    Entity *gridEntity = scene->addEntity("Grid Entity");
+    gridEntity = scene->addEntity("Grid Entity");
     entityId = gridEntity->uniqueID;
     gridEntity->updateChildren = false;
     for (int i = 0; i < width; i++) {
@@ -210,7 +165,7 @@ void Grid::GenerateTileEntities(float scale) {
             tileEntity->updateSelfAndChild();
 
             tileEntity->addComponent(
-                    std::make_unique<BoxCollider>(tileEntity, glm::vec3(0.5, 0.5, 0.5),
+                    std::make_unique<BoxCollider>(tileEntity, glm::vec4(0.5, 0.5, 0.5,1),
                                                   ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
             tileEntity->getComponent<BoxCollider>()->center =
                     tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
@@ -243,7 +198,7 @@ void Grid::InitializeTileEntities() {
 }
 
 void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
-    Entity *gridEntity = scene->addEntity("Grid Entity");
+    gridEntity = scene->addEntity("Grid Entity");
     entityId = gridEntity->uniqueID;
     gridEntity->updateChildren = false;
             
@@ -275,16 +230,18 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
     SetUpWalls();
 }
 
+
+
 void Grid::addComponent(void *component) {
     auto c = static_cast<Component *>(component);
     Tile *tile = dynamic_cast<Tile *>(c);
-    gridArray[tile->index.x][tile->index.z] = tile;
+    setTileAt (tile->index,tile);
 }
 
 void Grid::removeComponent(void *component) {
     auto c = static_cast<Component *>(component);
     Tile *tile = dynamic_cast<Tile *>(c);
-    gridArray[tile->index.x][tile->index.z] = nullptr;
+    removeTileAt(tile->index);
 }
 
 const std::type_index *Grid::getComponentTypes() {
@@ -293,19 +250,6 @@ const std::type_index *Grid::getComponentTypes() {
 
 int Grid::getNumComponentTypes() {
     return 1;
-}
-
-Grid::Grid(Grid *grid) {
-    this->name = "Grid";
-    this->scene = grid->scene;
-    this->width = grid->width;
-    this->height = grid->height;
-    this->tileSize = grid->tileSize;
-    this->Position = grid->Position;
-    this->offsetX = grid->offsetX;
-    this->offsetZ = grid->offsetZ;
-    this->gridArray = grid->gridArray;
-
 }
 
 void Grid::SetUpWalls() {
@@ -416,7 +360,7 @@ Chunk *Grid::getChunkAt(Vector2Int index) {
 void Grid::ClearAllWallData() {
     for (int i = 0; i < width; ++i) {
         for (int j = 0; j < height; ++j) {
-            auto tile = gridArray[i][j];
+            auto tile = getTileAt(i,j);
             if (tile != nullptr)
                 tile->walls.clear();
         }
@@ -447,6 +391,58 @@ void Grid::ClearWalls() {
 
 bool Grid::isInBounds(Vector2Int anInt) {
     return anInt.x >= 0 && anInt.x < width && anInt.z >= 0 && anInt.z < height;
+}
+
+
+void Grid::setTileAt(int x, int z, Tile *tile) {
+    if (x < width && x >= 0) {
+        if (z < height && z >= 0) {
+            chunkArray[x/chunkWidth][z/chunkHeight].getTileAt(x%chunkWidth,z%chunkHeight);
+        }
+    }
+}
+
+void Grid::setTileAt(Vector2Int index, Tile *tile) {
+    if (index.x < width && index.x >= 0) {
+        if (index.z < height && index.z >= 0) {
+            chunkArray[index.x/chunkWidth][index.z/chunkHeight].setTileAt(index.x%chunkWidth,index.z%chunkHeight,tile);
+        }
+    }
+}
+
+int Grid::CalculateOptimalChunkSize(int widith, int height)
+{
+    int start = 12;
+
+    // Ensuring that 'start' is less than or equal to the smallest of the two numbers
+    start = std::min(start, std::min(widith, height));
+
+    for (int i=start; i>0; i--)
+    {
+        if (widith % i == 0 && height % i == 0)
+        {
+            return i;
+        }
+    }
+
+    // Return 1 if there are no common divisors (excluding 1)
+    return 1;
+}
+
+void Grid::removeTileAt(int x, int z) {
+    if (x < width && x >= 0) {
+        if (z < height && z >= 0) {
+            chunkArray[x/chunkWidth][z/chunkHeight].removeTileAt(x%chunkWidth,z%chunkHeight);
+        }
+    }
+}
+
+void Grid::removeTileAt(Vector2Int index) {
+    if (index.x < width && index.x >= 0) {
+        if (index.z < height && index.z >= 0) {
+            chunkArray[index.x/chunkWidth][index.z/chunkHeight].removeTileAt(index.x%chunkWidth,index.z%chunkHeight);
+        }
+    }
 }
 
 

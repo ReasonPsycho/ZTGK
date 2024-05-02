@@ -8,7 +8,9 @@
 #elif defined(_MSC_VER)
 # define TracyFunction __FUNCSIG__
 #endif
+
 #include <tracy/Tracy.hpp >
+
 #pragma endregion Tracy
 
 #include "imgui.h"
@@ -93,7 +95,7 @@ HUD hud;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
-StateManager* stateManager;
+StateManager *stateManager;
 
 Entity *box1;
 Entity *box2;
@@ -155,6 +157,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
+void handle_picking(GLFWwindow *window, int button, int action, int mods);
+
 void processInput(GLFWwindow *window);
 
 #pragma endregion Function definitions
@@ -206,6 +210,13 @@ bool captureMouseButtonPressed = false;
 ImGuiIO mouseio;
 double mouseX;
 double mouseY;
+
+bool isLeftMouseButtonHeld = false;
+glm::vec3 mouseHeldStartPos;
+glm::vec3 mouseHeldEndPos;
+float mouseHeldStartTime = 0.0f;
+float mouseHeldReleaseTime = 0.0f;
+
 
 // timing
 double deltaTime = Time::Instance().DeltaTime();
@@ -263,7 +274,7 @@ int main(int, char **) {
 
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-        
+
         // Process I/O operations here
         input();
 
@@ -306,7 +317,7 @@ int main(int, char **) {
         // End frame and swap buffers (double buffering)
 
         end_frame();
-        
+
     }
 
     file_logger->info("Cleanup");
@@ -441,7 +452,7 @@ void load_enteties() {
 
     model.loadModel();
     wall.loadModel();
-    
+
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     //gabka.loadModel();
     tileModel.loadModel();
@@ -449,32 +460,32 @@ void load_enteties() {
 
 
     gameObject = scene.addEntity("Wall");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,50,0));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
-    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
     gameObject = scene.addEntity("Wall1");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,50,200));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
-    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 200));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 //
     gameObject = scene.addEntity("Wall2");;
-    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalPosition(glm::vec3(0, 50, 100));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
 //
     gameObject = scene.addEntity("Wall3");;
-    gameObject->transform.setLocalPosition(glm::vec3(200,50,100));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalPosition(glm::vec3(200, 50, 100));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
-    
-    
+
+
 //    gameObject = scene.addEntity("Dir light");
-  //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
+    //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
     gameObject->addComponent(make_unique<PointLight>(
             PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
@@ -488,7 +499,7 @@ void load_enteties() {
     lightSystem.Init();
 
     //gameObject = scene.addEntity("Quad");
-   // gameObject->addComponent(make_unique<Render>(quadModel));
+    // gameObject->addComponent(make_unique<Render>(quadModel));
 
 
     instanceRenderSystem.tileModel = quadModel;
@@ -523,19 +534,18 @@ void load_enteties() {
     hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
-                                                                                ztgk::game::window_size.y * 0.5));
+                                                        ztgk::game::window_size.y * 0.5));
     tx.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Text>( tx ));
+    fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
     fgelem = scene.addEntity(efg, "Animated Sprite");
     auto spr = Sprite("res/textures/puni.png");
     spr.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Sprite>( spr ));
+    fgelem->addComponent(make_unique<Sprite>(spr));
     zmspr = fgelem->getComponent<Sprite>();
     zmspr->groupID = zmgroup;
 
     load_units();
-
 
 
 }
@@ -614,6 +624,7 @@ void load_units() {
 //    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 }
+
 void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -691,7 +702,7 @@ void render() {
     phongPipeline.PrebindPipeline(&camera);
 
     renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader, &camera);
     wireRenderer.DrawColliders();
     wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
@@ -752,21 +763,21 @@ void imgui_render() {
     }
     ImGui::End();
 
-    static LevelGenerator::Config levelGenConfig {
-        .seed {},
-        .size {100, 100},
-        .wallThickness = 1.f,
-        .baseRadius = 4.5f,
-        .keyRadius = 4.f,
-        .pocketRadius = 2.5f,
-        .noiseImpact = 1.f,
-        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
-        .extraPocketAttempts = 10000,
-        .keyEnemies = 3,
-        .minEnemies = 0,
-        .maxEnemies = 2,
-        .unitCount = 3,
-        .chestCount = 10,
+    static LevelGenerator::Config levelGenConfig{
+            .seed {},
+            .size {100, 100},
+            .wallThickness = 1.f,
+            .baseRadius = 4.5f,
+            .keyRadius = 4.f,
+            .pocketRadius = 2.5f,
+            .noiseImpact = 1.f,
+            .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+            .extraPocketAttempts = 10000,
+            .keyEnemies = 3,
+            .minEnemies = 0,
+            .maxEnemies = 2,
+            .unitCount = 3,
+            .chestCount = 10,
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -904,8 +915,125 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+
     ztgk::game::cursor.click(button, action, mods);
+    handle_picking(window, button, action, mods);
+    
 }
+
+
+void handle_picking(GLFWwindow *window, int button, int action, int mods){
+
+    //calculate ray every mouse press
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
+                                                                 display_h);
+    std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+
+    //if left mouse button is pressed, start timer and save position of the mouse press
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+        mouseHeldStartTime = glfwGetTime();
+        isLeftMouseButtonHeld = true;
+        if(ray->getHitEntity() != nullptr){
+            mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
+        }
+    }
+
+    //if left mouse button is released, check if it was a click or a drag
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        mouseHeldReleaseTime = glfwGetTime();
+        isLeftMouseButtonHeld = false;
+
+        //if mouse was held for less than 0.2 seconds, consider it a click
+        if(mouseHeldReleaseTime - mouseHeldStartTime < 0.2f) {
+
+            // if ray hits an allied unit
+            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr &&
+                ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+
+                //if it is already selected, deselect it
+                if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
+                    unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                }
+
+                    //if it is not selected, select it
+                else {
+                    unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
+                }
+            }
+
+                // if ray hits anyting else than a unit, deselect all units
+            else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr) {
+                unitSystem.deselectAllUnits();
+            }
+        }
+
+        //if mouse was held for more than 0.2 seconds, consider it a drag
+        else{
+            if(ray->getHitEntity() != nullptr){
+                mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
+                Vector2Int mouseHeldStartGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+                Vector2Int mouseHeldEndGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+
+                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
+                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
+
+
+                std::vector<Collider*> collidersInArea = collisionSystem.getCollidersInArea(mouseHeldStartPos, mouseHeldEndPos);
+                if(!collidersInArea.empty()){
+                    spdlog::info("Colliders in area: {}", collidersInArea.size());
+                    for(auto col : collidersInArea){
+                        Tile* checkTile = col->getEntity()->getComponent<Tile>();
+                        if(checkTile != nullptr){
+                            checkTile->setTileSelectionState(POINTED_AT);
+                        }
+                        spdlog::info("Collider: {}", col->getEntity()->name);
+                    }
+                }
+            }
+            else{
+                isLeftMouseButtonHeld = false;
+                return;
+            }
+        }
+
+        wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+
+
+    //if there are selected units and right mouse button is pressed, set target for selected units
+    if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
+
+        Entity * hit = ray->getHitEntity();
+
+        //if something was hit
+        if(hit != nullptr){
+            for(auto unit : unitSystem.selectedUnits){
+
+                //if hit entity is mineable, set it as mining target
+                if(hit->getComponent<IMineable>()!=nullptr){
+                    unit->miningTarget = hit->getComponent<IMineable>();
+                    Tile* hitTile = hit->getComponent<Tile>();
+                    hitTile->setTileSelectionState(SELECTED);
+                    unit->hasMiningTarget = true;
+                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
+                }
+
+                    //if hit entity is a tile, stop doing anything and set movement target
+                else if (hit->getComponent<Tile>() != nullptr){
+                    unit->hasMiningTarget = false;
+                    unit->miningTarget = nullptr;
+                    unit->hasCombatTarget = false;
+                    unit->combatTarget = nullptr;
+                    unit->hasMovementTarget = true;
+                    unit->pathfinding.path.clear();
+                    unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                }
+            }
+        }
+        wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+}
+  
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");

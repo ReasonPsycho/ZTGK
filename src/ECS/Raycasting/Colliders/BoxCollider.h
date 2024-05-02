@@ -16,6 +16,7 @@ struct BoxColliderData{
     glm::vec4 color;
 
     BoxColliderData(const glm::mat4x4 &matrixInput, glm::vec4 color) : matrix(matrixInput),color(color) {}
+
 };
 
 class BoxCollider : public Collider
@@ -35,6 +36,8 @@ public:
 
     // Other methods
     void update();
+
+    bool intersects(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4);
 
 };
 
