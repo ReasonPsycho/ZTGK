@@ -102,7 +102,7 @@ void Entity::showImGuiDetails(Camera *camera) {
         if (scene->selectedEntityNumber == uniqueID) {
             ImVec2 window_pos = ImVec2(ImGui::GetIO().DisplaySize.x - 300, 40); // Top-Right
             ImGui::SetNextWindowPos(window_pos, ImGuiCond_FirstUseEver);
-            ImGui::Begin((name + ", Element id:" + std::to_string(uniqueID)).c_str());
+            ImGui::Begin((name + ", Element id:" + std::to_string(uniqueID) + "###Inspector").c_str());
             transform.ManipulateModelMatrix(camera);
 
             for (const auto &component: components) {
