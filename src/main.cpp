@@ -155,6 +155,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
+void handle_picking(GLFWwindow *window, int button, int action, int mods);
+
 void processInput(GLFWwindow *window);
 
 #pragma endregion Function definitions
@@ -206,6 +208,13 @@ bool captureMouseButtonPressed = false;
 ImGuiIO mouseio;
 double mouseX;
 double mouseY;
+
+bool isLeftMouseButtonHeld = false;
+glm::vec3 mouseHeldStartPos;
+glm::vec3 mouseHeldEndPos;
+float mouseHeldStartTime = 0.0f;
+float mouseHeldReleaseTime = 0.0f;
+
 
 // timing
 double deltaTime = Time::Instance().DeltaTime();
@@ -904,8 +913,125 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+
     ztgk::game::cursor.click(button, action, mods);
+
+    /*
+   signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+    handle_picking(window, button, action, mods);
+
 }
+
+void handle_picking(GLFWwindow *window, int button, int action, int mods){
+
+    //calculate ray every mouse press
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
+                                                                 display_h);
+    std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+
+    //if left mouse button is pressed, start timer and save position of the mouse press
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+        mouseHeldStartTime = glfwGetTime();
+        isLeftMouseButtonHeld = true;
+        if(ray->getHitEntity() != nullptr){
+            mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
+        }
+    }
+
+    //if left mouse button is released, check if it was a click or a drag
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        mouseHeldReleaseTime = glfwGetTime();
+        isLeftMouseButtonHeld = false;
+
+        //if mouse was held for less than 0.2 seconds, consider it a click
+        if(mouseHeldReleaseTime - mouseHeldStartTime < 0.2f) {
+
+            // if ray hits an allied unit
+            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr &&
+                ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+
+                //if it is already selected, deselect it
+                if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
+                    unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                }
+
+                    //if it is not selected, select it
+                else {
+                    unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
+                }
+            }
+
+                // if ray hits anyting else than a unit, deselect all units
+            else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr) {
+                unitSystem.deselectAllUnits();
+            }
+        }
+
+        //if mouse was held for more than 0.2 seconds, consider it a drag
+        else{
+            if(ray->getHitEntity() != nullptr){
+                mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
+                Vector2Int mouseHeldStartGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+                Vector2Int mouseHeldEndGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+
+                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
+                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
+
+
+                std::vector<Collider*> collidersInArea = collisionSystem.getCollidersInArea(mouseHeldStartPos, mouseHeldEndPos);
+                if(!collidersInArea.empty()){
+                    spdlog::info("Colliders in area: {}", collidersInArea.size());
+                    for(auto col : collidersInArea){
+                        spdlog::info("Collider: {}", col->getEntity()->name);
+                    }
+                }
+            }
+            else{
+                isLeftMouseButtonHeld = false;
+                return;
+            }
+        }
+
+        wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+
+*/
+
+    //if there are selected units and right mouse button is pressed, set target for selected units
+    if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
+
+        Entity * hit = ray->getHitEntity();
+
+        //if something was hit
+        if(hit != nullptr){
+            for(auto unit : unitSystem.selectedUnits){
+
+                //if hit entity is mineable, set it as mining target
+                if(hit->getComponent<IMineable>()!=nullptr){
+                    unit->miningTarget = hit->getComponent<IMineable>();
+                    unit->hasMiningTarget = true;
+                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
+                }
+
+                    //if hit entity is a tile, stop doing anything and set movement target
+                else if (hit->getComponent<Tile>() != nullptr){
+                    unit->hasMiningTarget = false;
+                    unit->miningTarget = nullptr;
+                    unit->hasCombatTarget = false;
+                    unit->combatTarget = nullptr;
+                    unit->hasMovementTarget = true;
+                    unit->pathfinding.path.clear();
+                    unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                }
+            }
+        }
+        wireRenderer.rayComponents.push_back(std::move(ray));
+    }
+}
+
+
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");

@@ -4,8 +4,7 @@
 
 #include "CollisionSystem.h"
 #include "imgui.h"
-
-
+#include "ECS/Utils/VectorUtils.h"
 
 
 void CollisionSystem::addComponent(void *component) {
@@ -61,4 +60,33 @@ std::vector<Collider *> CollisionSystem::getColliders() {
 
 CollisionSystem::CollisionSystem() {
     name = "Collision System";
+}
+
+std::vector<Collider *> CollisionSystem::getCollidersInArea(glm::vec3 p1, glm::vec3 p2) {
+    std::vector<Collider*> colliders;
+
+    //calculate the bounding box                                                // 1      3
+                                                                                //
+    float y = p1.y;                                                             //
+                                                                                // 2      4
+    glm::vec3 p3 = glm::vec3(p2.x, y, p1.z);
+    glm::vec3 p4 = glm::vec3(p1.x, y, p2.z);
+
+    spdlog::info("p1: {} {} {}, p2: {} {} {}, p3: {} {} {}, p4: {} {} {}", p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z, p4.x, p4.y, p4.z);
+
+
+    for(auto collider : BoxColliders)
+    {
+        for(auto box : collider.second)
+        {
+            if(box->intersects(p1, p2, p3, p4))
+            {
+                colliders.push_back(box);
+            }
+        }
+    }
+
+    return colliders;
+
+
 }
