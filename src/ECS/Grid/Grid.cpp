@@ -160,10 +160,11 @@ void Grid::GenerateTileEntities(float scale) {
         for (int j = 0; j < height/chunkHeight; j++) {
             Entity *chunkEntity = scene->addEntity(gridEntity, "Chunk " + std::to_string(i) + " " + std::to_string(j));
             chunkEntity->transform.setLocalPosition(glm::vec3(i * chunkWidth * tileSize, 0, j * chunkHeight * tileSize));
+            chunkEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
             chunkEntity->forceUpdateSelfAndChild();
-            chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec4(0.5, 0.5, 0.5,1),ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+            chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(0.5, 0.5, 0.5),ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
             chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0);
-            chunkEntity->getComponent<BoxCollider>()->size = chunkEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0);
+            chunkEntity->getComponent<BoxCollider>()->size = chunkEntity->transform.getGlobalScale() + glm::vec3(10, 0.5, 10);
             for (int x = 0; x < chunkWidth; ++x) {
                 for (int z = 0; z < chunkHeight; ++z) {
                     Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));
@@ -176,6 +177,7 @@ void Grid::GenerateTileEntities(float scale) {
                                                           ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
                     tileEntity->getComponent<BoxCollider>()->center =
                             tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                    tileEntity->getComponent<BoxCollider>()->size = glm::vec3(0.1, 0.1, 0.1);
                 }
             }
         }
@@ -221,7 +223,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(chunkWidth*tileSize ,0.8,chunkHeight*tileSize),CollisionType::CHUNK
                                                                     ,ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
             chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight);
-            chunkEntity->getComponent<BoxCollider>()->size = glm::vec3 ();
+            chunkEntity->getComponent<BoxCollider>()->size = glm::vec3 (10,1,10);
             for (int x = 0; x < chunkWidth; ++x) {
                 for (int z = 0; z < chunkHeight; ++z) {
                     Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));

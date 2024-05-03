@@ -556,7 +556,7 @@ void load_units() {
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     UnitStats stats = {100, 1, 1, 20, 3};
     playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
@@ -928,6 +928,14 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
                                                                  display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+
+    if(ray->getHitEntity()!= nullptr){
+        spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);
+    }
+    else{
+        spdlog::info("Ray hit nothing");
+    }
+
 
     //if left mouse button is pressed, start timer and save position of the mouse press
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){

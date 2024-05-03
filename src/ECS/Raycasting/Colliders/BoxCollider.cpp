@@ -30,7 +30,7 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionSystem *collis
 
 void BoxCollider::UpdateImpl() {
       center = getEntity()->transform.getGlobalPosition();
-      size = getEntity()->transform.getLocalScale();
+//      size = getEntity()->transform.getLocalScale();
 
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
