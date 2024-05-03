@@ -204,6 +204,8 @@ Grid grid(&scene, 100, 100, 2.0f, Vector3(0, 0, 0));
 
 Entity *playerUnit;
 
+std::vector<Vector2Int> selectedTiles;
+
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
 
@@ -681,6 +683,11 @@ void update() {
     signalQueue.Update();
 
     unitSystem.Update();
+
+    for(auto tile : selectedTiles){
+        grid.getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
+    }
+
 }
 
 void render() {
@@ -985,18 +992,20 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
                 spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
 
-
-                std::vector<Collider*> collidersInArea = collisionSystem.getCollidersInArea(mouseHeldStartPos, mouseHeldEndPos);
-                if(!collidersInArea.empty()){
-                    spdlog::info("Colliders in area: {}", collidersInArea.size());
-                    for(auto col : collidersInArea){
-                        Tile* checkTile = col->getEntity()->getComponent<Tile>();
-                        if(checkTile != nullptr){
-                            checkTile->setTileSelectionState(POINTED_AT);
-                        }
-                        spdlog::info("Collider: {}", col->getEntity()->name);
-                    }
+                for(auto tile : selectedTiles){
+                    grid.getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
                 }
+                std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                selectedTiles = tilesInArea;
+//                if(!tilesInArea.empty()){
+//                    for(auto tilePos : tilesInArea){
+//                        Tile* checkTile = grid.getTileAt(tilePos);
+//                        if(checkTile != nullptr){
+//                            checkTile->setTileSelectionState(POINTED_AT);
+//                        }
+//                    }
+//                }
+
             }
             else{
                 isLeftMouseButtonHeld = false;
@@ -1040,7 +1049,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         }
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
-}
+ }
   
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
