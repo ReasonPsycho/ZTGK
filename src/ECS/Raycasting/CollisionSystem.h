@@ -28,13 +28,13 @@ public:
 
     void showImGuiDetailsImpl(Camera *camera) override;
 
-
     std::vector<Collider*> getColliders();
 
     std::vector<Collider*> getCollidersInArea(glm::vec3 p1, glm::vec3 p2);
 
     std::unordered_map<unsigned, std::vector<BoxCollider*>> BoxColliders;
     std::unordered_map<unsigned, std::vector<SphereCollider*>> SphereColliders;
+    
 
 private:
     std::array<std::type_index, 2> componentTypes = {

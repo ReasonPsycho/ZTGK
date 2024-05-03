@@ -29,7 +29,7 @@ public:
     float tileSize;
 
     //2D array of tiles
-    std::vector<std::vector<Chunk>> chunkArray;
+    std::vector<std::vector<Chunk*>> chunkArray;
     Entity *gridEntity;
 
     Scene *scene;

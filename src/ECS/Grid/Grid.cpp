@@ -27,9 +27,9 @@ Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position
     chunkWidth = chunkHeight;
 
     for (int i = 0; i < width / chunkWidth; i++) {
-        std::vector<Chunk> chunkLine;    // Create a new line
+        std::vector<Chunk*> chunkLine;    // Create a new line
         for (int j = 0; j < height / chunkHeight; j++) {
-            chunkLine.push_back(Chunk(Vector2Int(i, j), this,chunkWidth,chunkHeight));  // Populate the line
+            chunkLine.push_back(nullptr);  // Populate the line
         }
         chunkArray.push_back(std::move(chunkLine));  // Add the line to the array
     }
@@ -48,6 +48,7 @@ void Grid::Clear() {
     gridEntity->Destroy();
 }
 
+
 void Grid::reinitWithSize(glm::ivec2 size) {
     Clear();
     width = size.x;
@@ -57,9 +58,9 @@ void Grid::reinitWithSize(glm::ivec2 size) {
     chunkWidth = chunkHeight;
 
     for (int i = 0; i < width / chunkWidth; i++) {
-        std::vector<Chunk> chunkLine;    // Create a new line
+        std::vector<Chunk*> chunkLine;    // Create a new line
         for (int j = 0; j < height / chunkHeight; j++) {
-            chunkLine.push_back(Chunk(Vector2Int(i, j), this,chunkWidth,chunkHeight));  // Populate the line
+            chunkLine.push_back(nullptr);  // Populate the line
         }
         chunkArray.push_back(std::move(chunkLine));  // Add the line to the array
     }
@@ -84,7 +85,7 @@ void Grid::reinitWithSize(glm::ivec2 size) {
 Tile *Grid::getTileAt(int x, int z) {
     if (x < width && x >= 0) {
         if (z < height && z >= 0) {
-            return chunkArray[x/chunkWidth][z/chunkHeight].getTileAt(x%chunkWidth,z%chunkHeight);
+            return chunkArray[x/chunkWidth][z/chunkHeight]->getTileAt(x%chunkWidth,z%chunkHeight);
         }
     }
     return nullptr;
@@ -102,7 +103,7 @@ Tile *Grid::getTileAt(Vector2Int index) {
 
     if (index.x < width && index.x >= 0) {
         if (index.z < height && index.z >= 0) {
-            return chunkArray[index.x/chunkWidth][index.z/chunkHeight].getTileAt(index.x%chunkWidth,index.z%chunkHeight);
+            return chunkArray[index.x/chunkWidth][index.z/chunkHeight]->getTileAt(index.x%chunkWidth,index.z%chunkHeight);
         }
     }
     return nullptr;
@@ -111,9 +112,9 @@ Tile *Grid::getTileAt(Vector2Int index) {
 
 const glm::vec3 Grid::GridToWorldPosition(Vector2Int index) const {
 
-    float worldPosX = Position.x + index.x * tileSize;
+    float worldPosX = Position.x + index.x * tileSize + tileSize/2;
     float worldPosY = Position.y;
-    float worldPosZ = Position.z + index.z * tileSize;
+    float worldPosZ = Position.z + index.z * tileSize + tileSize/2;
     return glm::vec3(worldPosX, worldPosY, worldPosZ);
 }
 
@@ -155,22 +156,33 @@ void Grid::GenerateTileEntities(float scale) {
     gridEntity = scene->addEntity("Grid Entity");
     entityId = gridEntity->uniqueID;
     gridEntity->updateChildren = false;
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
-            tileEntity->addComponent(std::make_unique<Tile>(i, j));
-            tileEntity->transform.setLocalPosition(GridToWorldPosition(i, j));
-            tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
-
-            tileEntity->updateSelfAndChild();
-
-            tileEntity->addComponent(
-                    std::make_unique<BoxCollider>(tileEntity, glm::vec4(0.5, 0.5, 0.5,1),
-                                                  ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
-            tileEntity->getComponent<BoxCollider>()->center =
-                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    for (int i = 0; i < width /chunkWidth; i++) {
+        for (int j = 0; j < height/chunkHeight; j++) {
+            Entity *chunkEntity = scene->addEntity(gridEntity, "Chunk " + std::to_string(i) + " " + std::to_string(j));
+            chunkEntity->transform.setLocalPosition(glm::vec3(i * chunkWidth * tileSize, 0, j * chunkHeight * tileSize));
+            chunkEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
+            chunkEntity->forceUpdateSelfAndChild();
+            chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(0.5, 0.5, 0.5),ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+            chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0);
+            chunkEntity->getComponent<BoxCollider>()->size = chunkEntity->transform.getGlobalScale() + glm::vec3(10, 0.5, 10);
+            for (int x = 0; x < chunkWidth; ++x) {
+                for (int z = 0; z < chunkHeight; ++z) {
+                    Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));
+                    tileEntity->addComponent(std::make_unique<Tile>(i * chunkWidth + x, j * chunkHeight + z));
+                    tileEntity->transform.setLocalPosition(GridToWorldPosition(x, z)); //TODO find where it is 
+                    tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
+                    tileEntity->forceUpdateSelfAndChild();
+                    tileEntity->addComponent(
+                            std::make_unique<BoxCollider>(tileEntity, glm::vec4(0.5, 0.5, 0.5,1),
+                                                          ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+                    tileEntity->getComponent<BoxCollider>()->center =
+                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                    tileEntity->getComponent<BoxCollider>()->size = glm::vec3(0.1, 0.1, 0.1);
+                }
+            }
         }
     }
+    gridEntity->forceUpdateSelfAndChild();
 }
 
 void Grid::InitializeTileEntities() {
@@ -201,31 +213,44 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
     gridEntity = scene->addEntity("Grid Entity");
     entityId = gridEntity->uniqueID;
     gridEntity->updateChildren = false;
-            
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            Entity *tileEntity = scene->addEntity(gridEntity, "Tile " + std::to_string(i) + " " + std::to_string(j));
-            tileEntity->addComponent(std::make_unique<Tile>(i, j));
-            tileEntity->transform.setLocalPosition(GridToWorldPosition(i, j));
-            tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
+    for (int i = 0; i < width /chunkWidth; i++) {
+        for (int j = 0; j < height/chunkHeight; j++) {
+            Entity *chunkEntity = scene->addEntity(gridEntity, "Chunk " + std::to_string(i) + " " + std::to_string(j));
+            chunkEntity->addComponent(make_unique<Chunk>(Vector2Int(i, j), this,chunkWidth,chunkHeight));
+            chunkArray[i][j] = chunkEntity->getComponent<Chunk>();
+            chunkEntity->transform.setLocalPosition(glm::vec3(i * chunkWidth * tileSize, 0, j * chunkHeight * tileSize));
+            chunkEntity->forceUpdateSelfAndChild();
+            chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(chunkWidth*tileSize ,0.8,chunkHeight*tileSize),CollisionType::CHUNK
+                                                                    ,ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+            chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight);
+            chunkEntity->getComponent<BoxCollider>()->size = glm::vec3 (10,1,10);
+            for (int x = 0; x < chunkWidth; ++x) {
+                for (int z = 0; z < chunkHeight; ++z) {
+                    Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));
+                    tileEntity->addComponent(std::make_unique<Tile>(i * chunkWidth + x, j * chunkHeight + z));
+                    tileEntity->transform.setLocalPosition(glm::vec3 (x * tileSize + tileSize/2,0, z * tileSize+ tileSize/2)); //TODO find where it is 
+                    tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
-            if (i >= width / 4 && i < (width - width / 4) && j >= height / 4 && j < (height - height / 4)) {
-                tileEntity->getComponent<Tile>()->state = FLOOR;
+                    if (i >= chunkWidth / 4 && i < (chunkWidth - chunkWidth / 4) && j >= chunkHeight / 4 && j < (chunkHeight - chunkHeight / 4)) {
+                        tileEntity->getComponent<Tile>()->state = FLOOR;
 
-            } else {
-                tileEntity->getComponent<Tile>()->state = WALL;
-                tileEntity->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
+                    } else {
+                        tileEntity->getComponent<Tile>()->state = WALL;
+                        tileEntity->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
 
+                    }
+                    
+                    tileEntity->forceUpdateSelfAndChild();
+                    tileEntity->addComponent(
+                            std::make_unique<BoxCollider>(tileEntity, glm::vec4(1, 0.2, 1,1),CollisionType::TILE,
+                                                          ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+                    tileEntity->getComponent<BoxCollider>()->center =
+                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                }
             }
-
-            tileEntity->updateSelfAndChild();
-
-            tileEntity->addComponent(
-                    std::make_unique<BoxCollider>(tileEntity, glm::vec3(1, 0.01, 1), collisionSystem));
-            tileEntity->getComponent<BoxCollider>()->center =
-                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0);
         }
     }
+    gridEntity->forceUpdateSelfAndChild();
 
     SetUpWalls();
 }
@@ -342,7 +367,7 @@ void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
 Chunk *Grid::getChunkAt(int x, int z) {
     if (x / 10 < width && x / 10 >= 0) {
         if (z / 10 < height && z / 10 >= 0) {
-            return &chunkArray[x / 10][z / 10];
+            return chunkArray[x / 10][z / 10];
         }
     }
     return nullptr;
@@ -351,7 +376,7 @@ Chunk *Grid::getChunkAt(int x, int z) {
 Chunk *Grid::getChunkAt(Vector2Int index) {
     if (index.x / 10 < width && index.x / 10 >= 0) {
         if (index.z / 10 < height && index.z / 10 >= 0) {
-            return &chunkArray[index.x / 10][index.z / 10];
+            return chunkArray[index.x / 10][index.z / 10];
         }
     }
     return nullptr;
@@ -397,7 +422,7 @@ bool Grid::isInBounds(Vector2Int anInt) {
 void Grid::setTileAt(int x, int z, Tile *tile) {
     if (x < width && x >= 0) {
         if (z < height && z >= 0) {
-            chunkArray[x/chunkWidth][z/chunkHeight].getTileAt(x%chunkWidth,z%chunkHeight);
+            chunkArray[x/chunkWidth][z/chunkHeight]->getTileAt(x%chunkWidth,z%chunkHeight);
         }
     }
 }
@@ -405,7 +430,7 @@ void Grid::setTileAt(int x, int z, Tile *tile) {
 void Grid::setTileAt(Vector2Int index, Tile *tile) {
     if (index.x < width && index.x >= 0) {
         if (index.z < height && index.z >= 0) {
-            chunkArray[index.x/chunkWidth][index.z/chunkHeight].setTileAt(index.x%chunkWidth,index.z%chunkHeight,tile);
+            chunkArray[index.x/chunkWidth][index.z/chunkHeight]->setTileAt(index.x%chunkWidth,index.z%chunkHeight,tile);
         }
     }
 }
@@ -432,7 +457,7 @@ int Grid::CalculateOptimalChunkSize(int widith, int height)
 void Grid::removeTileAt(int x, int z) {
     if (x < width && x >= 0) {
         if (z < height && z >= 0) {
-            chunkArray[x/chunkWidth][z/chunkHeight].removeTileAt(x%chunkWidth,z%chunkHeight);
+            chunkArray[x/chunkWidth][z/chunkHeight]->removeTileAt(x%chunkWidth,z%chunkHeight);
         }
     }
 }
@@ -440,7 +465,7 @@ void Grid::removeTileAt(int x, int z) {
 void Grid::removeTileAt(Vector2Int index) {
     if (index.x < width && index.x >= 0) {
         if (index.z < height && index.z >= 0) {
-            chunkArray[index.x/chunkWidth][index.z/chunkHeight].removeTileAt(index.x%chunkWidth,index.z%chunkHeight);
+            chunkArray[index.x/chunkWidth][index.z/chunkHeight]->removeTileAt(index.x%chunkWidth,index.z%chunkHeight);
         }
     }
 }

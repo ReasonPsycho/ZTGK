@@ -40,8 +40,8 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 void UnitSystem::UpdateImpl() {
     for (Unit* unit: unitComponents) {
         unit->UpdateImpl();
-        unit->getEntity()->getComponent<UnitAI>()->UpdateImpl();
-        unit->getEntity()->getComponent<BoxCollider>()->update();
+        unit->getEntity()->getComponent<UnitAI>()->Update();
+        unit->getEntity()->getComponent<BoxCollider>()->Update();
     }
 }
 

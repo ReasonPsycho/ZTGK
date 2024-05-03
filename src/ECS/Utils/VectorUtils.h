@@ -8,6 +8,7 @@
 
 #include "glm/vec3.hpp"
 #include <cmath>
+#include <vector>
 
 struct Vector2Int {
     int x;
@@ -15,6 +16,7 @@ struct Vector2Int {
 
     Vector2Int(int x, int z) : x(x), z(z) {}
     Vector2Int() = default;
+
 
     void normalize() {
         int length = sqrt(x * x + z * z);
@@ -74,7 +76,6 @@ struct Vector2Int {
         z /= scalar;
         return *this;
     }
-
 
 
 };
@@ -176,6 +177,25 @@ public:
         float num = sqrt(magnitude);
         return current + a / num * maxDistanceDelta;
     }
+
+    static std::vector<Vector2Int> getAllTilesBetween(Vector2Int p1, Vector2Int p2) {
+        std::vector<Vector2Int> tiles;
+
+        int minX = std::min(p2.x, p1.x);
+        int maxX = std::max(p2.x, p1.x);
+        int minZ = std::min(p2.z, p1.z);
+        int maxZ = std::max(p2.z, p1.z);
+
+        for (int i = minX; i <= maxX; i++) {
+            for (int j = minZ; j <= maxZ; j++) {
+                tiles.emplace_back(i, j);
+            }
+
+
+        }
+        return tiles;
+    }
+
 };
 
 #endif //ZTGK_VECTORUTILS_H

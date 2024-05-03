@@ -12,7 +12,7 @@
 
 class Grid;
 
-class Chunk {
+class Chunk : public Component{
 
 public:
      Chunk(Vector2Int index,Grid* grid,int width,int height);

@@ -204,6 +204,8 @@ Grid grid(&scene, 100, 100, 2.0f, Vector3(0, 0, 0));
 
 Entity *playerUnit;
 
+std::vector<Vector2Int> selectedTiles;
+
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
 
@@ -556,7 +558,7 @@ void load_units() {
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     UnitStats stats = {100, 1, 1, 20, 3};
     playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
@@ -681,6 +683,11 @@ void update() {
     signalQueue.Update();
 
     unitSystem.Update();
+
+    for(auto tile : selectedTiles){
+        grid.getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
+    }
+
 }
 
 void render() {
@@ -929,6 +936,14 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                                                                  display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
 
+    if(ray->getHitEntity()!= nullptr){
+        spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);
+    }
+    else{
+        spdlog::info("Ray hit nothing");
+    }
+
+
     //if left mouse button is pressed, start timer and save position of the mouse press
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
         mouseHeldStartTime = glfwGetTime();
@@ -974,21 +989,13 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 Vector2Int mouseHeldStartGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
                 Vector2Int mouseHeldEndGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
 
-                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
-                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
-
-
-                std::vector<Collider*> collidersInArea = collisionSystem.getCollidersInArea(mouseHeldStartPos, mouseHeldEndPos);
-                if(!collidersInArea.empty()){
-                    spdlog::info("Colliders in area: {}", collidersInArea.size());
-                    for(auto col : collidersInArea){
-                        Tile* checkTile = col->getEntity()->getComponent<Tile>();
-                        if(checkTile != nullptr){
-                            checkTile->setTileSelectionState(POINTED_AT);
-                        }
-                        spdlog::info("Collider: {}", col->getEntity()->name);
-                    }
+                for(auto tile : selectedTiles){
+                    grid.getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
                 }
+
+                std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                selectedTiles = tilesInArea;
+
             }
             else{
                 isLeftMouseButtonHeld = false;
@@ -1032,7 +1039,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         }
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
-}
+ }
   
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
