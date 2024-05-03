@@ -112,9 +112,9 @@ Tile *Grid::getTileAt(Vector2Int index) {
 
 const glm::vec3 Grid::GridToWorldPosition(Vector2Int index) const {
 
-    float worldPosX = Position.x + index.x * tileSize;
+    float worldPosX = Position.x + index.x * tileSize + tileSize/2;
     float worldPosY = Position.y;
-    float worldPosZ = Position.z + index.z * tileSize;
+    float worldPosZ = Position.z + index.z * tileSize + tileSize/2;
     return glm::vec3(worldPosX, worldPosY, worldPosZ);
 }
 

@@ -66,7 +66,7 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
                             if (doesCollide(tileEntity->getComponent<BoxCollider>())){
                                 RayHit = GetRayHit(ColliderType::BOX, collider);
                                 hitEntity = tileEntity;
-                                break;
+                                return;
                             }
                         }
                     }
