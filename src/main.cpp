@@ -989,22 +989,12 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 Vector2Int mouseHeldStartGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
                 Vector2Int mouseHeldEndGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
 
-                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
-                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
-
                 for(auto tile : selectedTiles){
                     grid.getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
                 }
+
                 std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
-//                if(!tilesInArea.empty()){
-//                    for(auto tilePos : tilesInArea){
-//                        Tile* checkTile = grid.getTileAt(tilePos);
-//                        if(checkTile != nullptr){
-//                            checkTile->setTileSelectionState(POINTED_AT);
-//                        }
-//                    }
-//                }
 
             }
             else{
