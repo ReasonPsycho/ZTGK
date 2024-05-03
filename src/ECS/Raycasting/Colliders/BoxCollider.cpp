@@ -24,7 +24,7 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionSystem *collis
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
 
-    this-> boxColliderData = BoxColliderData(translation * scale,glm::vec4(1,0,0,0));
+    this-> boxColliderData = BoxColliderData(translation * scale,glm::vec4(1,0,0,1));
 }
 
 void BoxCollider::update() {
@@ -33,7 +33,7 @@ void BoxCollider::update() {
 
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
-    boxColliderData = BoxColliderData(translation * scale,glm::vec4(1,0,0,0));
+    boxColliderData = BoxColliderData(translation * scale,boxColliderData.color);
       
 }
 

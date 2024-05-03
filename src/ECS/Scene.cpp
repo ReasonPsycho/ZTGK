@@ -12,7 +12,7 @@
 void Scene::updateScene() {
     ZoneScopedN("Update scene");
 
-    
+
     for (auto &&child: children) {
         child->updateSelfAndChild();
     }
@@ -22,16 +22,20 @@ Entity *Scene::addEntity(std::string name) {
     children.push_back(make_unique<Entity>(this, name));
     return children.back().get();
 }
+
 void Scene::removeChild(Entity *child) {
     auto iter = std::find_if(children.begin(), children.end(),
-                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
-    if (iter != children.end())
-    {
-    // Entity was found. Now remove it.
-    // unique_ptr will automatically delete the Entity when erased.
-    children.erase(iter);
+                             [&](const std::unique_ptr<Entity> &e) { return e.get() == child; });
+ 
+    
+    /*
+    if (iter != children.end()) {
+        // Entity was found. Now remove it.
+        // unique_ptr will automatically delete the Entity when erased.
+        children.erase(iter);
     }
     stopRenderingImgui = true;
+*/
 }
 
 
@@ -39,7 +43,7 @@ Entity *Scene::addEntity(Entity *parent, std::string name) {
     return parent->addChild(make_unique<Entity>(this, parent, name));
 }
 
-void Scene::showImGuiDetails(Camera *camera) {  
+void Scene::showImGuiDetails(Camera *camera) {
     ZoneScopedN("ShowImGuiDetails Scene");
 
 // Begin main window
@@ -61,7 +65,7 @@ void Scene::showImGuiDetails(Camera *camera) {
     ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
     ImGui::Begin("Scene graph");
     for (auto &child: children) {
-        if(!stopRenderingImgui){
+        if (!stopRenderingImgui) {
             child->showImGuiDetails(camera);
         }
     }

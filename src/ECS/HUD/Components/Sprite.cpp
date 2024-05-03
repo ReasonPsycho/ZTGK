@@ -14,10 +14,11 @@
 
 Sprite::Sprite(const std::string &path)
 : Sprite(ztgk::game::window_size / 2, {0, 0 }, ztgk::color.WHITE, 0, path)
-{}
+{ AHUDComponent::pos = pos; }
 
 Sprite::Sprite(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec4 &color, unsigned int hudGroupId, const std::string &path)
-: AHUDComponent(SPRITE, hudGroupId), pos(pos), size(size), color(color) {
+: AHUDComponent(SPRITE, hudGroupId), size(size), color(color) {
+    AHUDComponent::pos = pos;
     strcpy_s(editor_path, path.c_str());
     load(path);
     name = std::format("Sprite: {}", texture);

@@ -6,16 +6,17 @@
 
 
 #include "../SignalData.h"
-#include "ECS/Utils/Util.h"
+#include "glm/vec2.hpp"
 
 struct MouseScrollSignalData : SignalData {
-    ztgk::Vec2<double> offset;
+    glm::vec2 pos;
+    glm::vec2 offset;
 
-    explicit MouseScrollSignalData(ztgk::Vec2<double> offset, const std::string & message = "");
+    explicit MouseScrollSignalData(glm::vec2 offset, glm::vec2 pos, const std::string & message = "");
 
     [[nodiscard]] std::string to_string() const override {
-        return std::format("{{message=\"{}\", offset=({}, {})}}", message, offset.x, offset.y);
+        return std::format("{{message=\"{}\", offset=({}, {}), pos=({}, {})}}", message, offset.x, offset.y, pos.x, pos.y);
     }
 
-    static Signal signal(ztgk::Vec2<double> offset, const std::string & message = "");
+    static Signal signal(glm::vec2 offset, glm::vec2 pos, const std::string & message = "");
 };

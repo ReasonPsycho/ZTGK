@@ -15,26 +15,31 @@
 #include "Chunk.h"
 
 class CollisionSystem;
-class Grid : public System{
+
+class Grid : public System {
 public:
     //number of tiles in the grid
     int width;
     int height;
 
+    int chunkWidth = 10;
+    int chunkHeight = 10;
+
     //size of the tiles
     float tileSize;
 
     //2D array of tiles
-    std::vector<std::vector<Tile*>> gridArray;
     std::vector<std::vector<Chunk>> chunkArray;
-    Scene* scene;
+    Entity *gridEntity;
+
+    Scene *scene;
     Vector3 Position;
-    unsigned entityId = (unsigned)-1;
+    unsigned entityId = (unsigned) -1;
 
     // Constructors
     Grid() = default;
-    Grid(Scene* scene, int width, int height, float tileSize, Vector3 Position = Vector3(0,0,0));
-    Grid(Grid* grid);
+
+    Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position = Vector3(0, 0, 0));
 
     // Destructor
     ~Grid();
@@ -42,8 +47,10 @@ public:
     // save loading
     // clears all entities, changes size, regenerates entities for size
     void reinitWithSize(glm::ivec2 size);
+
     // removes all related entities, used by reinit
-    void clear();
+    void Clear();
+
     // generates empty tile entities, used by reinit
     void GenerateTileEntities(float scale);
 
@@ -52,16 +59,30 @@ public:
     // save loading
 
     //get the tile at a specific index
-    Tile* getTileAt(int x, int z);
-    Tile* getTileAt(Vector2Int index);
+    Tile *getTileAt(int x, int z);
 
+    Tile *getTileAt(Vector2Int index);
+
+    //set the tile at a specific index
+    void setTileAt(int x, int z, Tile *tile);
+
+    void setTileAt(Vector2Int index, Tile *tile);
+
+
+    void removeTileAt(int x, int z);
+
+    void removeTileAt(Vector2Int index);
+    
     //get the tile at a specific index
-    Chunk* getChunkAt(int x, int z);
-    Chunk* getChunkAt(Vector2Int index);
+    Chunk *getChunkAt(int x, int z);
+
+    Chunk *getChunkAt(Vector2Int index);
     
-    
+    int CalculateOptimalChunkSize(int widith, int height);
+
     //get the tile at a specific world position
     [[nodiscard]] const glm::vec3 GridToWorldPosition(Vector2Int index) const;
+
     [[nodiscard]] const glm::vec3 GridToWorldPosition(int x, int z) const;
 
     //get the index of a tile in specific world position
@@ -69,20 +90,28 @@ public:
 
     //loads and distributes the tile entities in world space
     void LoadTileEntities(float scale, CollisionSystem *collisionSystem);
-    
+
     void DestroyWallsOnTile(Vector2Int tileIndex);
 
     void ClearAllWallData();
+
     void SetUpWalls();
+
     void ClearWalls();
-    void SetUpWall(Tile* tile);
-    void ClearWall(Tile* tile);
+
+    void SetUpWall(Tile *tile);
+
+    void ClearWall(Tile *tile);
 
     //system methods
     void addComponent(void *component) override;
+
     void removeComponent(void *component) override;
+
     const std::type_index *getComponentTypes() override;
+
     int getNumComponentTypes() override;
+
     void showImGuiDetailsImpl(Camera *camera) override;
 
     bool isInBounds(Vector2Int anInt);
@@ -90,11 +119,9 @@ public:
 private:
     float offsetX = 0;
     float offsetZ = 0;
-
-    bool showTilesInImgui = false;
     
     std::array<std::type_index, 1> componentTypes = {
-        std::type_index(typeid(Tile))
+            std::type_index(typeid(Tile))
     };
 };
 

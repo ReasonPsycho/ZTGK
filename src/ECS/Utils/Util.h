@@ -41,7 +41,7 @@ namespace ztgk {
 
     extern Console console;
 
-    static struct {
+    static struct {  
         const glm::vec4 BLACK = { 0, 0, 0, 1 };
         const glm::vec4 WHITE = { 1, 1, 1, 1 };
         const glm::vec4 RED = { 1, 0, 0, 1 };

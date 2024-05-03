@@ -8,7 +8,9 @@
 #elif defined(_MSC_VER)
 # define TracyFunction __FUNCSIG__
 #endif
+
 #include <tracy/Tracy.hpp >
+
 #pragma endregion Tracy
 
 #include "imgui.h"
@@ -17,6 +19,7 @@
 #include <ImGuizmo.h>
 #include <cstdio>
 
+#include "ECS/Utils/Cursor.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
@@ -92,7 +95,7 @@ HUD hud;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
-StateManager* stateManager;
+StateManager *stateManager;
 
 Entity *box1;
 Entity *box2;
@@ -239,26 +242,26 @@ int main(int, char **) {
     }
     spdlog::info("Initialized OpenGL.");
 
-    init_systems();
-    spdlog::info("Initialized textures and vertices.");
-
     init_imgui();
     spdlog::info("Initialized ImGui.");
 
+    init_time();
+    spdlog::info("Initialized system timer.");
+
+    signalQueue.init();
+    spdlog::info("Initialized signal queue.");
+
     init_camera();
     spdlog::info("Initialized camera and viewport.");
+
+    init_systems();
+    spdlog::info("Initialized textures and vertices.");
 
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
-    glfwSwapInterval(1); 
-
-    signalQueue.init();
-    spdlog::info("Initialized signal queue.");
-
-    init_time();
-    spdlog::info("Initialized system timer.");
+    glfwSwapInterval(1);
 
     load_enteties();
     spdlog::info("Initialized entities.");
@@ -271,7 +274,7 @@ int main(int, char **) {
 
         //Setting up things for the rest of functionalities (ex. update_delta time)
         before_frame();
-        
+
         // Process I/O operations here
         input();
 
@@ -314,7 +317,7 @@ int main(int, char **) {
         // End frame and swap buffers (double buffering)
 
         end_frame();
-        
+
     }
 
     file_logger->info("Cleanup");
@@ -405,11 +408,16 @@ bool init() {
 
 void init_systems() {
     ztgk::game::scene = &scene;
+    ztgk::game::camera = &camera;
+    ztgk::game::signalQueue = &signalQueue;
+    ztgk::game::window = window;
+    ztgk::game::cursor.init();
+
+    scene.systemManager.addSystem(&signalQueue);
 
     scene.systemManager.addSystem(&lightSystem);
     scene.systemManager.addSystem(&renderSystem);
     scene.systemManager.addSystem(&instanceRenderSystem);
-    scene.systemManager.addSystem(&signalQueue);
     scene.systemManager.addSystem(&wireRenderer);
     scene.systemManager.addSystem(&grid);
     scene.systemManager.addSystem(&collisionSystem);
@@ -430,6 +438,8 @@ void init_systems() {
 
     hud.init();
     scene.systemManager.addSystem(&hud);
+
+    unitSystem.init();
 }
 
 void load_enteties() {
@@ -442,7 +452,7 @@ void load_enteties() {
 
     model.loadModel();
     wall.loadModel();
-    
+
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     //gabka.loadModel();
     tileModel.loadModel();
@@ -450,32 +460,32 @@ void load_enteties() {
 
 
     gameObject = scene.addEntity("Wall");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,50,0));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
-    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
     gameObject = scene.addEntity("Wall1");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,50,200));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
-    gameObject->transform.setLocalRotation(glm::quat (glm::vec3(0,0,0)));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 200));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
     gameObject->addComponent(make_unique<Render>(&wall));;
 //
     gameObject = scene.addEntity("Wall2");;
-    gameObject->transform.setLocalPosition(glm::vec3(0,50,100));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalPosition(glm::vec3(0, 50, 100));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
 //
     gameObject = scene.addEntity("Wall3");;
-    gameObject->transform.setLocalPosition(glm::vec3(200,50,100));
-    gameObject->transform.setLocalScale(glm::vec3(100,50,10));
+    gameObject->transform.setLocalPosition(glm::vec3(200, 50, 100));
+    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
-    
-    
+
+
 //    gameObject = scene.addEntity("Dir light");
-  //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
+    //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
     gameObject->addComponent(make_unique<PointLight>(
             PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
@@ -489,7 +499,7 @@ void load_enteties() {
     lightSystem.Init();
 
     //gameObject = scene.addEntity("Quad");
-   // gameObject->addComponent(make_unique<Render>(quadModel));
+    // gameObject->addComponent(make_unique<Render>(quadModel));
 
 
     instanceRenderSystem.tileModel = quadModel;
@@ -524,19 +534,18 @@ void load_enteties() {
     hud.getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
-                                                                                ztgk::game::window_size.y * 0.5));
+                                                        ztgk::game::window_size.y * 0.5));
     tx.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Text>( tx ));
+    fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
     fgelem = scene.addEntity(efg, "Animated Sprite");
     auto spr = Sprite("res/textures/puni.png");
     spr.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Sprite>( spr ));
+    fgelem->addComponent(make_unique<Sprite>(spr));
     zmspr = fgelem->getComponent<Sprite>();
     zmspr->groupID = zmgroup;
 
     load_units();
-
 
 
 }
@@ -615,6 +624,7 @@ void load_units() {
 //    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 }
+
 void init_imgui() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
@@ -692,7 +702,7 @@ void render() {
     phongPipeline.PrebindPipeline(&camera);
 
     renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader,&camera);
+    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader, &camera);
     wireRenderer.DrawColliders();
     wireRenderer.DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
@@ -753,21 +763,21 @@ void imgui_render() {
     }
     ImGui::End();
 
-    static LevelGenerator::Config levelGenConfig {
-        .seed {},
-        .size {100, 100},
-        .wallThickness = 1.f,
-        .baseRadius = 4.5f,
-        .keyRadius = 4.f,
-        .pocketRadius = 2.5f,
-        .noiseImpact = 1.f,
-        .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
-        .extraPocketAttempts = 10000,
-        .keyEnemies = 3,
-        .minEnemies = 0,
-        .maxEnemies = 2,
-        .unitCount = 3,
-        .chestCount = 10,
+    static LevelGenerator::Config levelGenConfig{
+            .seed {},
+            .size {100, 100},
+            .wallThickness = 1.f,
+            .baseRadius = 4.5f,
+            .keyRadius = 4.f,
+            .pocketRadius = 2.5f,
+            .noiseImpact = 1.f,
+            .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+            .extraPocketAttempts = 10000,
+            .keyEnemies = 3,
+            .minEnemies = 0,
+            .maxEnemies = 2,
+            .unitCount = 3,
+            .chestCount = 10,
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -878,7 +888,7 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-// glfw: whenever the window size changed (by OS or user reinitWithSize) this callback function executes
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -886,6 +896,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     display_h = height;
     display_w = width;
+    ztgk::game::window_size = {width, height};
     camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
 }
@@ -894,54 +905,22 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
-    signalQueue += MouseMoveSignalData::signal(
-            {xposIn, yposIn}, {lastX, lastY},
-            "Forwarding GLFW event."
-    );
-
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    static float uixpos{1920 / 2};
-    static float uiypos{1080 / 2};
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    if (captureMouse) {
-        if (timeStep != 0) {
-            camera.ProcessMouseMovement(xoffset, yoffset, true, deltaTime);
-        } else {
-            camera.ProcessMouseMovement(xoffset, yoffset, true, 0.01f);
-        }
-    } else {
-        uixpos += xoffset;
-        uiypos -= yoffset;
-        ImGuiIO &io = ImGui::GetIO();
-        io.MousePos = ImVec2(uixpos, uiypos);
-    }
-
+    ztgk::game::cursor.move({xposIn, yposIn});
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    signalQueue += MouseScrollSignalData::signal({xoffset, yoffset}, "Forwarding GLFW event.");
-
-    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+    ztgk::game::cursor.scroll({xoffset, yoffset});
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
-    signalQueue += MouseButtonSignalData::signal(button, action, mods, "Forwarding GLFW event.");
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
+    ztgk::game::cursor.click(button, action, mods);
     handle_picking(window, button, action, mods);
-
+    
 }
+
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods){
 
@@ -1003,6 +982,10 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 if(!collidersInArea.empty()){
                     spdlog::info("Colliders in area: {}", collidersInArea.size());
                     for(auto col : collidersInArea){
+                        Tile* checkTile = col->getEntity()->getComponent<Tile>();
+                        if(checkTile != nullptr){
+                            checkTile->setTileSelectionState(POINTED_AT);
+                        }
                         spdlog::info("Collider: {}", col->getEntity()->name);
                     }
                 }
@@ -1017,7 +1000,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
     }
 
 
-
     //if there are selected units and right mouse button is pressed, set target for selected units
     if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
 
@@ -1030,6 +1012,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 //if hit entity is mineable, set it as mining target
                 if(hit->getComponent<IMineable>()!=nullptr){
                     unit->miningTarget = hit->getComponent<IMineable>();
+                    Tile* hitTile = hit->getComponent<Tile>();
+                    hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
                     spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
                 }
@@ -1049,8 +1033,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         wireRenderer.rayComponents.push_back(std::move(ray));
     }
 }
-
-
+  
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
