@@ -11,12 +11,16 @@
 
 class CollisionSystem;
 
+enum CollisionType{
+    NORMAL,
+    CHUNK,
+    TILE
+};
 struct BoxColliderData{
     glm::mat4x4 matrix;
     glm::vec4 color;
 
     BoxColliderData(const glm::mat4x4 &matrixInput, glm::vec4 color) : matrix(matrixInput),color(color) {}
-
 };
 
 class BoxCollider : public Collider
@@ -25,9 +29,11 @@ public:
 
     glm::vec3 center{};
     glm::vec3 size{};
+    CollisionType collisionType;
     BoxColliderData boxColliderData = BoxColliderData(glm::mat4x4(1.0f), glm::vec4(1));
     // Constructors
     BoxCollider(Entity* entity, glm::vec3 size, CollisionSystem* collisionSystem);
+    BoxCollider(Entity* entity, glm::vec3 size, CollisionType type, CollisionSystem* collisionSystem);
 
     // Debug methods
 
@@ -35,7 +41,7 @@ public:
     void showImGuiDetailsImpl(Camera* camera) override;
 
     // Other methods
-    void update();
+    void UpdateImpl() override;
 
     bool intersects(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4);
 

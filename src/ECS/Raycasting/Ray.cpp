@@ -7,6 +7,7 @@
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Colliders/SphereCollider.h"
 #include "ECS/Entity.h"
+#include "ECS/Grid/Chunk.h"
 
 /**
  * @brief Ray constructor
@@ -57,7 +58,21 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
 
         if (doesCollide(collider)) {
             if (collider->type == ColliderType::BOX) {
-                RayHit = GetRayHit(ColliderType::BOX, collider);
+                if(((BoxCollider*)collider)->collisionType == CollisionType::CHUNK){
+                    Chunk * chunk = collider->getEntity()->getComponent<Chunk>();
+                    for(int x = 0;x < chunk->width;x++){
+                        for(int z = 0;z < chunk->width;z++){
+                            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
+                            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
+                                RayHit = GetRayHit(ColliderType::BOX, collider);
+                                hitEntity = tileEntity;
+                                return;
+                            }
+                        }
+                    }
+                }else{
+                    RayHit = GetRayHit(ColliderType::BOX, collider);
+                }
             } else if (collider->type == ColliderType::SPHERE) {
                 RayHit = GetRayHit(ColliderType::SPHERE, collider);
             }
