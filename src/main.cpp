@@ -1001,6 +1001,19 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
 
+                if(!unitSystem.selectedUnits.empty()){
+                    for(auto unit : unitSystem.selectedUnits){
+                        unit->miningTargets.clear();
+                        for(auto tile : tilesInArea){
+                            auto mineable = grid.getTileAt(tile)->getEntity()->getComponent<IMineable>();
+                            if(mineable != nullptr && !mineable->isMined){
+                                unit->miningTargets.push_back(mineable);
+                            }
+                        }
+                    }
+
+                }
+
             }
             else{
                 isLeftMouseButtonHeld = false;

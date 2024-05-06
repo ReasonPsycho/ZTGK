@@ -85,7 +85,17 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
-    if(!miningTargets.empty()){
+    if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
+        currentMiningTarget = nullptr;
+    }
+
+    for(auto &mineable : miningTargets){
+        if(mineable->isMined){
+            miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), mineable), miningTargets.end());
+        }
+    }
+
+    if(!miningTargets.empty() && currentMiningTarget == nullptr){
         currentMiningTarget = findClosestMineable();
         if(currentMiningTarget != nullptr){
             hasMiningTarget = true;
@@ -211,8 +221,6 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToEx
     }
     if(closestMineable == nullptr){
         spdlog::error("IN UNIT::findClosestMineable: No reachable mining target in area!");
-    }else{
-        spdlog::info("IN UNIT::findClosestMineable: Found closest mineable at {}, {}", closestMineable->gridPosition.x, closestMineable->gridPosition.z);
     }
 
     return closestMineable;

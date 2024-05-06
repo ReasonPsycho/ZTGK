@@ -26,6 +26,7 @@ void IMineable::Mine() {
         grid->DestroyWallsOnTile(gridPosition);
         isMined = true;
 
+
     }
 }
 

@@ -40,14 +40,9 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 void UnitSystem::UpdateImpl() {
     for (Unit* unit: unitComponents) {
         unit->UpdateImpl();
-        if(unit->currentMiningTarget != nullptr)
-            Entity *entity = unit->currentMiningTarget->getEntity();
         unit->getEntity()->getComponent<UnitAI>()->Update();
-        if(unit->currentMiningTarget != nullptr)
-            Entity *entity = unit->currentMiningTarget->getEntity();
         unit->getEntity()->getComponent<BoxCollider>()->Update();
-        if(unit->currentMiningTarget != nullptr)
-            Entity *entity = unit->currentMiningTarget->getEntity();
+
     }
 }
 
@@ -92,7 +87,7 @@ void UnitSystem::init() {
                             selectUnit(ray->getHitEntity()->getComponent<Unit>());
                         }
                     } else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
-                        deselectAllUnits();
+                        //deselectAllUnits();
                     }
 
                     ztgk::game::scene->systemManager.getSystem<WireRenderer>()->rayComponents.push_back(std::move(ray));

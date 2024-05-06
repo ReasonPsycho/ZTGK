@@ -43,8 +43,16 @@ State *IdleState::RunCurrentState() {
         else
         {
             unit->hasMovementTarget = true;
-            unit->movementTarget = unit->findClosestMineable()->gridPosition;
-            return this;
+            IMineable* mineable = unit->findClosestMineable();
+            if(mineable != nullptr) {
+                unit->movementTarget = unit->findClosestMineable()->gridPosition;
+                moveState = new MovementState(grid);
+                moveState->unit = unit;
+                return moveState;
+            }
+            else
+                return this;
+
         }
     }
 

@@ -13,8 +13,6 @@
 
 State *MiningState::RunCurrentState() {
     isTargetInRange();
-    IMineable* current = unit->currentMiningTarget;
-    Entity* entity = unit->currentMiningTarget->getEntity();
 
     //from Mining to Idle
     if(!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget){
@@ -24,10 +22,6 @@ State *MiningState::RunCurrentState() {
         return idleState;
     }
 
-    current = unit->currentMiningTarget;
-    entity = unit->currentMiningTarget->getEntity();
-
-
     //from Mining to Movement
     if(unit->hasMovementTarget){
         moveState = new MovementState(grid);
@@ -35,9 +29,6 @@ State *MiningState::RunCurrentState() {
 
         return moveState;
     }
-
-    current = unit->currentMiningTarget;
-    entity = unit->currentMiningTarget->getEntity();
 
     //from Mining to Combat
     if(unit->hasCombatTarget){
@@ -50,12 +41,11 @@ State *MiningState::RunCurrentState() {
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
-            return this;
+            moveState = new MovementState(grid);
+            moveState->unit = unit;
+            return moveState;
         }
     }
-
-    current = unit->currentMiningTarget;
-    entity = unit->currentMiningTarget->getEntity();
 
     Mine();
     return this;
@@ -77,9 +67,8 @@ bool MiningState::isTargetInRange() {
 }
 
 void MiningState::Mine() {
-    Entity* entity = unit->currentMiningTarget->getEntity();
     std::vector<IMineable*> miningTargets = unit->miningTargets;
-    entity = unit->currentMiningTarget->getEntity();
+
     if(miningTargets.empty()){
         spdlog::error("In MiningState::Mine(): Mining targets are empty");
         unit->hasMiningTarget = false;
@@ -90,29 +79,21 @@ void MiningState::Mine() {
     if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0 && miningTargets.size() == 1){
         unit->hasMiningTarget = false;
         miningTargets.clear();
+        unit->miningTargets.clear();
         return;
     }
 
     if(isTargetInRange()){
-        entity = unit->currentMiningTarget->getEntity();
         unit->currentMiningTarget->Mine();
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
             miningTargets.erase(miningTargets.begin());
             if(miningTargets.empty()){
                 unit->hasMiningTarget = false;
+                unit->currentMiningTarget = nullptr;
                 return;
             }
             unit->currentMiningTarget = miningTargets.front();
         }
-    }
-    else if(!unit->pathfinding.FindPath(unit->gridPosition, unit->pathfinding.GetNearestVacantTile( unit->gridPosition,unit->currentMiningTarget->gridPosition)).empty()){
-        unit->hasMovementTarget = true;
-        unit->movementTarget = unit->currentMiningTarget->gridPosition;
-        spdlog::info("In MiningState::Mine(): Pathfinding successful, going to tile {} {}", unit->movementTarget.x, unit->movementTarget.z);
-    }
-    else{
-        spdlog::error("In MiningState::Mine(): no path to mining target");
-        return;
     }
 //    else{
 //        auto miningPat= findMiningPath();

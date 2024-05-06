@@ -42,7 +42,7 @@ public:
                 if (typeIndex == system->getComponentTypes()[i]) {
                     // Pass the pointer or whatever information needed here
                     system->removeComponent(component);
-                    spdlog::info("Component removed");
+                    spdlog::info("Component {} removed", typeIndex.name());
                     break;
                 }
             }
