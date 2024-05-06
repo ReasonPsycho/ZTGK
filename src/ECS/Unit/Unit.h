@@ -6,19 +6,25 @@
 #include "ECS/Unit/Mining/IMineable.h"
 #include "ECS/Utils/AstarPathfinding.h"
 #include "ECS/Unit/UnitAI/StateMachine/StateManager.h"
-
-struct UnitStats{
-    float health;
-    float attackDamage;
-    float attackSpeed;
-    float movementSpeed;
-    float range;
-};
+#include "ECS/Unit/Equipment/Modifiers.h"
 
 class UnitSystem;
 
+struct UnitStats {
+    float max_hp{};
+    float hp{};
+
+    float move_spd{20};
+    float mine_spd{};
+    // todo atk speed
+
+    Modifiers added{};
+};
+
 class Unit : public Component {
 public:
+    static const UnitStats ALLY_BASE;
+    static const UnitStats ENEMY_BASE;
 
     bool isSelected = false;
 
@@ -43,12 +49,9 @@ public:
     Vector2Int movementTarget;
     Unit* combatTarget;
     IMineable* miningTarget;
-    UnitStats stats;
-
-    float attackCooldown = 0;
 
 
-    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly, UnitSystem* unitSystem);
+    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem);
     ~Unit();
 
     bool IsAlly() const;
@@ -63,7 +66,7 @@ public:
     void UpdateImpl() override;
 
     bool isAlly;
-    UnitStats baseStats;
+    UnitStats stats;
 
     Unit* findEnemy();
 

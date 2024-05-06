@@ -5,33 +5,33 @@
 #ifndef ITEM_H
 #define ITEM_H
 #include <string>
+#include "Modifiers.h"
+#include "GridRange.h"
 
 struct ItemStats {
-    float addHealth;
-    float addAttackDamage;
-    float addAttackSpeed;
-    float addMovementSpeed;
-    float addRange;
+    float dmg{0};
+    float cd_max_sec{1};
+    GridRange range{};
+    // ability
 
-    ItemStats() = default;
-    ItemStats(float addHealth, float addAttackDamage, float addAttackSpeed, float addMovementSpeed, float addRange) {
-        this->addHealth = addHealth;
-        this->addAttackDamage = addAttackDamage;
-        this->addAttackSpeed = addAttackSpeed;
-        this->addMovementSpeed = addMovementSpeed;
-        this->addRange = addRange;
-    }
+    Modifiers add_to_unit{};
 };
 
 class Item {
 public:
+    unsigned item_type_id;
+
+    bool offensive{false};
+    float cd_sec{0};
+
     std::string name;
-    std::string desctiption;
+    std::string description;
     ItemStats stats{};
     bool takesTwoSlots;
 
-    Item(std::string name, std::string desctiption, ItemStats stats, bool takesTwoSlots = false);
+    Item(std::string name, std::string desctiption, bool offensive, ItemStats stats, bool takesTwoSlots = false);
 
+    static Item default_attack_item();
 };
 
 

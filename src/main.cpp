@@ -558,8 +558,7 @@ void load_units() {
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    UnitStats stats = {100, 1, 1, 20, 3};
-    playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), stats, true, &unitSystem));
+    playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), Unit::ALLY_BASE, true, &unitSystem));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState(&grid);
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -572,8 +571,8 @@ void load_units() {
 //    enemyUnit->updateSelfAndChild();
 //    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
 //    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 20, 3};
-//    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), stats, false, &unitSystem));
+//    added = {100, 1, 1, 20, 3};
+//    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), added, false, &unitSystem));
 //    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
 //    stateManager->currentState = new IdleState(&grid);
 //    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
@@ -588,8 +587,8 @@ void load_units() {
 //    playerUnit->updateSelfAndChild();
 //    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
 //    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 30, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
+//    added = {100, 1, 1, 30, 1};
+//    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), added, true, &unitSystem));
 //    stateManager = new StateManager(playerUnit->getComponent<Unit>());
 //    stateManager->currentState = new idleState();
 //    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -602,8 +601,8 @@ void load_units() {
 //    playerUnit->updateSelfAndChild();
 //    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
 //    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 10, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), stats, true, &unitSystem));
+//    added = {100, 1, 1, 10, 1};
+//    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), added, true, &unitSystem));
 //    stateManager = new StateManager(playerUnit->getComponent<Unit>());
 //    stateManager->currentState = new idleState();
 //    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -616,8 +615,8 @@ void load_units() {
 //    playerUnit->updateSelfAndChild();
 //    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
 //    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 100, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), stats, true, &unitSystem));
+//    added = {100, 1, 1, 100, 1};
+//    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), added, true, &unitSystem));
 //    stateManager = new StateManager(playerUnit->getComponent<Unit>());
 //    stateManager->currentState = new idleState();
 //    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
