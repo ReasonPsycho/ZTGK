@@ -18,13 +18,14 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
 }
 
 void IMineable::Mine() {
+
     timeToMineRemaining -= Time::Instance().DeltaTime();
     spdlog::info(timeToMineRemaining);
+
     if (timeToMineRemaining<=0) {
         grid->DestroyWallsOnTile(gridPosition);
-        ztgk::game::scene->stopRenderingImgui = true;
-        Entity* entity = getEntity();
-        getEntity()->removeComponentFromMap(std::unique_ptr<IMineable>(this));
+        isMined = true;
+
     }
 }
 

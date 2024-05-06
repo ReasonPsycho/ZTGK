@@ -42,7 +42,7 @@ public:
     //targets
     Vector2Int movementTarget;
     Unit* combatTarget;
-    std::vector<IMineable> miningTargets;
+    std::vector<IMineable*> miningTargets;
     IMineable* currentMiningTarget = nullptr;
     UnitStats stats;
 

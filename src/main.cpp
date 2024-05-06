@@ -1022,7 +1022,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
             for(auto unit : unitSystem.selectedUnits){
 
                 //if hit entity is mineable, set it as mining target
-                if(hit->getComponent<IMineable>()!=nullptr){
+                if(hit->getComponent<IMineable>()!=nullptr && !hit->getComponent<IMineable>()->isMined){
                     unit->miningTargets.clear();
                     unit->miningTargets.emplace_back(hit->getComponent<IMineable>());
                     Tile* hitTile = hit->getComponent<Tile>();

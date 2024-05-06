@@ -28,6 +28,7 @@ public:
     float getTimeToMineRemaining() const {
         return timeToMineRemaining;
     }
+    bool isMined = false;
 
 private:
     float timeToMineRemaining;

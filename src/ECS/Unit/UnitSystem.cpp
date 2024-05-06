@@ -40,8 +40,14 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 void UnitSystem::UpdateImpl() {
     for (Unit* unit: unitComponents) {
         unit->UpdateImpl();
+        if(unit->currentMiningTarget != nullptr)
+            Entity *entity = unit->currentMiningTarget->getEntity();
         unit->getEntity()->getComponent<UnitAI>()->Update();
+        if(unit->currentMiningTarget != nullptr)
+            Entity *entity = unit->currentMiningTarget->getEntity();
         unit->getEntity()->getComponent<BoxCollider>()->Update();
+        if(unit->currentMiningTarget != nullptr)
+            Entity *entity = unit->currentMiningTarget->getEntity();
     }
 }
 
@@ -100,7 +106,7 @@ void UnitSystem::init() {
                         for(auto & unit : selectedUnits){
                             if(hit->getComponent<IMineable>()!=nullptr){
                                 unit->miningTargets.clear();
-                                unit->miningTargets.push_back(*hit->getComponent<IMineable>());
+                                unit->miningTargets.push_back(hit->getComponent<IMineable>());
                                 unit->hasMiningTarget = true;
                                 spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
                             }

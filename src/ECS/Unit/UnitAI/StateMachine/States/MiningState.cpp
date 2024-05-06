@@ -13,7 +13,8 @@
 
 State *MiningState::RunCurrentState() {
     isTargetInRange();
-
+    IMineable* current = unit->currentMiningTarget;
+    Entity* entity = unit->currentMiningTarget->getEntity();
 
     //from Mining to Idle
     if(!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget){
@@ -23,6 +24,10 @@ State *MiningState::RunCurrentState() {
         return idleState;
     }
 
+    current = unit->currentMiningTarget;
+    entity = unit->currentMiningTarget->getEntity();
+
+
     //from Mining to Movement
     if(unit->hasMovementTarget){
         moveState = new MovementState(grid);
@@ -30,6 +35,9 @@ State *MiningState::RunCurrentState() {
 
         return moveState;
     }
+
+    current = unit->currentMiningTarget;
+    entity = unit->currentMiningTarget->getEntity();
 
     //from Mining to Combat
     if(unit->hasCombatTarget){
@@ -45,6 +53,9 @@ State *MiningState::RunCurrentState() {
             return this;
         }
     }
+
+    current = unit->currentMiningTarget;
+    entity = unit->currentMiningTarget->getEntity();
 
     Mine();
     return this;
@@ -66,31 +77,32 @@ bool MiningState::isTargetInRange() {
 }
 
 void MiningState::Mine() {
-
-    std::vector<IMineable>* miningTargets = &unit->miningTargets;
-
-    if(miningTargets->empty()){
+    Entity* entity = unit->currentMiningTarget->getEntity();
+    std::vector<IMineable*> miningTargets = unit->miningTargets;
+    entity = unit->currentMiningTarget->getEntity();
+    if(miningTargets.empty()){
         spdlog::error("In MiningState::Mine(): Mining targets are empty");
         unit->hasMiningTarget = false;
         return;
     }
 
 
-    if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0 && miningTargets->size() == 1){
+    if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0 && miningTargets.size() == 1){
         unit->hasMiningTarget = false;
-        miningTargets->clear();
+        miningTargets.clear();
         return;
     }
 
     if(isTargetInRange()){
+        entity = unit->currentMiningTarget->getEntity();
         unit->currentMiningTarget->Mine();
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
-            miningTargets->erase(miningTargets->begin());
-            if(miningTargets->empty()){
+            miningTargets.erase(miningTargets.begin());
+            if(miningTargets.empty()){
                 unit->hasMiningTarget = false;
                 return;
             }
-            unit->currentMiningTarget = &miningTargets->front();
+            unit->currentMiningTarget = miningTargets.front();
         }
     }
     else if(!unit->pathfinding.FindPath(unit->gridPosition, unit->pathfinding.GetNearestVacantTile( unit->gridPosition,unit->currentMiningTarget->gridPosition)).empty()){

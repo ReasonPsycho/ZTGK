@@ -194,19 +194,19 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToEx
     IMineable* closestMineable = nullptr;
 
     float closestDistance = 1000000;
-    for (auto &tile : miningTargets) {
+    for (auto tile : miningTargets) {
         for(auto &excluded : MineablesToExclude){
-            if(tile.gridPosition == excluded.gridPosition){
+            if(tile->gridPosition == excluded.gridPosition){
                 continue;
             }
         }
-        float distance = VectorUtils::Distance(Vector2Int(gridPosition.x, gridPosition.z), Vector2Int(tile.gridPosition.x, tile.gridPosition.z));
+        float distance = VectorUtils::Distance(Vector2Int(gridPosition.x, gridPosition.z), Vector2Int(tile->gridPosition.x, tile->gridPosition.z));
         if(distance < closestDistance){
-            if(pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile.gridPosition, gridPosition)).empty()){
+            if(pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition, gridPosition)).empty()){
                 continue;
             }
             closestDistance = distance;
-            closestMineable = &tile;
+            closestMineable = tile;
         }
     }
     if(closestMineable == nullptr){
