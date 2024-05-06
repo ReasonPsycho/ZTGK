@@ -688,6 +688,11 @@ void update() {
         grid.getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
 
+//    Unit* u = unitSystem.unitComponents[0];
+//    if(u->currentMiningTarget !=nullptr){
+//        spdlog::info("Mining target: {} {}", u->currentMiningTarget->gridPosition.x, u->currentMiningTarget->gridPosition.z);
+//    }
+
 }
 
 void render() {
@@ -1018,7 +1023,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
 
                 //if hit entity is mineable, set it as mining target
                 if(hit->getComponent<IMineable>()!=nullptr){
-                    unit->miningTarget = hit->getComponent<IMineable>();
+                    unit->miningTargets.clear();
+                    unit->miningTargets.emplace_back(hit->getComponent<IMineable>());
                     Tile* hitTile = hit->getComponent<Tile>();
                     hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
@@ -1028,7 +1034,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                     //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr){
                     unit->hasMiningTarget = false;
-                    unit->miningTarget = nullptr;
+                    unit->miningTargets.clear();
                     unit->hasCombatTarget = false;
                     unit->combatTarget = nullptr;
                     unit->hasMovementTarget = true;

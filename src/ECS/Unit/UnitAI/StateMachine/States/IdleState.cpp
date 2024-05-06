@@ -43,7 +43,7 @@ State *IdleState::RunCurrentState() {
         else
         {
             unit->hasMovementTarget = true;
-            unit->movementTarget = unit->miningTarget->gridPosition;
+            unit->movementTarget = unit->findClosestMineable()->gridPosition;
             return this;
         }
     }

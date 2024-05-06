@@ -99,13 +99,15 @@ void UnitSystem::init() {
                     if(hit != nullptr){
                         for(auto & unit : selectedUnits){
                             if(hit->getComponent<IMineable>()!=nullptr){
-                                unit->miningTarget = hit->getComponent<IMineable>();
+                                unit->miningTargets.clear();
+                                unit->miningTargets.push_back(*hit->getComponent<IMineable>());
                                 unit->hasMiningTarget = true;
                                 spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
                             }
                             else{
                                 unit->hasMiningTarget = false;
-                                unit->miningTarget = nullptr;
+                                spdlog::info("Mining target not set");
+                                unit->miningTargets.clear();
                                 unit->hasCombatTarget = false;
                                 unit->combatTarget = nullptr;
                                 unit->hasMovementTarget = true;

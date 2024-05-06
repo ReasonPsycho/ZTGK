@@ -39,6 +39,8 @@ AABB Chunk::getBoundingVolume() {
 }
 
 Chunk::Chunk(Vector2Int index, Grid *grid, int width, int height) :index(index),grid(grid),width(width),height(height) {
+    name = "Chunk";
+
     chunkTileArray.resize(width);
     for (int i = 0; i < width; i++) {
         chunkTileArray[i].resize(height);

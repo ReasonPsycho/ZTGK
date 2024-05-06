@@ -85,7 +85,15 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
-
+    if(!miningTargets.empty()){
+        currentMiningTarget = findClosestMineable();
+        if(currentMiningTarget != nullptr){
+            hasMiningTarget = true;
+        }
+        else{
+            hasMiningTarget = false;
+        }
+    }
 
     if(hasMovementTarget){
         if(!grid->getTileAt(movementTarget)->vacant()){
@@ -175,5 +183,38 @@ Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) 
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     playerUnit->addComponent(make_unique<Unit>());
     return playerUnit;
+}
+
+IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToExclude) {
+    if(miningTargets.empty()){
+        spdlog::error("IN UNIT::findClosestMineable: No mining targets!");
+        return nullptr;
+    }
+
+    IMineable* closestMineable = nullptr;
+
+    float closestDistance = 1000000;
+    for (auto &tile : miningTargets) {
+        for(auto &excluded : MineablesToExclude){
+            if(tile.gridPosition == excluded.gridPosition){
+                continue;
+            }
+        }
+        float distance = VectorUtils::Distance(Vector2Int(gridPosition.x, gridPosition.z), Vector2Int(tile.gridPosition.x, tile.gridPosition.z));
+        if(distance < closestDistance){
+            if(pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile.gridPosition, gridPosition)).empty()){
+                continue;
+            }
+            closestDistance = distance;
+            closestMineable = &tile;
+        }
+    }
+    if(closestMineable == nullptr){
+        spdlog::error("IN UNIT::findClosestMineable: No reachable mining target in area!");
+    }else{
+        spdlog::info("IN UNIT::findClosestMineable: Found closest mineable at {}, {}", closestMineable->gridPosition.x, closestMineable->gridPosition.z);
+    }
+
+    return closestMineable;
 }
 

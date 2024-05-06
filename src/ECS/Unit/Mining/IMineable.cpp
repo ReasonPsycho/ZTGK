@@ -22,7 +22,9 @@ void IMineable::Mine() {
     spdlog::info(timeToMineRemaining);
     if (timeToMineRemaining<=0) {
         grid->DestroyWallsOnTile(gridPosition);
-        getEntity()->removeComponentFromMap(std::make_unique<IMineable>(this));
+        ztgk::game::scene->stopRenderingImgui = true;
+        Entity* entity = getEntity();
+        getEntity()->removeComponentFromMap(std::unique_ptr<IMineable>(this));
     }
 }
 
@@ -33,6 +35,10 @@ void IMineable::UpdateImpl() {
 void IMineable::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Time to mine: %f", timeToMine);
     ImGui::Text("Time to mine remaining: %f", timeToMineRemaining);
+    if(getEntity() != nullptr)
+        ImGui::Text("Parent Entity: %s", getEntity()->name.c_str());
+    else
+        ImGui::Text("Parent Entity: nullptr");
 
 }
 

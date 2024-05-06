@@ -28,7 +28,7 @@ public:
     ~AstarPathfinding() = default;
 
     // Most important method
-    void FindPath(Vector2Int start, Vector2Int target);
+    std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target);
     Vector2Int GetNearestVacantTile(Vector2Int target, Vector2Int origin);
 
 private:
