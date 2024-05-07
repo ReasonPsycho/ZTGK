@@ -16,7 +16,7 @@
 struct SpotLightData {
     glm::vec4 diffuse;
     glm::vec4 specular;
-    glm::vec4 position;
+    glm::vec4 position; //far plane will now be stored as 4th value in pos
     glm::vec4 direction;
     float cutOff;  
     float outerCutOff; 

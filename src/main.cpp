@@ -456,9 +456,14 @@ void load_enteties() {
     wall.loadModel();
 
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    //gabka.loadModel();
+   // gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
+    
+    //Gabka
+    //gameObject = scene.addEntity("Gabka");;
+   // gameObject->addComponent(make_unique<Render>(&gabka));;
+    //Gabka
 
 
     gameObject = scene.addEntity("Wall");;

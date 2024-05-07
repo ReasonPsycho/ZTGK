@@ -34,11 +34,15 @@ void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShado
     ZoneScopedN("SetUpShadowBuffer");
 
     shadowMapShader->use();
-    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(glm::mat4(1)));
-
+    shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    shadowMapShader->setFloat("far_plane", far_plane);
+    shadowMapShader->setFloat("near_plane", near_plane);
+    
+    
     instanceShadowMapShader->use();
     instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-
+    instanceShadowMapShader->setFloat("far_plane", far_plane);
+    instanceShadowMapShader->setFloat("near_plane", near_plane);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
     glDrawBuffer(GL_NONE);
@@ -101,17 +105,14 @@ void SpotLight::showImGuiDetailsImpl(Camera *camera) {
 
 void SpotLight::UpdateData(int height, int width) {
     glm::mat4 lightProjection, lightView;
-    lightProjection = glm::perspective(data.outerCutOff, (GLfloat) width / (GLfloat) height, near_plane, far_plane);
+    far_plane = ComputeFarPlane(data.constant, data.linear, data.quadratic);
+    data.position = glm::vec4(getEntity()->transform.getGlobalPosition(),far_plane);
 
-    glm::vec3 forward = glm::vec3(1, 0, 0);
-    glm::quat globalRotation = getEntity()->transform.getGlobalRotation();
-
-    data.position = glm::vec4(getEntity()->transform.getGlobalPosition(), 1.0f);
-    glm::vec3 direction = glm::rotate(globalRotation, forward);
-    data.direction = glm::vec4(direction, 0.0f);
+    lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat) width / (GLfloat) height, near_plane, far_plane);
+    data.direction = glm::vec4(-getEntity()->transform.getForward(), 0.0f);
 
     glm::vec3 lightPos = glm::vec3(data.position);
-    glm::vec3 target = lightPos + direction;
+    glm::vec3 target = lightPos + glm::vec3(data.direction) * far_plane;
 
     // To define the 'up' direction for lookAt function 
     // you will generally use glm::vec3(0.0f, 1.0f, 0.0f) if your world's 'up' vector is along y-axis
@@ -121,7 +122,6 @@ void SpotLight::UpdateData(int height, int width) {
 
     data.lightSpaceMatrix = lightProjection * lightView;
 
-    far_plane = ComputeFarPlane(data.constant, data.linear, data.quadratic);
 
     this->setIsDirty(false);
 }

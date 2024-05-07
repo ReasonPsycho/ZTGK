@@ -177,8 +177,10 @@ void LightSystem::UpdateImpl() {
         }
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++);
+        planeDepthShader.use();
         renderSystem->SimpleDrawScene(&planeDepthShader);
-        instanceRenderSystem->DrawTiles(&instancePlaneDepthShader,camera);
+        instancePlaneDepthShader.use();
+        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader,camera);
         offset += sizeof(light->data);
     }
 
@@ -193,7 +195,9 @@ void LightSystem::UpdateImpl() {
         }
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++);
+        planeDepthShader.use();
         renderSystem->SimpleDrawScene(&planeDepthShader);
+        instancePlaneDepthShader.use();
         instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader,camera);
         
         offset += sizeof(light->data);
@@ -212,7 +216,9 @@ void LightSystem::UpdateImpl() {
         }
         light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  cubeShadowMaps, index++);
+        cubeDepthShader.use();
         renderSystem->SimpleDrawScene(&cubeDepthShader);
+        instanceCubeDepthShader.use();
         instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader,camera);
         offset += sizeof(light->data);
     }

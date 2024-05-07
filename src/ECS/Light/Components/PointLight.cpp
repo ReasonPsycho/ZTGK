@@ -46,11 +46,13 @@ void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShad
         shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
                                     glm::value_ptr(shadowTransforms[i]));
         shadowMapShader->setFloat("far_plane", far_plane);
+        shadowMapShader->setFloat("near_plane", near_plane);
         shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
         shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
                                     glm::value_ptr(shadowTransforms[i]));
         instanceShadowMapShader->use();
-        instanceShadowMapShader->setFloat("far_plane", near_plane);
+        instanceShadowMapShader->setFloat("far_plane", far_plane);
+        instanceShadowMapShader->setFloat("near_plane", near_plane);
         instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
     }
 
@@ -150,6 +152,6 @@ void PointLight::UpdateData(int height, int width) {
             glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, 0.0f, -1.0f),
                         glm::vec3(0.0f, -1.0f, 0.0f)));
 
-    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), 0);
+    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), far_plane);
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
