@@ -24,9 +24,9 @@ const UnitStats Unit::ENEMY_BASE = {
         .added = {}
 };
 
-Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
+Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem)
+: equipment(this) {
     this->name = std::move(name);
-    this->equipment = UnitEquipment();
     this->grid = grid;
     this->gridPosition = gridPosition;
     this->worldPosition = grid->GridToWorldPosition(gridPosition);

@@ -72,6 +72,7 @@
 #include "ECS/Unit/UnitSystem.h"
 #include "ECS/SaveSystem/LevelSaving.h"
 #include "ECS/LevelGenerator/LevelGenerator.h"
+#include "ECS/Unit/Equipment/InventoryManager.h"
 
 #pragma endregion Includes
 
@@ -118,6 +119,8 @@ bool init();
 void init_systems();
 
 void load_enteties();
+
+void init_managers();
 
 void load_units();
 
@@ -262,6 +265,9 @@ int main(int, char **) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
     glfwSwapInterval(1);
+
+    init_managers();
+    spdlog::info("Intialized non-system manager components.");
 
     load_enteties();
     spdlog::info("Initialized entities.");
@@ -440,6 +446,12 @@ void init_systems() {
     scene.systemManager.addSystem(&hud);
 
     unitSystem.init();
+}
+
+void init_managers() {
+    auto ent = scene.addEntity("Controllers");
+    ent->addComponent(make_unique<InventoryManager>());
+    ent->getComponent<InventoryManager>()->init();
 }
 
 void load_enteties() {

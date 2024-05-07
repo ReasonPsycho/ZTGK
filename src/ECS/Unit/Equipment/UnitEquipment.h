@@ -9,6 +9,8 @@
 
 class UnitEquipment {
 public:
+    Unit * unit;
+
     // default, no item
     Item* item0;
     GridRange rangeEff0;
@@ -23,13 +25,17 @@ public:
     float cd_between_max_sec = 0.5;
     float cd_between_sec = 0;
 
-    UnitEquipment();
+    explicit UnitEquipment(Unit * unit);
 
-    bool equipItem(Item* item, short slot);
-    Item* unequipItem(short slot);
+    // purely for ptr management, do not use outside of InventoryManager
+    std::pair<Item *, Item *> equipItem(Item* item, short slot);
+    // purely for ptr management, do not use outside of InventoryManager
+    Item * unequipItem(short slot);
 
     [[nodiscard]] Item * in_range_of(glm::ivec2 self, glm::ivec2 target) const;
 
+    // serializer
+    UnitEquipment() {};
 };
 
 

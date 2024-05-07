@@ -62,15 +62,15 @@ Entity *Entity::addChild(std::unique_ptr<Entity> child) {
 void Entity::removeChild(Entity *child) {
     std::erase_if(children, [&](const std::unique_ptr<Entity> &e) { return e.get() == child; });
     removedChild = true;
-//    
-//    auto iter = std::find_if(children.begin(), children.end(),
-//                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
-//    if (iter <= children.end())
-//    {
-//        // Entity was found. Now remove it.
-//        // unique_ptr will automatically delete the Entity when erased.
-//        children.erase(iter);
-//    }
+
+    auto iter = std::find_if(children.begin(), children.end(),
+                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
+    if (iter <= children.end())
+    {
+        // Entity was found. Now remove it.
+        // unique_ptr will automatically delete the Entity when erased.
+        children.erase(iter);
+    }
 }
 
 void Entity::showImGuiDetails(Camera *camera) {
@@ -143,5 +143,43 @@ void Entity::Destroy() {
     }
 }
 
+Entity *Entity::getChild(unsigned int id) const {
+    auto found = std::find_if(children.begin(), children.end(), [id](auto & child){
+        return child->uniqueID == id;
+    });
+    return found == children.end() ? nullptr : found->get();
+}
 
+Entity *Entity::getChild(const string &name) const {
+    auto found = std::find_if(children.begin(), children.end(), [name](auto & child){
+        return child->name == name;
+    });
+    return found == children.end() ? nullptr : found->get();
+}
+
+Entity *Entity::getChildR(unsigned int id) const {
+    Entity * found = getChild(id);
+    if (found != nullptr)
+        return found;
+
+    for (auto & child : children) {
+        found = child->getChildR(id);
+        if (found != nullptr)
+            return found;
+    }
+    return nullptr;
+}
+
+Entity *Entity::getChildR(const string &name) const {
+    Entity * found = getChild(name);
+    if (found != nullptr)
+        return found;
+
+    for (auto & child : children) {
+        found = child->getChildR(name);
+        if (found != nullptr)
+            return found;
+    }
+    return nullptr;
+}
 

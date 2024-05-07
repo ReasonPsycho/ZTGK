@@ -7,6 +7,7 @@
 #include <string>
 #include "Modifiers.h"
 #include "GridRange.h"
+#include "ConcreteItems/ItemTypes.h"
 
 struct ItemStats {
     float dmg{0};
@@ -19,10 +20,15 @@ struct ItemStats {
 
 class Item {
 public:
-    unsigned item_type_id;
+    static const s_item_types item_types;
+
+    unsigned uniqueID;
 
     bool offensive{false};
     float cd_sec{0};
+
+    // bool on_ground{false};
+    // glm::vec2 worldPos{};
 
     std::string name;
     std::string description;
@@ -30,8 +36,6 @@ public:
     bool takesTwoSlots;
 
     Item(std::string name, std::string desctiption, bool offensive, ItemStats stats, bool takesTwoSlots = false);
-
-    static Item default_attack_item();
 };
 
 

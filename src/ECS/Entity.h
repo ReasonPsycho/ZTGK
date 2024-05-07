@@ -37,6 +37,10 @@ public:
     //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
     Entity* addChild(std::unique_ptr<Entity> child);
     void removeChild(Entity *child);
+    [[nodiscard]] Entity * getChild(unsigned id) const;
+    [[nodiscard]] Entity * getChild(const std::string & name) const;
+    [[nodiscard]] Entity * getChildR(unsigned id) const;
+    [[nodiscard]] Entity * getChildR(const std::string & name) const;
     void Destroy();
     
     //UpdateImpl transform if it was changed

@@ -27,15 +27,13 @@ void Scene::removeChild(Entity *child) {
     auto iter = std::find_if(children.begin(), children.end(),
                              [&](const std::unique_ptr<Entity> &e) { return e.get() == child; });
  
-    
-    /*
+
     if (iter != children.end()) {
         // Entity was found. Now remove it.
         // unique_ptr will automatically delete the Entity when erased.
         children.erase(iter);
     }
     stopRenderingImgui = true;
-*/
 }
 
 
@@ -84,4 +82,43 @@ std::vector<std::unique_ptr<Entity>> &Scene::getChildren() {
     return children;
 }
 
+Entity *Scene::getChild(unsigned int id) const {
+    auto found = std::find_if(children.begin(), children.end(), [id](auto & child){
+        return child->uniqueID == id;
+    });
+    return found == children.end() ? nullptr : found->get();
+}
+
+Entity *Scene::getChild(const string &name) const {
+    auto found = std::find_if(children.begin(), children.end(), [name](auto & child){
+        return child->name == name;
+    });
+    return found == children.end() ? nullptr : found->get();
+}
+
+Entity *Scene::getChildR(unsigned int id) const {
+    Entity * found = getChild(id);
+    if (found != nullptr)
+        return found;
+
+    for (auto & child : children) {
+        found = child->getChildR(id);
+        if (found != nullptr)
+            return found;
+    }
+    return nullptr;
+}
+
+Entity *Scene::getChildR(const string &name) const {
+    Entity * found = getChild(name);
+    if (found != nullptr)
+        return found;
+
+    for (auto & child : children) {
+        found = child->getChildR(name);
+        if (found != nullptr)
+            return found;
+    }
+    return nullptr;
+}
 

@@ -3,65 +3,65 @@
 //
 
 #include "UnitEquipment.h"
+#include "InventoryManager.h"
 
 #include <iostream>
 
-UnitEquipment::UnitEquipment() {
-    // todo item0 =
+UnitEquipment::UnitEquipment(Unit * unit) : unit(unit) {
+    InventoryManager::instance->create_default_item(unit);
     item1 = nullptr;
     item2 = nullptr;
 }
 
-bool UnitEquipment::equipItem(Item* item, short slot) {
-    if(slot == 1 || slot == 2){
-        if(item->takesTwoSlots) {
-            if(item1 != nullptr) {
-                unequipItem(1);
-            }
-            if(item2 != nullptr) {
-                unequipItem(2);
-            }
-            item1 = item;
-            return true;
+std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
+    std::pair<Item *, Item *> ret = {};
+    if (item->takesTwoSlots) {
+        if (item1 != nullptr) {
+            ret.first = unequipItem(1);
         }
-        if(slot==1){
-            if(item1 != nullptr) {
-                unequipItem(1);
-            }
-            item1 = item;
-            return true;
-        }if(slot == 2){
-            if(item2 != nullptr) {
-                unequipItem(2);
-            }
-            item2 = item;
-            return true;
+        if (item2 != nullptr) {
+            if (ret.first == nullptr)
+                ret.first = unequipItem(2);
+            else ret.second = unequipItem(2);
         }
+        item1 = item;
+        return ret;
     }
-    else{
-        std::cerr << "Invalid slot. Trying to equip item into "<<slot<< ". slot, while unit has only 2." << std::endl;
-        return false;
+    if (slot == 1) {
+        if (item1 != nullptr)
+            ret.first = unequipItem(1);
+        item1 = item;
+        return ret;
+    } else if (slot == 2) {
+        if (item2 != nullptr)
+            ret.first = unequipItem(2);
+        item2 = item;
+        return ret;
+    } else {
+        spdlog::error("Invalid slot. Trying to equip item into {}. slot, while unit has only 2.", slot);
+        return ret;
     }
 }
 
-Item* UnitEquipment::unequipItem(short slot) {
+Item * UnitEquipment::unequipItem(short slot) {
     if (slot == 1) {
-        Item* temp = item1;
+        Item *temp = item1;
         item1 = nullptr;
         return temp;
-    }if(slot == 2){
-        Item* temp = item2;
+    }
+    if (slot == 2) {
+        Item *temp = item2;
         item2 = nullptr;
         return temp;
     }
-    std::cerr << "Invalid slot. Trying to unequip item from "<<slot<< ". slot, while unit has only 2." << std::endl;
+    spdlog::error("Invalid slot. Trying to unequip item from {}. slot, while unit has only 2.", slot);
     return nullptr;
 }
 
 Item *UnitEquipment::in_range_of(glm::ivec2 self, glm::ivec2 target) const {
-    Item * it;
-    Item * sec_it = nullptr;
-    Item * ret = nullptr;
+    Item *it;
+    Item *sec_it = nullptr;
+    Item *ret = nullptr;
 
     if (use_default()) {
         it = item0;
@@ -74,9 +74,11 @@ Item *UnitEquipment::in_range_of(glm::ivec2 self, glm::ivec2 target) const {
         if (item1->offensive && item2->offensive) {
             // try item with shorter range first
             if (item1->stats.range.add <= item2->stats.range.add) {
-                it = item1; sec_it = item2;
+                it = item1;
+                sec_it = item2;
             } else {
-                it = item2; sec_it = item1;
+                it = item2;
+                sec_it = item1;
             }
         } else {
             it = item1->offensive ? item1 : item2;
@@ -104,6 +106,6 @@ Item *UnitEquipment::in_range_of(glm::ivec2 self, glm::ivec2 target) const {
     return ret;
 }
 
-bool UnitEquipment::use_default() const  {
+bool UnitEquipment::use_default() const {
     return (item1 != nullptr && item1->offensive) || (item2 != nullptr && item2->offensive);
 }

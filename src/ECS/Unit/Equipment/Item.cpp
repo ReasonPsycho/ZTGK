@@ -3,16 +3,10 @@
 //
 
 #include "Item.h"
+#include "ECS/Utils/Util.h"
+
+const s_item_types Item::item_types{};
 
 Item::Item(std::string name, std::string desctiption, bool offensive, ItemStats stats, bool takesTwoSlots)
-    : name(name), description(desctiption), offensive(offensive), stats(stats), takesTwoSlots(takesTwoSlots) {
-}
-
-Item Item::default_attack_item() {
-    return Item("Just hands", "Even sponges can throw hands.", true, ItemStats{
-        .dmg = 5,
-        .cd_max_sec = 2,
-        .range = GridRange(1),
-        .add_to_unit = {}
-    });
+    : uniqueID(ztgk::id<ztgk::ID_POOL_ITEM>()), name(name), description(desctiption), offensive(offensive), stats(stats), takesTwoSlots(takesTwoSlots) {
 }
