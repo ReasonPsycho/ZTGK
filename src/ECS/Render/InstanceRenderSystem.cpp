@@ -55,6 +55,7 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
 void InstanceRenderSystem::SimpleDrawTiles(Shader *regularShader, Camera *camera) {
     ZoneScopedN("Simple draw tiles");
     PushToSSBO(camera);
+    regularShader->use();
     Grid* grid = systemManager->getSystem<Grid>();
 
     glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));

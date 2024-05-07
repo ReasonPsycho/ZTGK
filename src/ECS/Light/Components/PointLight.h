@@ -17,7 +17,7 @@
 struct PointLightData {
     glm::vec4 diffuse;
     glm::vec4 specular;
-    glm::vec4 position;
+    glm::vec4 position; //far plane will now be stored as 4th value in pos
     float constant;
     float linear;
     float quadratic;

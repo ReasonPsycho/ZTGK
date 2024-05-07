@@ -231,7 +231,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
                     tileEntity->transform.setLocalPosition(glm::vec3 (x * tileSize + tileSize/2,0, z * tileSize+ tileSize/2)); //TODO find where it is 
                     tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
-                    if (i >= chunkWidth / 4 && i < (chunkWidth - chunkWidth / 4) && j >= chunkHeight / 4 && j < (chunkHeight - chunkHeight / 4)) {
+                    if ((i >= chunkWidth / 4 && i < (chunkWidth - chunkWidth / 4) && j >= chunkHeight / 4 && j < (chunkHeight - chunkHeight / 4)) && (x * i != 40 || z * j != 40 )) {
                         tileEntity->getComponent<Tile>()->state = FLOOR;
 
                     } else {

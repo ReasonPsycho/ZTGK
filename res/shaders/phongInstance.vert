@@ -23,6 +23,7 @@ out VS_OUT {
      vec3 FragPos;
      vec2 TexCoords;
      vec3 WorldPos;
+     vec3 Normal;
      flat int textureType;
      flat bool inFogOfWar;
      flat int typeOfSelection;
@@ -36,6 +37,8 @@ void main()
     vs_out.FragPos = aPos;
     vs_out.TexCoords = aTexCoords;
     vs_out.WorldPos = vec3(wallData[index].matrix * vec4(aPos, 1.0) * gridMatrix);
+    vs_out.Normal = transpose(inverse(mat3(wallData[index].matrix))) * aNormal;
+
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
     vs_out.textureType = wallData[index].data[0];
     vs_out.inFogOfWar = wallData[index].data[1] == 1;

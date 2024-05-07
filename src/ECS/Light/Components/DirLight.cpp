@@ -26,9 +26,12 @@ DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapSh
 
     shadowMapShader->use();
     shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    shadowMapShader->setFloat("far_plane", far_plane);
+    shadowMapShader->setFloat("near_plane", near_plane);
     instanceShadowMapShader->use();
     instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-
+    instanceShadowMapShader->setFloat("far_plane", far_plane);
+    instanceShadowMapShader->setFloat("near_plane", near_plane);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
     glDrawBuffer(GL_NONE);
@@ -88,7 +91,7 @@ void DirLight::UpdateData(int height, int width) {
 
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
-
+    data.position[3] = far_plane;
     float scale_factor = 25.0f;
     // assume data.direction contains Euler angles (yaw, pitch, roll)
     glm::vec3 forward = glm::vec3(1, 0, 0);
