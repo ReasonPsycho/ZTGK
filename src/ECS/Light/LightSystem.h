@@ -87,7 +87,7 @@ private:
     GLuint cubeShadowMaps;
 
 
-    const unsigned int SHADOW_WIDTH = 512, SHADOW_HEIGHT = 512;
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
     std::array<std::type_index, 4> componentTypes = {
             std::type_index(typeid(ILight)),
