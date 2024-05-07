@@ -27,6 +27,11 @@ void InstanceRenderSystem::removeComponent(void *component) {
 
 void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Wall amount %d",wallData.size());
+    double step = 0.0001f;
+    ImGui::InputScalar("Max bias",ImGuiDataType_Double, &maxBias, &step);
+    ImGui::InputScalar("biasMuliplayer",ImGuiDataType_Double, &biasMuliplayer, &step);
+    ImGui::InputScalar("factor",ImGuiDataType_Double, &factor, &step);
+    ImGui::InputScalar("units",ImGuiDataType_Double, &units, &step);
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
@@ -42,6 +47,7 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
     
     glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));
     regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
+    regularShader->setFloat("biasMuliplayer", biasMuliplayer);
     
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);
@@ -54,12 +60,16 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
 
 void InstanceRenderSystem::SimpleDrawTiles(Shader *regularShader, Camera *camera) {
     ZoneScopedN("Simple draw tiles");
+    glPolygonOffset(factor, units); // You can experiment with these values
+    glEnable(GL_POLYGON_OFFSET_FILL);
     PushToSSBO(camera);
     regularShader->use();
     Grid* grid = systemManager->getSystem<Grid>();
 
     glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));
     regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
+    regularShader->setFloat("maxBias", maxBias);
+    regularShader->setFloat("biasMuliplayer", biasMuliplayer);
     
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);
@@ -67,6 +77,8 @@ void InstanceRenderSystem::SimpleDrawTiles(Shader *regularShader, Camera *camera
                                 GL_UNSIGNED_INT, 0, wallData.size());
         glBindVertexArray(0);
     }
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
 

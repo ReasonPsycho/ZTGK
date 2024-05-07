@@ -81,6 +81,8 @@ uniform Material material;
 
 //Lighting and shadows
 uniform vec3 camPos;
+uniform float maxBias;
+uniform float biasMuliplayer;
 
 vec3 selectionColor[5] = vec3[]
 (
@@ -255,7 +257,7 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos,float far_pl
     // calculate bias (based on depth map resolution and slope)
     vec3 normal = normalize( vs_out.Normal);
     vec3 lightDir = normalize(lightPos - vs_out.WorldPos);
-//    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.00005);
+    float bias = max(biasMuliplayer * (1.0 - dot(normal, lightDir)),  maxBias);
     // check whether current frag pos is in shadow
     // PCF
     float shadow = 0.0;
@@ -265,12 +267,14 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos,float far_pl
         for (int y = -1; y <= 1; ++y)
         {
             float pcfDepth = texture(planeShadowMaps, vec3(projCoords.x + x * texelSize.x,projCoords.y + y * texelSize.y, lightID)).r;
-            shadow += currentDepth - 0.0005 > pcfDepth ? 1.0 : 0.0;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }
     }
     shadow /= 9.0;
 
- 
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+
 
     return shadow;
 }
