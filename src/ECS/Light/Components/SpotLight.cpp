@@ -30,7 +30,7 @@ void SpotLight::Innit(int width, int height, int index) {
 }
 
 void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                                  GLuint ShadowMapArrayId, int index) {
+                                  GLuint ShadowMapArrayId, int index, int layer) {
     ZoneScopedN("SetUpShadowBuffer");
 
     shadowMapShader->use();
@@ -43,11 +43,12 @@ void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShado
     instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
     instanceShadowMapShader->setFloat("far_plane", far_plane);
     instanceShadowMapShader->setFloat("near_plane", near_plane);
+    
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
+    glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
-    glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, width, height);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

@@ -21,7 +21,7 @@ void DirLight::Innit(int width, int height, int index) {
 
 void
 DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                            GLuint ShadowMapArrayId, int index) {
+                            GLuint ShadowMapArrayId, int index, int layer) {
     ZoneScopedN("SetUpShadowBuffer");
 
     shadowMapShader->use();
