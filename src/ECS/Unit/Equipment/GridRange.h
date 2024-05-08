@@ -14,6 +14,7 @@ class Unit;
 
 struct GridRange {
     explicit GridRange(int add = 1, int remove = 0);
+    unsigned uniqueID;
 
     int add;
     int remove;

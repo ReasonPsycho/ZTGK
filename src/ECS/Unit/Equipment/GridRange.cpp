@@ -6,29 +6,28 @@
 #include "ECS/Utils/Globals.h"
 #include "ECS/Unit/Unit.h"
 #include "ECS/Grid/Tile.h"
+#include "ECS/Utils/Util.h"
 #include <ranges>
+
+using namespace ztgk;
 
 //|4|3|2|3|4|
 //|3|2|1|2|3|
 //|2|1|1|1|2|
 //|3|2|1|2|3|
 //|4|3|2|3|4|
-GridRange::GridRange(int add, int remove) : add(add), remove(remove) {
+GridRange::GridRange(int add, int remove) : uniqueID(id<ID_POOL_GRID_RANGE>()), add(add), remove(remove) {
     offsets = {};
 
-    // center line
-    for (int x = -add; x <= add; ++x) {
-        if ( remove == 0 || (x < -remove || x > remove) )
-            offsets.emplace_back(x, 0);
-    }
-
-    for (int z = 1; z <= add; ++z) {
-        for (int x = -add + z; x <= add - z; ++x) {
-            // todo this is not correct
-            if (remove == 0 || ((x < -remove || x > remove) && (z < -remove || z > remove)) ) {
+    for(int z = -add; z <= add; ++z) {
+        for (int x = -add; x <= add; ++x) {
+            // this is just the circle formula without power gives rhombus
+            // https://www.desmos.com/calculator/46kpd5a2bf
+            auto dist = abs(x) + abs(z);
+            if (z == 0 && x == 0 && remove == 0) {
                 offsets.emplace_back(x, z);
-                offsets.emplace_back(x, -z);
-            }
+            } else if (dist <= add && dist > remove)
+                offsets.emplace_back(x, z);
         }
     }
 }
@@ -101,7 +100,12 @@ bool GridRange::is_in_range(glm::ivec2 center, glm::ivec2 target_indices) {
 }
 
 void GridRange::imgui_preview() const {
-    ImGui::Text("%s", std::format("Range: {}-{}", add, remove).c_str());
+    if (ImGui::TreeNode(std::format("Range: {}-{}##range_{}", add, remove, uniqueID).c_str())) {
+        for (auto & offset : offsets) {
+            ImGui::Text("x,z : [%d,%d]", offset.x, offset.y);
+        }
+        ImGui::TreePop();
+    }
     if (ImGui::IsItemHovered()) {
         std::string visual;
         for(int z = -add; z <= add; ++z) {
