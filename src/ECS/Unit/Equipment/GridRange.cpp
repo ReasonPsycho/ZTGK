@@ -109,12 +109,12 @@ void GridRange::imgui_preview() const {
                 // this is just the circle formula simplified for rhombus
                 // https://www.desmos.com/calculator/46kpd5a2bf
                 auto dist = abs(x) + abs(z);
-                if (dist <= add && dist > remove)
+                if (z == 0 && x == 0)
+                    visual += 'x';
+                else if (dist <= add && dist > remove)
                     visual += '+';
                 else if (dist <= remove)
                     visual += '-';
-                else if (z == 0 && x == 0)
-                    visual += 'x';
                 else visual += ' ';
             }
             visual += '\n';
