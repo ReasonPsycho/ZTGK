@@ -11,6 +11,7 @@
 #include "ECS/Utils/Globals.h"
 #include "GLFW/glfw3.h"
 #include "ECS/Render/WireRenderer.h"
+#include "ECS/Utils/Time.h"
 
 UnitSystem::UnitSystem() {
     name = "UnitSystem";
@@ -44,6 +45,12 @@ void UnitSystem::UpdateImpl() {
         unit->getEntity()->getComponent<BoxCollider>()->Update();
 
     }
+
+    if((int)glfwGetTime() % 2 == 0){
+        fixOverlappingUnits();
+    }
+
+
 }
 
 void UnitSystem::selectUnit(Unit *unit) {
@@ -124,4 +131,14 @@ void UnitSystem::init() {
         }
     );
     *ztgk::game::signalQueue += raycastSelectionHandler.get();
+}
+
+void UnitSystem::fixOverlappingUnits() {
+    for (Unit* unit: unitComponents) {
+        for (Unit* otherUnit: unitComponents) {
+            if (unit != otherUnit && unit->gridPosition == otherUnit->gridPosition) {
+                unit->gridPosition = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, otherUnit->gridPosition);
+            }
+        }
+    }
 }

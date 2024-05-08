@@ -50,8 +50,22 @@ State *MovementState::RunCurrentState() {
             return miningState;
         else
         {
-            unit->hasMovementTarget = true;
-            unit->movementTarget = unit->findClosestMineable()->gridPosition;
+            auto closestMineable = unit->findClosestMineable();
+            if(closestMineable != nullptr) {
+                unit->hasMovementTarget = true;
+                unit->movementTarget = unit->findClosestMineable()->gridPosition;
+                unit->currentMiningTarget = nullptr;
+                unit->hasMiningTarget = false;
+
+                //spdlog::info("Target not in range, moving to mining target");
+            }
+            else{
+                unit->hasMiningTarget = false;
+                idleState = new IdleState(grid);
+                idleState->unit = unit;
+                //spdlog::info("No mineable targets found, returning to idle state");
+                return idleState;
+            }
             return this;
         }
     }

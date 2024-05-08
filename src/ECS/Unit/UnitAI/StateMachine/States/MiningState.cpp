@@ -46,8 +46,15 @@ State *MiningState::RunCurrentState() {
             return moveState;
         }
     }
-
-    Mine();
+    if(isTargetInRange())
+        Mine();
+    else{
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+        unit->hasMovementTarget = true;
+        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->currentMiningTarget->gridPosition, unit->gridPosition);
+        return moveState;
+    }
     return this;
 }
 
