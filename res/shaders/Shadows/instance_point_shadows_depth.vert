@@ -13,6 +13,8 @@ layout (std430, binding = 6) buffer WallDataBuffer {
     WallData wallData[]; // Array of velocities
 };
 
+out vec4 FragPos; // Send position to next stage
+
 
 void main()
 {

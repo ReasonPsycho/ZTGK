@@ -59,15 +59,13 @@ private:
     bool isDataPushedToSSBO = false;
     //Shaders
     Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
-                                      "res/shaders/Shadows/point_shadows_depth.frag",
-                                    "res/shaders/Shadows/point_shadows_depth.geom");
+                                      "res/shaders/Shadows/point_shadows_depth.frag");
     
     Shader planeDepthShader = Shader("res/shaders/Shadows/shadows_depth.vert",
                                      "res/shaders/Shadows/shadows_depth.frag");
 
     Shader instanceCubeDepthShader = Shader("res/shaders/Shadows/instance_point_shadows_depth.vert",
-                                            "res/shaders/Shadows/point_shadows_depth.frag",
-                                            "res/shaders/Shadows/point_shadows_depth.geom");
+                                            "res/shaders/Shadows/point_shadows_depth.frag");
 
     Shader instancePlaneDepthShader = Shader("res/shaders/Shadows/instance_shadows_depth.vert",
                                              "res/shaders/Shadows/shadows_depth.frag");

@@ -176,7 +176,7 @@ void LightSystem::UpdateImpl() {
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,sizeof(DirLightData), &light->data);
         }
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
-                                 planeShadowMaps, index++);
+                                 planeShadowMaps, index++, 0);
         planeDepthShader.use();
         renderSystem->SimpleDrawScene(&planeDepthShader);
         instancePlaneDepthShader.use();
@@ -194,7 +194,7 @@ void LightSystem::UpdateImpl() {
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset,  sizeof(SpotLightData), &light->data);
         }
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
-                                 planeShadowMaps, index++);
+                                 planeShadowMaps, index++, 0);
         planeDepthShader.use();
         renderSystem->SimpleDrawScene(&planeDepthShader);
         instancePlaneDepthShader.use();
@@ -212,14 +212,16 @@ void LightSystem::UpdateImpl() {
         if (light->getIsDirty()) {  // Only push it if it's dirty
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
-            
         }
-        light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
-                                 cubeShadowMaps, index++);
-        cubeDepthShader.use();
-        renderSystem->SimpleDrawScene(&cubeDepthShader);
-        instanceCubeDepthShader.use();
-        instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader,camera);
+        for(int i = 0; i < 6; i++){
+            light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
+                                     cubeShadowMaps, index, i);
+            cubeDepthShader.use();
+            renderSystem->SimpleDrawScene(&cubeDepthShader);
+            instanceCubeDepthShader.use();
+            instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader,camera);
+        }
+        index++;
         offset += sizeof(light->data);
     }
 }

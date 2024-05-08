@@ -229,7 +229,7 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int li
     vec3 fragToLight = vs_out.WorldPos - lightPos;
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
-    float bias = 0.15;
+    float bias = 0.00001;
     int samples = 20;
     float viewDistance = length(camPos - vs_out.WorldPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
@@ -237,7 +237,7 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int li
     {
         float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;      
         closestDepth *= far_plane;// undo mapping [0;1]
-        if (currentDepth - bias > closestDepth){
+        if (currentDepth  > closestDepth){
             shadow += 1.0;
         }
     }
