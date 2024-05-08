@@ -567,6 +567,34 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
+    playerUnit = scene.addEntity("Player2");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 20, 3};
+    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 50), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState(&grid);
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+    playerUnit = scene.addEntity("Player3");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1), &collisionSystem));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    stats = {100, 1, 1, 20, 3};
+    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState(&grid);
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
 //    Entity* enemyUnit = scene.addEntity("Enemy1");
 //    enemyUnit->addComponent(make_unique<Render>(cubeModel));
 //    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -580,50 +608,6 @@ void load_units() {
 //    stateManager->currentState = new IdleState(&grid);
 //    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
 //    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-
-
-
-//    playerUnit = scene.addEntity("Player2");
-//    playerUnit->addComponent(make_unique<Render>(cube_model));
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
-//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 30, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), stats, true, &unitSystem));
-//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-//    stateManager->currentState = new idleState();
-//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-//
-//    playerUnit = scene.addEntity("Player3");
-//    playerUnit->addComponent(make_unique<Render>(cube_model));
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
-//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 10, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), stats, true, &unitSystem));
-//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-//    stateManager->currentState = new idleState();
-//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-//
-//    playerUnit = scene.addEntity("Player4");
-//    playerUnit->addComponent(make_unique<Render>(cube_model));
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
-//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 100, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), stats, true, &unitSystem));
-//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-//    stateManager->currentState = new idleState();
-//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 }
 
@@ -687,6 +671,9 @@ void update() {
     for(auto tile : selectedTiles){
         grid.getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
+
+//    Unit* u = unitSystem.unitComponents[0];
+//    spdlog::info("{}", u->currentState->name);
 
 }
 
@@ -996,6 +983,19 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
 
+                if(!unitSystem.selectedUnits.empty()){
+                    for(auto unit : unitSystem.selectedUnits){
+                        unit->miningTargets.clear();
+                        for(auto tile : tilesInArea){
+                            auto mineable = grid.getTileAt(tile)->getEntity()->getComponent<IMineable>();
+                            if(mineable != nullptr && !mineable->isMined){
+                                unit->miningTargets.push_back(mineable);
+                            }
+                        }
+                    }
+
+                }
+
             }
             else{
                 isLeftMouseButtonHeld = false;
@@ -1017,8 +1017,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
             for(auto unit : unitSystem.selectedUnits){
 
                 //if hit entity is mineable, set it as mining target
-                if(hit->getComponent<IMineable>()!=nullptr){
-                    unit->miningTarget = hit->getComponent<IMineable>();
+                if(hit->getComponent<IMineable>()!=nullptr && !hit->getComponent<IMineable>()->isMined){
+                    unit->miningTargets.clear();
+                    unit->miningTargets.emplace_back(hit->getComponent<IMineable>());
                     Tile* hitTile = hit->getComponent<Tile>();
                     hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
@@ -1028,7 +1029,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                     //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr){
                     unit->hasMiningTarget = false;
-                    unit->miningTarget = nullptr;
+                    unit->miningTargets.clear();
                     unit->hasCombatTarget = false;
                     unit->combatTarget = nullptr;
                     unit->hasMovementTarget = true;

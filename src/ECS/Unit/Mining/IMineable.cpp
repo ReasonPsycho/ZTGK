@@ -18,11 +18,15 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
 }
 
 void IMineable::Mine() {
+
     timeToMineRemaining -= Time::Instance().DeltaTime();
     spdlog::info(timeToMineRemaining);
+
     if (timeToMineRemaining<=0) {
         grid->DestroyWallsOnTile(gridPosition);
-        getEntity()->removeComponentFromMap(std::make_unique<IMineable>(this));
+        isMined = true;
+
+
     }
 }
 
@@ -33,6 +37,10 @@ void IMineable::UpdateImpl() {
 void IMineable::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Time to mine: %f", timeToMine);
     ImGui::Text("Time to mine remaining: %f", timeToMineRemaining);
+    if(getEntity() != nullptr)
+        ImGui::Text("Parent Entity: %s", getEntity()->name.c_str());
+    else
+        ImGui::Text("Parent Entity: nullptr");
 
 }
 

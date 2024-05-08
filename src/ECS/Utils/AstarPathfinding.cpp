@@ -19,7 +19,7 @@ AstarPathfinding::AstarPathfinding(Grid *grid) {
  * @param start
  * @param target
  */
-void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
+std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
 
     if (grid->getTileAt(target) == nullptr){
         spdlog::error("PATHFINDING: Target tile is nullptr");
@@ -28,7 +28,7 @@ void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
         spdlog::error("PATHFINDING: Start tile is nullptr");
     }
 
-    if(!grid->getTileAt(target)->vacant()){
+    if(grid->getTileAt(target)->vacant()){
         target = GetNearestVacantTile(target, start);
     }
 
@@ -47,7 +47,7 @@ void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
         Vector2Int current = GetLowestFScore(openSet, fScore);
         if (current == target){
             path = ReconstructPath(cameFrom, current);
-            return;
+            return path;
         }
 
         openSet.erase(current);
@@ -74,6 +74,7 @@ void AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
     }
     spdlog::error("PATHFINDING: No path found");
     path.clear();
+    return path;
 }
 //________________________________________________HELPER FUNCTIONS_____________________________________________________
 /**
