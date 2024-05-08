@@ -109,3 +109,40 @@ Item *UnitEquipment::in_range_of(glm::ivec2 self, glm::ivec2 target) const {
 bool UnitEquipment::use_default() const {
     return (item1 != nullptr && item1->offensive) || (item2 != nullptr && item2->offensive);
 }
+
+void UnitEquipment::imgui_preview() const {
+    ImGui::Text("CD between items: %f / %f", cd_between_sec, cd_between_max_sec);
+    
+    if (ImGui::TreeNode(std::format("Default : {} - id {}", item0->name, item0->uniqueID).c_str())) {
+        ImGui::Text("Cached effective range:");
+        ImGui::SameLine();
+        rangeEff0.imgui_preview();
+        
+        item0->imgui_preview();
+        ImGui::TreePop();
+    }
+    
+    if (ImGui::TreeNode(std::format("Item 1 : {} - id {}", item1 == nullptr ? "none" : item1->name.c_str(), item1 == nullptr ? 0 : item1->uniqueID).c_str())) {
+        if (item1 != nullptr) {
+            ImGui::Text("Cached effective range:");
+            ImGui::SameLine();
+            rangeEff1.imgui_preview();
+
+            item1->imgui_preview();
+        }
+        ImGui::TreePop();
+    }
+    
+    if (ImGui::TreeNode(std::format("Item 2 : {} - id {}", item2 == nullptr ? "none" : item2->name.c_str(), item2 == nullptr ? 0 : item2->uniqueID).c_str())) {
+        if (item2 != nullptr) {
+            ImGui::Text("Cached effective range:");
+            ImGui::SameLine();
+            rangeEff2.imgui_preview();
+
+
+            item2->imgui_preview();
+        }
+        ImGui::TreePop();
+    }
+    
+}

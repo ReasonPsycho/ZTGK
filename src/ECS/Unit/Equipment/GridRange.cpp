@@ -24,6 +24,7 @@ GridRange::GridRange(int add, int remove) : add(add), remove(remove) {
 
     for (int z = 1; z <= add; ++z) {
         for (int x = -add + z; x <= add - z; ++x) {
+            // todo this is not correct
             if (remove == 0 || ((x < -remove || x > remove) && (z < -remove || z > remove)) ) {
                 offsets.emplace_back(x, z);
                 offsets.emplace_back(x, -z);
@@ -97,4 +98,27 @@ GridRange GridRange::merge(int add, int remove) {
 bool GridRange::is_in_range(glm::ivec2 center, glm::ivec2 target_indices) {
     auto ind = get_indices(center);
     return std::find(ind.begin(), ind.end(), target_indices) != ind.end();
+}
+
+void GridRange::imgui_preview() const {
+    ImGui::Text("%s", std::format("Range: {}-{}", add, remove).c_str());
+    if (ImGui::IsItemHovered()) {
+        std::string visual;
+        for(int z = -add; z <= add; ++z) {
+            for (int x = -add; x <= add; ++x) {
+                // this is just the circle formula simplified for rhombus
+                // https://www.desmos.com/calculator/46kpd5a2bf
+                auto dist = abs(x) + abs(z);
+                if (dist <= add && dist > remove)
+                    visual += '+';
+                else if (dist <= remove)
+                    visual += '-';
+                else if (z == 0 && x == 0)
+                    visual += 'x';
+                else visual += ' ';
+            }
+            visual += '\n';
+        }
+        ImGui::SetTooltip("%s", visual.c_str());
+    }
 }

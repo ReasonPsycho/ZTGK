@@ -96,7 +96,22 @@ void InventoryManager::spawn_item_on_map(Item *item, glm::vec2 world_pos) {
 }
 
 void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
-    Component::showImGuiDetailsImpl(camera);
+    if (ImGui::CollapsingHeader("Free Items")) {
+        for (auto & item : free_items) {
+            if (ImGui::TreeNode(std::format("{1} id {0}", item->uniqueID, item->name).c_str())) {
+                item->imgui_preview();
+                ImGui::TreePop();
+            }
+        }
+    }
+    if (ImGui::CollapsingHeader("Assigned Items")) {
+        for (auto & item : assigned_items) {
+            if (ImGui::TreeNode(std::format("{1} id {0}", item->uniqueID, item->name).c_str())) {
+                item->imgui_preview();
+                ImGui::TreePop();
+            }
+        }
+    }
 }
 
 bool InventoryManager::mv_to_free(Item * item) {

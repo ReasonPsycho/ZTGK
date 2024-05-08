@@ -95,9 +95,11 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Ally: %s", isAlly ? "true" : "false");
     ImGui::Text("Selected: %s", isSelected ? "true" : "false");
     ImGui::Text("HP %f / %f (%f + %f)", stats.hp, stats.max_hp + stats.added.max_hp, stats.max_hp, stats.added.max_hp);
-    if (ImGui::CollapsingHeader("Added stats:")) {
+    if (ImGui::CollapsingHeader(std::format("Added stats:##+stats_unit_{}", uniqueID).c_str())) {
         stats.added.imgui_preview();
     }
+    if (ImGui::CollapsingHeader(std::format("Equipment:##eq_unit_{}", uniqueID).c_str()))
+        equipment.imgui_preview();
 
 }
 

@@ -36,6 +36,8 @@ public:
 
     // serializer
     UnitEquipment() {};
+
+    void imgui_preview() const;
 };
 
 
