@@ -123,7 +123,7 @@ void main()
     vec3 result = vec3(0);
     if (!vs_out.inFogOfWar){
 
-        result = 0.4f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
+        result = 0.02f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLights.length(); ++i) {
             result += CalcDirLight(dirLights[i], norm, viewDir, index++);
@@ -227,9 +227,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, in
 float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex)
 {
     vec3 fragToLight = vs_out.WorldPos - lightPos;
-    float currentDepth = length(fragToLight);
+    float currentDepth = length(fragToLight) ;
     float shadow = 0.0;
-    float bias = 0.00001;
+    float bias = 0.05;
     int samples = 20;
     float viewDistance = length(camPos - vs_out.WorldPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
@@ -237,7 +237,7 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int li
     {
         float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;      
         closestDepth *= far_plane;// undo mapping [0;1]
-        if (currentDepth  > closestDepth){
+        if (currentDepth - bias > closestDepth){
             shadow += 1.0;
         }
     }

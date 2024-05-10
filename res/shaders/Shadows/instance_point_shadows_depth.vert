@@ -14,10 +14,13 @@ layout (std430, binding = 6) buffer WallDataBuffer {
 };
 
 out vec4 FragPos; // Send position to next stage
+uniform mat4 shadowMatrice;
 
 
 void main()
 {
     uint index = gl_InstanceID;
-    gl_Position = wallData[index].matrix * vec4(aPos, 1.0);
+    vec4 pos = wallData[index].matrix * vec4(aPos, 1.0);
+    gl_Position = shadowMatrice * pos;
+    FragPos = pos;
 }
