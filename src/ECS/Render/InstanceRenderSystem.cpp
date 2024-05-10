@@ -90,9 +90,12 @@ void InstanceRenderSystem::UpdateImpl() {
         for (int z = 0; z < grid->height/grid->chunkHeight; ++z) {
             Chunk * chunk = grid->chunkArray[x][z];
             if(chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)){
+                chunk->isVisible = true;
                 for (auto &wallDataPtr : grid->chunkArray[x][z]->wallDataArray) {
                     wallData.push_back(*wallDataPtr);
                 }
+            }else{
+                chunk->isVisible = false;
             }
         }
     }
@@ -140,7 +143,7 @@ void InstanceRenderSystem::PushToSSBO(Camera* camera) {
 
 
 
-       glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), nullptr, //Orphaning buffer
                  GL_STREAM_DRAW);
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), wallData.data(),
