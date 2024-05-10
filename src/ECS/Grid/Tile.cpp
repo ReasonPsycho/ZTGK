@@ -6,21 +6,24 @@
 #include "ECS/Utils/Util.h"
 #include <utility>
 #include "ECS/Unit/Unit.h"
+#include "ECS/Grid/Chunk.h"
 
 Tile::~Tile() {
     //delete this;
 }
 
-Tile::Tile(Vector2Int index, TileState state, std::string name){
+Tile::Tile(Vector2Int index, Chunk* chunk, TileState state, std::string ) {
     this->index = index;
     this->state = state;
     this->name = std::move(name);
+    this->chunk = chunk;
 }
 
-Tile::Tile(int index_x, int index_z, TileState state, std::string name) {
+Tile::Tile(int index_x, int index_z, Chunk* chunk, TileState state, std::string name) {
     this->index = Vector2Int(index_x, index_z);
     this->state = state;
     this->name = std::move(name);
+    this->chunk = chunk;
 }
 
 void Tile::showImGuiDetailsImpl(Camera *camera) {
@@ -46,4 +49,5 @@ void Tile::setTileSelectionState(TileSelectionState state) {
 TileSelectionState Tile::getTileSelectionState() {
     return tileSelectionState;
 }
+
 

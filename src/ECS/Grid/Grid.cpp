@@ -227,7 +227,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
             for (int x = 0; x < chunkWidth; ++x) {
                 for (int z = 0; z < chunkHeight; ++z) {
                     Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));
-                    tileEntity->addComponent(std::make_unique<Tile>(i * chunkWidth + x, j * chunkHeight + z));
+                    tileEntity->addComponent(std::make_unique<Tile>(i * chunkWidth + x, j * chunkHeight + z, chunkEntity->getComponent<Chunk>()));
                     tileEntity->transform.setLocalPosition(glm::vec3 (x * tileSize + tileSize/2,0, z * tileSize+ tileSize/2)); //TODO find where it is 
                     tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
@@ -236,7 +236,7 @@ void Grid::LoadTileEntities(float scale, CollisionSystem *collisionSystem) {
 
                     } else {
                         tileEntity->getComponent<Tile>()->state = WALL;
-                        tileEntity->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
+                        tileEntity->addComponent(std::make_unique<IMineable>(1.0f, tileEntity->getComponent<Tile>()->index , this));
 
                     }
                     

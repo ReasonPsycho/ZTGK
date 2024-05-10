@@ -5,6 +5,7 @@
 #include "ECS/Component.h"
 
 class Unit;
+class Chunk;
 
 struct WallData {
     glm::mat4x4 matrix;
@@ -51,12 +52,13 @@ public:
     TileState state;
     TileStateData stateData;
     Unit* unit = nullptr;
+    Chunk* chunk = nullptr;
 
     void setTileSelectionState(TileSelectionState state );
     TileSelectionState getTileSelectionState();
     // Constructors
-    explicit Tile(Vector2Int index, TileState state = FLOOR, std::string name = "Tile");
-    Tile(int index_x, int index_z, TileState state = FLOOR, std::string name = "Tile");
+    explicit Tile(Vector2Int index, Chunk* chunkPtr = nullptr, TileState state = FLOOR, std::string name = "Tile");
+    Tile(int index_x, int index_z, Chunk* chunkPtr = nullptr, TileState state = FLOOR, std::string name = "Tile");
     Tile() = default;
     
     // Destructor
@@ -68,6 +70,7 @@ public:
     void changeHitWallsState(TileSelectionState state);
     
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
+
     
 private:
     TileSelectionState tileSelectionState = NOT_SELECTED;

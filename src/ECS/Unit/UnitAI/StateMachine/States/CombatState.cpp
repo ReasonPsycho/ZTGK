@@ -39,8 +39,8 @@ State *CombatState::RunCurrentState() {
         else
         {
             unit->hasMovementTarget = true;
-            unit->movementTarget = unit->miningTarget->gridPosition;
-            return this;
+            unit->movementTarget = unit->findClosestMineable()->gridPosition;
+            return moveState;
         }
     }
     AttackTarget();

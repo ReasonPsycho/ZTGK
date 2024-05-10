@@ -27,6 +27,8 @@ public:
     void deselectUnit(Unit* unit);
     void deselectAllUnits();
 
+    void fixOverlappingUnits();
+
     std::vector<Unit* > selectedUnits;
 
     std::vector<Unit *> unitComponents;
