@@ -37,6 +37,10 @@ private:
     GLuint tileTextureArray;
     GLuint tileTextureBindingPoint = 10;
     int numberOfTextures = 3;
+    double maxBias = 0.005f;
+    double biasMuliplayer = 0.00001f;
+    double factor = 2;
+    double units = 0;
     
     string tilePath =  "res/textures/tiles/Tile";
     

@@ -37,35 +37,33 @@ void PointLight::Innit(int width, int height, int index) {
 }
 
 void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                                   GLuint ShadowMapArrayId, int index) {
+                                   GLuint ShadowMapArrayId, int index, int layer) {
     ZoneScopedN("SetUpShadowBuffer");
 
-    for (unsigned int i = 0; i < 6; ++i) {
         shadowMapShader->use();
-
-        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                    glm::value_ptr(shadowTransforms[i]));
+        shadowMapShader->setMatrix4("shadowMatrice", false,
+                                    glm::value_ptr(shadowTransforms[layer]));
         shadowMapShader->setFloat("far_plane", far_plane);
+        shadowMapShader->setFloat("near_plane", near_plane);
         shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-        shadowMapShader->setMatrix4("shadowMatrices[" + std::to_string(i) + "]", false,
-                                    glm::value_ptr(shadowTransforms[i]));
+
         instanceShadowMapShader->use();
-        instanceShadowMapShader->setFloat("far_plane", near_plane);
+        instanceShadowMapShader->setMatrix4("shadowMatrice", false,
+                                            glm::value_ptr(shadowTransforms[layer]));
+        instanceShadowMapShader->use();
+        instanceShadowMapShader->setFloat("far_plane", far_plane);
+        instanceShadowMapShader->setFloat("near_plane", near_plane);
         instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-    }
-
-    GLenum attachments[6];
-
+        
+    
+        
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    for (int i = 0; i < 6; i++) {
-        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, i + index * 6);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        attachments[i] = GL_DEPTH_ATTACHMENT + i;
-    }
-
-    glDrawBuffers(6, attachments);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, layer + index * 6);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+
     glViewport(0, 0, width, height);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -123,8 +121,9 @@ void PointLight::showImGuiDetailsImpl(Camera *camera) {
 
 void PointLight::UpdateData(int height, int width) {
     shadowTransforms.clear();
+    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), far_plane);
     shadowProj = glm::perspective(glm::radians(90.0f), (float) width / (float) height,
-                                  1.0f, 25.0f); //TODO add based pn calculation
+                                  1.0f, far_plane); //TODO add based pn calculation
     shadowTransforms.push_back(
             shadowProj *
             glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(1.0f, 0.0f, 0.0f),
@@ -150,6 +149,5 @@ void PointLight::UpdateData(int height, int width) {
             glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(0.0f, 0.0f, -1.0f),
                         glm::vec3(0.0f, -1.0f, 0.0f)));
 
-    data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), 0);
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }

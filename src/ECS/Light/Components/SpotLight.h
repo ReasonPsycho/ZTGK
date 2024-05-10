@@ -16,7 +16,7 @@
 struct SpotLightData {
     glm::vec4 diffuse;
     glm::vec4 specular;
-    glm::vec4 position;
+    glm::vec4 position; //far plane will now be stored as 4th value in pos
     glm::vec4 direction;
     float cutOff;  
     float outerCutOff; 
@@ -71,7 +71,7 @@ public:
     void Innit(int width, int height, int index) override;
 
     void SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                           GLuint ShadowMapArrayId, int index) override; // Pure virtual function
+                           GLuint ShadowMapArrayId, int index, int layer) override; // Pure virtual function
     void UpdateData(int height, int width) override;
 
 };

@@ -456,9 +456,14 @@ void load_enteties() {
     wall.loadModel();
 
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    //gabka.loadModel();
+   // gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
+    
+    //Gabka
+    //gameObject = scene.addEntity("Gabka");;
+   // gameObject->addComponent(make_unique<Render>(&gabka));;
+    //Gabka
 
 
     gameObject = scene.addEntity("Wall");;
@@ -489,12 +494,14 @@ void load_enteties() {
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
+    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
     gameObject->addComponent(make_unique<PointLight>(
             PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
                            0.032f)));
     //  gameObject = scene.addEntity("Point Light 2");
     // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
+    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
@@ -662,6 +669,7 @@ void update() {
     scene.updateScene();
     lightSystem.Update();
     instanceRenderSystem.Update();
+    instanceRenderSystem.PushToSSBO(&camera);
     wireRenderer.Update();
 
     signalQueue.Update();

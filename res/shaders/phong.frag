@@ -90,7 +90,7 @@ layout (binding = 9) uniform sampler2DArray planeShadowMaps;
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex);
-float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex);
+float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex);
 float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID);
 
 void main()
@@ -155,7 +155,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, 
     specular *= attenuation;
     
     float shadow = 1;
-    shadow = (1.0 - CubeShadowCalculation(vs_out.WorldPos, light.position.xyz, lightIndex));
+    shadow = (1.0 - CubeShadowCalculation(vs_out.WorldPos, light.position.xyz,light.position.w, lightIndex));
     
     
     return (diffuse + specular) * shadow;
@@ -190,18 +190,19 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, in
     return (diffuse + specular) * shadow;
 }
 
-float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
+float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex)
 {
     vec3 fragToLight = vs_out.WorldPos - lightPos;
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
-    float bias = 0.15;
+    float bias = 0.05;
     int samples = 20;
     float viewDistance = length(camPos - vs_out.WorldPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;        closestDepth *= far_plane;   // undo mapping [0;1]
+        float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;      
+        closestDepth *= far_plane;   // undo mapping [0;1]
         if (currentDepth - bias > closestDepth){
             shadow += 1.0;
         }
@@ -224,7 +225,7 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
 
     vec3 normal = normalize( vec3(texture(material.normal, vs_out.TexCoords)));
     vec3 lightDir = normalize(lightPos - vs_out.WorldPos);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = max(0.00001 * (1.0 - dot(normal, lightDir)),  0.005);
     // check whether current frag pos is in shadow
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     // PCF
