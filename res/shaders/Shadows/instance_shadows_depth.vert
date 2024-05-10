@@ -16,6 +16,7 @@ layout (std430, binding = 6) buffer WallDataBuffer {
 uniform mat4 lightSpaceMatrix;
 uniform mat4 gridMatrix;
 
+
 void main()
 {
     uint index = gl_InstanceID;

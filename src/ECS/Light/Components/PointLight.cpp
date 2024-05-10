@@ -123,7 +123,7 @@ void PointLight::UpdateData(int height, int width) {
     shadowTransforms.clear();
     data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), far_plane);
     shadowProj = glm::perspective(glm::radians(90.0f), (float) width / (float) height,
-                                  1.0f, 25.0f); //TODO add based pn calculation
+                                  1.0f, far_plane); //TODO add based pn calculation
     shadowTransforms.push_back(
             shadowProj *
             glm::lookAt(glm::vec3(data.position), glm::vec3(data.position) + glm::vec3(1.0f, 0.0f, 0.0f),
