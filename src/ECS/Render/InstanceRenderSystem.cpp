@@ -38,7 +38,6 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
   //it must be here bcs if we mine wall we need to UpdateImpl walls
   //Innit();
     ZoneScopedN("Draw tiles");
-    PushToSSBO(camera);
     tileModel->meshes[0].material.loadMaterial(regularShader);
     glActiveTexture(GL_TEXTURE0 + tileTextureBindingPoint);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tileTextureArray);
@@ -62,7 +61,6 @@ void InstanceRenderSystem::SimpleDrawTiles(Shader *regularShader, Camera *camera
     ZoneScopedN("Simple draw tiles");
     glPolygonOffset(factor, units); // You can experiment with these values
     glEnable(GL_POLYGON_OFFSET_FILL);
-    PushToSSBO(camera);
     regularShader->use();
     Grid* grid = systemManager->getSystem<Grid>();
 

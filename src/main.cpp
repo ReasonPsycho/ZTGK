@@ -669,6 +669,7 @@ void update() {
     scene.updateScene();
     lightSystem.Update();
     instanceRenderSystem.Update();
+    instanceRenderSystem.PushToSSBO(&camera);
     wireRenderer.Update();
 
     signalQueue.Update();
