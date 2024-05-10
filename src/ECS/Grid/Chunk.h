@@ -20,6 +20,7 @@ public:
      //Data
     int width;
     int height;
+    bool isVisible;
     
     Vector2Int index{};
     

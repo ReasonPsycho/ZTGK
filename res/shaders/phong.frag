@@ -99,7 +99,7 @@ void main()
     vec3 norm = vec3(texture(material.normal, vs_out.TexCoords));
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
 
-    vec3 result = 0.02f * vec3(texture(material.diffuse, vs_out.TexCoords)); //We do be calculating ambient here
+    vec3 result = 0.2f * vec3(texture(material.diffuse, vs_out.TexCoords)); //We do be calculating ambient here
     int index = 0;
     for (int i = 0; i < dirLights.length(); ++i) {
         result += CalcDirLight(dirLights[i], norm,viewDir,index++);

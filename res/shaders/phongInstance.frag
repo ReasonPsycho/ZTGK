@@ -123,7 +123,7 @@ void main()
     vec3 result = vec3(0);
     if (!vs_out.inFogOfWar){
 
-        result = 0.02f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
+        result = 0.2f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLights.length(); ++i) {
             result += CalcDirLight(dirLights[i], norm, viewDir, index++);
