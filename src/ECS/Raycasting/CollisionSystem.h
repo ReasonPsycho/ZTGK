@@ -25,9 +25,9 @@ public:
     void removeComponent(void *component) override;
     const std::type_index* getComponentTypes() override;
     int getNumComponentTypes() override;
+    void registerComponents() override{};
 
     void showImGuiDetailsImpl(Camera *camera) override;
-
 
     std::vector<Collider*> getColliders();
 
@@ -35,6 +35,7 @@ public:
 
     std::unordered_map<unsigned, std::vector<BoxCollider*>> BoxColliders;
     std::unordered_map<unsigned, std::vector<SphereCollider*>> SphereColliders;
+    
 
 private:
     std::array<std::type_index, 2> componentTypes = {

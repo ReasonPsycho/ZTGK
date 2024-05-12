@@ -34,7 +34,7 @@ public:
     //Space information
     Transform transform = Transform();
     
-    //Add child. Argument input is argument of any constructor that you create. By default you can use the default constructor and don't put argument input.
+    //Add child. Argument input is argument of any constructor that you create. By default, you can use the default constructor and don't put argument input.
     Entity* addChild(std::unique_ptr<Entity> child);
     void removeChild(Entity *child);
     [[nodiscard]] Entity * getChild(unsigned id) const;

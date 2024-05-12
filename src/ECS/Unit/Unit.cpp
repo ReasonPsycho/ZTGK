@@ -24,7 +24,7 @@ const UnitStats Unit::ENEMY_BASE = {
         .added = {}
 };
 
-Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem)
+Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly)
 : equipment(this) {
     this->name = std::move(name);
     this->grid = grid;
@@ -104,7 +104,25 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
+    if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
+        currentMiningTarget = nullptr;
+    }
 
+    for(auto &mineable : miningTargets){
+        if(mineable->isMined){
+            miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), mineable), miningTargets.end());
+        }
+    }
+
+    if(!miningTargets.empty() && currentMiningTarget == nullptr){
+        currentMiningTarget = findClosestMineable();
+        if(currentMiningTarget != nullptr){
+            hasMiningTarget = true;
+        }
+        else{
+            hasMiningTarget = false;
+        }
+    }
 
     if(hasMovementTarget){
         if(!grid->getTileAt(movementTarget)->vacant()){
@@ -222,9 +240,40 @@ Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) 
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2)));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     playerUnit->addComponent(make_unique<Unit>());
     return playerUnit;
+}
+
+IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToExclude) {
+    if(miningTargets.empty()){
+        spdlog::error("IN UNIT::findClosestMineable: No mining targets!");
+        return nullptr;
+    }
+
+    IMineable* closestMineable = nullptr;
+
+    float closestDistance = 1000000;
+    for (auto tile : miningTargets) {
+        for(auto &excluded : MineablesToExclude){
+            if(tile->gridPosition == excluded.gridPosition){
+                continue;
+            }
+        }
+        float distance = VectorUtils::Distance(Vector2Int(gridPosition.x, gridPosition.z), Vector2Int(tile->gridPosition.x, tile->gridPosition.z));
+        if(distance < closestDistance){
+            if(pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition, gridPosition)).empty()){
+                continue;
+            }
+            closestDistance = distance;
+            closestMineable = tile;
+        }
+    }
+    if(closestMineable == nullptr){
+        spdlog::error("IN UNIT::findClosestMineable: No reachable mining target in area!");
+    }
+
+    return closestMineable;
 }
 

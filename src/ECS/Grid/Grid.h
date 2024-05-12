@@ -29,7 +29,7 @@ public:
     float tileSize;
 
     //2D array of tiles
-    std::vector<std::vector<Chunk>> chunkArray;
+    std::vector<std::vector<Chunk*>> chunkArray;
     Entity *gridEntity;
 
     Scene *scene;
@@ -89,7 +89,7 @@ public:
     [[nodiscard]] Vector2Int WorldToGridPosition(Vector3 position) const;
 
     //loads and distributes the tile entities in world space
-    void LoadTileEntities(float scale, CollisionSystem *collisionSystem);
+    void LoadTileEntities(float scale);
 
     void DestroyWallsOnTile(Vector2Int tileIndex);
 
@@ -111,6 +111,7 @@ public:
     const std::type_index *getComponentTypes() override;
 
     int getNumComponentTypes() override;
+    void registerComponents() override{};
 
     void showImGuiDetailsImpl(Camera *camera) override;
 

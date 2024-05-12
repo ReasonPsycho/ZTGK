@@ -11,7 +11,9 @@ void CollisionSystem::addComponent(void *component) {
     auto c =(Collider*)component;
     if (c->type == ColliderType::BOX) {
         auto* boxCollider = static_cast<BoxCollider*>(component);
-        BoxColliders[boxCollider->uniqueID].push_back(boxCollider);
+        if(boxCollider->collisionType != TILE){
+            BoxColliders[boxCollider->uniqueID].push_back(boxCollider);
+        }
     } else if (c->type == ColliderType::SPHERE) {
         auto* sphereCollider = static_cast<SphereCollider*>(component);
         SphereColliders[sphereCollider->uniqueID].push_back(sphereCollider);

@@ -10,7 +10,8 @@
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Utils/Globals.h"
 #include "GLFW/glfw3.h"
-#include "ECS/Render/WireRenderer.h"
+#include "ECS/Render/WireRenderSystem.h"
+#include "ECS/Utils/Time.h"
 
 UnitSystem::UnitSystem() {
     name = "UnitSystem";
@@ -40,9 +41,16 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 void UnitSystem::UpdateImpl() {
     for (Unit* unit: unitComponents) {
         unit->UpdateImpl();
-        unit->getEntity()->getComponent<UnitAI>()->UpdateImpl();
-        unit->getEntity()->getComponent<BoxCollider>()->update();
+        unit->getEntity()->getComponent<UnitAI>()->Update();
+        unit->getEntity()->getComponent<BoxCollider>()->Update();
+
     }
+
+    if((int)glfwGetTime() % 2 == 0){
+        fixOverlappingUnits();
+    }
+
+
 }
 
 void UnitSystem::selectUnit(Unit *unit) {
@@ -86,10 +94,10 @@ void UnitSystem::init() {
                             selectUnit(ray->getHitEntity()->getComponent<Unit>());
                         }
                     } else if(ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr){
-                        deselectAllUnits();
+                        //deselectAllUnits();
                     }
 
-                    ztgk::game::scene->systemManager.getSystem<WireRenderer>()->rayComponents.push_back(std::move(ray));
+                    ztgk::game::scene->systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
                 }
                 else if (!selectedUnits.empty() && data.button == GLFW_MOUSE_BUTTON_RIGHT && data.action == GLFW_PRESS) {
                     glm::vec3 worldPressCoords = ztgk::game::camera->getDirFromCameraToCursor(data.pos.x - 10, data.pos.y - 10, ztgk::game::window_size.x, ztgk::game::window_size.y);
@@ -99,13 +107,15 @@ void UnitSystem::init() {
                     if(hit != nullptr){
                         for(auto & unit : selectedUnits){
                             if(hit->getComponent<IMineable>()!=nullptr){
-                                unit->miningTarget = hit->getComponent<IMineable>();
+                                unit->miningTargets.clear();
+                                unit->miningTargets.push_back(hit->getComponent<IMineable>());
                                 unit->hasMiningTarget = true;
                                 spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
                             }
                             else{
                                 unit->hasMiningTarget = false;
-                                unit->miningTarget = nullptr;
+                                spdlog::info("Mining target not set");
+                                unit->miningTargets.clear();
                                 unit->hasCombatTarget = false;
                                 unit->combatTarget = nullptr;
                                 unit->hasMovementTarget = true;
@@ -115,10 +125,20 @@ void UnitSystem::init() {
                         }
                     }
 
-                    ztgk::game::scene->systemManager.getSystem<WireRenderer>()->rayComponents.push_back(std::move(ray));
+                    ztgk::game::scene->systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
                 }
             }
         }
     );
     *ztgk::game::signalQueue += raycastSelectionHandler.get();
+}
+
+void UnitSystem::fixOverlappingUnits() {
+    for (Unit* unit: unitComponents) {
+        for (Unit* otherUnit: unitComponents) {
+            if (unit != otherUnit && unit->gridPosition == otherUnit->gridPosition) {
+                unit->gridPosition = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, otherUnit->gridPosition);
+            }
+        }
+    }
 }

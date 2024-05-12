@@ -64,7 +64,7 @@
 #include "ECS/Render/FrustumCulling/Frustum.h"
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Ray.h"
-#include "ECS/Render/WireRenderer.h"
+#include "ECS/Render/WireRenderSystem.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Render/InstanceRenderSystem.h"
 #include "ECS/Unit/UnitAI/UnitAI.h"
@@ -92,7 +92,6 @@ Model *cubeModel;
 Model *bathroomWAll;
 Model *quadModel;
 Entity *gridEntity;
-HUD hud;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -103,6 +102,7 @@ Entity *box2;
 Text text = {};
 
 BoxCollider *boxCollider;
+BloomPostProcess bloomSystem;
 
 
 shared_ptr<spdlog::logger> file_logger;
@@ -194,18 +194,12 @@ float lastY = 0;
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
-LightSystem lightSystem(&camera, &scene);
 PhongPipeline phongPipeline;
-RenderSystem renderSystem;
-InstanceRenderSystem instanceRenderSystem(&camera);
-WireRenderer wireRenderer(&primitives, &camera);
-BloomPostProcess bloomSystem;
-CollisionSystem collisionSystem;
-UnitSystem unitSystem;
 
-Grid grid(&scene, 100, 100, 2.0f, Vector3(0, 0, 0));
 
 Entity *playerUnit;
+
+std::vector<Vector2Int> selectedTiles;
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -230,7 +224,6 @@ bool timeStepKeyPressed = false;
 
 #pragma region ZTGK-Global
 
-SignalQueue signalQueue = SignalQueue();
 
 #pragma endregion
 
@@ -251,7 +244,6 @@ int main(int, char **) {
     init_time();
     spdlog::info("Initialized system timer.");
 
-    signalQueue.init();
     spdlog::info("Initialized signal queue.");
 
     init_camera();
@@ -272,6 +264,8 @@ int main(int, char **) {
     load_enteties();
     spdlog::info("Initialized entities.");
 
+
+    scene.systemManager.FinishInnit();
 #pragma endregion Init
 
     // Main loop
@@ -415,19 +409,22 @@ bool init() {
 void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
-    ztgk::game::signalQueue = &signalQueue;
     ztgk::game::window = window;
+    scene.systemManager.addSystem(std::make_unique<SignalQueue>());
+    ztgk::game::signalQueue = scene.systemManager.getSystem<SignalQueue>(); //TODO gregori and ijgor just pls use scene to get systems
+    scene.systemManager.getSystem<SignalQueue>()->init();
     ztgk::game::cursor.init();
 
-    scene.systemManager.addSystem(&signalQueue);
 
-    scene.systemManager.addSystem(&lightSystem);
-    scene.systemManager.addSystem(&renderSystem);
-    scene.systemManager.addSystem(&instanceRenderSystem);
-    scene.systemManager.addSystem(&wireRenderer);
-    scene.systemManager.addSystem(&grid);
-    scene.systemManager.addSystem(&collisionSystem);
-    scene.systemManager.addSystem(&unitSystem);
+
+    scene.systemManager.addSystem(std::make_unique<LightSystem>(&camera, &scene));
+    scene.systemManager.addSystem(std::make_unique<RenderSystem>());
+    scene.systemManager.addSystem(std::make_unique<InstanceRenderSystem>(&camera));
+    scene.systemManager.addSystem(std::make_unique<WireRenderSystem>(&primitives, &camera));
+    scene.systemManager.addSystem(std::make_unique<Grid>(&scene, 100, 100, 2.0f, Vector3(0, 0, 0)));
+    scene.systemManager.addSystem(std::make_unique<CollisionSystem>());
+    scene.systemManager.addSystem(std::make_unique<UnitSystem>());
+
 
 
     primitives.Init();
@@ -439,13 +436,13 @@ void init_systems() {
     cubeModel = new Model(pbrprimitives.cubeVAO, materialPhong,
                           vector<GLuint>(pbrprimitives.cubeIndices, pbrprimitives.cubeIndices + 36));
     ztgk::game::cube_model = cubeModel;
-    wireRenderer.boxModel = cubeModel;
-    wireRenderer.Innit();
+    scene.systemManager.getSystem<WireRenderSystem>()->boxModel = cubeModel;
+    scene.systemManager.getSystem<WireRenderSystem>()->Innit();
 
-    hud.init();
-    scene.systemManager.addSystem(&hud);
+    scene.systemManager.addSystem(std::make_unique<HUD>());
+    scene.systemManager.getSystem<HUD>()->init();
 
-    unitSystem.init();
+    scene.systemManager.getSystem<UnitSystem>()->init();
 }
 
 void init_managers() {
@@ -466,9 +463,14 @@ void load_enteties() {
     wall.loadModel();
 
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    //gabka.loadModel();
+   // gabka.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
+    
+    //Gabka
+    //gameObject = scene.addEntity("Gabka");;
+   // gameObject->addComponent(make_unique<Render>(&gabka));;
+    //Gabka
 
 
     gameObject = scene.addEntity("Wall");;
@@ -499,30 +501,31 @@ void load_enteties() {
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
+    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
     gameObject->addComponent(make_unique<PointLight>(
             PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
                            0.032f)));
     //  gameObject = scene.addEntity("Point Light 2");
     // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
+    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
-    lightSystem.Init();
+    scene.systemManager.getSystem<LightSystem>()->Init();
 
     //gameObject = scene.addEntity("Quad");
     // gameObject->addComponent(make_unique<Render>(quadModel));
 
+    scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
+    scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-    instanceRenderSystem.tileModel = quadModel;
-    grid.LoadTileEntities(1.0f, &collisionSystem);
-    instanceRenderSystem.Innit();
-
-    hud.getDefaultGroup()->setHidden(true);
+    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
-    bggroup = hud.addGroup(glm::vec3(0, 0, 10));
-    hud.getGroupOrDefault(bggroup)->setHidden(true);
+    bggroup =   scene.systemManager.getSystem<HUD>()->addGroup(glm::vec3(0, 0, 10));
+    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
     auto bgelem = scene.addEntity(ebg, "Puni1");
     bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
                                              "res/textures/puni.png"));
@@ -542,8 +545,8 @@ void load_enteties() {
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
-    zmgroup = hud.addGroup();
-    hud.getGroupOrDefault(zmgroup)->setHidden(true);
+    zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
+    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
     auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
                                                         ztgk::game::window_size.y * 0.5));
@@ -568,71 +571,39 @@ void load_units() {
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    playerUnit->addComponent(make_unique<Unit>("Player1", &grid, Vector2Int(50, 50), Unit::ALLY_BASE, true, &unitSystem));
+    playerUnit->addComponent(make_unique<Unit>("Player1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(&grid);
+    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-//    Entity* enemyUnit = scene.addEntity("Enemy1");
-//    enemyUnit->addComponent(make_unique<Render>(cubeModel));
-//    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    enemyUnit->updateSelfAndChild();
-//    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    added = {100, 1, 1, 20, 3};
-//    enemyUnit->addComponent(make_unique<Unit>("Enemy1", &grid, Vector2Int(50, 70), added, false, &unitSystem));
-//    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
-//    stateManager->currentState = new IdleState(&grid);
-//    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
-//    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
+    playerUnit = scene.addEntity("Player2");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-
-
-//    playerUnit = scene.addEntity("Player2");
-//    playerUnit->addComponent(make_unique<Render>(cube_model));
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
-//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    added = {100, 1, 1, 30, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player2", &grid, Vector2Int(60, 60), added, true, &unitSystem));
-//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-//    stateManager->currentState = new idleState();
-//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-//
-//    playerUnit = scene.addEntity("Player3");
-//    playerUnit->addComponent(make_unique<Render>(cube_model));
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
-//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    added = {100, 1, 1, 10, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player3", &grid, Vector2Int(70, 60), added, true, &unitSystem));
-//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-//    stateManager->currentState = new idleState();
-//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-//
-//    playerUnit = scene.addEntity("Player4");
-//    playerUnit->addComponent(make_unique<Render>(cube_model));
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
-//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    added = {100, 1, 1, 100, 1};
-//    playerUnit->addComponent(make_unique<Unit>("Player4", &grid, Vector2Int(60, 70), added, true, &unitSystem));
-//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-//    stateManager->currentState = new idleState();
-//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+    playerUnit = scene.addEntity("Player3");
+    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
+    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
+    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
+    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
 }
 
@@ -684,21 +655,31 @@ void update() {
     mouseX = mouseio.MousePos.x;
     mouseY = mouseio.MousePos.y;
 
+    scene.systemManager.Update();
     scene.updateScene();
-    lightSystem.Update();
-    instanceRenderSystem.Update();
-    wireRenderer.Update();
+    
+    scene.systemManager.getSystem<LightSystem>()->Update();
+    scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
+    scene.systemManager.getSystem<InstanceRenderSystem>()->PushToSSBO(&camera);
+    scene.systemManager.getSystem<WireRenderSystem>()->Update();
 
-    signalQueue.Update();
+    scene.systemManager.getSystem<SignalQueue>()->Update();
 
-    unitSystem.Update();
+    scene.systemManager.getSystem<UnitSystem>()->Update();
+
+    for(auto tile : selectedTiles){
+        scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
+    }
+
+//    Unit* u = unitSystem.unitComponents[0];
+//    spdlog::info("{}", u->currentState->name);
 }
 
 void render() {
     ZoneScopedN("Render");
 
-    lightSystem.PushDepthMapsToShader(&phongPipeline.phongShader);
-    lightSystem.PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&phongPipeline.phongShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -712,16 +693,16 @@ void render() {
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
 
-    renderSystem.DrawScene(&phongPipeline.phongShader, &camera);
-    instanceRenderSystem.DrawTiles(&phongPipeline.phongInstanceShader, &camera);
-    wireRenderer.DrawColliders();
-    wireRenderer.DrawRays();
+    scene.systemManager.getSystem<RenderSystem>()->DrawScene(&phongPipeline.phongShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&phongPipeline.phongInstanceShader, &camera);
+    scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
+    scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
-    hud.draw();
+    scene.systemManager.getSystem<HUD>()->draw();
 }
 
 void imgui_begin() {
@@ -938,7 +919,15 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
     //calculate ray every mouse press
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
                                                                  display_h);
-    std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, &collisionSystem);
+    std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
+
+    if(ray->getHitEntity()!= nullptr){
+        spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);
+    }
+    else{
+        spdlog::info("Ray hit nothing");
+    }
+
 
     //if left mouse button is pressed, start timer and save position of the mouse press
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
@@ -963,18 +952,18 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
 
                 //if it is already selected, deselect it
                 if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
-                    unitSystem.deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ray->getHitEntity()->getComponent<Unit>());
                 }
 
                     //if it is not selected, select it
                 else {
-                    unitSystem.selectUnit(ray->getHitEntity()->getComponent<Unit>());
+                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(ray->getHitEntity()->getComponent<Unit>());
                 }
             }
 
                 // if ray hits anyting else than a unit, deselect all units
             else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr) {
-                unitSystem.deselectAllUnits();
+                scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
             }
         }
 
@@ -982,24 +971,29 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         else{
             if(ray->getHitEntity() != nullptr){
                 mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
-                Vector2Int mouseHeldStartGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
-                Vector2Int mouseHeldEndGridPos = grid.WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+                Vector2Int mouseHeldStartGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+                Vector2Int mouseHeldEndGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
 
-                spdlog::info("Mouse held start pos: {}, {}", mouseHeldStartGridPos.x, mouseHeldStartGridPos.z);
-                spdlog::info("Mouse held end pos: {}, {}", mouseHeldEndGridPos.x, mouseHeldEndGridPos.z);
-
-
-                std::vector<Collider*> collidersInArea = collisionSystem.getCollidersInArea(mouseHeldStartPos, mouseHeldEndPos);
-                if(!collidersInArea.empty()){
-                    spdlog::info("Colliders in area: {}", collidersInArea.size());
-                    for(auto col : collidersInArea){
-                        Tile* checkTile = col->getEntity()->getComponent<Tile>();
-                        if(checkTile != nullptr){
-                            checkTile->setTileSelectionState(POINTED_AT);
-                        }
-                        spdlog::info("Collider: {}", col->getEntity()->name);
-                    }
+                for(auto tile : selectedTiles){
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
                 }
+
+                std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                selectedTiles = tilesInArea;
+
+                if(! scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
+                    for(auto unit :  scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                        unit->miningTargets.clear();
+                        for(auto tile : tilesInArea){
+                            auto mineable =  scene.systemManager.getSystem<Grid>()->getTileAt(tile)->getEntity()->getComponent<IMineable>();
+                            if(mineable != nullptr && !mineable->isMined){
+                                unit->miningTargets.push_back(mineable);
+                            }
+                        }
+                    }
+
+                }
+
             }
             else{
                 isLeftMouseButtonHeld = false;
@@ -1007,22 +1001,23 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
             }
         }
 
-        wireRenderer.rayComponents.push_back(std::move(ray));
+        scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
 
 
     //if there are selected units and right mouse button is pressed, set target for selected units
-    if(!unitSystem.selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
+    if(!  scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
 
         Entity * hit = ray->getHitEntity();
 
         //if something was hit
         if(hit != nullptr){
-            for(auto unit : unitSystem.selectedUnits){
+            for(auto unit :   scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
 
                 //if hit entity is mineable, set it as mining target
-                if(hit->getComponent<IMineable>()!=nullptr){
-                    unit->miningTarget = hit->getComponent<IMineable>();
+                if(hit->getComponent<IMineable>()!=nullptr && !hit->getComponent<IMineable>()->isMined){
+                    unit->miningTargets.clear();
+                    unit->miningTargets.emplace_back(hit->getComponent<IMineable>());
                     Tile* hitTile = hit->getComponent<Tile>();
                     hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
@@ -1032,22 +1027,22 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                     //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr){
                     unit->hasMiningTarget = false;
-                    unit->miningTarget = nullptr;
+                    unit->miningTargets.clear();
                     unit->hasCombatTarget = false;
                     unit->combatTarget = nullptr;
                     unit->hasMovementTarget = true;
                     unit->pathfinding.path.clear();
-                    unit->movementTarget = grid.WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    unit->movementTarget =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition( VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
                 }
             }
         }
-        wireRenderer.rayComponents.push_back(std::move(ray));
+        scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
-}
+ }
   
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
+    *ztgk::game::signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
 

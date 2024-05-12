@@ -48,10 +48,11 @@ public:
     //targets
     Vector2Int movementTarget;
     Unit* combatTarget;
-    IMineable* miningTarget;
 
+    std::vector<IMineable*> miningTargets;
+    IMineable* currentMiningTarget = nullptr;
 
-    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem);
+    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
     ~Unit();
 
     bool IsAlly() const;
@@ -81,6 +82,9 @@ public:
     void serializer_init(Grid * pGrid);
     // partially sets up the required components, always call serializer_init after this, before returning to the main loop!!
     static Entity * serializer_newUnitEntity(Scene * scene, const std::string & name);
+
+
+    IMineable* findClosestMineable(const std::vector<IMineable>& MineablesToExclude = {});
 
 private:
     Vector2Int previousGridPosition;

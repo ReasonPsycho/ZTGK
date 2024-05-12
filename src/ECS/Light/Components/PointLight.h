@@ -17,19 +17,19 @@
 struct PointLightData {
     glm::vec4 diffuse;
     glm::vec4 specular;
-    glm::vec4 position;
+    glm::vec4 position; //far plane will now be stored as 4th value in pos
     float constant;
     float linear;
     float quadratic;
     float pointlessfloat;
 
     //Default constructor
-    PointLightData(  glm::vec4 diffuse = glm::vec4(glm::vec3 (255.0f),1),
-                     glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
+    PointLightData(  glm::vec4 diffuse = glm::vec4(glm::vec3 (5),1),
+                     glm::vec4 specular= glm::vec4(glm::vec3 (5),1),
     glm::vec4 position = glm::vec4(0.0f),
     float constant = 1,
-    float linear = 1,
-    float quadratic = 1)
+    float linear = 2,
+    float quadratic =  0.032f)
             : diffuse(diffuse),
               specular(specular),
               position(position),
@@ -40,9 +40,12 @@ struct PointLightData {
     {}
 };
 
+
+
 class PointLight : public ILight {
 public:
     PointLight(PointLightData data);
+    PointLight();
     
     PointLightData data;
 
@@ -52,7 +55,7 @@ public:
     void Innit(int width, int height, int index) override;
 
     void SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                           GLuint ShadowMapArrayId, int index) override; // Pure virtual function
+                           GLuint ShadowMapArrayId, int index, int layer) override; // Pure virtual function
     void UpdateData(int height, int width) override;
 
 private:

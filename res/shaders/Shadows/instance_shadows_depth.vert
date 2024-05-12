@@ -14,9 +14,11 @@ layout (std430, binding = 6) buffer WallDataBuffer {
 };
 
 uniform mat4 lightSpaceMatrix;
+uniform mat4 gridMatrix;
+
 
 void main()
 {
     uint index = gl_InstanceID;
-    gl_Position = vec4(lightSpaceMatrix * wallData[index].matrix * vec4(aPos, 1.0));
+    gl_Position = lightSpaceMatrix * wallData[index].matrix * vec4(aPos, 1.0)  * gridMatrix;
 }

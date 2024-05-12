@@ -9,6 +9,7 @@
 #include "Console.h"
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
+#include "spdlog/spdlog.h"
 
 namespace ztgk {
     static constexpr short ID_POOL_SYSTEM = 0;

@@ -43,10 +43,17 @@ public:
 
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
+    void createPlaneShadowMap();
+    void createCubeShadowMap();
     void PushDepthMapsToShader(Shader *shader);
-
     void showImGuiDetailsImpl(Camera *camera);
+    void registerComponents() override{
+        systemManager->registerComponent<DirLight>();
+        systemManager->registerComponent<PointLight>();
+        systemManager->registerComponent<SpotLight>();
+    }
 
+    
     //Vectors
     std::vector<ILight *> lights;
     std::vector<DirLight*> dirLights;
@@ -59,22 +66,22 @@ private:
     bool isDataPushedToSSBO = false;
     //Shaders
     Shader cubeDepthShader = Shader("res/shaders/Shadows/point_shadows_depth.vert",
-                                      "res/shaders/Shadows/point_shadows_depth.frag",
-                                    "res/shaders/Shadows/point_shadows_depth.geom");
+                                      "res/shaders/Shadows/point_shadows_depth.frag");
     
     Shader planeDepthShader = Shader("res/shaders/Shadows/shadows_depth.vert",
                                      "res/shaders/Shadows/shadows_depth.frag");
 
     Shader instanceCubeDepthShader = Shader("res/shaders/Shadows/instance_point_shadows_depth.vert",
-                                            "res/shaders/Shadows/point_shadows_depth.frag",
-                                            "res/shaders/Shadows/point_shadows_depth.geom");
+                                            "res/shaders/Shadows/point_shadows_depth.frag");
 
     Shader instancePlaneDepthShader = Shader("res/shaders/Shadows/instance_shadows_depth.vert",
                                              "res/shaders/Shadows/shadows_depth.frag");
 
     int CUBE_SHADOW_INDEX = 8;
-    int PLANE_SHADOW_TEXTURE_INDEX = 9;    
+    int PLANE_SHADOW_TEXTURE_INDEX = 9;
+    unsigned int depthFBO{};
     
+
     GLuint dirLightBufferBindingPoint = 3;
     GLuint pointLightBufferBindingPoint = 4;
     GLuint spotLightBufferBindingPoint = 5;
@@ -86,8 +93,11 @@ private:
     GLuint planeShadowMaps;
     GLuint cubeShadowMaps;
 
-
-    const unsigned int SHADOW_WIDTH = 512, SHADOW_HEIGHT = 512;
+    int maxDirLight = 1;
+    int maxPointLight = 20;
+    int maxSpotLight = 20;
+    
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
     std::array<std::type_index, 4> componentTypes = {
             std::type_index(typeid(ILight)),

@@ -14,7 +14,6 @@
 State *MiningState::RunCurrentState() {
     isTargetInRange();
 
-
     //from Mining to Idle
     if(!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget){
         idleState = new IdleState(grid);
@@ -42,21 +41,33 @@ State *MiningState::RunCurrentState() {
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
-            return this;
+            moveState = new MovementState(grid);
+            moveState->unit = unit;
+            return moveState;
         }
     }
-
-    Mine();
+    if(isTargetInRange())
+        Mine();
+    else{
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+        unit->hasMovementTarget = true;
+        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->currentMiningTarget->gridPosition, unit->gridPosition);
+        return moveState;
+    }
     return this;
 }
 
 bool MiningState::isTargetInRange() {
-    if(unit->miningTarget == nullptr){
+    IMineable* current = unit->currentMiningTarget;
+    if(current == nullptr){
+        spdlog::error("IN MiningState::isTargetInRange(): no current mining target");
         unit->hasMiningTarget = false;
         unit->isTargetInRange = false;
         return false;
     }
-     if(VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(unit->worldPosition), VectorUtils::GlmVec3ToVector3(grid->GridToWorldPosition(unit->miningTarget->gridPosition))) <= /*todo this is the old range value ??*/ 3){
+
+     if(VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(unit->worldPosition), VectorUtils::GlmVec3ToVector3(grid->GridToWorldPosition(current->gridPosition))) <=/*todo this is the old range value ??*/ 3){
          unit->isTargetInRange = true;
          return true;
      }
@@ -64,51 +75,53 @@ bool MiningState::isTargetInRange() {
 }
 
 void MiningState::Mine() {
-    if(unit->miningTarget->getTimeToMineRemaining() <= 0 && miningPath.empty()){
+    std::vector<IMineable*> miningTargets = unit->miningTargets;
+
+    if(miningTargets.empty()){
+        spdlog::error("In MiningState::Mine(): Mining targets are empty");
         unit->hasMiningTarget = false;
         return;
     }
-    if(miningPath.empty() && isTargetInRange()){
-        auto miningPat= findMiningPath();
-        if(miningPat.size() == 0){
-            spdlog::error("In MiningState::Mine(): Mining path is empty");
-            miningPath.clear();
-            unit->miningPath.clear();
-            unit->hasMiningTarget = false;
-            return;
-        }
-        for(auto &tile : findMiningPath()) {
-            miningPath.push_back(tile);
-            unit->miningPath.push_back(tile);
-        }
-    }
 
-    if(!unit->isTargetInRange){
-        unit->hasMovementTarget = true;
-        if(unit->canFindPathToTarget(unit->miningTarget->gridPosition)){
-            unit->movementTarget = unit->miningTarget->gridPosition;
-        }
-        else {
-            unit->movementTarget = miningPath[0].gridPosition;
-        }
+
+    if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0 && miningTargets.size() == 1){
+        unit->hasMiningTarget = false;
+        miningTargets.clear();
+        unit->miningTargets.clear();
         return;
     }
 
-        if(miningPath.empty()){
-            spdlog::error("In MiningState::Mine(): Mining path is empty");
-            return;
+    if(isTargetInRange()){
+        unit->currentMiningTarget->Mine();
+        if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
+            miningTargets.erase(miningTargets.begin());
+            if(miningTargets.empty()){
+                unit->hasMiningTarget = false;
+                unit->currentMiningTarget = nullptr;
+                return;
+            }
+            unit->currentMiningTarget = miningTargets.front();
         }
-        miningPath[0].Mine();
-        if(miningPath[0].getTimeToMineRemaining() <= 0){
-            miningPath.erase(miningPath.begin());
-            unit->miningPath.erase(unit->miningPath.begin());
-        }
+    }
+//    else{
+//        auto miningPat= findMiningPath();
+//        if(miningPat.size() == 0){
+//            spdlog::error("In MiningState::Mine(): Mining path is empty");
+//            return;
+//        }
+//        for(auto &tile : findMiningPath()) {
+//            tilesToMine.push_back(tile);
+//            unit->miningPath.push_back(tile);
+//        }
+//
+//
+//    }
 }
 
 std::vector<IMineable> MiningState::findMiningPath() {
     if(!unit->hasMiningTarget) return {}; //empty vector
     std::vector<IMineable> path = {};
-    IMineable* currentUnitTarget = unit->miningTarget;
+    IMineable* currentUnitTarget = unit->currentMiningTarget;
     if(currentUnitTarget == nullptr){
         spdlog::error("In MiningState::findMiningPath(): Mining target is nullptr");
         return {};

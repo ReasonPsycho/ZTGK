@@ -12,7 +12,7 @@
 
 class Grid;
 
-class Chunk {
+class Chunk : public Component{
 
 public:
      Chunk(Vector2Int index,Grid* grid,int width,int height);
@@ -20,6 +20,7 @@ public:
      //Data
     int width;
     int height;
+    bool isVisible;
     
     Vector2Int index{};
     

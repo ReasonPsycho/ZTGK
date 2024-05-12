@@ -102,24 +102,37 @@ void Entity::showImGuiDetails(Camera *camera) {
         if (scene->selectedEntityNumber == uniqueID) {
             ImVec2 window_pos = ImVec2(ImGui::GetIO().DisplaySize.x - 300, 40); // Top-Right
             ImGui::SetNextWindowPos(window_pos, ImGuiCond_FirstUseEver);
-            ImGui::Begin((name + ", Element id:" + std::to_string(uniqueID) + "###Inspector").c_str());
-            transform.ManipulateModelMatrix(camera);
+            ImGui::Begin((name + ", Element id:" + std::to_string(uniqueID) + "###Inspector").c_str(), nullptr, ImGuiWindowFlags_MenuBar);
+            if (ImGui::BeginMenuBar()) {
+                scene->systemManager.showImGuiEnitityBar(this);
 
-            for (const auto &component: components) {
-                if (ImGui::CollapsingHeader(component.second->name.c_str())) {
-                    ImGui::Indent();
-                    component.second->showImGuiDetails(camera);
-                    if (ImGui::Button("Delete component")) {
-                        scene->stopRenderingImgui = true; //Just in case I am not sure if needed here.
-                        removeComponentFromMap(component.second);
-                        break;
-                    }
-                    ImGui::Unindent();
+                if (ImGui::MenuItem("Add child")) {
+                    scene->addEntity(this,name + "Child");
                 }
+                
+                ImGui::EndMenuBar();
             }
 
-            if (ImGui::Button("Delete entity")) {
-                Destroy();
+            transform.ManipulateModelMatrix(camera);
+            if (!scene->stopRenderingImgui) {
+                
+                for (const auto &component: components) {
+                    if (ImGui::CollapsingHeader(component.second->name.c_str())) {
+                        ImGui::Indent();
+                        component.second->showImGuiDetails(camera);
+                        if (ImGui::Button("Delete component")) {
+                            scene->stopRenderingImgui = true; //Just in case I am not sure if needed here.
+                            removeComponentFromMap(component.second);
+                            break;
+                        }
+                        ImGui::Unindent();
+                    }
+                }
+
+                if (ImGui::Button("Delete entity")) {
+                    Destroy();
+                }
+                 
             }
             ImGui::End();
         }

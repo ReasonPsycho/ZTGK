@@ -21,8 +21,6 @@ public:
     CombatState* combatState;
     IdleState* idleState;
 
-
-    std::vector<IMineable> miningPath;
     std::vector<IMineable> findMiningPath();
 
     Vector2Int GetNearestFloorTile(Vector2Int target, Vector2Int origin);

@@ -6,6 +6,7 @@ in VS_OUT {
     vec3 FragPos;
     vec2 TexCoords;
     vec3 WorldPos;
+    vec3 Normal;
     flat int textureType;
     flat bool inFogOfWar;
     flat int typeOfSelection;
@@ -75,12 +76,17 @@ layout (std430, binding = 5) buffer SpotLightBuffer {
     SpotLight spotLights[];
 };
 
+uniform int spotLightAmount;
+uniform int dirLightAmount;
+uniform int pointLightAmount;
+
 uniform vec3 viewPos;
 uniform Material material;
 
 //Lighting and shadows
 uniform vec3 camPos;
-uniform float far_plane;
+uniform float maxBias;
+uniform float biasMuliplayer;
 
 vec3 selectionColor[5] = vec3[]
 (
@@ -109,31 +115,31 @@ layout (binding = 10) uniform sampler2DArray diffuseTextureArray;
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex);
-float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex);
-float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID);
+float CubeShadowCalculation(vec3 fragPos, vec3 lightPos ,float far_plane, int lightIndex);
+float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos,float far_plane, int lightID);
 
 void main()
 {
     // properties
-    vec3 norm = vec3(texture(material.normal, vs_out.TexCoords));
+    vec3 norm =  vs_out.Normal;
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
 
     vec3 result = vec3(0);
     if (!vs_out.inFogOfWar){
 
-        result = 0.4f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
+        result = 0.2f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
         int index = 0;
-        for (int i = 0; i < dirLights.length(); ++i) {
-            result += CalcDirLight(dirLights[i], norm, viewDir, index++);
+        for (int i = 0; i < dirLightAmount; ++i) {
+            result += CalcDirLight(dirLights[i], norm,viewDir,index++);
         }
 
-        for (int i = 0; i < spotLights.length(); ++i) {
-            result += CalcSpotLight(spotLights[i], norm, vs_out.WorldPos, viewDir, index++);
+        for (int i = 0; i < spotLightAmount; ++i) {
+            result += CalcSpotLight(spotLights[i], norm,vs_out.WorldPos,viewDir,index++);
         }
 
         index = 0;
-        for (int i = 0; i < pointLights.length(); ++i) {
-            result += CalcPointLight(pointLights[i], norm, vs_out.WorldPos, viewDir, index++);
+        for (int i = 0; i < pointLightAmount; ++i) {
+            result += CalcPointLight(pointLights[i], norm,vs_out.WorldPos,viewDir,index++);
         }
 
     }
@@ -163,7 +169,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
     vec3 specular = vec3(light.specular) * spec * vec3(texture(material.specular, vs_out.TexCoords));
 
     float shadow = 1;
-    shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+    shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz,light.position.w, lightIndex));
 
     return (diffuse + specular) * shadow;
 }
@@ -187,7 +193,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, 
     specular *= attenuation;
 
     float shadow = 1;
-    shadow = (1.0 - CubeShadowCalculation(vs_out.WorldPos, light.position.xyz, lightIndex));
+    shadow = (1.0 - CubeShadowCalculation(vs_out.WorldPos, light.position.xyz, light.position.w, lightIndex));
 
 
     return (diffuse + specular) * shadow;
@@ -216,24 +222,25 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, in
     specular *= attenuation * intensity;
 
     float shadow = 1;
-    shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
+    shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz,light.position.w, lightIndex));
 
 
     return (diffuse + specular) * shadow;
 }
 
-float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
+float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex)
 {
     vec3 fragToLight = vs_out.WorldPos - lightPos;
-    float currentDepth = length(fragToLight);
+    float currentDepth = length(fragToLight) ;
     float shadow = 0.0;
-    float bias = 0.15;
+    float bias = 0.05;
     int samples = 20;
     float viewDistance = length(camPos - vs_out.WorldPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;        closestDepth *= far_plane;// undo mapping [0;1]
+        float closestDepth = texture(cubeShadowMaps, vec4(fragToLight + gridSamplingDisk[i] * diskRadius, lightIndex)).r;      
+        closestDepth *= far_plane;// undo mapping [0;1]
         if (currentDepth - bias > closestDepth){
             shadow += 1.0;
         }
@@ -242,7 +249,7 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, int lightIndex)
     return shadow;
 }
 
-float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID)
+float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos,float far_plane, int lightID)
 {
     vec4 fragPosLightSpace = lightSpaceMatrix * vec4(vs_out.WorldPos, 1.0);
     // perform perspective divide
@@ -250,15 +257,12 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(planeShadowMaps, vec3(projCoords.xy, lightID)).r;// get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
-
-    vec3 normal = normalize(vec3(texture(material.normal, vs_out.TexCoords)));
+    vec3 normal = normalize( vs_out.Normal);
     vec3 lightDir = normalize(lightPos - vs_out.WorldPos);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = max(biasMuliplayer * (1.0 - dot(normal, lightDir)),  maxBias);
     // check whether current frag pos is in shadow
-    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     // PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(planeShadowMaps, 0).xy;
@@ -266,16 +270,15 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     {
         for (int y = -1; y <= 1; ++y)
         {
-            float pcfDepth = texture(planeShadowMaps, vec3(projCoords.xy + vec2(x, y) * texelSize, lightID)).r;
+            float pcfDepth = texture(planeShadowMaps, vec3(projCoords.x + x * texelSize.x,projCoords.y + y * texelSize.y, lightID)).r;
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }
     }
     shadow /= 9.0;
 
-    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
-    if (projCoords.z > 1.0){
-        shadow = 1.0;
-    }
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+
 
     return shadow;
 }
