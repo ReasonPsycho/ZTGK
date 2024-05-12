@@ -6,7 +6,6 @@
 #include "PointLight.h"
 
 void PointLight::Innit(int width, int height, int index) {
-    glGenFramebuffers(1, &depthMapFBO);
     shadowProj = glm::perspective(glm::radians(90.0f), (float) width / (float) height,
                                   near_plane, far_plane); //TODO add based pn calculation
     shadowTransforms.push_back(
@@ -57,7 +56,6 @@ void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShad
         
     
         
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, layer + index * 6);
@@ -150,4 +148,10 @@ void PointLight::UpdateData(int height, int width) {
                         glm::vec3(0.0f, -1.0f, 0.0f)));
 
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
+}
+
+PointLight::PointLight(): data(PointLightData()) {
+    name = "Point light";
+
+    lightType = Point;
 }

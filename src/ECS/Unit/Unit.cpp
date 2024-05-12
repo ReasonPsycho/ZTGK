@@ -12,7 +12,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Utils/Time.h"
 
-Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly, UnitSystem* unitSystem) {
+Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) {
     this->name = std::move(name);
     this->equipment = UnitEquipment();
     this->grid = grid;
@@ -189,7 +189,7 @@ Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) 
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2), ztgk::game::scene->systemManager.getSystem<CollisionSystem>()));
+    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(2, 2, 2)));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
     playerUnit->addComponent(make_unique<Unit>());
     return playerUnit;

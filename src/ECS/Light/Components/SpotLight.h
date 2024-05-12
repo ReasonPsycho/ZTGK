@@ -28,15 +28,15 @@ struct SpotLightData {
     float pointlessfloat3;
     glm::mat4x4 lightSpaceMatrix;
 
-    SpotLightData( glm::vec4 diffuse = glm::vec4(glm::vec3 (255.0f),1),
-                   glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
+    SpotLightData( glm::vec4 diffuse = glm::vec4(glm::vec3 (5.0f),1),
+                   glm::vec4 specular= glm::vec4(glm::vec3 (5),1),
     glm::vec4 position = glm::vec4(0.0f),
     glm::vec4 direction= glm::vec4(1.0f),
-    float cutOff = 1,
-    float outerCutOff = 1,
-    float constant = 1,
-    float linear = 1,
-    float quadratic = 1,
+    float cutOff = 0.9763f,
+    float outerCutOff = 0.96593f,
+    float constant = 1.0f,
+    float linear = 0.09f,
+    float quadratic =  0.032f,
     glm::mat4x4 lightSpaceMatrix = glm::mat4x4(1.0f)
     )
             : diffuse(diffuse),
@@ -55,12 +55,15 @@ struct SpotLightData {
     {}
 };
 
+
+
 class SpotLight : public ILight {
 private:
     float near_plane = 0.1f, far_plane = 1.0f;
 
 public:
     SpotLight(SpotLightData data);
+    SpotLight();
 
 
 

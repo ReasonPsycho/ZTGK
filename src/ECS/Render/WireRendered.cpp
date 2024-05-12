@@ -2,10 +2,10 @@
 // Created by redkc on 10/04/2024.
 //
 
-#include "WireRenderer.h"
+#include "WireRenderSystem.h"
 #include "ECS/Grid/Tile.h"
 
-void WireRenderer::DrawColliders() {
+void WireRenderSystem::DrawColliders() {
     
     if(renderBoxes){
         boxShader.use();
@@ -28,11 +28,11 @@ void WireRenderer::DrawColliders() {
  
 }
 
-void WireRenderer::addComponent(void *component) {
+void WireRenderSystem::addComponent(void *component) {
     colliderComponents.push_back(reinterpret_cast<Collider *const>(component));
 }
 
-void WireRenderer::removeComponent(void *component) {
+void WireRenderSystem::removeComponent(void *component) {
     auto component_iter = std::find(colliderComponents.begin(), colliderComponents.end(),
                                     reinterpret_cast<Collider *const>(component));
 
@@ -41,7 +41,7 @@ void WireRenderer::removeComponent(void *component) {
     }
 }
 
-void WireRenderer::showImGuiDetailsImpl(Camera *camera) {
+void WireRenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Checkbox("Render boxes",&renderBoxes);
     ImGui::Checkbox("Render rays",&renderRays);
     if(ImGui::Button("Clear rays")){
@@ -51,19 +51,19 @@ void WireRenderer::showImGuiDetailsImpl(Camera *camera) {
 
 }
 
-WireRenderer::WireRenderer(Primitives *primitives, Camera *camera) : primitives(primitives), camera(camera) {
+WireRenderSystem::WireRenderSystem(Primitives *primitives, Camera *camera) : primitives(primitives), camera(camera) {
     name = "Wire Renderer";
-
+    
 }
 
-void WireRenderer::Innit() {
+void WireRenderSystem::Innit() {
     rayShader.init();
     boxShader.init();
     glGenBuffers(1, &wireBoxBufferID);
 
 }
 
-void WireRenderer::DrawRays() {
+void WireRenderSystem::DrawRays() {
     if(renderRays){
         rayShader.use();
         camera->GetProjectionMatrix();
@@ -81,7 +81,7 @@ void WireRenderer::DrawRays() {
     }
 }
 
-void WireRenderer::PushToSSBO(Camera *camera) {
+void WireRenderSystem::PushToSSBO(Camera *camera) {
     boxColliderDataArray.clear();
     for (auto &collider: colliderComponents) {
         BoxCollider *boxCollider = reinterpret_cast<BoxCollider *>(collider);
@@ -99,7 +99,7 @@ void WireRenderer::PushToSSBO(Camera *camera) {
 
 }
 
-void WireRenderer::UpdateImpl() {
+void WireRenderSystem::UpdateImpl() {
 
     if (renderBoxes){
         PushToSSBO(camera);

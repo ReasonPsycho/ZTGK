@@ -36,6 +36,7 @@ struct DirLightData {
 class DirLight : public ILight {
 public:
     DirLight( DirLightData data);
+    DirLight();
     
     DirLightData data;
 

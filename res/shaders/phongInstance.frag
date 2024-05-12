@@ -76,6 +76,10 @@ layout (std430, binding = 5) buffer SpotLightBuffer {
     SpotLight spotLights[];
 };
 
+uniform int spotLightAmount;
+uniform int dirLightAmount;
+uniform int pointLightAmount;
+
 uniform vec3 viewPos;
 uniform Material material;
 
@@ -125,17 +129,17 @@ void main()
 
         result = 0.2f * vec3(texture(diffuseTextureArray, vec3(vs_out.TexCoords, float(vs_out.textureType))));//We do be calculating ambient here
         int index = 0;
-        for (int i = 0; i < dirLights.length(); ++i) {
-            result += CalcDirLight(dirLights[i], norm, viewDir, index++);
+        for (int i = 0; i < dirLightAmount; ++i) {
+            result += CalcDirLight(dirLights[i], norm,viewDir,index++);
         }
 
-        for (int i = 0; i < spotLights.length(); ++i) {
-            result += CalcSpotLight(spotLights[i], norm, vs_out.WorldPos, viewDir, index++);
+        for (int i = 0; i < spotLightAmount; ++i) {
+            result += CalcSpotLight(spotLights[i], norm,vs_out.WorldPos,viewDir,index++);
         }
 
         index = 0;
-        for (int i = 0; i < pointLights.length(); ++i) {
-            result += CalcPointLight(pointLights[i], norm, vs_out.WorldPos, viewDir, index++);
+        for (int i = 0; i < pointLightAmount; ++i) {
+            result += CalcPointLight(pointLights[i], norm,vs_out.WorldPos,viewDir,index++);
         }
 
     }

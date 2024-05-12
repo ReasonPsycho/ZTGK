@@ -2,8 +2,8 @@
 // Created by redkc on 10/04/2024.
 //
 
-#ifndef ZTGK_WIRERENDERER_H
-#define ZTGK_WIRERENDERER_H
+#ifndef ZTGK_WIRERENDERSYSTEM_H
+#define ZTGK_WIRERENDERSYSTEM_H
 
 
 #include "ECS/System.h"
@@ -11,7 +11,7 @@
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 
-class WireRenderer : public System {
+class WireRenderSystem : public System {
 
 
 public:
@@ -20,13 +20,16 @@ public:
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
     void showImGuiDetailsImpl(Camera *camera) override;
-    void Innit();
-    void UpdateImpl() override;
-    
     const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
     int getNumComponentTypes() override { return 3;};
+
+    void registerComponents() override{};
+    void Innit();
+    void UpdateImpl() override;
+
     
-    explicit WireRenderer(Primitives *primitives, Camera *camera);
+    
+    explicit WireRenderSystem(Primitives *primitives, Camera *camera);
 
     std::vector<unique_ptr<Ray>> rayComponents;
     void PushToSSBO(Camera* camera);
@@ -48,7 +51,8 @@ private:
             std::type_index(typeid(BoxCollider)), //Sphere isn't supported yet XD
             std::type_index(typeid(Ray)) //Sphere isn't supported yet XD
     };
+    
 };
 
 
-#endif //ZTGK_WIRERENDERER_H
+#endif //ZTGK_WIRERENDERSYSTEM_H

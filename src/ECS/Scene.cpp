@@ -49,12 +49,16 @@ void Scene::showImGuiDetails(Camera *camera) {
 // Begin main window
     ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
     if (ImGui::BeginMenuBar()) {
+        if (ImGui::MenuItem("Add entity")) {
+            addEntity("New entity");
+        }
         if (ImGui::MenuItem("Save")) {
             LevelSaving::save();
         }
         if (ImGui::MenuItem("Load")) {
             LevelSaving::load();
         }
+        
         ImGui::EndMenuBar();
     }
 

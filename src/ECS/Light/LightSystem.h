@@ -43,10 +43,17 @@ public:
 
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
+    void createPlaneShadowMap();
+    void createCubeShadowMap();
     void PushDepthMapsToShader(Shader *shader);
-
     void showImGuiDetailsImpl(Camera *camera);
+    void registerComponents() override{
+        systemManager->registerComponent<DirLight>();
+        systemManager->registerComponent<PointLight>();
+        systemManager->registerComponent<SpotLight>();
+    }
 
+    
     //Vectors
     std::vector<ILight *> lights;
     std::vector<DirLight*> dirLights;
@@ -71,8 +78,10 @@ private:
                                              "res/shaders/Shadows/shadows_depth.frag");
 
     int CUBE_SHADOW_INDEX = 8;
-    int PLANE_SHADOW_TEXTURE_INDEX = 9;    
+    int PLANE_SHADOW_TEXTURE_INDEX = 9;
+    unsigned int depthFBO{};
     
+
     GLuint dirLightBufferBindingPoint = 3;
     GLuint pointLightBufferBindingPoint = 4;
     GLuint spotLightBufferBindingPoint = 5;
@@ -84,7 +93,10 @@ private:
     GLuint planeShadowMaps;
     GLuint cubeShadowMaps;
 
-
+    int maxDirLight = 1;
+    int maxPointLight = 20;
+    int maxSpotLight = 20;
+    
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
     std::array<std::type_index, 4> componentTypes = {

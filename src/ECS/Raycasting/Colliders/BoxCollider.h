@@ -32,8 +32,8 @@ public:
     CollisionType collisionType;
     BoxColliderData boxColliderData = BoxColliderData(glm::mat4x4(1.0f), glm::vec4(1));
     // Constructors
-    BoxCollider(Entity* entity, glm::vec3 size, CollisionSystem* collisionSystem);
-    BoxCollider(Entity* entity, glm::vec3 size, CollisionType type, CollisionSystem* collisionSystem);
+    BoxCollider(Entity *entity, glm::vec3 size);
+    BoxCollider(Entity *entity, glm::vec3 size, CollisionType type);
 
     // Debug methods
 
