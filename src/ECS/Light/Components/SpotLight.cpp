@@ -6,7 +6,6 @@
 #include "SpotLight.h"
 
 void SpotLight::Innit(int width, int height, int index) {
-    glGenFramebuffers(1, &depthMapFBO);
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat) width / (GLfloat) height,
                                        near_plane,
@@ -44,7 +43,6 @@ void SpotLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShado
     instanceShadowMapShader->setFloat("far_plane", far_plane);
     instanceShadowMapShader->setFloat("near_plane", near_plane);
     
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
@@ -125,4 +123,9 @@ void SpotLight::UpdateData(int height, int width) {
 
 
     this->setIsDirty(false);
+}
+
+SpotLight::SpotLight() : ILight(), data(SpotLightData()) {
+    name = "Spot light";
+    lightType = Spot;
 }

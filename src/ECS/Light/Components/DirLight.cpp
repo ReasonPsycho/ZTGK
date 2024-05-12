@@ -6,7 +6,6 @@
 #include "DirLight.h"
 
 void DirLight::Innit(int width, int height, int index) {
-    glGenFramebuffers(1, &depthMapFBO);
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 
@@ -32,7 +31,6 @@ DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapSh
     instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
     instanceShadowMapShader->setFloat("far_plane", far_plane);
     instanceShadowMapShader->setFloat("near_plane", near_plane);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
@@ -102,3 +100,8 @@ void DirLight::UpdateData(int height, int width) {
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
 
+DirLight::DirLight():  ILight(),
+        data(DirLightData())  {
+    name = "Directional light";
+    lightType = Directional;
+}

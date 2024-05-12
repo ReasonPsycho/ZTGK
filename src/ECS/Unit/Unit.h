@@ -49,7 +49,7 @@ public:
     float attackCooldown = 0;
 
 
-    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly, UnitSystem* unitSystem);
+    Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
     ~Unit();
 
     bool IsAlly() const;

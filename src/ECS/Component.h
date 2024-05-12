@@ -43,7 +43,7 @@ protected:
 
 
 private:
-    bool isDirty = false;
+    bool isDirty = true;
 };
 
 

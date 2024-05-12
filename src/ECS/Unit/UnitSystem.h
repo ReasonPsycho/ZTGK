@@ -20,6 +20,7 @@ public:
     int getNumComponentTypes() override {return 1;};
 
     void showImGuiDetailsImpl(Camera *camera) override;
+    void registerComponents() override{};
 
     void UpdateImpl() override;
 

@@ -13,7 +13,7 @@ public:
     glm::vec3 center{};
     float radius;
 
-    SphereCollider(const glm::vec3& center, float radius, CollisionSystem* collisionSystem);
+    SphereCollider(const glm::vec3 &center, float radius);
 };
 
 

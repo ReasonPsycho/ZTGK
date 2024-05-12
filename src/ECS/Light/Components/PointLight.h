@@ -24,12 +24,12 @@ struct PointLightData {
     float pointlessfloat;
 
     //Default constructor
-    PointLightData(  glm::vec4 diffuse = glm::vec4(glm::vec3 (255.0f),1),
-                     glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
+    PointLightData(  glm::vec4 diffuse = glm::vec4(glm::vec3 (5),1),
+                     glm::vec4 specular= glm::vec4(glm::vec3 (5),1),
     glm::vec4 position = glm::vec4(0.0f),
     float constant = 1,
-    float linear = 1,
-    float quadratic = 1)
+    float linear = 2,
+    float quadratic =  0.032f)
             : diffuse(diffuse),
               specular(specular),
               position(position),
@@ -40,9 +40,12 @@ struct PointLightData {
     {}
 };
 
+
+
 class PointLight : public ILight {
 public:
     PointLight(PointLightData data);
+    PointLight();
     
     PointLightData data;
 
