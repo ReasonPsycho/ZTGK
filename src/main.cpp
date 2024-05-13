@@ -164,6 +164,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods);
 
 void processInput(GLFWwindow *window);
 
+void update_dragged_tiles();
+
 #pragma endregion Function definitions
 
 #pragma region Orginal set up
@@ -667,12 +669,10 @@ void update() {
 
     scene.systemManager.getSystem<UnitSystem>()->Update();
 
+    update_dragged_tiles();
     for(auto tile : selectedTiles){
         scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
-
-//    Unit* u = unitSystem.unitComponents[0];
-//    spdlog::info("{}", u->currentState->name);
 }
 
 void render() {
@@ -924,17 +924,38 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     
 }
 
+void update_dragged_tiles(){
+
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
+                                                                 display_h);
+    std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
+
+    if (isLeftMouseButtonHeld && ray!= nullptr && ray->getHitEntity() != nullptr){
+        Vector2Int mouseHeldStartGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+        mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
+        Vector2Int mouseHeldEndGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+        std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+        if(!selectedTiles.empty())
+        {
+            for(auto tile : selectedTiles){
+                scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
+            }
+        }
+        selectedTiles = tilesInArea;
+//        for(auto tile : tilesInArea){
+//            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
+//        }
+
+    }
+
+}
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods){
-
-
-
 
     //calculate ray every mouse press
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
                                                                  display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
-
     if(ray->getHitEntity()!= nullptr){
         spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);
     }
@@ -942,6 +963,16 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         spdlog::info("Ray hit nothing");
     }
 
+    if(isLeftMouseButtonHeld && ray->getHitEntity() != nullptr){
+        spdlog::info("Mouse held");
+        Vector2Int mouseHeldStartGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+        mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
+        Vector2Int mouseHeldEndGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+        std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+        for(auto tile : tilesInArea){
+            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
+        }
+    }
 
     //if left mouse button is pressed, start timer and save position of the mouse press
     if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
@@ -1009,6 +1040,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
 
                 }
                 else if(dsm == dragSelectionMode::DRAG_UNIT){
+                    scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
                     for(auto tile : tilesInArea){
                         Unit* unitptr = scene.systemManager.getSystem<Grid>()->getTileAt(tile)->unit;
                         if(unitptr != nullptr){
@@ -1018,7 +1050,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                         }
                     }
                 }
-
             }
             else{
                 isLeftMouseButtonHeld = false;
@@ -1063,7 +1094,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         }
         scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
- }
+
+}
   
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
