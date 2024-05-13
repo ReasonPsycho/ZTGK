@@ -18,15 +18,10 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
 }
 
 void IMineable::Mine() {
-
     timeToMineRemaining -= Time::Instance().DeltaTime();
-    spdlog::info(timeToMineRemaining);
-
     if (timeToMineRemaining<=0) {
         grid->DestroyWallsOnTile(gridPosition);
         isMined = true;
-
-
     }
 }
 
