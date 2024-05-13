@@ -92,7 +92,7 @@ void MiningState::Mine() {
     }
 
     if(isTargetInRange()){
-        unit->currentMiningTarget->Mine();
+        unit->currentMiningTarget->Mine(unit);
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
             miningTargets.erase(miningTargets.begin());
             if(miningTargets.empty()){
