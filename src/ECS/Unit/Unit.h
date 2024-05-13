@@ -85,6 +85,10 @@ public:
 
 
     IMineable* findClosestMineable(const std::vector<IMineable>& MineablesToExclude = {});
+    void sortMiningTargetsByDistance();
+    bool forcedIdleState = false;
+    float waitTimer = 0;
+    void Wait(float seconds);
 
 private:
     Vector2Int previousGridPosition;

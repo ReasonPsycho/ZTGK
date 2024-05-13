@@ -100,6 +100,7 @@ void MiningState::Mine() {
                 unit->currentMiningTarget = nullptr;
                 return;
             }
+            unit->sortMiningTargetsByDistance();
             unit->currentMiningTarget = miningTargets.front();
         }
     }
