@@ -883,6 +883,17 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
         ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
+
+    if(glfwGetKey(window,  GLFW_KEY_U) == GLFW_PRESS){
+        ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_UNIT;
+        spdlog::info("Drag mode set to DRAG_UNIT");
+
+    }
+    else if(glfwGetKey(window,  GLFW_KEY_M) == GLFW_PRESS){
+        ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_TILE;
+        spdlog::info("Drag mode set to DRAG_TILE");
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -920,6 +931,9 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods){
+
+
+
 
     //calculate ray every mouse press
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
@@ -975,6 +989,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         //if mouse was held for more than 0.2 seconds, consider it a drag
         else{
             if(ray->getHitEntity() != nullptr){
+                dragSelectionMode dsm = ztgk::game::cursor.dragMode;
                 mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
                 Vector2Int mouseHeldStartGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
                 Vector2Int mouseHeldEndGridPos =  scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
@@ -986,7 +1001,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                 std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
 
-                if(! scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
+                if(! scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty() && dsm == dragSelectionMode::DRAG_TILE){
                     for(auto unit :  scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
                         unit->miningTargets.clear();
                         for(auto tile : tilesInArea){
@@ -997,6 +1012,16 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
                         }
                     }
 
+                }
+                else if(dsm == dragSelectionMode::DRAG_UNIT){
+                    for(auto tile : tilesInArea){
+                        Unit* unitptr = scene.systemManager.getSystem<Grid>()->getTileAt(tile)->unit;
+                        if(unitptr != nullptr){
+                            if(unitptr->isAlly && !unitptr->isSelected){
+                                scene.systemManager.getSystem<UnitSystem>()->selectUnit(unitptr);
+                            }
+                        }
+                    }
                 }
 
             }

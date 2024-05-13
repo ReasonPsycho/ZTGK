@@ -10,6 +10,13 @@
 #include "ECS/SignalQueue/SignalReceiver.h"
 #include "Globals.h"
 
+enum dragSelectionMode{
+    DRAG_UNIT,
+    DRAG_TILE
+};
+
+
+
 struct Cursor {
     void init();
     void move(glm::vec2 newpos);
@@ -35,4 +42,5 @@ struct Cursor {
     glm::vec2 ui_prev_pos = ztgk::game::window_size / 2;
     ImGuiIO * mouseio;
     SignalReceiver toggleHandler;
+    dragSelectionMode dragMode = DRAG_TILE;
 };
