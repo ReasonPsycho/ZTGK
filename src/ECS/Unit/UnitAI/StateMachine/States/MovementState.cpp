@@ -8,11 +8,25 @@
 #include "IdleState.h"
 #include "MiningState.h"
 #include "ECS/Utils/Time.h"
+#include "ECS/Unit/Equipment/InventoryManager.h"
 
 
 State *MovementState::RunCurrentState() {
 
     MoveOnPath();
+
+    if (unit->hasPickupTarget && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1) {
+        std::pair<Item *, Item *> drop = {unit->equipment[1], unit->equipment[2]};
+        InventoryManager::instance->assign_item(unit->pickupTarget->item, unit, -1);
+        if (drop.first)
+            InventoryManager::instance->spawn_item_on_map(drop.first, {unit->worldPosition.x, unit->worldPosition.z});
+        if (drop.second)
+            InventoryManager::instance->spawn_item_on_map(drop.second, {unit->worldPosition.x + 0.2, unit->worldPosition.z + 0.2});
+
+        unit->pickupTarget->getEntity()->Destroy();
+        unit->pickupTarget = nullptr;
+        unit->hasPickupTarget = false;
+    }
 
     if(unit->hasMovementTarget){
         return this;
