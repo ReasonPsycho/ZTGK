@@ -212,6 +212,9 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
                 } else {
                     delete_item(item_id);
                 }
+                found = nullptr;
+                found_unit = nullptr;
+                found_assigned = false;
             }
             ImGui::TreePop();
         }
