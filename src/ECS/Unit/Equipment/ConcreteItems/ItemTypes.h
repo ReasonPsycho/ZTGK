@@ -4,15 +4,22 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <string>
+
 class Item;
 
 struct s_item_types {
     unsigned hands;
     unsigned mop;
     unsigned water_gun;
+    unsigned test_buff_item;
 
-    // add new type here!!
+    std::unordered_map<unsigned, std::string> map;
+
+    // add new type here too!!
     s_item_types();
     // and here!!
-    unsigned id_of(Item * item) const;
+    [[nodiscard]] unsigned id_of(Item * item) const;
+    [[nodiscard]] std::string types_string() const;
 };

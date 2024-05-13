@@ -89,6 +89,7 @@ UnitStats Unit::GetBaseStats() {
 
 void Unit::showImGuiDetailsImpl(Camera *camera) {
 
+    ImGui::Text("ID %d", uniqueID);
     ImGui::Text("Unit: %s", name.c_str());
     ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
     ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);

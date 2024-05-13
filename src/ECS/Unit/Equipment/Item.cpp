@@ -7,8 +7,8 @@
 
 const s_item_types Item::item_types{};
 
-Item::Item(std::string name, std::string desctiption, bool offensive, ItemStats stats, bool takesTwoSlots)
-    : uniqueID(ztgk::id<ztgk::ID_POOL_ITEM>()), name(name), description(desctiption), offensive(offensive), stats(stats), takesTwoSlots(takesTwoSlots) {
+Item::Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots)
+    : uniqueID(ztgk::id<ztgk::ID_POOL_ITEM>()), name(name), description(description), offensive(offensive), stats(stats), takesTwoSlots(takesTwoSlots) {
 }
 
 void Item::imgui_preview() const {

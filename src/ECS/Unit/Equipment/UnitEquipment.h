@@ -38,6 +38,36 @@ public:
     UnitEquipment() {};
 
     void imgui_preview() const;
+
+    Item * operator[](const short & slot) const {
+        switch (slot) {
+            case 0:
+                return item0;
+            case 1:
+                return item1;
+            case 2:
+                return item2;
+            default:
+                spdlog::error("Accessing incorrect unit equipment slot {}!", slot);
+                return nullptr;
+        }
+    }
+    GridRange * range_of(const short & slot) {
+        switch (slot) {
+            case 0:
+                return &rangeEff0;
+            case 1:
+                return &rangeEff1;
+            case 2:
+                return &rangeEff2;
+            default:
+                spdlog::error("Accessing grid range for incorrect unit equipment slot {}!", slot);
+                return nullptr;
+        }
+    }
+    bool has(Item * item) {
+        return item0 == item || item1 == item || item2 == item;
+    }
 };
 
 

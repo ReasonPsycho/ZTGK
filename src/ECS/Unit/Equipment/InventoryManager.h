@@ -23,7 +23,11 @@ public:
 
     Item * create_item(unsigned type_id);
     Item * create_default_item(Unit * unit);
+    // CAREFUL! This doesn't unequip the item! Use unassign_and_delete_item instead or call unassign_item before!
+    void delete_item(unsigned item_id);
     void delete_item(Item * item);
+    void unassign_and_delete_item(Unit * unit, short slot);
+    void unassign_and_delete_item(Unit * unit, Item * item);
 
     // nullptr if not found, bool true means the item is assigned
     std::pair<Item *, bool> get_item(unsigned item_uid);

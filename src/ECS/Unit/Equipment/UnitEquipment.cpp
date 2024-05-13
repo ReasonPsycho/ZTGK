@@ -15,6 +15,13 @@ UnitEquipment::UnitEquipment(Unit * unit) : unit(unit) {
 
 std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
     std::pair<Item *, Item *> ret = {};
+    if (slot == 0) {
+        spdlog::warn("Equipping into default slot!");
+        if (item0 != null)
+            ret.first = item0;
+        item0 = item;
+        return ret;
+    }
     if (item->takesTwoSlots) {
         if (item1 != nullptr) {
             ret.first = unequipItem(1);

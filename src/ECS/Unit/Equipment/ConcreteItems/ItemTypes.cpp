@@ -4,13 +4,22 @@
 #include "ECS/Unit/Equipment/ConcreteItems/Hands.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Mop.h"
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
+#include "ECS/Unit/Equipment/ConcreteItems/TestBuffItem.h"
 
 using namespace ztgk;
+#define quote(x) #x
 
 s_item_types::s_item_types() {
     hands = 0;
     mop = id<ID_POOL_ITEM_TYPE>();
     water_gun = id<ID_POOL_ITEM_TYPE>();
+    test_buff_item = id<ID_POOL_ITEM_TYPE>();
+
+    map = {};
+    map.emplace(hands, quote(hands));
+    map.emplace(mop, quote(mop));
+    map.emplace(water_gun, quote(water_gun));
+    map.emplace(test_buff_item, quote(test_buff_item));
 }
 
 unsigned s_item_types::id_of(Item *item) const {
@@ -22,4 +31,14 @@ unsigned s_item_types::id_of(Item *item) const {
         return mop;
     if (type == std::type_index(typeid(WaterGun)))
         return water_gun;
+    if (type == std::type_index(typeid(TestBuffItem)))
+        return water_gun;
+}
+
+std::string s_item_types::types_string() const {
+    std::string ret;
+    for (auto [id, name] : map) {
+        ret += name + " - " + std::to_string(id) + '\n';
+    }
+    return ret;
 }

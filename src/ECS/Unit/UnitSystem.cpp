@@ -34,8 +34,22 @@ const std::type_index *UnitSystem::getComponentTypes() {
 }
 
 void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
-    ImGui::Text("Units: %d", unitComponents.size());
-    ImGui::Text("Selected Units: %d", selectedUnits.size());
+    if (ImGui::CollapsingHeader(std::format("Units: {}###UnitSystem_Units", unitComponents.size()).c_str())) {
+        for (auto & unit : unitComponents) {
+            if (ImGui::TreeNode(std::format("{} - id {}", unit->name, unit->uniqueID).c_str())) {
+                unit->showImGuiDetailsImpl(camera);
+                ImGui::TreePop();
+            }
+        }
+    }
+    if (ImGui::CollapsingHeader(std::format("Units: {}###UnitSystem_SelectedUnits", selectedUnits.size()).c_str())) {
+        for (auto & unit : selectedUnits) {
+            if (ImGui::TreeNode(std::format("{} - id {}", unit->name, unit->uniqueID).c_str())) {
+                unit->showImGuiDetailsImpl(camera);
+                ImGui::TreePop();
+            }
+        }
+    }
 }
 
 void UnitSystem::UpdateImpl() {

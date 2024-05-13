@@ -35,7 +35,7 @@ public:
     ItemStats stats{};
     bool takesTwoSlots;
 
-    Item(std::string name, std::string desctiption, bool offensive, ItemStats stats, bool takesTwoSlots = false);
+    Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false);
 
     void imgui_preview() const;
 };
