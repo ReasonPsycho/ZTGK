@@ -18,6 +18,9 @@ namespace ztgk {
     static constexpr short ID_POOL_SIGNAL_RECEIVER = 3;
     static constexpr short ID_POOL_SIGNAL = 4;
     static constexpr short ID_POOL_HUD_GROUP = 5;
+    static constexpr short ID_POOL_ITEM = 6;
+    static constexpr short ID_POOL_ITEM_TYPE = 7;
+    static constexpr short ID_POOL_GRID_RANGE = 8;
 
     // Values start from 1. 0 is intended to be left for manually created default objects or left as invalid id.
     template<int POOL>

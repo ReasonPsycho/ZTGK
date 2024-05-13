@@ -29,6 +29,10 @@ public:
     bool stopRenderingImgui = false;
 
     std::vector<std::unique_ptr<Entity>>& getChildren();
+    [[nodiscard]] Entity * getChild(unsigned id) const;
+    [[nodiscard]] Entity * getChild(const std::string & name) const;
+    [[nodiscard]] Entity * getChildR(unsigned id) const;
+    [[nodiscard]] Entity * getChildR(const std::string & name) const;
     
     
 private:

@@ -28,6 +28,7 @@ namespace ztgk {
 }
 
 struct LevelSaving {
+    static char* im_path;
 
     static void save(const std::string& path = ztgk::DEFAULT_SAVE_PATH);
     static void load( const std::string& path = ztgk::DEFAULT_SAVE_PATH);

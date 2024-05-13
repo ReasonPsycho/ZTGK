@@ -66,7 +66,8 @@ bool MiningState::isTargetInRange() {
         unit->isTargetInRange = false;
         return false;
     }
-     if(VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(unit->worldPosition), VectorUtils::GlmVec3ToVector3(grid->GridToWorldPosition(current->gridPosition))) <= unit->stats.range){
+
+     if(VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(unit->worldPosition), VectorUtils::GlmVec3ToVector3(grid->GridToWorldPosition(current->gridPosition))) <=/*todo this is the old range value ??*/ 3){
          unit->isTargetInRange = true;
          return true;
      }

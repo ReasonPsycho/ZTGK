@@ -12,14 +12,26 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Utils/Time.h"
 
-Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly) {
+const UnitStats Unit::ALLY_BASE = {
+        .max_hp = 100,
+        .hp = 100,
+        .added = {}
+};
+
+const UnitStats Unit::ENEMY_BASE = {
+        .max_hp = 100,
+        .hp = 100,
+        .added = {}
+};
+
+Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly)
+: equipment(this) {
     this->name = std::move(name);
-    this->equipment = UnitEquipment();
     this->grid = grid;
     this->gridPosition = gridPosition;
     this->worldPosition = grid->GridToWorldPosition(gridPosition);
     this->pathfinding = AstarPathfinding(grid);
-    this->baseStats = baseStats;
+    this->stats = baseStats;
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
     grid->getTileAt(gridPosition)->state = UNIT;
@@ -47,40 +59,48 @@ void Unit::UnequipItem(short slot) {
 }
 
 void Unit::UpdateStats() {
-    stats = baseStats;
+    glm::ivec2 old_range = {stats.added.rng_add, stats.added.rng_rem};
+
+    stats.added = {};
     if(equipment.item1 != nullptr){
-        stats.health += equipment.item1->stats.addHealth;
-        stats.attackDamage += equipment.item1->stats.addAttackDamage;
-        stats.attackSpeed += equipment.item1->stats.addAttackSpeed;
-        stats.movementSpeed += equipment.item1->stats.addMovementSpeed;
-        stats.range += equipment.item1->stats.addRange;
+        stats.added += equipment.item1->stats.add_to_unit;
     }
     if(equipment.item2 != nullptr){
-        stats.health += equipment.item2->stats.addHealth;
-        stats.attackDamage += equipment.item2->stats.addAttackDamage;
-        stats.attackSpeed += equipment.item2->stats.addAttackSpeed;
-        stats.movementSpeed += equipment.item2->stats.addMovementSpeed;
-        stats.range += equipment.item2->stats.addRange;
+        stats.added += equipment.item2->stats.add_to_unit;
+    }
+
+    glm::ivec2 new_range = {stats.added.rng_add, stats.added.rng_rem};
+    if (new_range != old_range) {
+        equipment.rangeEff0 = equipment.item0->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
+        if (equipment.item1 != nullptr)
+            equipment.rangeEff1 = equipment.item1->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
+        if (equipment.item2 != nullptr)
+            equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
+    }
+
+    if (stats.hp > stats.max_hp + stats.added.max_hp) {
+        stats.hp = stats.max_hp + stats.added.max_hp;
     }
 }
 
 UnitStats Unit::GetBaseStats() {
-    return this->baseStats;
+    return this->stats;
 }
 
 void Unit::showImGuiDetailsImpl(Camera *camera) {
 
+    ImGui::Text("ID %d", uniqueID);
     ImGui::Text("Unit: %s", name.c_str());
     ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
     ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);
-    ImGui::Text("Health: %f", stats.health);
-    ImGui::Text("Attack Damage: %f", stats.attackDamage);
-    ImGui::Text("Attack Speed: %f", stats.attackSpeed);
-    ImGui::Text("Movement Speed: %f", stats.movementSpeed);
-    ImGui::Text("Range: %f", stats.range);
     ImGui::Text("Ally: %s", isAlly ? "true" : "false");
     ImGui::Text("Selected: %s", isSelected ? "true" : "false");
-
+    ImGui::Text("HP %f / %f (%f + %f)", stats.hp, stats.max_hp + stats.added.max_hp, stats.max_hp, stats.added.max_hp);
+    if (ImGui::CollapsingHeader(std::format("Added stats:##+stats_unit_{}", uniqueID).c_str())) {
+        stats.added.imgui_preview();
+    }
+    if (ImGui::CollapsingHeader(std::format("Equipment:##eq_unit_{}", uniqueID).c_str()))
+        equipment.imgui_preview();
 
 }
 
@@ -140,23 +160,55 @@ void Unit::UpdateImpl() {
 
     previousGridPosition = gridPosition;
 
-    attackCooldown += Time::Instance().DeltaTime();
+    if (equipment.item0->cd_sec > 0)
+        equipment.item0->cd_sec -= Time::Instance().DeltaTime();
+    if (equipment.item1 != nullptr && equipment.item1->cd_sec > 0)
+        equipment.item1->cd_sec -= Time::Instance().DeltaTime();
+    if (equipment.item2 != nullptr && equipment.item2->cd_sec > 0)
+        equipment.item2->cd_sec -= Time::Instance().DeltaTime();
+    if (equipment.cd_between_sec > 0)
+        equipment.cd_between_sec -= Time::Instance().DeltaTime();
 }
 
 Unit *Unit::findEnemy() {
-    int sightRange = 5 + stats.range;
-    for (int i = -sightRange; i < sightRange; i++) {
-        for (int j = -sightRange; j < sightRange; j++) {
-            Vector2Int pos = Vector2Int(gridPosition.x + i, gridPosition.z + j);
-            if (grid->isInBounds(pos)) {
-                Tile *tile = grid->getTileAt(pos);
-                if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
-                    return tile->unit;
-                }
-            }
+    std::vector<Unit*> enemies;
+
+    if (equipment.use_default()) {
+        auto found = equipment.rangeEff0.find_enemies({gridPosition.x, gridPosition.z});
+        enemies.insert(enemies.end(), found.begin(), found.end());
+    } else {
+        if (equipment.item1 != nullptr && equipment.item1->offensive) {
+            auto found = equipment.rangeEff1.find_enemies({gridPosition.x, gridPosition.z});
+            enemies.insert(enemies.end(), found.begin(), found.end());
+        }
+        if (equipment.item2 != nullptr && equipment.item2->offensive) {
+            auto found = equipment.rangeEff2.find_enemies({gridPosition.x, gridPosition.z});
+            enemies.insert(enemies.end(), found.begin(), found.end());
         }
     }
-    return nullptr;
+
+    if (enemies.empty())
+        return nullptr;
+
+    // todo see if this kills performance
+    std::sort(enemies.begin(), enemies.end(), [this](Unit * enemy, Unit * enemy1){
+        return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) < VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
+    });
+    return enemies.at(0);
+//
+//    int sightRange = 5 + added.range;
+//    for (int i = -sightRange; i < sightRange; i++) {
+//        for (int j = -sightRange; j < sightRange; j++) {
+//            Vector2Int pos = Vector2Int(gridPosition.x + i, gridPosition.z + j);
+//            if (grid->isInBounds(pos)) {
+//                Tile *tile = grid->getTileAt(pos);
+//                if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
+//                    return tile->unit;
+//                }
+//            }
+//        }
+//    }
+//    return nullptr;
 }
 
 

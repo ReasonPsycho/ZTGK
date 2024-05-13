@@ -6,6 +6,7 @@
 #define ZTGK_COMBATSTATE_H
 
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
+#include "ECS/Unit/Equipment/Item.h"
 class MovementState;
 class MiningState;
 class IdleState;
@@ -20,6 +21,8 @@ public:
     MovementState *moveState;
     MiningState* miningState;
     IdleState* idleState;
+
+    Item * useItem;
 
     bool isAttackOnCooldown();
 
