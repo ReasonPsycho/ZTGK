@@ -32,7 +32,6 @@ public:
     // purely for ptr management, do not use outside of InventoryManager
     Item * unequipItem(short slot);
 
-    [[nodiscard]] bool is_full() const;
     [[nodiscard]] Item * in_range_of(glm::ivec2 self, glm::ivec2 target) const;
 
     // serializer

@@ -34,9 +34,8 @@ public:
     std::string description;
     ItemStats stats{};
     bool takesTwoSlots;
-    Model * model;
 
-    Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false, Model * model = ztgk::game::cube_model);
+    Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false);
 
     void imgui_preview() const;
 };

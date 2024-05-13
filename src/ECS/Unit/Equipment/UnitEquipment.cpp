@@ -22,19 +22,6 @@ std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
         item0 = item;
         return ret;
     }
-    // any free, otherwise slot 1
-    if (slot == -1) {
-        if (item->takesTwoSlots) {
-        } else if (item1 != nullptr && item2 != nullptr) {
-            slot = 1;
-        } else if (item1 == nullptr) {
-            item1 = item;
-            return ret;
-        } else if (item2 == nullptr) {
-            item2 = item;
-            return ret;
-        }
-    }
     if (item->takesTwoSlots) {
         if (item1 != nullptr) {
             ret.first = unequipItem(1);
@@ -165,8 +152,4 @@ void UnitEquipment::imgui_preview() const {
         ImGui::TreePop();
     }
     
-}
-
-bool UnitEquipment::is_full() const {
-    return item1 && item2;
 }

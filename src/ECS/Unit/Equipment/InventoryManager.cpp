@@ -9,7 +9,6 @@
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Hands.h"
 #include "ECS/Unit/Equipment/ConcreteItems/TestBuffItem.h"
-#include "ECS/Unit/Mining/PickupubleItem.h"
 
 InventoryManager * InventoryManager::instance = nullptr;
 
@@ -57,6 +56,24 @@ void InventoryManager::delete_item(unsigned int item_id) {
     ztgk::game::scene->stopRenderingImgui = true;
 }
 
+void InventoryManager::unassign_and_delete_item(Unit *unit, short slot) {
+    auto item = unit->equipment[slot];
+    if (!unassign_item(unit, slot))
+        return;
+    delete_item(item);
+}
+
+void InventoryManager::unassign_and_delete_item(Unit *unit, Item *item) {
+    if (item == unit->equipment[1])
+        unassign_and_delete_item(unit, 1);
+    else if (item == unit->equipment[2])
+        unassign_and_delete_item(unit, 2);
+    else if (item == unit->equipment[0]) {
+        spdlog::warn("Unequipping default item!!");
+        unassign_and_delete_item(unit, (short)0);
+    }
+}
+
 std::pair<Item *, bool> InventoryManager::get_item(unsigned int item_uid) {
     auto found = std::find_if(free_items.begin(), free_items.end(), [item_uid](auto & item){
         return item->uniqueID == item_uid;
@@ -78,7 +95,7 @@ bool InventoryManager::assign_item(Item *item, Unit *unit, short slot) {
         spdlog::error("Item not found or not freed before! Cannot assign!");
         return false;
     }
-
+    
     auto un_eq = unit->equipment.equipItem(item, slot);
     // equipItem() automatically unequips the other items for use,
     //  so we just need to move them to the right collection
@@ -115,37 +132,8 @@ bool InventoryManager::unassign_item(Unit *unit, short slot) {
     return true;
 }
 
-bool InventoryManager::create_and_assign_item(unsigned int type_id, Unit *unit, short slot) {
-    auto item = create_item(type_id);
-    return assign_item(item, unit, slot);
-}
-
-bool InventoryManager::unassign_and_delete_item(Unit *unit, short slot) {
-    auto item = unit->equipment[slot];
-    if (!unassign_item(unit, slot))
-        return false;
-    delete_item(item);
-    return true;
-}
-
-bool InventoryManager::unassign_and_delete_item(Unit *unit, Item *item) {
-    if (item == unit->equipment[1])
-        return unassign_and_delete_item(unit, 1);
-    else if (item == unit->equipment[2])
-        return unassign_and_delete_item(unit, 2);
-    else if (item == unit->equipment[0]) {
-        spdlog::warn("Unequipping default item!!");
-        return unassign_and_delete_item(unit, (short)0);
-    }
-    return false;
-}
-
 void InventoryManager::spawn_item_on_map(Item *item, glm::vec2 world_pos) {
     spdlog::debug("InventoryManager::spawn_item_on_map is TODO");
-    auto entity = ztgk::game::scene->addEntity(std::format("On-map Item {} - id {}", item->name, item->uniqueID));
-    entity->transform.setLocalPosition(glm::vec3(world_pos.x, entity->transform.getLocalPosition().y, world_pos.y));
-    entity->addComponent(std::make_unique<Render>(item->model));
-    entity->addComponent(std::make_unique<PickupubleItem>(item));
 }
 
 void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
@@ -160,7 +148,6 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
         static Item * found = nullptr;
         static Unit * found_unit = nullptr;
         static bool found_assigned = false;
-        static glm::vec3 world_pos = {};
 
         if (ImGui::TreeNode("Create Item")) {
             ImGui::InputInt("Type ID", &item_type_id);
@@ -280,32 +267,6 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
                     if (e_delete_item)
                         unassign_and_delete_item(*unit, unit_slot);
                     else unassign_item(*unit, unit_slot);
-                }
-            }
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("Spawn Item on Map")) {
-            ImGui::Checkbox("Create Item?", &new_item);
-            if (new_item) {
-                ImGui::InputInt("Type ID", &item_type_id);
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("%s", Item::item_types.types_string().c_str());
-                }
-            }
-            else {
-                ImGui::InputInt("Item ID", &item_id);
-            }
-            ImGui::DragFloat3("World Pos", glm::value_ptr(world_pos));
-
-            if (ImGui::Button("Spawn")) {
-                Item * item = nullptr;
-                if (new_item)
-                    item = create_item(item_type_id);
-                else item = get_item(item_id).first;
-                if (!item) {
-                    spdlog::error("Failed to find/create item!");
-                } else {
-                    spawn_item_on_map(item, world_pos);
                 }
             }
             ImGui::TreePop();

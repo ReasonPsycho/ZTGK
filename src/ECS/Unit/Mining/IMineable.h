@@ -19,9 +19,7 @@ public:
     Grid* grid;
     explicit  IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid);
     ~IMineable() = default;
-    virtual void onMine(Unit * unit) { /*todo fire particles!*/ };
-    virtual void onMined(Unit * unit) { /**/ };
-    void Mine(Unit * unit);
+    void Mine();
 
     void UpdateImpl() override;
 
@@ -32,7 +30,7 @@ public:
     }
     bool isMined = false;
 
-protected:
+private:
     float timeToMineRemaining;
 };
 
