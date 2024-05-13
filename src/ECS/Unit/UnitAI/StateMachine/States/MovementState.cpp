@@ -15,7 +15,8 @@ State *MovementState::RunCurrentState() {
 
     MoveOnPath();
 
-    if (unit->hasPickupTarget && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1) {
+    // todo calculate from centers
+    if (unit->hasPickupTarget && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1.5) {
         std::pair<Item *, Item *> drop = {unit->equipment[1], unit->equipment[2]};
         InventoryManager::instance->assign_item(unit->pickupTarget->item, unit, -1);
         if (drop.first)

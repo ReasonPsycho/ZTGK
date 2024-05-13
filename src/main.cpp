@@ -671,6 +671,8 @@ void update() {
         scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
 
+    scene.systemManager.getSystem<CollisionSystem>()->Update();
+
 //    Unit* u = unitSystem.unitComponents[0];
 //    spdlog::info("{}", u->currentState->name);
 }

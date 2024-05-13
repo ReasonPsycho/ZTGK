@@ -109,6 +109,10 @@ void Entity::showImGuiDetails(Camera *camera) {
                 if (ImGui::MenuItem("Add child")) {
                     scene->addEntity(this,name + "Child");
                 }
+                if (ImGui::MenuItem("Update")) {
+
+                    forceUpdateSelfAndChild();
+                }
                 
                 ImGui::EndMenuBar();
             }

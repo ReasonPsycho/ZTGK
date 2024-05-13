@@ -146,6 +146,8 @@ void InventoryManager::spawn_item_on_map(Item *item, glm::vec2 world_pos) {
     entity->transform.setLocalPosition(glm::vec3(world_pos.x, entity->transform.getLocalPosition().y, world_pos.y));
     entity->addComponent(std::make_unique<Render>(item->model));
     entity->addComponent(std::make_unique<PickupubleItem>(item));
+    entity->addComponent(std::make_unique<BoxCollider>(entity, glm::vec3(1, 1, 1)));
+    entity->getComponent<BoxCollider>()->Update();
 }
 
 void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
@@ -160,7 +162,7 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
         static Item * found = nullptr;
         static Unit * found_unit = nullptr;
         static bool found_assigned = false;
-        static glm::vec3 world_pos = {};
+        static glm::vec2 world_pos = {};
 
         if (ImGui::TreeNode("Create Item")) {
             ImGui::InputInt("Type ID", &item_type_id);
@@ -295,7 +297,7 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
             else {
                 ImGui::InputInt("Item ID", &item_id);
             }
-            ImGui::DragFloat3("World Pos", glm::value_ptr(world_pos));
+            ImGui::DragFloat2("World Pos", glm::value_ptr(world_pos));
 
             if (ImGui::Button("Spawn")) {
                 Item * item = nullptr;

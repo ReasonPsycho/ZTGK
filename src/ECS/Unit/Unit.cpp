@@ -15,7 +15,7 @@
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
         .hp = 100,
-        .move_spd = 5,
+        .move_spd = 20,
         .mine_spd = 1,
         .added = {}
 };
@@ -23,7 +23,7 @@ const UnitStats Unit::ALLY_BASE = {
 const UnitStats Unit::ENEMY_BASE = {
         .max_hp = 100,
         .hp = 100,
-        .move_spd = 5,
+        .move_spd = 20,
         .mine_spd = 1,
         .added = {}
 };

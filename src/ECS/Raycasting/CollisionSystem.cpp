@@ -2,6 +2,7 @@
 // Created by igork on 16.04.2024.
 //
 
+#include <ranges>
 #include "CollisionSystem.h"
 #include "imgui.h"
 #include "ECS/Utils/VectorUtils.h"
@@ -91,4 +92,21 @@ std::vector<Collider *> CollisionSystem::getCollidersInArea(glm::vec3 p1, glm::v
     return colliders;
 
 
+}
+
+void CollisionSystem::UpdateImpl() {
+    for(auto& [id, boxes] : BoxColliders)
+    {
+        for(auto& box : boxes | std::ranges::views::filter([](BoxCollider * coll){ return coll->getIsDirty(); }))
+        {
+            box->Update();
+        }
+    }
+    for(auto& [id, spheres] : SphereColliders)
+    {
+        for(auto& sphere : spheres | std::ranges::views::filter([](SphereCollider * coll){ return coll->getIsDirty(); }))
+        {
+            sphere->Update();
+        }
+    }
 }
