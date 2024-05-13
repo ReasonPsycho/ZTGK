@@ -120,6 +120,11 @@ void UnitSystem::init() {
                     Entity * hit = ray->getHitEntity();
                     if(hit != nullptr){
                         for(auto & unit : selectedUnits){
+                            auto atktarget = hit->getComponent<Unit>();
+                            if (atktarget != nullptr && atktarget != unit) {
+                                spdlog::info("set combat target for {} to {}", unit->name, atktarget->name);
+                                unit->combatTarget = hit->getComponent<Unit>();
+                            }
                             if(hit->getComponent<IMineable>()!=nullptr){
                                 unit->miningTargets.clear();
                                 unit->miningTargets.push_back(hit->getComponent<IMineable>());
