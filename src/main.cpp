@@ -72,6 +72,7 @@
 #include "ECS/Unit/UnitSystem.h"
 #include "ECS/SaveSystem/LevelSaving.h"
 #include "ECS/LevelGenerator/LevelGenerator.h"
+#include "ECS/Unit/Equipment/InventoryManager.h"
 
 #pragma endregion Includes
 
@@ -118,6 +119,8 @@ bool init();
 void init_systems();
 
 void load_enteties();
+
+void init_managers();
 
 void load_units();
 
@@ -254,6 +257,9 @@ int main(int, char **) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
     glfwSwapInterval(1);
+
+    init_managers();
+    spdlog::info("Intialized non-system manager components.");
 
     load_enteties();
     spdlog::info("Initialized entities.");
@@ -439,6 +445,12 @@ void init_systems() {
     scene.systemManager.getSystem<UnitSystem>()->init();
 }
 
+void init_managers() {
+    auto ent = scene.addEntity("Controllers");
+    ent->addComponent(make_unique<InventoryManager>());
+    ent->getComponent<InventoryManager>()->init();
+}
+
 void load_enteties() {
     Color color = {255, 255, 255, 255}; // this is equivalent to white color
 
@@ -561,8 +573,7 @@ void load_units() {
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    UnitStats stats = {100, 1, 1, 20, 3};
-    playerUnit->addComponent(make_unique<Unit>("Player1",  scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), stats, true));
+    playerUnit->addComponent(make_unique<Unit>("Player1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -575,8 +586,7 @@ void load_units() {
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    stats = {100, 1, 1, 20, 3};
-    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), stats, true));
+    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
@@ -589,26 +599,11 @@ void load_units() {
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
     playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-    stats = {100, 1, 1, 20, 3};
-    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), stats, true));
+    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-//    Entity* enemyUnit = scene.addEntity("Enemy1");
-//    enemyUnit->addComponent(make_unique<Render>(cubeModel));
-//    enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    enemyUnit->updateSelfAndChild();
-//    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(2, 2, 2), &collisionSystem));
-//    enemyUnit->getComponent<BoxCollider>()->center = enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-//    stats = {100, 1, 1, 20, 3};
-//    enemyUnit->addComponent(make_unique<Unit>("Enemy1",  scene.systemManager.getSystem<Grid>(), Vector2Int(50, 70), stats, false, &unitSystem));
-//    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
-//    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
-//    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
-//    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
 
 }
 

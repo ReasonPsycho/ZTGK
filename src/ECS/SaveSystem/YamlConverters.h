@@ -58,23 +58,66 @@ struct convert<Vector2Int> {
 };
 
 template<>
+struct convert<GridRange> {
+    static Node encode(const GridRange& rhs) {
+        Node node;
+        node[nameof(quote(rhs.add))] = rhs.add;
+        node[nameof(quote(rhs.remove))] = rhs.remove;
+        return node;
+    }
+
+    static bool decode(const Node& node, GridRange& rhs) {
+        auto add = node[nameof(quote(rhs.add))].as<int>();
+        auto rem = node[nameof(quote(rhs.remove))].as<int>();
+        rhs = GridRange(add, rem);
+        return true;
+    }
+};
+
+template<>
+struct convert<Modifiers> {
+    static Node encode(const Modifiers& rhs) {
+        Node node;
+        node[nameof(quote(rhs.max_hp))] = rhs.max_hp;
+        node[nameof(quote(rhs.def_flat))] = rhs.def_flat;
+        node[nameof(quote(rhs.dmg_perc))] = rhs.dmg_perc;
+        node[nameof(quote(rhs.dmg_flat))] = rhs.dmg_flat;
+        node[nameof(quote(rhs.move_speed))] = rhs.move_speed;
+        node[nameof(quote(rhs.mine_speed))] = rhs.mine_speed;
+        node[nameof(quote(rhs.atk_speed))] = rhs.atk_speed;
+        node[nameof(quote(rhs.knockback))] = rhs.knockback;
+        return node;
+    }
+
+    static bool decode(const Node& node, Modifiers& rhs) {
+        rhs.max_hp = node[nameof(quote(rhs.max_hp))].as<float>();
+        rhs.def_flat = node[nameof(quote(rhs.def_flat))].as<float>();
+        rhs.dmg_perc = node[nameof(quote(rhs.dmg_perc))].as<float>();
+        rhs.dmg_flat = node[nameof(quote(rhs.dmg_flat))].as<float>();
+        rhs.move_speed = node[nameof(quote(rhs.move_speed))].as<float>();
+        rhs.mine_speed = node[nameof(quote(rhs.mine_speed))].as<float>();
+        rhs.atk_speed = node[nameof(quote(rhs.atk_speed))].as<float>();
+        rhs.knockback = node[nameof(quote(rhs.knockback))].as<int>();
+        return true;
+    }
+};
+
+template<>
 struct convert<ItemStats> {
     static Node encode(const ItemStats& rhs) {
         Node node;
-        node[nameof(quote(rhs.addHealth))] = rhs.addHealth;
-        node[nameof(quote(rhs.addAttackDamage))] = rhs.addAttackDamage;
-        node[nameof(quote(rhs.addAttackSpeed))] = rhs.addAttackSpeed;
-        node[nameof(quote(rhs.addMovementSpeed))] = rhs.addMovementSpeed;
-        node[nameof(quote(rhs.addRange))] = rhs.addRange;
+        node[nameof(quote(rhs.dmg))] = rhs.dmg;
+        node[nameof(quote(rhs.cd_max_sec))] = rhs.cd_max_sec;
+        node[nameof(quote(rhs.range))] = rhs.range;
+        node[nameof(quote(rhs.add_to_unit))] = rhs.add_to_unit;
         return node;
     }
 
     static bool decode(const Node& node, ItemStats& rhs) {
-        rhs.addHealth = node[nameof(quote(rhs.addHealth))].as<float>();
-        rhs.addAttackDamage = node[nameof(quote(rhs.addAttackDamage))].as<float>();
-        rhs.addAttackSpeed = node[nameof(quote(rhs.addAttackSpeed))].as<float>();
-        rhs.addMovementSpeed = node[nameof(quote(rhs.addMovementSpeed))].as<float>();
-        rhs.addRange = node[nameof(quote(rhs.addRange))].as<float>();
+        rhs.dmg = node[nameof(quote(rhs.dmg))].as<float>();
+        rhs.cd_max_sec = node[nameof(quote(rhs.cd_max_sec))].as<float>();
+        rhs.range = node[nameof(quote(rhs.range))].as<GridRange>();
+        rhs.add_to_unit = node[nameof(quote(rhs.add_to_unit))].as<Modifiers>();
         return true;
     }
 };
@@ -85,7 +128,7 @@ struct convert<Item> {
         Node node;
         node["typeId"] = "TODO";
         node[nameof(quote(rhs.name))] = rhs.name;
-        node[nameof(quote(rhs.desctiption))] = rhs.desctiption;
+        node[nameof(quote(rhs.description))] = rhs.description;
         node[nameof(quote(rhs.stats))] = rhs.stats;
         node[nameof(quote(rhs.takesTwoSlots))] = rhs.takesTwoSlots;
         return node;
@@ -93,7 +136,7 @@ struct convert<Item> {
 
     static bool decode(const Node& node, Item& rhs) {
         rhs.name = node[nameof(quote(rhs.name))].as<std::string>();
-        rhs.desctiption = node[nameof(quote(rhs.desctiption))].as<std::string>();
+        rhs.description = node[nameof(quote(rhs.description))].as<std::string>();
         rhs.stats = node[nameof(quote(rhs.stats))].as<ItemStats>();
         rhs.takesTwoSlots = node[nameof(quote(rhs.takesTwoSlots))].as<bool>();
         return true;
@@ -126,25 +169,25 @@ struct convert<UnitEquipment> {
 
 template<>
 struct convert<UnitStats> {
-        static Node encode(const UnitStats& rhs) {
-            Node node;
-            node[nameof(quote(rhs.health))] = rhs.health;
-            node[nameof(quote(rhs.attackDamage))] = rhs.attackDamage;
-            node[nameof(quote(rhs.attackSpeed))] = rhs.attackSpeed;
-            node[nameof(quote(rhs.movementSpeed))] = rhs.movementSpeed;
-            node[nameof(quote(rhs.range))] = rhs.range;
-            return node;
-        }
+    static Node encode(const UnitStats& rhs) {
+        Node node;
+        node[nameof(quote(rhs.max_hp))] = rhs.max_hp;
+        node[nameof(quote(rhs.hp))] = rhs.hp;
+        node[nameof(quote(rhs.move_spd))] = rhs.move_spd;
+        node[nameof(quote(rhs.mine_spd))] = rhs.mine_spd;
+        node[nameof(quote(rhs.added))] = rhs.added;
+        return node;
+    }
 
-        static bool decode(const Node& node, UnitStats& rhs) {
-            rhs.health = node[nameof(quote(rhs.health))].as<float>();
-            rhs.attackDamage = node[nameof(quote(rhs.attackDamage))].as<float>();
-            rhs.attackSpeed = node[nameof(quote(rhs.attackSpeed))].as<float>();
-            rhs.movementSpeed = node[nameof(quote(rhs.movementSpeed))].as<float>();
-            rhs.range = node[nameof(quote(rhs.range))].as<float>();
-            return true;
-        }
-    };
+    static bool decode(const Node& node, UnitStats& rhs) {
+        rhs.max_hp = node[nameof(quote(rhs.max_hp))].as<float>();
+        rhs.hp = node[nameof(quote(rhs.hp))].as<float>();
+        rhs.move_spd = node[nameof(quote(rhs.move_spd))].as<float>();
+        rhs.mine_spd = node[nameof(quote(rhs.mine_spd))].as<float>();
+        rhs.added = node[nameof(quote(rhs.added))].as<Modifiers>();
+        return true;
+    }
+};
 
 template<>
 struct convert<Unit> {
@@ -153,7 +196,7 @@ struct convert<Unit> {
         node[nameof(quote(rhs.name))] = rhs.name;
         node[nameof(quote(rhs.gridPosition))] = rhs.gridPosition;
         node[nameof(quote(rhs.isAlly))] = rhs.isAlly;
-        node[nameof(quote(rhs.baseStats))] = rhs.baseStats;
+        node[nameof(quote(rhs.stats))] = rhs.stats;
         node[nameof(quote(rhs.equipment))] = rhs.equipment;
         return node;
     }
@@ -162,7 +205,7 @@ struct convert<Unit> {
         rhs.name = node[nameof(quote(rhs.name))].as<std::string>();
         rhs.gridPosition = node[nameof(quote(rhs.gridPosition))].as<Vector2Int>();
         rhs.isAlly = node[nameof(quote(rhs.isAlly))].as<bool>();
-        rhs.baseStats = node[nameof(quote(rhs.baseStats))].as<UnitStats>();
+        rhs.stats = node[nameof(quote(rhs.base))].as<UnitStats>();
         rhs.equipment = node[nameof(quote(rhs.equipment))].as<UnitEquipment>();
         rhs.serializer_init(ztgk::game::scene->systemManager.getSystem<Grid>());
         return true;

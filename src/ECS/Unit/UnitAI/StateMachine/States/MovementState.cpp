@@ -97,7 +97,7 @@ void MovementState::MoveOnPath() {
 
             Vector3 worldPos = Vector3(unit->worldPosition.x, unit->worldPosition.y, unit->worldPosition.z);
             Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, nextTileWorldPosition.y, nextTileWorldPosition.z);
-            Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, unit->stats.movementSpeed * Time::Instance().DeltaTime());
+            Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, (unit->stats.move_spd + unit->stats.added.move_speed) * Time::Instance().DeltaTime());
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
             unit->rotation = rotationAngle;
         }
