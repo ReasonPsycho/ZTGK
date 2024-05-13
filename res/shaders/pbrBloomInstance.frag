@@ -70,6 +70,8 @@ layout (std430, binding = 5) buffer SpotLightBuffer {
     SpotLight spotLights[];
 };
 
+
+
 uniform bool shadows;
 
 

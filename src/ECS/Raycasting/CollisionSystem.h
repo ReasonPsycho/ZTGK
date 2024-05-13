@@ -25,6 +25,7 @@ public:
     void removeComponent(void *component) override;
     const std::type_index* getComponentTypes() override;
     int getNumComponentTypes() override;
+    void registerComponents() override{};
 
     void showImGuiDetailsImpl(Camera *camera) override;
 

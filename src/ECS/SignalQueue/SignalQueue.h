@@ -42,6 +42,8 @@ public:
 
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&component_types); };
     int getNumComponentTypes() override { return 1; };
+    void registerComponents() override{};
+    
     void showImGuiDetailsImpl(Camera *camera);
 
 

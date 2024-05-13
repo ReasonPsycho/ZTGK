@@ -35,17 +35,14 @@ public:
 
     virtual void
     SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                      GLuint ShadowMapArrayId, int index) = 0; // Pure virtual function
+                      GLuint ShadowMapArrayId, int index, int layer) = 0; // Pure virtual function
     virtual void Innit(int width, int height, int index) = 0;
     virtual void UpdateData(int height, int width) = 0;
-    unsigned int depthMap{};
     void DeleteShadow();
 
 
 protected:
-    int uniqueID;     // Instance variable to store the unique ID for each object
     bool initializedShadow = false;
-    unsigned int depthMapFBO{};
 
     //For shadows
     glm::mat4 shadowProj{};

@@ -15,7 +15,7 @@ void BoxCollider::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat4("Color: ", glm::value_ptr(boxColliderData.color));
 }
 
-BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionSystem *collisionSystem) {
+BoxCollider::BoxCollider(Entity *entity, glm::vec3 size) {
     this->name = "Box Collider";
     this->center = entity->transform.getGlobalPosition();
     this->size = size;
@@ -75,7 +75,7 @@ bool BoxCollider::intersects(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3
     return false;
 }
 
-BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionType type, CollisionSystem *collisionSystem) {
+BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionType type) {
     this->name = "Box Collider";
     this->center = entity->transform.getGlobalPosition();
     this->size = size;

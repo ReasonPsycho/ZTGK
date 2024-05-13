@@ -6,7 +6,6 @@
 #include "DirLight.h"
 
 void DirLight::Innit(int width, int height, int index) {
-    glGenFramebuffers(1, &depthMapFBO);
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 
@@ -21,15 +20,17 @@ void DirLight::Innit(int width, int height, int index) {
 
 void
 DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                            GLuint ShadowMapArrayId, int index) {
+                            GLuint ShadowMapArrayId, int index, int layer) {
     ZoneScopedN("SetUpShadowBuffer");
 
     shadowMapShader->use();
     shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
+    shadowMapShader->setFloat("far_plane", far_plane);
+    shadowMapShader->setFloat("near_plane", near_plane);
     instanceShadowMapShader->use();
     instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    instanceShadowMapShader->setFloat("far_plane", far_plane);
+    instanceShadowMapShader->setFloat("near_plane", near_plane);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
@@ -88,7 +89,7 @@ void DirLight::UpdateData(int height, int width) {
 
     glm::mat4 lightProjection, lightView;
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
-
+    data.position[3] = far_plane;
     float scale_factor = 25.0f;
     // assume data.direction contains Euler angles (yaw, pitch, roll)
     glm::vec3 forward = glm::vec3(1, 0, 0);
@@ -99,3 +100,8 @@ void DirLight::UpdateData(int height, int width) {
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
 
+DirLight::DirLight():  ILight(),
+        data(DirLightData())  {
+    name = "Directional light";
+    lightType = Directional;
+}

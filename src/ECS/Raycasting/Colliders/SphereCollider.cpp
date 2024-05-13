@@ -6,11 +6,9 @@
 #include "ECS/Render/Primitives/Primitives.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 
-SphereCollider::SphereCollider(const glm::vec3& center, float radius, CollisionSystem* collisionSystem){
+SphereCollider::SphereCollider(const glm::vec3 &center, float radius) {
     this->name = "Sphere Collider";
     this->center = center;
     this->radius = radius;
     this->type = ColliderType::SPHERE;
-
-    collisionSystem->addComponent(this);
 }

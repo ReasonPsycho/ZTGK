@@ -22,6 +22,7 @@ public:
     void showImGuiDetailsImpl(Camera *camera) override;
     void DrawScene(Shader *regularShader, Camera *camera);
     void SimpleDrawScene(Shader* regularShader);
+    void registerComponents() override{};
 
 
 

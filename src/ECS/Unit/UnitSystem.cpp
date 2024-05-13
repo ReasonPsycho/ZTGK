@@ -10,7 +10,7 @@
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Utils/Globals.h"
 #include "GLFW/glfw3.h"
-#include "ECS/Render/WireRenderer.h"
+#include "ECS/Render/WireRenderSystem.h"
 #include "ECS/Utils/Time.h"
 
 UnitSystem::UnitSystem() {
@@ -97,7 +97,7 @@ void UnitSystem::init() {
                         //deselectAllUnits();
                     }
 
-                    ztgk::game::scene->systemManager.getSystem<WireRenderer>()->rayComponents.push_back(std::move(ray));
+                    ztgk::game::scene->systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
                 }
                 else if (!selectedUnits.empty() && data.button == GLFW_MOUSE_BUTTON_RIGHT && data.action == GLFW_PRESS) {
                     glm::vec3 worldPressCoords = ztgk::game::camera->getDirFromCameraToCursor(data.pos.x - 10, data.pos.y - 10, ztgk::game::window_size.x, ztgk::game::window_size.y);
@@ -125,7 +125,7 @@ void UnitSystem::init() {
                         }
                     }
 
-                    ztgk::game::scene->systemManager.getSystem<WireRenderer>()->rayComponents.push_back(std::move(ray));
+                    ztgk::game::scene->systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
                 }
             }
         }
