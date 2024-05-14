@@ -10,6 +10,8 @@
 #include "ECS/Unit/Mining/IMineable.h"
 #include "ECS/Utils/Globals.h"
 #include "tracy/Tracy.hpp"
+#include "ECS/Unit/Mining/MineableChest.h"
+#include "ECS/Light/Components/PointLight.h"
 
 Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position) {
     this->name = "Grid";
@@ -159,24 +161,25 @@ void Grid::GenerateTileEntities(float scale) {
     for (int i = 0; i < width /chunkWidth; i++) {
         for (int j = 0; j < height/chunkHeight; j++) {
             Entity *chunkEntity = scene->addEntity(gridEntity, "Chunk " + std::to_string(i) + " " + std::to_string(j));
+            chunkEntity->addComponent(make_unique<Chunk>(Vector2Int(i, j), this,chunkWidth,chunkHeight));
+            chunkArray[i][j] = chunkEntity->getComponent<Chunk>();
             chunkEntity->transform.setLocalPosition(glm::vec3(i * chunkWidth * tileSize, 0, j * chunkHeight * tileSize));
-            chunkEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
             chunkEntity->forceUpdateSelfAndChild();
-            chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(0.5, 0.5, 0.5)));
-            chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0);
-            chunkEntity->getComponent<BoxCollider>()->size = chunkEntity->transform.getGlobalScale() + glm::vec3(10, 0.5, 10);
+            chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(chunkWidth*tileSize ,0.8,chunkHeight*tileSize),CollisionType::CHUNK));
+            chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight);
+            chunkEntity->getComponent<BoxCollider>()->size = glm::vec3 (10,1,10);
             for (int x = 0; x < chunkWidth; ++x) {
                 for (int z = 0; z < chunkHeight; ++z) {
                     Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));
-                    tileEntity->addComponent(std::make_unique<Tile>(i * chunkWidth + x, j * chunkHeight + z));
-                    tileEntity->transform.setLocalPosition(GridToWorldPosition(x, z)); //TODO find where it is 
+                    tileEntity->addComponent(std::make_unique<Tile>(i * chunkWidth + x, j * chunkHeight + z, chunkEntity->getComponent<Chunk>()));
+                    tileEntity->transform.setLocalPosition(glm::vec3 (x * tileSize + tileSize/2,0, z * tileSize+ tileSize/2)); //TODO find where it is
                     tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
+
                     tileEntity->forceUpdateSelfAndChild();
                     tileEntity->addComponent(
-                            std::make_unique<BoxCollider>(tileEntity, glm::vec4(0.5, 0.5, 0.5,1)));
+                            std::make_unique<BoxCollider>(tileEntity, glm::vec4(1, 0.2, 1,1),CollisionType::TILE));
                     tileEntity->getComponent<BoxCollider>()->center =
                             tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
-                    tileEntity->getComponent<BoxCollider>()->size = glm::vec3(0.1, 0.1, 0.1);
                 }
             }
         }
@@ -194,11 +197,15 @@ void Grid::InitializeTileEntities() {
                 // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
                 default:
                 case FLOOR:
-                case CHEST:
                 case ORE:
                 case CORE:
                 case UNIT:
                 case state_count:   // keep this one empty or signal error, this is unreachable
+                    break;
+                case CHEST:
+                    // todo item type id
+                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
+                    tile->getEntity()->addComponent(std::make_unique<PointLight>());
                     break;
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));

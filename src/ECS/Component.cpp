@@ -38,5 +38,5 @@ void Component::Update() {
 }
 
 void Component::Remove() {
-    parentEntity->removeComponentFromMap(std::unique_ptr<Component>(this)); //TODO check if this works
+    parentEntity->removeComponentFromMap(this);
 }

@@ -12,6 +12,8 @@
 #include "GLFW/glfw3.h"
 #include "ECS/Render/WireRenderSystem.h"
 #include "ECS/Utils/Time.h"
+#include "ECS/Unit/Mining/PickupubleItem.h"
+#include "ECS/Unit/Mining/MineableChest.h"
 
 UnitSystem::UnitSystem() {
     name = "UnitSystem";
@@ -121,15 +123,31 @@ void UnitSystem::init() {
                     if(hit != nullptr){
                         for(auto & unit : selectedUnits){
                             auto atktarget = hit->getComponent<Unit>();
+                            auto pItem = hit->getComponent<PickupubleItem>();
                             if (atktarget != nullptr && atktarget != unit) {
                                 spdlog::info("set combat target for {} to {}", unit->name, atktarget->name);
+                                unit->hasCombatTarget = true;
                                 unit->combatTarget = hit->getComponent<Unit>();
+                            }
+                            if (pItem != nullptr) {
+                                auto pos = pItem->getEntity()->transform.getGlobalPosition();
+                                spdlog::info("set pickup target");
+                                unit->pickupTarget = pItem;
+                                unit->hasPickupTarget = true;
+                                unit->hasMovementTarget = true;
+                                unit->movementTarget = unit->grid->WorldToGridPosition({pos.x, pos.y, pos.z});
                             }
                             if(hit->getComponent<IMineable>()!=nullptr){
                                 unit->miningTargets.clear();
                                 unit->miningTargets.push_back(hit->getComponent<IMineable>());
                                 unit->hasMiningTarget = true;
                                 spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
+                            }
+                            if(hit->getComponent<MineableChest>()!=nullptr){
+                                unit->miningTargets.clear();
+                                unit->miningTargets.push_back(hit->getComponent<MineableChest>());
+                                unit->hasMiningTarget = true;
+                                spdlog::info("Mining target set at {}, {}", hit->getComponent<MineableChest>()->gridPosition.x, hit->getComponent<MineableChest>()->gridPosition.z);
                             }
                             else{
                                 unit->hasMiningTarget = false;
