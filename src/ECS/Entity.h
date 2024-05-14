@@ -14,6 +14,7 @@
 #include "Component.h"
 #include "SystemManager.h"
 #include "Scene.h"
+#include "ECS/Unit/Mining/IMineable.h"
 
 #include "../ECS/Raycasting/Colliders/BoxCollider.h"
 
@@ -83,6 +84,30 @@ public:
             }
         }
         // Component of type T doesn't exist for the entity - handle this case appropriately
+        return nullptr;
+    }
+
+    template <typename T>
+    T* getMineableComponent(Entity* entity) {
+        // Try to get the component of class T
+        T* component = entity->getComponent<T>();
+        if (component != nullptr) {
+            return component;
+        }
+
+        // If the direct component of type T is not found, check other components
+        for (auto& pair : entity->components) {
+            Component* baseComponent = pair.second.get();
+            // Try to dynamically cast the component to IMineable or its derived class
+            if (IMineable* mineableComponent = dynamic_cast<IMineable*>(baseComponent)) {
+                // Try to dynamically cast to T
+                if (T* castedComponent = dynamic_cast<T*>(mineableComponent)) {
+                    return castedComponent;
+                }
+            }
+        }
+
+        // If the component of type T or its derived class is not found, return nullptr
         return nullptr;
     }
 
