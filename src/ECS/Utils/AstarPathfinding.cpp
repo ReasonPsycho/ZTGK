@@ -3,6 +3,8 @@
 //
 
 #include "AstarPathfinding.h"
+#include <tracy/Tracy.hpp >
+#include <GLFW/glfw3.h>
 
 /**
  * @brief AstarPathfinding constructor
@@ -20,6 +22,8 @@ AstarPathfinding::AstarPathfinding(Grid *grid) {
  * @param target
  */
 std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
+    ZoneScopedN("Astar::FindPath");
+    double start_time = glfwGetTime();
 
     if (grid->getTileAt(target) == nullptr){
         spdlog::error("PATHFINDING: Target tile is nullptr");
@@ -42,7 +46,7 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
     gScore[start] = 0;
     fScore[start] = VectorUtils::Distance(start, target);
 
-    while(!openSet.empty()){
+    while(!openSet.empty() && glfwGetTime() - start_time < 0.002){
 
         Vector2Int current = GetLowestFScore(openSet, fScore);
         if (current == target){
@@ -196,6 +200,7 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
 }
 
 Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int origin) {
+    ZoneScopedN("GetNearestVacantTile");
     Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
     std::vector<Vector2Int> list;
     list.push_back(target);

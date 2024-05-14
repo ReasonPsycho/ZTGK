@@ -262,6 +262,7 @@ Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) 
 }
 
 IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToExclude) {
+    ZoneScopedN("Find closest mineable");
     if(miningTargets.empty()){
         spdlog::error("IN UNIT::findClosestMineable: No mining targets!");
         return nullptr;
@@ -281,6 +282,7 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToEx
             if(pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition, gridPosition)).empty()){
                 continue;
             }
+
             closestDistance = distance;
             closestMineable = tile;
         }
