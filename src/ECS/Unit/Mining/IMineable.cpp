@@ -18,6 +18,7 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->timeToMineRemaining = timeToMine;
 }
 
+
 void IMineable::Mine(Unit * unit) {
 
     timeToMineRemaining -= Time::Instance().DeltaTime() * (unit->stats.mine_spd + unit->stats.added.mine_speed);
@@ -28,6 +29,7 @@ void IMineable::Mine(Unit * unit) {
         grid->DestroyWallsOnTile(gridPosition);
         isMined = true;
         onMined(unit);
+
     }
 }
 

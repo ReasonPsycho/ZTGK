@@ -3,6 +3,8 @@
 //
 
 #include "AstarPathfinding.h"
+#include <tracy/Tracy.hpp >
+#include <GLFW/glfw3.h>
 
 /**
  * @brief AstarPathfinding constructor
@@ -20,6 +22,8 @@ AstarPathfinding::AstarPathfinding(Grid *grid) {
  * @param target
  */
 std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
+    ZoneScopedN("Astar::FindPath");
+    double start_time = glfwGetTime();
 
     if (grid->getTileAt(target) == nullptr){
         spdlog::error("PATHFINDING: Target tile is nullptr");
@@ -42,7 +46,7 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
     gScore[start] = 0;
     fScore[start] = VectorUtils::Distance(start, target);
 
-    while(!openSet.empty()){
+    while(!openSet.empty() && glfwGetTime() - start_time < 0.002){
 
         Vector2Int current = GetLowestFScore(openSet, fScore);
         if (current == target){
@@ -196,6 +200,7 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
 }
 
 Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int origin) {
+    ZoneScopedN("GetNearestVacantTile");
     Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
     std::vector<Vector2Int> list;
     list.push_back(target);
@@ -224,4 +229,69 @@ Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int 
 
 
 }
+
+std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target, int max_iterations) {
+    if (grid->getTileAt(target) == nullptr) {
+        spdlog::error("PATHFINDING: Target tile is nullptr");
+    }
+    if (grid->getTileAt(start) == nullptr) {
+        spdlog::error("PATHFINDING: Start tile is nullptr");
+    }
+
+    if (grid->getTileAt(target)->vacant()) {
+        target = GetNearestVacantTile(target, start);
+    }
+
+    std::unordered_set<Vector2Int> openSet;
+    std::unordered_set<Vector2Int> closedSet;
+    std::unordered_map<Vector2Int, Vector2Int> cameFrom;
+    std::unordered_map<Vector2Int, float> gScore;
+    std::unordered_map<Vector2Int, float> fScore;
+
+    openSet.insert(start);
+    gScore[start] = 0;
+    fScore[start] = VectorUtils::Distance(start, target);
+
+    int iterationCount = 0; // Counter for iterations
+
+    while (!openSet.empty()) {
+        // Check if the maximum iteration limit has been reached
+        if (iterationCount >= max_iterations) {
+            spdlog::warn("PATHFINDING: Maximum iterations reached. Path may be incomplete.");
+            break; // Exit the loop
+        }
+
+        Vector2Int current = GetLowestFScore(openSet, fScore);
+        if (current == target) {
+            path = ReconstructPath(cameFrom, current);
+            return path;
+        }
+
+        openSet.erase(current);
+        closedSet.insert(current);
+
+        for (auto neigh : GetNeighbours(current)) {
+            if (closedSet.contains(neigh) || !grid->getTileAt(neigh)->vacant()) {
+                continue;
+            }
+
+            float tentativeGScore = gScore[current] + VectorUtils::Distance(current, neigh);
+            if (!openSet.contains(neigh) || tentativeGScore < gScore[neigh]) {
+                cameFrom[neigh] = current;
+                gScore[neigh] = tentativeGScore;
+                fScore[neigh] = gScore[neigh] + VectorUtils::Distance(neigh, target);
+                if (!openSet.contains(neigh)) {
+                    openSet.insert(neigh);
+                }
+            }
+        }
+
+        iterationCount++; // Increment the iteration counter
+    }
+
+    spdlog::error("PATHFINDING: No path found");
+    path.clear();
+    return path;
+}
+
 

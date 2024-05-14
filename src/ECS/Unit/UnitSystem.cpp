@@ -62,6 +62,9 @@ void UnitSystem::UpdateImpl() {
 
     }
 
+    float xd = glfwGetTime();
+    int xdd = (int)xd;
+    int xddd = xdd % 2;
     if((int)glfwGetTime() % 2 == 0){
         fixOverlappingUnits();
     }
@@ -174,7 +177,22 @@ void UnitSystem::fixOverlappingUnits() {
     for (Unit* unit: unitComponents) {
         for (Unit* otherUnit: unitComponents) {
             if (unit != otherUnit && unit->gridPosition == otherUnit->gridPosition) {
-                unit->gridPosition = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, otherUnit->gridPosition);
+                Vector2Int random_dir;
+                switch((int)glfwGetTime()%4){
+                    case 0:
+                        random_dir = Vector2Int{1, 0};
+                        break;
+                    case 1:
+                        random_dir = Vector2Int{-1, 0};
+                        break;
+                    case 2:
+                        random_dir = Vector2Int{0, 1};
+                        break;
+                    case 3:
+                        random_dir = Vector2Int{0, -1};
+                        break;
+                }
+                unit->gridPosition = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, otherUnit->gridPosition + random_dir);
             }
         }
     }

@@ -29,6 +29,9 @@ public:
 
     // Most important method
     std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target);
+
+    std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target, int max_iterations);
+
     Vector2Int GetNearestVacantTile(Vector2Int target, Vector2Int origin);
 
 private:
