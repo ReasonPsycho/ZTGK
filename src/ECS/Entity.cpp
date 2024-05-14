@@ -47,9 +47,9 @@ void Entity::updateSelfAndChild() {
 
 }
 
-void Entity::removeComponentFromMap(const std::unique_ptr<Component> &comp) {
+void Entity::removeComponentFromMap(Component * comp) {
     std::type_index typeName = std::type_index(typeid(*comp));
-    scene->systemManager.removeComponent(comp.get());
+    scene->systemManager.removeComponent(comp);
     components.erase(typeName);
 }
 
@@ -117,7 +117,7 @@ void Entity::showImGuiDetails(Camera *camera) {
                         component.second->showImGuiDetails(camera);
                         if (ImGui::Button("Delete component")) {
                             scene->stopRenderingImgui = true; //Just in case I am not sure if needed here.
-                            removeComponentFromMap(component.second);
+                            removeComponentFromMap(component.second.get());
                             break;
                         }
                         ImGui::Unindent();
@@ -139,7 +139,7 @@ void Entity::showImGuiDetails(Camera *camera) {
 
 Entity::~Entity() {
     while (!components.empty()) {
-        removeComponentFromMap(components.begin()->second);
+        removeComponentFromMap(components.begin()->second.get());
     }
 }
 

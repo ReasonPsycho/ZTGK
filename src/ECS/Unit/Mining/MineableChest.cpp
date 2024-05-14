@@ -17,5 +17,6 @@ void MineableChest::showImGuiDetailsImpl(Camera *camera) {
 void MineableChest::onMined(Unit *unit) {
     IMineable::onMined(unit);
     auto item = InventoryManager::instance->create_item(item_type_id);
-    InventoryManager::instance->spawn_item_on_map(item, grid->GridToWorldPosition(gridPosition));
+    auto pos = grid->GridToWorldPosition(gridPosition);
+    InventoryManager::instance->spawn_item_on_map(item, {pos.x, pos.z});
 }

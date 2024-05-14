@@ -66,7 +66,7 @@ public:
         scene->systemManager.addComponent(components[typeName].get());
     }
 
-    void removeComponentFromMap(const std::unique_ptr<Component> &comp);
+    void removeComponentFromMap(Component * comp);
 
 
     template <typename T>

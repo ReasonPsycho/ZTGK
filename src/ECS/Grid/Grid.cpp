@@ -10,6 +10,8 @@
 #include "ECS/Unit/Mining/IMineable.h"
 #include "ECS/Utils/Globals.h"
 #include "tracy/Tracy.hpp"
+#include "ECS/Unit/Mining/MineableChest.h"
+#include "ECS/Light/Components/PointLight.h"
 
 Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position) {
     this->name = "Grid";
@@ -195,11 +197,15 @@ void Grid::InitializeTileEntities() {
                 // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
                 default:
                 case FLOOR:
-                case CHEST:
                 case ORE:
                 case CORE:
                 case UNIT:
                 case state_count:   // keep this one empty or signal error, this is unreachable
+                    break;
+                case CHEST:
+                    // todo item type id
+                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
+                    tile->getEntity()->addComponent(std::make_unique<PointLight>());
                     break;
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
