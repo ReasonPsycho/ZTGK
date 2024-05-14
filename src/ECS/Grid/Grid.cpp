@@ -166,7 +166,7 @@ void Grid::GenerateTileEntities(float scale) {
             chunkEntity->transform.setLocalPosition(glm::vec3(i * chunkWidth * tileSize, 0, j * chunkHeight * tileSize));
             chunkEntity->forceUpdateSelfAndChild();
             chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(chunkWidth*tileSize ,0.8,chunkHeight*tileSize),CollisionType::CHUNK));
-            chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight);
+            chunkEntity->getComponent<BoxCollider>()->setCenter(chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight));
             chunkEntity->getComponent<BoxCollider>()->size = glm::vec3 (10,1,10);
             for (int x = 0; x < chunkWidth; ++x) {
                 for (int z = 0; z < chunkHeight; ++z) {
@@ -178,8 +178,8 @@ void Grid::GenerateTileEntities(float scale) {
                     tileEntity->forceUpdateSelfAndChild();
                     tileEntity->addComponent(
                             std::make_unique<BoxCollider>(tileEntity, glm::vec4(1, 0.2, 1,1),CollisionType::TILE));
-                    tileEntity->getComponent<BoxCollider>()->center =
-                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                    tileEntity->getComponent<BoxCollider>()->setCenter(
+                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, -10, 0.5));
                 }
             }
         }
@@ -227,8 +227,9 @@ void Grid::LoadTileEntities(float scale) {
             chunkEntity->transform.setLocalPosition(glm::vec3(i * chunkWidth * tileSize, 0, j * chunkHeight * tileSize));
             chunkEntity->forceUpdateSelfAndChild();
             chunkEntity->addComponent(std::make_unique<BoxCollider>(chunkEntity, glm::vec3(chunkWidth*tileSize ,0.8,chunkHeight*tileSize),CollisionType::CHUNK));
-            chunkEntity->getComponent<BoxCollider>()->center = chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight);
+            chunkEntity->getComponent<BoxCollider>()->setCenter(chunkEntity->transform.getGlobalPosition() + glm::vec3(chunkWidth, 0, chunkHeight) - glm::vec3(0,0,0));
             chunkEntity->getComponent<BoxCollider>()->size = glm::vec3 (10,1,10);
+            chunkEntity->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
             for (int x = 0; x < chunkWidth; ++x) {
                 for (int z = 0; z < chunkHeight; ++z) {
                     Entity *tileEntity = scene->addEntity(chunkEntity, "Tile " + std::to_string(x) + " " + std::to_string(z));
@@ -247,9 +248,9 @@ void Grid::LoadTileEntities(float scale) {
                     
                     tileEntity->forceUpdateSelfAndChild();
                     tileEntity->addComponent(
-                            std::make_unique<BoxCollider>(tileEntity, glm::vec4(1, 0.2, 1,1),CollisionType::TILE));
-                    tileEntity->getComponent<BoxCollider>()->center =
-                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+                            std::make_unique<BoxCollider>(tileEntity, glm::vec4(1, 1, 1,1),CollisionType::TILE));
+                    tileEntity->getComponent<BoxCollider>()->setCenter(
+                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
                 }
             }
         }
