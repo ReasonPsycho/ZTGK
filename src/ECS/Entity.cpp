@@ -62,15 +62,6 @@ Entity *Entity::addChild(std::unique_ptr<Entity> child) {
 void Entity::removeChild(Entity *child) {
     std::erase_if(children, [&](const std::unique_ptr<Entity> &e) { return e.get() == child; });
     removedChild = true;
-
-    auto iter = std::find_if(children.begin(), children.end(),
-                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
-    if (iter <= children.end())
-    {
-        // Entity was found. Now remove it.
-        // unique_ptr will automatically delete the Entity when erased.
-        children.erase(iter);
-    }
 }
 
 void Entity::showImGuiDetails(Camera *camera) {
@@ -153,6 +144,8 @@ Entity::~Entity() {
 }
 
 void Entity::Destroy() {
+    while (!children.empty())
+        (*children.begin())->Destroy();
     if (parent != nullptr) {
         parent->removeChild(this);
     } else {
