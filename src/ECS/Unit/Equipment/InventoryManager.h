@@ -26,8 +26,6 @@ public:
     // CAREFUL! This doesn't unequip the item! Use unassign_and_delete_item instead or call unassign_item before!
     void delete_item(unsigned item_id);
     void delete_item(Item * item);
-    void unassign_and_delete_item(Unit * unit, short slot);
-    void unassign_and_delete_item(Unit * unit, Item * item);
 
     // nullptr if not found, bool true means the item is assigned
     std::pair<Item *, bool> get_item(unsigned item_uid);
@@ -36,6 +34,10 @@ public:
     bool assign_item(Item * item, Unit * unit, short slot);
     bool unassign_item(Unit * unit, Item * item);
     bool unassign_item(Unit * unit, short slot);
+
+    bool create_and_assign_item(unsigned type_id, Unit * unit, short slot);
+    bool unassign_and_delete_item(Unit * unit, short slot);
+    bool unassign_and_delete_item(Unit * unit, Item * item);
 
     // todo
     void spawn_item_on_map(Item * item, glm::vec2 world_pos);

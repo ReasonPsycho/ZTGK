@@ -73,6 +73,7 @@
 #include "ECS/SaveSystem/LevelSaving.h"
 #include "ECS/LevelGenerator/LevelGenerator.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
+#include "ECS/Unit/Mining/MineableChest.h"
 
 #pragma endregion Includes
 
@@ -673,6 +674,13 @@ void update() {
     for(auto tile : selectedTiles){
         scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
+
+
+    scene.systemManager.getSystem<CollisionSystem>()->Update();
+
+//    Unit* u = unitSystem.unitComponents[0];
+//    spdlog::info("{}", u->currentState->name);
+
 }
 
 void render() {
@@ -804,6 +812,48 @@ void imgui_render() {
         auto level = generateLevel(levelGenConfig);
         std::ofstream("save.txt") << level;
         spdlog::trace("New level saved to save.txt");
+    }
+    ImGui::End();
+
+    ImGui::Begin("Chest Test");
+    static glm::ivec2 chestpos;
+    static int chestitem = 1;
+    ImGui::DragInt2("Chest pos", glm::value_ptr(chestpos));
+    ImGui::InputInt("Item Type ID", &chestitem);
+    if (ImGui::Button("Add chest")) {
+        auto tile = scene.systemManager.getSystem<Grid>()->getTileAt(chestpos.x, chestpos.y);
+        if (tile->state == WALL) {
+            tile->state = CHEST;
+            tile->getEntity()->getComponent<IMineable>()->Remove();
+            tile->getEntity()->addComponent(make_unique<MineableChest>(Vector2Int(chestpos.x, chestpos.y),
+                                                                       scene.systemManager.getSystem<Grid>(),
+                                                                       chestitem));
+            tile->getEntity()->addComponent(make_unique<PointLight>());
+            tile->getEntity()->getComponent<PointLight>()->data.diffuse = ztgk::color.YELLOW;
+            tile->getEntity()->getComponent<PointLight>()->data.specular = ztgk::color.YELLOW;
+            scene.stopRenderingImgui = true;
+        } else if (tile->state == FLOOR) {
+            tile->state = WALL;
+            scene.systemManager.getSystem<Grid>()->SetUpWall(tile);
+            tile->state = CHEST;
+            tile->getEntity()->addComponent(make_unique<MineableChest>(Vector2Int(chestpos.x, chestpos.y),
+                                                                       scene.systemManager.getSystem<Grid>(),
+                                                                       chestitem));
+            tile->getEntity()->addComponent(make_unique<PointLight>());
+            tile->getEntity()->getComponent<PointLight>()->data.diffuse = ztgk::color.YELLOW;
+            tile->getEntity()->getComponent<PointLight>()->data.specular = ztgk::color.YELLOW;
+            scene.stopRenderingImgui = true;
+        }
+    }
+    static Tile * peektile = nullptr;
+    if (ImGui::Button("Peek tile")) {
+        peektile = scene.systemManager.getSystem<Grid>()->getTileAt(chestpos.x, chestpos.y);
+    }
+    if (peektile != nullptr) {
+        if (ImGui::TreeNode("Tile")) {
+            peektile->showImGuiDetails(&camera);
+            ImGui::TreePop();
+        }
     }
     ImGui::End();
 

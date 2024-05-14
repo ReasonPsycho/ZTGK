@@ -8,6 +8,7 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/HUD/Components/Text.h"
 #include "ECS/Entity.h"
+#include "ECS/Unit/Unit.h"
 
 IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->name = "IMineable";
@@ -17,11 +18,18 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->timeToMineRemaining = timeToMine;
 }
 
-void IMineable::Mine() {
-    timeToMineRemaining -= Time::Instance().DeltaTime();
+
+void IMineable::Mine(Unit * unit) {
+
+    timeToMineRemaining -= Time::Instance().DeltaTime() * (unit->stats.mine_spd + unit->stats.added.mine_speed);
+    spdlog::info(timeToMineRemaining);
+    onMine(unit);
+
     if (timeToMineRemaining<=0) {
         grid->DestroyWallsOnTile(gridPosition);
         isMined = true;
+        onMined(unit);
+
     }
 }
 

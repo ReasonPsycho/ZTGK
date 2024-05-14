@@ -74,7 +74,7 @@ void Chunk::removeTileAt(Vector2Int index) {
 }
 
 void Chunk::removeTileAt(int x, int z) {
-    chunkTileArray[x][z]->Remove();
+//    chunkTileArray[x][z]->Remove();
     chunkTileArray[x][z] = nullptr;
 }
 

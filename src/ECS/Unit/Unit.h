@@ -7,6 +7,7 @@
 #include "ECS/Utils/AstarPathfinding.h"
 #include "ECS/Unit/UnitAI/StateMachine/StateManager.h"
 #include "ECS/Unit/Equipment/Modifiers.h"
+#include "ECS/Unit/Mining/PickupubleItem.h"
 
 class UnitSystem;
 
@@ -43,11 +44,13 @@ public:
     bool hasMovementTarget = false;
     bool hasCombatTarget = false;
     bool hasMiningTarget = false;
+    bool hasPickupTarget = false;
     bool isTargetInRange = false;
 
     //targets
     Vector2Int movementTarget;
     Unit* combatTarget;
+    PickupubleItem * pickupTarget;
 
     std::vector<IMineable*> miningTargets;
     IMineable* currentMiningTarget = nullptr;

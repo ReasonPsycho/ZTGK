@@ -38,6 +38,7 @@ public:
     
 
 private:
+    void UpdateImpl() override;
     std::array<std::type_index, 2> componentTypes = {
         std::type_index(typeid(BoxCollider)),
         std::type_index(typeid(SphereCollider))

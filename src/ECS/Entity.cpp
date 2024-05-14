@@ -47,9 +47,9 @@ void Entity::updateSelfAndChild() {
 
 }
 
-void Entity::removeComponentFromMap(const std::unique_ptr<Component> &comp) {
+void Entity::removeComponentFromMap(Component * comp) {
     std::type_index typeName = std::type_index(typeid(*comp));
-    scene->systemManager.removeComponent(comp.get());
+    scene->systemManager.removeComponent(comp);
     components.erase(typeName);
 }
 
@@ -62,15 +62,6 @@ Entity *Entity::addChild(std::unique_ptr<Entity> child) {
 void Entity::removeChild(Entity *child) {
     std::erase_if(children, [&](const std::unique_ptr<Entity> &e) { return e.get() == child; });
     removedChild = true;
-
-    auto iter = std::find_if(children.begin(), children.end(),
-                             [&](const std::unique_ptr<Entity>& e) { return e.get() == child; });
-    if (iter <= children.end())
-    {
-        // Entity was found. Now remove it.
-        // unique_ptr will automatically delete the Entity when erased.
-        children.erase(iter);
-    }
 }
 
 void Entity::showImGuiDetails(Camera *camera) {
@@ -109,6 +100,10 @@ void Entity::showImGuiDetails(Camera *camera) {
                 if (ImGui::MenuItem("Add child")) {
                     scene->addEntity(this,name + "Child");
                 }
+                if (ImGui::MenuItem("Update")) {
+
+                    forceUpdateSelfAndChild();
+                }
                 
                 ImGui::EndMenuBar();
             }
@@ -122,7 +117,7 @@ void Entity::showImGuiDetails(Camera *camera) {
                         component.second->showImGuiDetails(camera);
                         if (ImGui::Button("Delete component")) {
                             scene->stopRenderingImgui = true; //Just in case I am not sure if needed here.
-                            removeComponentFromMap(component.second);
+                            removeComponentFromMap(component.second.get());
                             break;
                         }
                         ImGui::Unindent();
@@ -144,11 +139,13 @@ void Entity::showImGuiDetails(Camera *camera) {
 
 Entity::~Entity() {
     while (!components.empty()) {
-        removeComponentFromMap(components.begin()->second);
+        removeComponentFromMap(components.begin()->second.get());
     }
 }
 
 void Entity::Destroy() {
+    while (!children.empty())
+        (*children.begin())->Destroy();
     if (parent != nullptr) {
         parent->removeChild(this);
     } else {
