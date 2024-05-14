@@ -1119,16 +1119,16 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods){
         //if something was hit
         if(hit != nullptr){
             for(auto unit :   scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                IMineable* mineable = hit->getMineableComponent<IMineable>(hit);
 
-                IMineable* mineable = hit->getComponent<IMineable>();
                 //if hit entity is mineable, set it as mining target
                 if(mineable != nullptr && !mineable->isMined){
                     unit->miningTargets.clear();
-                    unit->miningTargets.emplace_back(hit->getComponent<IMineable>());
+                    unit->miningTargets.emplace_back(hit->getMineableComponent<IMineable>(hit));
                     Tile* hitTile = hit->getComponent<Tile>();
                     hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
-                    spdlog::info("Mining target set at {}, {}", hit->getComponent<IMineable>()->gridPosition.x, hit->getComponent<IMineable>()->gridPosition.z);
+                    spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
                 }
 
                     //if hit entity is a tile, stop doing anything and set movement target
