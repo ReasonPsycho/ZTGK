@@ -29,8 +29,15 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size) {
 }
 
 void BoxCollider::UpdateImpl() {
-      center = getEntity()->transform.getGlobalPosition();
-//      size = getEntity()->transform.getLocalScale();
+    if(!coordsToExcludeFromUpdate.contains("x")){
+        center.x = parentEntity->transform.getGlobalPosition().x;
+    }
+    if(!coordsToExcludeFromUpdate.contains("y")){
+        center.y = parentEntity->transform.getGlobalPosition().y;
+    }
+    if(!coordsToExcludeFromUpdate.contains("z")){
+        center.z = parentEntity->transform.getGlobalPosition().z;
+    }
 
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
@@ -86,6 +93,19 @@ BoxCollider::BoxCollider(Entity *entity, glm::vec3 size, CollisionType type) {
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
 
     this-> boxColliderData = BoxColliderData(translation * scale,glm::vec4(1,0,0,1));
+}
+
+glm::vec3 BoxCollider::getCenter() {
+    return center;
+}
+
+void BoxCollider::setCenter(glm::vec3 center) {
+    this->center = center;
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), size);
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), center);
+    this-> boxColliderData = BoxColliderData(translation * scale,glm::vec4(1,0,0,1));
+
+
 }
 
 

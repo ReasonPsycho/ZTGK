@@ -98,8 +98,8 @@ glm::vec3 Ray::GetRayHit(ColliderType type,Collider* collider) const
             spdlog::error("Failed to cast collider to BoxCollider");
             return defaultHit;
         }
-        glm::vec3 min = box->center - box->size;
-        glm::vec3 max = box->center + box->size;
+        glm::vec3 min = box->getCenter() - box->size;
+        glm::vec3 max = box->getCenter() + box->size;
         glm::vec3 tmin = (min - origin) / direction;
         glm::vec3 tmax = (max - origin) / direction;
         glm::vec3 real_min = glm::min(tmin, tmax);
@@ -142,8 +142,8 @@ bool Ray::doesCollide(Collider* collider) const
     if(collider->type == ColliderType::BOX)
     {
         auto* box = dynamic_cast<BoxCollider*>(collider);
-        glm::vec3 min = box->center - box->size;
-        glm::vec3 max = box->center + box->size;
+        glm::vec3 min = box->getCenter() - box->size;
+        glm::vec3 max = box->getCenter() + box->size;
         glm::vec3 tmin = (min - origin) / direction;
         glm::vec3 tmax = (max - origin) / direction;
         glm::vec3 real_min = glm::min(tmin, tmax);

@@ -27,7 +27,7 @@ class BoxCollider : public Collider
 {
 public:
 
-    glm::vec3 center{};
+
     glm::vec3 size{};
     CollisionType collisionType;
     BoxColliderData boxColliderData = BoxColliderData(glm::mat4x4(1.0f), glm::vec4(1));
@@ -45,6 +45,13 @@ public:
 
     bool intersects(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4);
 
+    void setCenter(glm::vec3 center);
+    glm::vec3 getCenter();
+
+    //by default, we exclude y from the updating with the transform of entity
+    string coordsToExcludeFromUpdate = "y";
+private:
+    glm::vec3 center{};
 };
 
 

@@ -575,7 +575,7 @@ void load_units() {
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
     playerUnit->addComponent(make_unique<Unit>("Player1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
@@ -588,7 +588,7 @@ void load_units() {
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
     playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
@@ -601,7 +601,7 @@ void load_units() {
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
     playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->center = playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5);
+    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
     playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
     stateManager = new StateManager(playerUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
