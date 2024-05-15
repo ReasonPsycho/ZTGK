@@ -97,3 +97,17 @@ glm::vec2 SpriteRenderer::drawModeOffset(Sprite *sprite) const {
             return { -_size.x, 0 };
     }
 }
+
+Bounds SpriteRenderer::bounds(Sprite *sprite) const {
+    auto pivotOffset = drawModeOffset(sprite);
+    auto groupOffset = hud->getGroupTreeOffset(sprite->groupID);
+    float xpos = sprite->pos.x + groupOffset.x + pivotOffset.x;
+    float ypos = sprite->pos.y + groupOffset.y + pivotOffset.y;
+    float w = sprite->size.x, h = sprite->size.y;
+    return {
+        .top = ypos + h,
+        .bottom = ypos,
+        .left = xpos,
+        .right = xpos + w
+    };
+}

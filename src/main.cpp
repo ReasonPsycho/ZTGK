@@ -296,16 +296,16 @@ int main(int, char **) {
 
         //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
 //        static bool bgup = true;
-//        auto group = hud.getGroupOrDefault(bggroup);
-//        if (group->offset.y == ztgk::config::window_size.y) {
+//        auto groupID = hud.getGroupOrDefault(bggroup);
+//        if (groupID->offset.y == ztgk::config::window_size.y) {
 //            bgup = false;
-//        } else if (group->offset.y == 0) {
+//        } else if (groupID->offset.y == 0) {
 //            bgup = true;
 //        }
 //        if (bgup) {
-//            group->offset.y++;
+//            groupID->offset.y++;
 //        } else {
-//            group->offset.y--;
+//            groupID->offset.y--;
 //        }
 //        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
 //        auto s = sin(Time::Instance().LastFrame());
@@ -526,42 +526,109 @@ void load_enteties() {
 
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
-    auto ebg = scene.addEntity(ehud, "Background");
-    bggroup =   scene.systemManager.getSystem<HUD>()->addGroup(glm::vec3(0, 0, 10));
-//    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
-    auto bgelem = scene.addEntity(ebg, "Puni1");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni2");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni3");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni4");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni5");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
+    auto entity = scene.addEntity(ehud, "HoverE");
+    auto egroup = scene.systemManager.getSystem<HUD>()->addGroup({-100, 0, 0}, false, "Hover");
+    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
+    auto spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(make_unique<Text>("Hover me!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
+    auto txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    entity->addComponent(make_unique<HUDHoverable>(entity->getComponent<Sprite>(), egroup,
+        [txt, spr](){
+            txt->content = ":)";
+            txt->color = ztgk::color.BLACK;
+            spr->color = ztgk::color.WHITE;
+            spr->load();
+        },
+       [txt, spr](){
+            txt->content = "Hover me!";
+            txt->color = ztgk::color.WHITE;
+            spr->color = ztgk::color.BLACK;
+            spr->load();
+        }
+       ) );
+    entity = scene.addEntity(ehud, "ButtonE");
+    egroup = scene.systemManager.getSystem<HUD>()->addGroup({100, 0, 0}, false, "Button");
+    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
+    spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(make_unique<Text>("Press me!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
+    txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    entity->addComponent(make_unique<HUDButton>(entity->getComponent<Sprite>(), egroup,
+        [txt](){
+            txt->content = ":)";
+        },
+       [txt](){
+            txt->content = "Press me!";
+        }
+   ) );
+    entity = scene.addEntity(ehud, "BothE");
+    egroup = scene.systemManager.getSystem<HUD>()->addGroup({0, 100, 0}, false, "Both");
+    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
+    spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(make_unique<Text>("Do it!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
+    txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+        entity->addComponent(make_unique<HUDHoverable>(entity->getComponent<Sprite>(), egroup,
+        [txt, spr](){
+            txt->color = ztgk::color.BLACK;
+            spr->color = ztgk::color.WHITE;
+            spr->load();
+        },
+       [txt, spr](){
+            txt->color = ztgk::color.WHITE;
+            spr->color = ztgk::color.BLACK;
+            spr->load();
+        }
+       ) );
+    entity->addComponent(make_unique<HUDButton>(entity->getComponent<Sprite>(), egroup,
+        [txt](){
+            txt->content = ":)";
+        },
+       [txt](){
+            txt->content = "Do it!";
+        }
+   ) );
 
-    auto efg = scene.addEntity(ehud, "Foreground");
-    auto fgelem = scene.addEntity(efg, "Fixed");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
-    zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
-//    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
-    fgelem = scene.addEntity(efg, "Variable Text");
-    auto tx = Text("Ten tekst jest zmienny!\ntest\ntesttest", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
-                                                        ztgk::game::window_size.y * 0.5));
-    tx.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Text>(tx));
-    zmtxt = fgelem->getComponent<Text>();
-    fgelem = scene.addEntity(efg, "Animated Sprite");
-    auto spr = Sprite("res/textures/puni.png");
-    spr.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Sprite>(spr));
-    zmspr = fgelem->getComponent<Sprite>();
-    zmspr->groupID = zmgroup;
+//    auto ebg = scene.addEntity(ehud, "Background");
+//    bggroup =   scene.systemManager.getSystem<HUD>()->addGroup(glm::vec3(0, 0, 10));
+////    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
+//    auto bgelem = scene.addEntity(ebg, "Puni1");
+//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
+//                                             "res/textures/puni.png"));
+//    bgelem = scene.addEntity(ebg, "Puni2");
+//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
+//                                             "res/textures/puni.png"));
+//    bgelem = scene.addEntity(ebg, "Puni3");
+//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup,
+//                                             "res/textures/puni.png"));
+//    bgelem = scene.addEntity(ebg, "Puni4");
+//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup,
+//                                             "res/textures/puni.png"));
+//    bgelem = scene.addEntity(ebg, "Puni5");
+//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup,
+//                                             "res/textures/puni.png"));
+//
+//    auto efg = scene.addEntity(ehud, "Foreground");
+//    auto fgelem = scene.addEntity(efg, "Fixed");
+//    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
+//    zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
+////    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
+//    fgelem = scene.addEntity(efg, "Variable Text");
+//    auto tx = Text("Ten tekst jest zmienny!\ntest\ntesttest", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
+//                                                        ztgk::game::window_size.y * 0.5));
+//    tx.groupID = zmgroup;
+//    fgelem->addComponent(make_unique<Text>(tx));
+//    zmtxt = fgelem->getComponent<Text>();
+//    fgelem = scene.addEntity(efg, "Animated Sprite");
+//    auto spr = Sprite("res/textures/puni.png");
+//    spr.groupID = zmgroup;
+//    fgelem->addComponent(make_unique<Sprite>(spr));
+//    zmspr = fgelem->getComponent<Sprite>();
+//    zmspr->groupID = zmgroup;
 
     load_units();
 

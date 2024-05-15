@@ -9,6 +9,8 @@
 #include "ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "ECS/SignalQueue/SignalQueue.h"
+#include "Components/HudCompType.h"
+#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
 #include <ranges>
 #include <algorithm>
 using namespace std;
@@ -21,7 +23,7 @@ void HUD::init() {
     z_sorted_groups.push_back(&groups.at(0));
     textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
-    signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud);
+    signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud | Signal::signal_types.mouse_move_signal | Signal::signal_types.mouse_button_signal);
     signalReceiver->receive = [this](const Signal & signal) {
         if ( signal.stype == Signal::signal_types.hud_sort_z_depth_signal ) {
             sort_z();
@@ -32,6 +34,58 @@ void HUD::init() {
         } else if ( signal.stype == Signal::signal_types.hud_update_group_mappings_signal ) {
             remap_groups( *dynamic_pointer_cast<HUDRemapGroupsSignalData>(signal.data) );
             return;
+        } else if ( signal.stype == Signal::signal_types.mouse_move_signal ) {
+            auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
+            static HUDHoverable * hovered = nullptr;
+            spdlog::debug("hud recv move x{} y{}", data->pos.x, data->pos.y);
+
+            // for each non-hidden group, in order of z-index...
+            for (auto & group : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
+                // go through each hoverable belonging to the group...
+                for (auto & hoverable : hoverables[group->id]) {
+                    auto bounds = spriteRenderer->bounds(hoverable->collisionSprite);
+                    spdlog::debug("Hoverable T{}B{}L{}R{} Mouse x{}y{} ? {}", bounds.top, bounds.bottom, bounds.left, bounds.right, data->pos.x, data->pos.y, bounds.contains(data->pos));
+                    // and if the mouse is within the hoverable...
+                    if (spriteRenderer->bounds(hoverable->collisionSprite).contains(data->pos)) {
+                        // and the hoverable was not hovered on before...
+                        if (hoverable != hovered) {
+                            // quit the old hoverable (if possible) and enter the new one
+                            if (hovered != nullptr)
+                                hovered->onHoverExit();
+
+                            hovered = hoverable;
+                            hovered->onHoverEnter();
+                            return;
+                        }
+                    }
+                }
+            }
+            // if no element is hovered upon, clear the old hover
+            if (hovered != nullptr && !spriteRenderer->bounds(hovered->collisionSprite).contains(data->pos)) {
+                hovered->onHoverExit();
+                hovered = nullptr;
+            }
+        } else if ( signal.stype == Signal::signal_types.mouse_button_signal ) {
+            auto data = dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+            // for each non-hidden group, in order of z-index...
+            for (auto & group : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
+                // go through each button belonging to the group...
+                for (auto & button : buttons[group->id]) {
+                    // and if the mouse is within the button...
+                    if (spriteRenderer->bounds(button->collisionSprite).contains(data->pos)) {
+                        // and the button was pressed...
+                        if (data->action == GLFW_PRESS) {
+                            button->onPress();
+                            return;
+                        }
+                        // and the button was released...
+                        if (data->action == GLFW_RELEASE) {
+                            button->onRelease();
+                            return;
+                        }
+                    }
+                }
+            }
         }
     };
 
@@ -46,7 +100,7 @@ void HUD::draw() {
 
 void HUD::drawGroup(unsigned int groupID) {
     if ( !groups.contains(groupID) ) {
-        spdlog::warn(std::format("HUD Group {} not found! Defaulting to group 0.", groupID));
+        spdlog::warn(std::format("HUD Group {} not found! Defaulting to groupID 0.", groupID));
         groupID = 0;
     }
     for ( auto sprite : sprites[groupID] ) {
@@ -63,7 +117,7 @@ Group *HUD::getDefaultGroup() const {
 
 Group *HUD::getGroupOrDefault(unsigned groupID) const {
     if ( !groups.contains(groupID) ) {
-        spdlog::warn(std::format("No HUD group {} found! Using default group.", groupID));
+        spdlog::warn(std::format("No HUD groupID {} found! Using default groupID.", groupID));
         return getDefaultGroup();
     }
     return const_cast<Group *>(&groups.at(groupID));
@@ -98,45 +152,6 @@ std::vector<AHUDComponent *> HUD::getOfGroup(unsigned int groupID) {
     return ret;
 }
 
-//Entity *
-//HUD::newButton(const string &text, const HUD::btn_callback &callback, glm::vec2 pos, glm::vec2 size, Entity *parent) {
-//    auto scene = ztgk::game::scene;
-//    Entity * entity;
-//    if (parent == nullptr)
-//        entity = scene->addEntity(format("HUD Button: {0}##HUD_BUTTON_{0}", text));
-//    else
-//        entity = scene->addEntity(parent, format("HUD Button: {0}##HUD_BUTTON_{0}", text));
-//
-//    auto group = addGroup();
-//    entity->addComponent(make_unique<Text>(
-//        text, pos, glm::vec2(1, 1),
-//        ztgk::color.WHITE,
-//        ztgk::font.default_font,NONE,
-//        group
-//    ));
-//    entity->addComponent(make_unique<Sprite>(
-//        pos, size,
-//        ztgk::color.TEAL,
-//        group,
-//        ""
-//    ));
-//    entity->addComponent(make_unique<SignalReceiver>(
-//        Signal::signal_types.mouse_button_signal,
-//        [this, entity, callback](const Signal & signal){
-//            auto data = dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
-//            if ( data->button == GLFW_MOUSE_BUTTON_LEFT && data->action == GLFW_PRESS )
-//
-//            callback({ this, entity });
-//        }
-//    ));
-//
-//    return nullptr;
-//}
-//
-//Entity *HUD::newCheckbox(const HUD::btn_callback &callbackOn, const HUD::btn_callback &callbackOff, glm::vec2 pos,
-//                         glm::vec2 size, Entity *parent) {
-//    return nullptr;
-//}
 
 void HUD::addComponent(void *component) {
     auto c = static_cast<AHUDComponent*>(component);
@@ -151,8 +166,18 @@ void HUD::addComponent(void *component) {
             break;
         }
         case hudcType::TEXT: {
-            Text * text = reinterpret_cast<Text*>(component);
+            Text * text = reinterpret_cast<Text *>(component);
             texts[text->groupID].push_back(text);
+            break;
+        }
+        case hudcType::HOVERABLE: {
+            HUDHoverable * hoverable = reinterpret_cast<HUDHoverable*>(component);
+            hoverables[hoverable->groupID].push_back(hoverable);
+            break;
+        }
+        case hudcType::BUTTON: {
+            HUDButton * button = reinterpret_cast<HUDButton*>(component);
+            buttons[button->groupID].push_back(button);
             break;
         }
     }
@@ -167,6 +192,14 @@ void HUD::removeComponent(void *component) {
         }
         case hudcType::TEXT: {
             erase(texts[c->groupID], dynamic_cast<Text *>(c));
+            break;
+        }
+        case hudcType::HOVERABLE: {
+            erase(hoverables[c->groupID], dynamic_cast<HUDHoverable *>(c));
+            break;
+        }
+        case hudcType::BUTTON: {
+            erase(buttons[c->groupID], dynamic_cast<HUDButton *>(c));
             break;
         }
     }
@@ -217,7 +250,7 @@ void HUD::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void HUD::sort_z() {
-    std::sort(z_sorted_groups.begin(), z_sorted_groups.end(), [](Group * g1, Group * g2){ return g1->offset.z > g2->offset.z; });
+    std::sort(z_sorted_groups.begin(), z_sorted_groups.end(), [this](Group * g1, Group * g2){ return getGroupTreeOffset(g1->id).z > getGroupTreeOffset(g2->id).z; });
 }
 
 void HUD::remap_groups(HUDRemapGroupsSignalData data) {
@@ -230,23 +263,36 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
         }
         std::unordered_map<unsigned, std::vector<Text*>> remapped_t;
         for ( auto & mapping : texts ) {
-            for ( auto spr : mapping.second ) {
-                remapped_t[spr->groupID].push_back(spr);
+            for ( auto txt : mapping.second ) {
+                remapped_t[txt->groupID].push_back(txt);
+            }
+        }
+        std::unordered_map<unsigned, std::vector<HUDHoverable*>> remapped_h;
+        for ( auto & mapping : hoverables ) {
+            for ( auto hov : mapping.second ) {
+                remapped_h[hov->groupID].push_back(hov);
+            }
+        }
+        std::unordered_map<unsigned, std::vector<HUDButton*>> remapped_b;
+        for ( auto & mapping : buttons ) {
+            for ( auto btn : mapping.second ) {
+                remapped_b[btn->groupID].push_back(btn);
             }
         }
         sprites = remapped_s;
         texts = remapped_t;
+        hoverables = remapped_h;
+        buttons = remapped_b;
     } else {
         switch (data.componentType) {
             case hudcType::SPRITE: {
                  auto pos = std::find_if(sprites[data.oldGroup].begin(), sprites[data.oldGroup].end(), [data](Sprite * spr){ return spr->uniqueID == data.componentID; });
-                 auto e = sprites[data.oldGroup].end();
                  if ( pos == sprites[data.oldGroup].end() ) {
-                     spdlog::warn("HUD group remap request - Component not found. Aborting.");
+                     spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
                      return;
                  }
                  if ( !groups.contains(data.newGroup) ) {
-                     spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
+                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
                  }
                  auto val = *pos;
                  sprites[data.oldGroup].erase(pos);
@@ -256,19 +302,47 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
             case hudcType::TEXT: {
                  auto pos = std::find_if(texts[data.oldGroup].begin(), texts[data.oldGroup].end(), [data](Text * spr){ return spr->uniqueID == data.componentID; });
                  if ( pos == texts[data.oldGroup].end() ) {
-                     spdlog::warn("HUD group remap request - Component not found. Aborting.");
+                     spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
                      return;
                  }
                  if ( !groups.contains(data.newGroup) ) {
-                     spdlog::warn("HUD group remap request - No such group pre-existing! Remap proceeding but element will not be accesible without a matching group element.");
+                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
                  }
                  auto val = *pos;
                  texts[data.oldGroup].erase(pos);
                  texts[data.newGroup].push_back(val);
                  return;
             }
+            case hudcType::HOVERABLE: {
+                 auto pos = std::find_if(hoverables[data.oldGroup].begin(), hoverables[data.oldGroup].end(), [data](HUDHoverable * spr){ return spr->uniqueID == data.componentID; });
+                 if ( pos == hoverables[data.oldGroup].end() ) {
+                     spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
+                     return;
+                 }
+                 if ( !groups.contains(data.newGroup) ) {
+                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
+                 }
+                 auto val = *pos;
+                 hoverables[data.oldGroup].erase(pos);
+                 hoverables[data.newGroup].push_back(val);
+                 return;
+            }
+            case hudcType::BUTTON: {
+                 auto pos = std::find_if(buttons[data.oldGroup].begin(), buttons[data.oldGroup].end(), [data](HUDButton * spr){ return spr->uniqueID == data.componentID; });
+                 if ( pos == buttons[data.oldGroup].end() ) {
+                     spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
+                     return;
+                 }
+                 if ( !groups.contains(data.newGroup) ) {
+                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
+                 }
+                 auto val = *pos;
+                 buttons[data.oldGroup].erase(pos);
+                 buttons[data.newGroup].push_back(val);
+                 return;
+            }
             case hudcType::UNDEFINED: {
-                spdlog::warn("HUD group remap request for undefined type! Aborting.");
+                spdlog::warn("HUD groupID remap request for undefined type! Aborting.");
                 return;
             }
         }
@@ -277,7 +351,7 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
 
 glm::vec3 HUD::getGroupTreeOffset(unsigned int leafGroupID) const {
     if ( !groups.contains(leafGroupID) ) {
-        spdlog::warn(std::format("HUD::getGroupTreeOffset:: No HUD group {} found!", leafGroupID));
+        spdlog::warn(std::format("HUD::getGroupTreeOffset:: No HUD groupID {} found!", leafGroupID));
         return {};
     }
     Group * group = getGroupOrDefault(leafGroupID);
@@ -287,7 +361,7 @@ glm::vec3 HUD::getGroupTreeOffset(unsigned int leafGroupID) const {
             spdlog::warn("Group {} has itself as parent! Aborting.", group->id);
             return offset;
         }
-        // get group first to handle root offset correctly
+        // get groupID first to handle root offset correctly
         group = getGroupOrDefault(group->parent);
         offset += group->offset;
     }
@@ -296,7 +370,7 @@ glm::vec3 HUD::getGroupTreeOffset(unsigned int leafGroupID) const {
 
 bool HUD::isGroupTreeHidden(unsigned int leafGroupID) const {
     if ( !groups.contains(leafGroupID) ) {
-        spdlog::warn(std::format("HUD::isGroupTreeHidden:: No HUD group {} found!", leafGroupID));
+        spdlog::warn(std::format("HUD::isGroupTreeHidden:: No HUD groupID {} found!", leafGroupID));
         return true;
     }
     Group * group = getGroupOrDefault(leafGroupID);

@@ -5,11 +5,7 @@
 #pragma once
 
 #include "ECS/Component.h"
-
-enum hudcType {
-    UNDEFINED,
-    SPRITE, TEXT
-};
+#include "HudCompType.h"
 
 enum drawMode {
     TOP_LEFT,    TOP_CENTER,    TOP_RIGHT,
