@@ -524,11 +524,11 @@ void load_enteties() {
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
+//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto ebg = scene.addEntity(ehud, "Background");
     bggroup =   scene.systemManager.getSystem<HUD>()->addGroup(glm::vec3(0, 0, 10));
-    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
+//    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
     auto bgelem = scene.addEntity(ebg, "Puni1");
     bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
                                              "res/textures/puni.png"));
@@ -549,9 +549,9 @@ void load_enteties() {
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
     zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
-    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
+//    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
-    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
+    auto tx = Text("Ten tekst jest zmienny!\ntest\ntesttest", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
                                                         ztgk::game::window_size.y * 0.5));
     tx.groupID = zmgroup;
     fgelem->addComponent(make_unique<Text>(tx));

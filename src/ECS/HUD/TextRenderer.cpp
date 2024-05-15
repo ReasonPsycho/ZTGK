@@ -106,17 +106,27 @@ void TextRenderer::render(Text * text) {
     glBindVertexArray(VAO);
 
     auto glyphs = fonts[text->font];
-    float xpos, ypos, adv = 0;
+    float xpos, ypos;
+    float maxsize_y = 0;
+    glm::vec2 adv = {0,0};
     glm::vec2 pivotOffset = drawModeOffset(text);
 
     // iterate through all characters
     for (auto & c : text->content) {
         Glyph ch = glyphs[c];
 
+        if (c == '\n') {
+            adv.x = 0;
+            adv.y += maxsize_y + interline_px;
+            continue;
+        }
+
+        maxsize_y = std::max(maxsize_y, ch.Size.y * text->scale.y);
+
         auto group = hud->getGroupOrDefault(text->groupID);
         // todo vertical adv for newlines
-        xpos = text->pos.x + adv + ch.Bearing.x * text->scale.x               + group->offset.x + pivotOffset.x;
-        ypos = text->pos.y       - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y + pivotOffset.y;
+        xpos = text->pos.x + adv.x + ch.Bearing.x * text->scale.x               + group->offset.x + pivotOffset.x;
+        ypos = text->pos.y - adv.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y + pivotOffset.y;
         // snap to full pixels to avoid blurring
         xpos = std::round(xpos);
         ypos = std::round(ypos);
@@ -142,7 +152,7 @@ void TextRenderer::render(Text * text) {
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        adv += (ch.Advance >> 6) * text->scale.x; // bitshift by 6 to get value in pixels (2^6 = 64)
+        adv.x += (ch.Advance >> 6) * text->scale.x; // bitshift by 6 to get value in pixels (2^6 = 64)
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -167,41 +177,68 @@ void TextRenderer::imgui_controls() {
     }
 }
 
-glm::vec2 TextRenderer::size(Text *text) const {
+TextSize TextRenderer::size(Text *text) const {
     if ( !fonts.contains(text->font) )
-        return {0,0};
+        return {};
     auto glyphs = fonts.at(text->font);
     glm::vec2 _size = {0,0};
+    glm::vec2 _linesize = {0,0};
+    int n_lines = 1;
+    float first_line_height = 0;
+    float line_base_down = 0;
+    float bottom_base_line = 0;
     for (auto & c : text->content) {
-        Glyph ch = glyphs[c];
-        _size.x += (ch.Advance >> 6) * text->scale.x;
-        _size.y = std::max(_size.y, ch.Size.y * text->scale.y); // _size.y is already scaled
-    }
+        if (c == '\n') {
+            if (n_lines == 1) {
+                first_line_height = _linesize.y;
+                bottom_base_line = line_base_down;
+            } else {
+                bottom_base_line += (interline_px * text->scale.y) + (_linesize.y - line_base_down);
+            }
+            ++n_lines;
+            _size.x = std::max(_size.x, _linesize.x);
+            _size.y += _linesize.y + (interline_px * text->scale.y);
+            _linesize = {0,0};
+            line_base_down = 0;
+            continue;
+        }
 
-    return _size;
+        Glyph ch = glyphs[c];
+        _linesize.x += (ch.Advance >> 6) * text->scale.x;
+        _linesize.y = std::max(_linesize.y, ch.Size.y * text->scale.y); // _size.y is already scaled
+        line_base_down = std::max(line_base_down, (ch.Size.y - ch.Bearing.y) * text->scale.y);
+    }
+    _size.x = std::max(_size.x, _linesize.x);
+    _size.y += _linesize.y;
+    bottom_base_line += (interline_px * text->scale.y) + (_linesize.y - line_base_down);
+
+    return TextSize{ _size, n_lines, first_line_height, bottom_base_line };
 }
 
 glm::vec2 TextRenderer::drawModeOffset(Text *text) const {
     auto _size = size(text);
+    float bottom_offset = _size.n_lines > 1 ? _size.bottom_base_line : 0;
+    float middle_offset = _size.n_lines > 1 ? (_size.total.y - _size.first_line_height) / 2 : _size.first_line_height / 2;
+
     switch (text->mode) {
         case TOP_LEFT:
-            return { 0, -_size.y };
+            return { 0, -_size.first_line_height };
         case TOP_CENTER:
-            return { -_size.x / 2, -_size.y };
+            return { -_size.total.x / 2, -_size.first_line_height };
         case TOP_RIGHT:
-            return { -_size.x, -_size.y };
+            return { -_size.total.x, -_size.first_line_height };
         case MIDDLE_LEFT:
-            return { 0, -_size.y / 2 };
+            return { 0, middle_offset };
         case CENTER:
-            return { -_size.x / 2, -_size.y / 2 };
+            return { -_size.total.x / 2, middle_offset };
         case MIDDLE_RIGHT:
-            return { -_size.x, -_size.y / 2 };
+            return { -_size.total.x, middle_offset };
         default:
         case BOTTOM_LEFT:
-            return { 0, 0 };
+            return { 0, bottom_offset };
         case BOTTOM_CENTER:
-            return { -_size.x / 2, 0 };
+            return { -_size.total.x / 2, bottom_offset };
         case BOTTOM_RIGHT:
-            return { -_size.x, 0 };
+            return { -_size.total.x, bottom_offset };
     }
 }
