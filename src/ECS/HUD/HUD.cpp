@@ -37,14 +37,11 @@ void HUD::init() {
         } else if ( signal.stype == Signal::signal_types.mouse_move_signal ) {
             auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
             static HUDHoverable * hovered = nullptr;
-            spdlog::debug("hud recv move x{} y{}", data->pos.x, data->pos.y);
 
             // for each non-hidden group, in order of z-index...
             for (auto & group : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
                 // go through each hoverable belonging to the group...
                 for (auto & hoverable : hoverables[group->id]) {
-                    auto bounds = spriteRenderer->bounds(hoverable->collisionSprite);
-                    spdlog::debug("Hoverable T{}B{}L{}R{} Mouse x{}y{} ? {}", bounds.top, bounds.bottom, bounds.left, bounds.right, data->pos.x, data->pos.y, bounds.contains(data->pos));
                     // and if the mouse is within the hoverable...
                     if (spriteRenderer->bounds(hoverable->collisionSprite).contains(data->pos)) {
                         // and the hoverable was not hovered on before...

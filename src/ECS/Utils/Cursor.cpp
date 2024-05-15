@@ -45,7 +45,8 @@ void Cursor::move(glm::vec2 newpos) {
         ui_pos -= glfw_offset;
         mouseio->MousePos = {ui_pos.x, ui_pos.y};
         if (config.forward_move)
-            *ztgk::game::signalQueue += MouseMoveSignalData::signal(ui_pos, ui_prev_pos, "Cursor forwarding MOVE");
+            *ztgk::game::signalQueue += MouseMoveSignalData::signal({ui_pos.x, ztgk::game::window_size.y - ui_pos.y},
+                                                                    {ui_prev_pos.x, ztgk::game::window_size.y - ui_prev_pos.y}, "Cursor forwarding MOVE");
     } else {
         ztgk::game::camera->ProcessMouseMovement(-glfw_offset.x, glfw_offset.y, true, Time::Instance().DeltaTime());
     }
