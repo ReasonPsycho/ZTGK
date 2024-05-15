@@ -117,6 +117,7 @@ void TextRenderer::render(Text * text) {
 
         if (c == '\n') {
             adv.x = 0;
+            // ideally this should be max baseline-offset-down of the line above, interline and then max baseline-offset-up of the line below, but this is a decent approximation
             adv.y += maxsize_y + interline_px;
             continue;
         }
@@ -124,7 +125,6 @@ void TextRenderer::render(Text * text) {
         maxsize_y = std::max(maxsize_y, ch.Size.y * text->scale.y);
 
         auto group = hud->getGroupOrDefault(text->groupID);
-        // todo vertical adv for newlines
         xpos = text->pos.x + adv.x + ch.Bearing.x * text->scale.x               + group->offset.x + pivotOffset.x;
         ypos = text->pos.y - adv.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y + pivotOffset.y;
         // snap to full pixels to avoid blurring
