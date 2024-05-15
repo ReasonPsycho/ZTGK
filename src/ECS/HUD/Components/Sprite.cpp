@@ -54,8 +54,8 @@ void Sprite::load(const std::string &path) {
             spdlog::error("Failed to load sprite \"" + path + "\". Generating color pixel texture.");
             loadColor();
         }
-        if (size == glm::vec2{0,0}) {
-            size = { width, height };
+        if (size == glm::vec2{0, 0}) {
+            size = {width, height };
             pos -= (size / 2.0f);
         }
 
@@ -71,7 +71,7 @@ void Sprite::showImGuiDetailsImpl(Camera *camera) {
     }
     ImGui::DragFloat2("Pos", glm::value_ptr(pos));
     ImGui::DragFloat2("Size", glm::value_ptr(size));
-    ImGui::ColorEdit3("Color", glm::value_ptr(color));
+    ImGui::ColorEdit4("Color", glm::value_ptr(color));
     static int e_tex;
     e_tex = static_cast<int>(texture);
     ImGui::InputInt("Texture ID", &e_tex);
@@ -85,6 +85,8 @@ void Sprite::showImGuiDetailsImpl(Camera *camera) {
         );
         gid = groupID;
     }
+    static const char * const modes[] = MODE_NAMES;
+    ImGui::Combo("Draw Mode", reinterpret_cast<int *>(&mode), modes, num_modes);
 }
 
 void Sprite::loadColor() {

@@ -679,7 +679,7 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
 
     Unit* u = scene.systemManager.getSystem<UnitSystem>()->unitComponents[0];
-    spdlog::info("{}", u->currentState->name);
+//    spdlog::info("{}", u->currentState->name);
 
 }
 

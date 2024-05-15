@@ -107,13 +107,19 @@ void TextRenderer::render(Text * text) {
 
     auto glyphs = fonts[text->font];
     float xpos, ypos, adv = 0;
+    glm::vec2 pivotOffset = drawModeOffset(text);
+
     // iterate through all characters
     for (auto & c : text->content) {
         Glyph ch = glyphs[c];
 
         auto group = hud->getGroupOrDefault(text->groupID);
-        xpos = text->pos.x + ch.Bearing.x * text->scale.x + group->offset.x + adv;
-        ypos = text->pos.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y;
+        // todo vertical adv for newlines
+        xpos = text->pos.x + adv + ch.Bearing.x * text->scale.x               + group->offset.x + pivotOffset.x;
+        ypos = text->pos.y       - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y + pivotOffset.y;
+        // snap to full pixels to avoid blurring
+        xpos = std::round(xpos);
+        ypos = std::round(ypos);
 
         float w = ch.Size.x * text->scale.x;
         float h = ch.Size.y * text->scale.y;
@@ -158,5 +164,44 @@ void TextRenderer::imgui_controls() {
         }
         ImGui::SameLine();
         ImGui::Text("%s", font.first.c_str());
+    }
+}
+
+glm::vec2 TextRenderer::size(Text *text) const {
+    if ( !fonts.contains(text->font) )
+        return {0,0};
+    auto glyphs = fonts.at(text->font);
+    glm::vec2 _size = {0,0};
+    for (auto & c : text->content) {
+        Glyph ch = glyphs[c];
+        _size.x += (ch.Advance >> 6) * text->scale.x;
+        _size.y = std::max(_size.y, ch.Size.y * text->scale.y); // _size.y is already scaled
+    }
+
+    return _size;
+}
+
+glm::vec2 TextRenderer::drawModeOffset(Text *text) const {
+    auto _size = size(text);
+    switch (text->mode) {
+        case TOP_LEFT:
+            return { 0, -_size.y };
+        case TOP_CENTER:
+            return { -_size.x / 2, -_size.y };
+        case TOP_RIGHT:
+            return { -_size.x, -_size.y };
+        case MIDDLE_LEFT:
+            return { 0, -_size.y / 2 };
+        case CENTER:
+            return { -_size.x / 2, -_size.y / 2 };
+        case MIDDLE_RIGHT:
+            return { -_size.x, -_size.y / 2 };
+        default:
+        case BOTTOM_LEFT:
+            return { 0, 0 };
+        case BOTTOM_CENTER:
+            return { -_size.x / 2, 0 };
+        case BOTTOM_RIGHT:
+            return { -_size.x, 0 };
     }
 }

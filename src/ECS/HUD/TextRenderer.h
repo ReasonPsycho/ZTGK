@@ -35,6 +35,7 @@ public:
 
     void loadFont(std::string font);
     void render(Text * text);
+    [[nodiscard]] glm::vec2 size(Text * text) const;
 
     std::unordered_map<std::string, std::unordered_map<unsigned, Glyph>> fonts;
 
@@ -47,4 +48,6 @@ private:
     FT_Library ft;
 
     Shader shader;
+
+    glm::vec2 drawModeOffset(Text * text) const;
 };

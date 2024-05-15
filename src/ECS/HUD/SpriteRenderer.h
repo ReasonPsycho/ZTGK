@@ -17,6 +17,7 @@ public:
 
     HUD * hud;
 
+    glm::vec2 size(Sprite * sprite) const;
     // editor
     void imgui_controls();
 private:
@@ -24,4 +25,6 @@ private:
     glm::mat4 projection;
 
     Shader shader;
+
+    glm::vec2 drawModeOffset(Sprite * sprite) const;
 };

@@ -33,6 +33,8 @@ void Text::showImGuiDetailsImpl(Camera *camera) {
         );
         groupID = gid;
     }
+    static const char * const modes[] = MODE_NAMES;
+    ImGui::Combo("Draw Mode", reinterpret_cast<int *>(&mode), modes, num_modes);
 
     ImGui::Text("Font");
 
