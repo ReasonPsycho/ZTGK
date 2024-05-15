@@ -24,6 +24,8 @@ struct Group {
 
     bool hidden = false; // don't set this directly
     glm::vec3 offset = {0, 0, 0 };
+    std::string name{};
+    unsigned parent = 0; // 0 is root
 
 private:
     // for default_group()

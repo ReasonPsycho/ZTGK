@@ -18,7 +18,7 @@ void HUD::init() {
 
     auto g = Group::default_group();
     groups.insert({0, g});
-    z_sorted_groups.push_back(&g);
+    z_sorted_groups.push_back(&groups.at(0));
     textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
     signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud);
@@ -39,7 +39,7 @@ void HUD::init() {
 }
 
 void HUD::draw() {
-    for (auto pair : z_sorted_groups | std::views::filter([](Group * g){ return !g->hidden; })) {
+    for (auto pair : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
         drawGroup(pair->id);
     }
 }
@@ -271,4 +271,51 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
             }
         }
     }
+}
+
+glm::vec3 HUD::getGroupTreeOffset(unsigned int leafGroupID) const {
+    if ( !groups.contains(leafGroupID) ) {
+        spdlog::warn(std::format("HUD::getGroupTreeOffset:: No HUD group {} found!", leafGroupID));
+        return {};
+    }
+    Group * group = getGroupOrDefault(leafGroupID);
+    glm::vec3 offset = group->offset;
+    while (group->parent != static_cast<unsigned>(-1)) {    // should only be -1 for root
+        if (group->parent == group->id) {
+            spdlog::warn("Group {} has itself as parent! Aborting.", group->id);
+            return offset;
+        }
+        // get group first to handle root offset correctly
+        group = getGroupOrDefault(group->parent);
+        offset += group->offset;
+    }
+    return offset;
+}
+
+bool HUD::isGroupTreeHidden(unsigned int leafGroupID) const {
+    if ( !groups.contains(leafGroupID) ) {
+        spdlog::warn(std::format("HUD::isGroupTreeHidden:: No HUD group {} found!", leafGroupID));
+        return true;
+    }
+    Group * group = getGroupOrDefault(leafGroupID);
+    if (group->hidden)
+        return true;
+    while (group->parent != static_cast<unsigned>(-1)) {
+        if (group->parent == group->id) {
+            spdlog::warn("Group {} has itself as parent! Aborting.", group->id);
+            return true;
+        }
+        group = getGroupOrDefault(group->parent);
+        if (group->hidden)
+            return true;
+    }
+    return false;
+}
+
+Group *HUD::findGroupByName(const string &name) const {
+    for (auto & pair : groups) {
+        if (pair.second.name == name)
+            return const_cast<Group *>(&pair.second);
+    }
+    return getDefaultGroup();
 }

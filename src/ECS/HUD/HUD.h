@@ -32,10 +32,13 @@ public:
     Group * getDefaultGroup() const;
     Group * getGroupOrDefault(unsigned groupID) const;
     Group * getGroupOrAddDefault(unsigned groupID);
+    Group * findGroupByName(const std::string & name) const;
     unsigned addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
     bool removeGroup(unsigned groupID);
 
     std::vector<AHUDComponent *> getOfGroup(unsigned groupID);
+    glm::vec3 getGroupTreeOffset(unsigned leafGroupID) const;
+    bool isGroupTreeHidden(unsigned leafGroupID) const;
 
 //    Entity * newButton(const std::string & text, const btn_callback & callback, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
 //    Entity * newCheckbox(const btn_callback & callbackOn, const btn_callback & callbackOff, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);

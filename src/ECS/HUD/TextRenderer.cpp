@@ -124,9 +124,9 @@ void TextRenderer::render(Text * text) {
 
         maxsize_y = std::max(maxsize_y, ch.Size.y * text->scale.y);
 
-        auto group = hud->getGroupOrDefault(text->groupID);
-        xpos = text->pos.x + adv.x + ch.Bearing.x * text->scale.x               + group->offset.x + pivotOffset.x;
-        ypos = text->pos.y - adv.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + group->offset.y + pivotOffset.y;
+        auto groupOffset = hud->getGroupTreeOffset(text->groupID);
+        xpos = text->pos.x + adv.x + ch.Bearing.x * text->scale.x               + groupOffset.x + pivotOffset.x;
+        ypos = text->pos.y - adv.y - (ch.Size.y - ch.Bearing.y) * text->scale.y + groupOffset.y + pivotOffset.y;
         // snap to full pixels to avoid blurring
         xpos = std::round(xpos);
         ypos = std::round(ypos);

@@ -35,10 +35,10 @@ void SpriteRenderer::render(Sprite * sprite) {
     shader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sprite->texture);
-    auto group = hud->getGroupOrDefault(sprite->groupID);
     auto pivotOffset = drawModeOffset(sprite);
-    float xpos = sprite->pos.x + group->offset.x + pivotOffset.x;
-    float ypos = sprite->pos.y + group->offset.y + pivotOffset.y;
+    auto groupOffset = hud->getGroupTreeOffset(sprite->groupID);
+    float xpos = sprite->pos.x + groupOffset.x + pivotOffset.x;
+    float ypos = sprite->pos.y + groupOffset.y + pivotOffset.y;
     float w = sprite->size.x, h = sprite->size.y;
 
     float vertices[] = {
