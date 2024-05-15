@@ -33,7 +33,8 @@ public:
     Group * getGroupOrDefault(unsigned groupID) const;
     Group * getGroupOrAddDefault(unsigned groupID);
     Group * findGroupByName(const std::string & name) const;
-    unsigned addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
+    unsigned int
+    addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false, const std::string &name = "", unsigned parentGroupID = 0);
     bool removeGroup(unsigned groupID);
 
     std::vector<AHUDComponent *> getOfGroup(unsigned groupID);

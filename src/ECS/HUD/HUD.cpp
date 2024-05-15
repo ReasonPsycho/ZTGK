@@ -73,10 +73,12 @@ Group *HUD::getGroupOrAddDefault(unsigned int groupID) {
     return &groups[groupID];
 }
 
-unsigned HUD::addGroup(glm::vec3 offset, bool hidden) {
+unsigned int HUD::addGroup(glm::vec3 offset, bool hidden, const std::string &name, unsigned parentGroupID) {
     Group newGroup;
     newGroup.offset = offset;
     newGroup.setHidden(hidden);
+    newGroup.name = name;
+    newGroup.parent = parentGroupID;
     groups.insert({newGroup.id, newGroup});
     z_sorted_groups.push_back(&groups.at(newGroup.id));
     sort_z();
