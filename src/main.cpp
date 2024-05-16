@@ -473,18 +473,18 @@ void load_enteties() {
     tileModel.loadModel();
     Entity *gameObject;
     
-    //Gabka
-    gameObject = scene.addEntity("Gabka");
-    gameObject->addComponent(make_unique<Render>(&gabka));;
-    gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
-    //Gabka
-
-    //Zuczek
-    gameObject = scene.addEntity("Zuczek");;
-     gameObject->addComponent(make_unique<Render>(&zuczek));;
-    gameObject->transform.setLocalPosition(glm::vec3(95,1,95));
-
-    //Zuczek
+//    //Gabka
+//    gameObject = scene.addEntity("Gabka");
+//    gameObject->addComponent(make_unique<Render>(&gabka));;
+//    gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
+//    //Gabka
+//
+//    //Zuczek
+//    gameObject = scene.addEntity("Zuczek");;
+//     gameObject->addComponent(make_unique<Render>(&zuczek));;
+//    gameObject->transform.setLocalPosition(glm::vec3(95,1,95));
+//
+//    //Zuczek
 
     gameObject = scene.addEntity("Wall");;
     gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
@@ -580,7 +580,7 @@ void load_enteties() {
 
 void load_units() {
     playerUnit = scene.addEntity("Player1");
-    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -593,7 +593,7 @@ void load_units() {
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
     playerUnit = scene.addEntity("Player2");
-    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -606,7 +606,7 @@ void load_units() {
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
     playerUnit = scene.addEntity("Player3");
-    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -619,7 +619,7 @@ void load_units() {
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
     Entity* enemyUnit = scene.addEntity("Enemy1");
-    enemyUnit->addComponent(make_unique<Render>(&model));
+    enemyUnit->addComponent(make_unique<Render>(&zuczek));
     enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     enemyUnit->updateSelfAndChild();
