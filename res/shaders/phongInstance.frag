@@ -121,7 +121,7 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos,float far_pl
 void main()
 {
     // properties
-    vec3 norm =  vs_out.Normal;
+    vec3 norm =  normalize(vs_out.Normal);
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
 
     vec3 result = vec3(0);

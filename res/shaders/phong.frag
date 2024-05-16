@@ -5,6 +5,7 @@ in VS_OUT {
     vec3 FragPos;
     vec2 TexCoords;
     vec3 WorldPos;
+    vec3 Normal;
 }vs_out;
 
 struct Material {
@@ -102,7 +103,7 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
 void main()
 {
     // properties
-    vec3 norm = vec3(texture(material.normal, vs_out.TexCoords));
+    vec3 norm =  normalize(vs_out.Normal);
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
     
     vec3 result = 0.2f * vec3(texture(material.diffuse, vs_out.TexCoords)); //We do be calculating ambient here

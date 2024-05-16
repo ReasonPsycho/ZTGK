@@ -9,6 +9,9 @@
 
 void LightSystem::PushToSSBO() {
 
+    
+    bool maxChanged = false;
+    
     if (isDataPushedToSSBO) {
         glDeleteBuffers(1, &dirLightBufferId);
         glDeleteBuffers(1, &pointLightBufferId);
@@ -38,14 +41,17 @@ void LightSystem::PushToSSBO() {
 
     while (spotLights.size() > maxSpotLight) {
         maxSpotLight += 10;
+        maxChanged = true;
     }
 
     while (pointLights.size() > maxPointLight) {
         maxPointLight += 10;
+        maxChanged = true;
     }
 
     while (dirLights.size() > maxDirLight) {
         maxDirLight += 1;
+        maxChanged = true;
     }
 
 
@@ -71,6 +77,14 @@ void LightSystem::PushToSSBO() {
     pointLightDataArray.clear();
     spotLightDataArray.clear();
     isDataPushedToSSBO = true;
+    
+    if(maxChanged){
+        glDeleteTextures(1, &planeShadowMaps);
+        glDeleteTextures(1, &cubeShadowMaps);
+
+        createCubeShadowMap();
+        createPlaneShadowMap();
+    }
 }
 
 
@@ -78,6 +92,7 @@ LightSystem::~LightSystem() {
     dirLights.clear();
     pointLights.clear();
     spotLights.clear();
+    delete[] whiteImage;
 }
 
 LightSystem::LightSystem(Camera *camera, Scene *scene) : camera(camera), scene(scene) {
@@ -104,6 +119,12 @@ void LightSystem::GenerateShadowBuffers() {
 void LightSystem::Init() {
     glGenFramebuffers(1, &depthFBO);
 
+    for (int i = 0; i < SHADOW_WIDTH * SHADOW_HEIGHT * 3; i += 3) {
+        whiteImage[i] = whitePixel[0];
+        whiteImage[i + 1] = whitePixel[1];
+        whiteImage[i + 2] = whitePixel[2];
+    }
+    
     planeDepthShader.init();
     cubeDepthShader.init();
 
@@ -212,6 +233,7 @@ void LightSystem::UpdateImpl() {
 
 void LightSystem::addComponent(void *component) {
     ILight *light = static_cast<ILight *>(component);
+    ZoneScopedN("Add Light");
 
     switch (light->lightType) {
         case Point:
@@ -227,12 +249,6 @@ void LightSystem::addComponent(void *component) {
             PushToSSBO();
             break;
     }
-    
-    glDeleteTextures(1, &planeShadowMaps);
-    glDeleteTextures(1, &cubeShadowMaps);
-
-    createCubeShadowMap();
-    createPlaneShadowMap();
     
     lights.push_back(light);
 }
@@ -272,31 +288,17 @@ void LightSystem::removeComponent(void *component) {
             }
             break;
     }
-
-    glDeleteTextures(1, &planeShadowMaps);
-    glDeleteTextures(1, &cubeShadowMaps);
-
-    createCubeShadowMap();
-    createPlaneShadowMap();
 }
 
 void LightSystem::createPlaneShadowMap() {
-
-    GLubyte whitePixel[3] = {255, 255, 255};
-    GLubyte *whiteImage = new GLubyte[SHADOW_WIDTH * SHADOW_HEIGHT * 3];
-    for (int i = 0; i < SHADOW_WIDTH * SHADOW_HEIGHT * 3; i += 3) {
-        whiteImage[i] = whitePixel[0];
-        whiteImage[i + 1] = whitePixel[1];
-        whiteImage[i + 2] = whitePixel[2];
-    }
-    float borderColor[] = {1.0, 1.0, 1.0, 1.0};
+    
 
     glGenTextures(1, &planeShadowMaps);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,
-                 dirLights.size() + spotLights.size(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    for (GLsizei layer = 0; layer < dirLights.size() + spotLights.size(); layer++) {
+                 maxDirLight + maxSpotLight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    for (GLsizei layer = 0; layer < maxDirLight + maxSpotLight; layer++) {
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE,
                         whiteImage);
     }
@@ -308,26 +310,16 @@ void LightSystem::createPlaneShadowMap() {
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 
-    delete[] whiteImage;
 }
 
 void LightSystem::createCubeShadowMap() {
 
-    GLubyte whitePixel[3] = {255, 255, 255};
-    GLubyte *whiteImage = new GLubyte[SHADOW_WIDTH * SHADOW_HEIGHT * 3];
-    for (int i = 0; i < SHADOW_WIDTH * SHADOW_HEIGHT * 3; i += 3) {
-        whiteImage[i] = whitePixel[0];
-        whiteImage[i + 1] = whitePixel[1];
-        whiteImage[i + 2] = whitePixel[2];
-    }
-    float borderColor[] = {1.0, 1.0, 1.0, 1.0};
-
 
     glGenTextures(1, &cubeShadowMaps);
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, cubeShadowMaps);
-    glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, pointLights.size() * 6,
+    glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, maxPointLight * 6,
                  0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    for (unsigned int light = 0; light < pointLights.size(); ++light) {
+    for (unsigned int light = 0; light < maxPointLight; ++light) {
         for (unsigned int face = 0; face < 6; ++face) {
             //Here (your_loaded_image) refers your image data loaded using any image loading libraries.
             glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, 0, 0, light * 6 + face, SHADOW_WIDTH, SHADOW_HEIGHT, 1,
@@ -340,7 +332,5 @@ void LightSystem::createCubeShadowMap() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);;
-
-
-    delete[] whiteImage;
+    
 }
