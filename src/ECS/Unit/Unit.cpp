@@ -105,6 +105,13 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     }
     if (ImGui::CollapsingHeader(std::format("Equipment:##eq_unit_{}", uniqueID).c_str()))
         equipment.imgui_preview();
+    ImGui::Text("Has movement target? %s", hasMovementTarget ? "true" : "false");
+    ImGui::Text("Movement Target: (%d, %d)", movementTarget.x, movementTarget.z);
+    ImGui::Text("Has combat target? %s", hasCombatTarget ? "true" : "false");
+    ImGui::Text("Combat Target: %s", combatTarget != nullptr ? combatTarget->name.c_str() : "This sponge is pacifist");
+    ImGui::Text("Has mining target? %s", hasMiningTarget ? "true" : "false");
+    ImGui::Text("Mining Target: %s", currentMiningTarget != nullptr ? currentMiningTarget->name.c_str() : "No mining target");
+
 
 }
 
@@ -191,16 +198,17 @@ void Unit::UpdateImpl() {
 Unit *Unit::findEnemy() {
     std::vector<Unit*> enemies;
 
+    bool mySide = isAlly;
     if (equipment.use_default()) {
-        auto found = equipment.rangeEff0.find_enemies({gridPosition.x, gridPosition.z});
+        auto found = equipment.rangeEff0.find_enemies({gridPosition.x, gridPosition.z}, mySide);
         enemies.insert(enemies.end(), found.begin(), found.end());
     } else {
         if (equipment.item1 != nullptr && equipment.item1->offensive) {
-            auto found = equipment.rangeEff1.find_enemies({gridPosition.x, gridPosition.z});
+            auto found = equipment.rangeEff1.find_enemies({gridPosition.x, gridPosition.z}, mySide);
             enemies.insert(enemies.end(), found.begin(), found.end());
         }
         if (equipment.item2 != nullptr && equipment.item2->offensive) {
-            auto found = equipment.rangeEff2.find_enemies({gridPosition.x, gridPosition.z});
+            auto found = equipment.rangeEff2.find_enemies({gridPosition.x, gridPosition.z}, mySide);
             enemies.insert(enemies.end(), found.begin(), found.end());
         }
     }
