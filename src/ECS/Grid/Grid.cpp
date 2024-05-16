@@ -303,7 +303,7 @@ void Grid::SetUpWall(Tile *tile) {
     if (tile->state != WALL) {
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
         floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
-        floorMatrix = glm::rotate(floorMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
+        floorMatrix = glm::rotate(floorMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(
                 wallChunk->addWallData(make_unique<WallData>(floorMatrix, (isDiagonal ? 0 : 1), 0, 0, 0)));
     } else if (tile->state == WALL) {
@@ -311,7 +311,7 @@ void Grid::SetUpWall(Tile *tile) {
         if (northNeighbour == nullptr || northNeighbour->state != WALL) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
             northMatrix = glm::translate(northMatrix, glm::vec3(translateLength, 0, 0));
-            northMatrix = glm::rotate(northMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+            northMatrix = glm::rotate(northMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
             tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(northMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
@@ -320,7 +320,7 @@ void Grid::SetUpWall(Tile *tile) {
         if (southNeighbour == nullptr || southNeighbour->state != WALL) {
             glm::mat4x4 southMatrix = tile->getEntity()->transform.getModelMatrix();
             southMatrix = glm::translate(southMatrix, glm::vec3(-translateLength, 0, 0));
-            southMatrix = glm::rotate(southMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
+            southMatrix = glm::rotate(southMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
             tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(southMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
@@ -329,7 +329,7 @@ void Grid::SetUpWall(Tile *tile) {
         if (eastNeighbour == nullptr || eastNeighbour->state != WALL) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
             eastMatrix = glm::translate(eastMatrix, glm::vec3(0, 0, translateLength));
-            eastMatrix = glm::rotate(eastMatrix, glm::radians(90.0f), glm::vec3(0, 0, 1));
+            eastMatrix = glm::rotate(eastMatrix, glm::radians(-90.0f), glm::vec3(0, 0, 1));
             tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(eastMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
@@ -338,14 +338,14 @@ void Grid::SetUpWall(Tile *tile) {
         if (westNeighbour == nullptr || westNeighbour->state != WALL) {
             glm::mat4x4 westMatrix = tile->getEntity()->transform.getModelMatrix();
             westMatrix = glm::translate(westMatrix, glm::vec3(0, 0, -translateLength));
-            //  westMatrix = glm::rotate(westMatrix,glm::radians(-90.0f),glm::vec3 (1,0,0));
+              westMatrix = glm::rotate(westMatrix,glm::radians(180.0f),glm::vec3 (1,0,0));
             tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(westMatrix, 2, 0, 0, 0)));
             isSurrounded = false;
         }
 
         glm::mat4x4 topMatrix = tile->getEntity()->transform.getModelMatrix();
         topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
-        topMatrix = glm::rotate(topMatrix, glm::radians(90.0f), glm::vec3(1, 0, 0));
+        topMatrix = glm::rotate(topMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(
                 wallChunk->addWallData(make_unique<WallData>(topMatrix, 2, (isSurrounded ? 1 : 0), 0, 0)));
     }

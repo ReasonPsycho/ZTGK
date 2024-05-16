@@ -13,6 +13,7 @@ out VS_OUT {
      vec3 FragPos;
      vec2 TexCoords;
      vec3 WorldPos;
+    vec3 Normal;
 }vs_out;
 
 void main()
@@ -20,5 +21,6 @@ void main()
     vs_out.FragPos = aPos;
     vs_out.TexCoords = aTexCoords;
     vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
 }
