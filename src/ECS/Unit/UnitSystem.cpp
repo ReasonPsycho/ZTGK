@@ -52,6 +52,7 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
             }
         }
     }
+
 }
 
 void UnitSystem::UpdateImpl() {
