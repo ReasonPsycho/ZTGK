@@ -93,13 +93,16 @@ SpotLight::SpotLight(SpotLightData data) : data(data) {
 }
 
 void SpotLight::showImGuiDetailsImpl(Camera *camera) {
-    ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
-    ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
+    ImGui::ColorEdit4("Diffuse", glm::value_ptr(data.diffuse));
+    ImGui::ColorEdit4("Specular", glm::value_ptr(data.specular));
     ImGui::InputFloat("Constant", &data.constant);
     ImGui::InputFloat("Linear", &data.linear);
     ImGui::InputFloat("Quadratic", &data.quadratic);
     ImGui::InputFloat("Cut off", &data.cutOff);
     ImGui::InputFloat("Outer cut Off", &data.outerCutOff);
+    if(ImGui::Button("Update")){
+        this->setIsDirty(true);
+    }
 }
 
 void SpotLight::UpdateData(int height, int width) {

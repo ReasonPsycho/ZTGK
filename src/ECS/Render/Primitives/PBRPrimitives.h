@@ -18,8 +18,10 @@ public:
      GLfloat quadVertices[8*4];
      GLuint quadIndices[6];
 
+    int tessellationLevel = 1; // Change this to perform more tessellations
 
     PBRPrimitives();
+    ~PBRPrimitives();
     void Init();
     void renderCube();
     void renderQuad();

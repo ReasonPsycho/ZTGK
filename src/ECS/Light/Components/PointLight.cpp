@@ -109,12 +109,14 @@ PointLight::PointLight(PointLightData data) :
 
 void PointLight::showImGuiDetailsImpl(Camera *camera) {
 
-    ImGui::InputFloat4("Diffuse", glm::value_ptr(data.diffuse));
-    ImGui::InputFloat4("Specular", glm::value_ptr(data.specular));
+    ImGui::ColorEdit4("Diffuse", glm::value_ptr(data.diffuse));
+    ImGui::ColorEdit4("Specular", glm::value_ptr(data.specular));
     ImGui::InputFloat("Constant", &data.constant);
     ImGui::InputFloat("Linear", &data.linear);
     ImGui::InputFloat("Quadratic", &data.quadratic);
-
+    if(ImGui::Button("Update")){
+        this->setIsDirty(true);
+    }
 }
 
 void PointLight::UpdateData(int height, int width) {

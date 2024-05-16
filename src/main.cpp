@@ -82,12 +82,14 @@
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
 string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
+string modelPathZuczek= "res/models/properZuczek/Zuczek.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
 Model *quad;
 Model gabka = Model(&modelPathGabka);
+Model zuczek = Model(&modelPathZuczek);
 Model wall = Model(&modelPathWall);
 Model *cubeModel;
 Model *bathroomWAll;
@@ -467,6 +469,7 @@ void load_enteties() {
 
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
    // gabka.loadModel();
+    zuczek.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
     
@@ -475,6 +478,10 @@ void load_enteties() {
    // gameObject->addComponent(make_unique<Render>(&gabka));;
     //Gabka
 
+    //Zuczek
+    gameObject = scene.addEntity("Zuczek");;
+     gameObject->addComponent(make_unique<Render>(&zuczek));;
+    //Zuczek
 
     gameObject = scene.addEntity("Wall");;
     gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
@@ -506,14 +513,14 @@ void load_enteties() {
     gameObject = scene.addEntity("Point Light");;
     gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
     gameObject->addComponent(make_unique<PointLight>(
-            PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
+            PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
                            0.032f)));
     //  gameObject = scene.addEntity("Point Light 2");
     // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
     gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
     gameObject->addComponent(make_unique<SpotLight>(
-            SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(5), 1), glm::vec4(0), glm::vec4(1),
+            SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
     scene.systemManager.getSystem<LightSystem>()->Init();
 
