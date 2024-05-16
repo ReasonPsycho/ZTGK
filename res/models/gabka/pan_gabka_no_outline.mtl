@@ -1,0 +1,12 @@
+# Blender 4.1.1 MTL File: 'pan_gabka_no_outline.blend'
+# www.blender.org
+
+newmtl SBWORKING_sponge.001
+Ns 1000.000000
+Ka 0.091743 0.091743 0.091743
+Ks 0.523810 0.523810 0.523810
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 3
+map_Kd sponge Base Color.001.png
