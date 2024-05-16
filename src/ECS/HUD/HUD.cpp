@@ -243,6 +243,28 @@ void HUD::showImGuiDetailsImpl(Camera *camera) {
             }
             ImGui::TreePop();
         }
+        if (ImGui::TreeNodeEx("Hoverables", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+            for (auto & pair : hoverables) {
+                for (auto & hov : hoverables[pair.first]) {
+                    if (ImGui::TreeNodeEx(std::format("ID {0}##Hoverable{0}", hov->uniqueID).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                        hov->showImGuiDetailsImpl(camera);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNodeEx("Buttons", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+            for (auto & pair : buttons) {
+                for (auto & btn : buttons[pair.first]) {
+                    if (ImGui::TreeNodeEx(std::format("ID {0}##Button{0}", btn->uniqueID).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                        btn->showImGuiDetailsImpl(camera);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
     }
 }
 

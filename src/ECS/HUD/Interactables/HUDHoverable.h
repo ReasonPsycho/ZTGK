@@ -19,4 +19,6 @@ public:
     std::function<void()> onHoverEnter;
     std::function<void()> onHoverExit;
 
+    void showImGuiDetailsImpl(Camera *camera) override;
+
 };

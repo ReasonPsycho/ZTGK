@@ -18,4 +18,6 @@ public:
 
     std::function<void()> onPress;
     std::function<void()> onRelease;
+
+    void showImGuiDetailsImpl(Camera *camera) override;
 };
