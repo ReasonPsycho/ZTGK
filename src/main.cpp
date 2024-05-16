@@ -468,19 +468,22 @@ void load_enteties() {
     wall.loadModel();
 
     quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-   // gabka.loadModel();
+    gabka.loadModel();
     zuczek.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
     
     //Gabka
-    //gameObject = scene.addEntity("Gabka");;
-   // gameObject->addComponent(make_unique<Render>(&gabka));;
+    gameObject = scene.addEntity("Gabka");
+    gameObject->addComponent(make_unique<Render>(&gabka));;
+    gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
     //Gabka
 
     //Zuczek
     gameObject = scene.addEntity("Zuczek");;
      gameObject->addComponent(make_unique<Render>(&zuczek));;
+    gameObject->transform.setLocalPosition(glm::vec3(95,1,95));
+
     //Zuczek
 
     gameObject = scene.addEntity("Wall");;
