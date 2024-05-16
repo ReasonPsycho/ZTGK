@@ -527,7 +527,7 @@ void load_enteties() {
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
     auto entity = scene.addEntity(ehud, "HoverE");
-    auto egroup = scene.systemManager.getSystem<HUD>()->addGroup({-100, 0, 0}, false, "Hover");
+    auto egroup = scene.systemManager.getSystem<HUD>()->addGroup({-200, 100, 0}, false, "Hover");
     entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
     auto spr = entity->getComponent<Sprite>();
     spr->mode = CENTER;
@@ -549,7 +549,7 @@ void load_enteties() {
         }
        ) );
     entity = scene.addEntity(ehud, "ButtonE");
-    egroup = scene.systemManager.getSystem<HUD>()->addGroup({100, 0, 0}, false, "Button");
+    egroup = scene.systemManager.getSystem<HUD>()->addGroup({200, -100, 0}, false, "Button");
     entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
     spr = entity->getComponent<Sprite>();
     spr->mode = CENTER;

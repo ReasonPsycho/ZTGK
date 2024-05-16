@@ -67,6 +67,6 @@ void Cursor::click(int button, int action, int mods) {
     if (config.capture_click) {
         ImGui_ImplGlfw_MouseButtonCallback(ztgk::game::window, button, action, mods);
         if (config.forward_click){}
-            *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods, ui_pos, "Cursor forwarding CLICK");
+            *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods, {ui_pos.x, ztgk::game::window_size.y - ui_pos.y}, "Cursor forwarding CLICK");
     }
 }
