@@ -23,11 +23,12 @@ public:
     ~Texture();
 
     // the texture ID
-    GLuint ID{}; // TODO add more than one texture on top of it
+    GLuint ID{};
     string path;
-    string type;
+    string type; //TODO remove this shit
     string name;
-
+    GLenum format;
+    int width, height, nrChannels;
     // constructor reads and builds the texture
     void use(GLenum GL_TEXTUREX);
 };

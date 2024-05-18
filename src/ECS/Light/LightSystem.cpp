@@ -296,11 +296,9 @@ void LightSystem::createPlaneShadowMap() {
     glGenTextures(1, &planeShadowMaps);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,
-                 maxDirLight + maxSpotLight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,maxDirLight + maxSpotLight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     for (GLsizei layer = 0; layer < maxDirLight + maxSpotLight; layer++) {
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE,
-                        whiteImage);
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE,whiteImage);
     }
 
 

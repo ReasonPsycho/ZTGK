@@ -463,11 +463,11 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-
     model.loadModel();
     wall.loadModel();
 
-    quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
+    //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
+    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[1], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[1]);
     gabka.loadModel();
     zuczek.loadModel();
     tileModel.loadModel();
@@ -580,7 +580,7 @@ void load_enteties() {
 
 void load_units() {
     playerUnit = scene.addEntity("Player1");
-    playerUnit->addComponent(make_unique<Render>(cubeModel));
+    playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -689,7 +689,7 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
 
     Unit* u = scene.systemManager.getSystem<UnitSystem>()->unitComponents[0];
-    spdlog::info("{}", u->currentState->name);
+    //spdlog::info("{}", u->currentState->name); I am gonna murder u next time XoXo
 
 }
 
@@ -720,7 +720,7 @@ void render() {
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
-    scene.systemManager.getSystem<HUD>()->draw();
+ //   scene.systemManager.getSystem<HUD>()->draw();
 }
 
 void imgui_begin() {

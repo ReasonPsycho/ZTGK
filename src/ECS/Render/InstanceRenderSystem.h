@@ -46,6 +46,7 @@ private:
     string tilePath =  "res/textures/tiles/Tile";
     
     std::vector<WallData> wallData;
+    MaterialPhong wallMaterial;
 };
 
 

@@ -1,18 +1,25 @@
 #version 460
 out vec4 FragColor;
 
-in VS_OUT {
+struct TangentData{ // So it's easier to operate on
+    vec3 ViewPos;
     vec3 FragPos;
-    vec2 TexCoords;
-    vec3 WorldPos;
-    vec3 Normal;
-}vs_out;
+    mat3 TBN;//No light position but TBN since fuck transporting 20 lights pos that are allready in SSBO
+};
+
+
+in VS_OUT {
+     vec2 TexCoords;
+     vec3 WorldPos;
+     vec3 Normal;
+     TangentData tangentData;
+}fs_in;
 
 struct Material {
-    sampler2D diffuse;
-    sampler2D specular;
-    sampler2D shininess;
-    sampler2D normal; //TODO use it somwhere lol
+    sampler2D diffuseTexture;
+    sampler2D specularTexture;
+    sampler2D normalTexture;
+    sampler2D depthTexture;
 };
 
 struct DirLight {
@@ -67,17 +74,16 @@ layout (std430, binding = 5) buffer SpotLightBuffer {
     SpotLight spotLights[];
 };
 
-
+uniform bool useNormalMap;
 uniform int spotLightAmount;
 uniform int dirLightAmount;
 uniform int pointLightAmount;
-
+uniform float heightScale;
 uniform vec3 viewPos;
+uniform vec3 camPos;
 uniform Material material;
 
-//Lighting and shadows
-uniform vec3 camPos;
-uniform float far_plane;
+
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -99,26 +105,41 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex);
 float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex);
 float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID);
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
+    vec2 texCoords = fs_in.TexCoords;
+    vec3 viewDir = normalize(fs_in.tangentData.ViewPos - fs_in.tangentData.FragPos);
+
+    texCoords = ParallaxMapping(fs_in.TexCoords,  viewDir);
+    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+    discard;
+
+
     // properties
-    vec3 norm =  normalize(vs_out.Normal);
-    vec3 viewDir = normalize(viewPos - vs_out.FragPos);
+    // obtain normal from normal map
     
-    vec3 result = 0.2f * vec3(texture(material.diffuse, vs_out.TexCoords)); //We do be calculating ambient here
+    vec3 normal = fs_in.Normal;
+    if(useNormalMap){
+        normal = texture(material.diffuseTexture, texCoords).rgb;
+        normal = normalize(normal * 2.0 - 1.0); 
+    }
+
+    
+    vec3 result = 0.2f * vec3(texture(material.diffuseTexture, fs_in.TexCoords)); //We do be calculating ambient here
     int index = 0;
     for (int i = 0; i < dirLightAmount; ++i) {
-        result += CalcDirLight(dirLights[i], norm,viewDir,index++);
+        result += CalcDirLight(dirLights[i], normal,viewDir,index++);
     }
   
     for (int i = 0; i < spotLightAmount; ++i) {
-        result += CalcSpotLight(spotLights[i], norm,vs_out.WorldPos,viewDir,index++);
+        result += CalcSpotLight(spotLights[i], normal,fs_in.WorldPos,viewDir,index++);
     }
     
     index = 0;
     for (int i = 0; i < pointLightAmount; ++i) {
-        result += CalcPointLight(pointLights[i], norm,vs_out.WorldPos,viewDir,index++);
+        result += CalcPointLight(pointLights[i], normal,fs_in.WorldPos,viewDir,index++);
     }
     
     FragColor = vec4(result, 1.0);
@@ -134,8 +155,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0);
     // combine results
-    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuse, vs_out.TexCoords));
-    vec3 specular = vec3(light.specular) * spec * vec3(texture(material.specular, vs_out.TexCoords));
+    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
+    vec3 specular = vec3(light.specular) * spec * vec3(texture(material.specularTexture, fs_in.TexCoords));
 
     float shadow = 1;
     shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
@@ -156,13 +177,13 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, 
     float distance = length(vec3(light.position)  - worldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
     // combine results
-    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuse, vs_out.TexCoords));
-    vec3 specular =  vec3(light.specular) * spec * vec3(texture(material.specular, vs_out.TexCoords));
+    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
+    vec3 specular =  vec3(light.specular) * spec * vec3(texture(material.specularTexture, fs_in.TexCoords));
     diffuse *= attenuation;
     specular *= attenuation;
     
     float shadow = 1;
-    shadow = (1.0 - CubeShadowCalculation(vs_out.WorldPos, light.position.xyz,light.position.w, lightIndex));
+    shadow = (1.0 - CubeShadowCalculation(fs_in.WorldPos, light.position.xyz,light.position.w, lightIndex));
     
     
     return (diffuse + specular) * shadow;
@@ -185,8 +206,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, in
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     // combine results
-    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuse, vs_out.TexCoords));
-    vec3 specular =  vec3(light.specular) * spec * vec3(texture(material.specular, vs_out.TexCoords));
+    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
+    vec3 specular =  vec3(light.specular) * spec * vec3(texture(material.specularTexture, fs_in.TexCoords));
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
@@ -199,12 +220,12 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, in
 
 float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex)
 {
-    vec3 fragToLight = vs_out.WorldPos - lightPos;
+    vec3 fragToLight = fs_in.WorldPos - lightPos;
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
     float bias = 0.05;
     int samples = 20;
-    float viewDistance = length(camPos - vs_out.WorldPos);
+    float viewDistance = length(camPos - fs_in.WorldPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for (int i = 0; i < samples; ++i)
     {
@@ -220,7 +241,7 @@ float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int li
 
 float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID)
 {
-    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(vs_out.WorldPos, 1.0);
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fs_in.WorldPos, 1.0);
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // transform to [0,1] range
@@ -230,8 +251,8 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
 
-    vec3 normal = normalize( vec3(texture(material.normal, vs_out.TexCoords)));
-    vec3 lightDir = normalize(lightPos - vs_out.WorldPos);
+    vec3 normal = normalize( vec3(texture(material.normalTexture, fs_in.TexCoords)));
+    vec3 lightDir = normalize(lightPos - fs_in.WorldPos);
     float bias = max(0.00001 * (1.0 - dot(normal, lightDir)),  0.005);
     // check whether current frag pos is in shadow
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
@@ -254,4 +275,46 @@ float PlaneShadowCalculation(mat4x4 lightSpaceMatrix, vec3 lightPos, int lightID
     }
 
     return shadow;
+}
+
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{
+    // number of depth layers
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = viewDir.xy / viewDir.z * heightScale;
+    vec2 deltaTexCoords = P / numLayers;
+
+    // get initial values
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture(material.depthTexture, currentTexCoords).r;
+
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        // shift texture coordinates along direction of P
+        currentTexCoords -= deltaTexCoords;
+        // get depthmap value at current texture coordinates
+        currentDepthMapValue = texture(material.depthTexture, currentTexCoords).r;
+        // get depth of next layer
+        currentLayerDepth += layerDepth;
+    }
+
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    // get depth after and before collision for linear interpolation
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(material.depthTexture, prevTexCoords).r - currentLayerDepth + layerDepth;
+
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
 }

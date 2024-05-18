@@ -12,17 +12,24 @@ public:
     GLuint cubeVAO, cubeVBO, cubeEBO;
     GLuint quadVAO, quadVBO, quadEBO;
 
-     GLfloat cubeVertices[8*8];
-     GLuint cubeIndices[36];
+    GLfloat cubeVertices[8*8];
+    GLuint cubeIndices[36];
+    
+    GLfloat quadVertices[8*4];
+    GLuint quadIndices[6];
 
-     GLfloat quadVertices[8*4];
-     GLuint quadIndices[6];
+    std::vector<std::vector<GLfloat>> subdividedPlanesVertices; 
+    std::vector<std::vector<unsigned int>> subdividedPlanesIndices; 
+    std::vector<GLuint> subdividedPlaneVAO;
+    std::vector<GLuint>  subdividedPlaneVBO;
+    std::vector<GLuint>  subdividedPlaneEBO;
 
-    int tessellationLevel = 1; // Change this to perform more tessellations
-
+    int numberOfDetails = 2;
+    
     PBRPrimitives();
     ~PBRPrimitives();
     void Init();
+    void createSubdividedPlane(int subdivisions);
     void renderCube();
     void renderQuad();
 };
