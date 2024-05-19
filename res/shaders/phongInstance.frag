@@ -155,10 +155,13 @@ void main()
     float dirtinessMap  =  1 *  cnoise(fs_in.WorldPos*2) +
     +  0.5 * cnoise(fs_in.WorldPos*4) +
     + 0.25 * cnoise(fs_in.WorldPos*8);
-    dirtinessMap += dirtLevel; //TODO here just put how clean it is ^^
     dirtinessMap = dirtinessMap / (1 + 0.5 + 0.25);
-    dirtinessMap = pow(dirtinessMap, 0.30);
+    dirtinessMap = pow(dirtinessMap, dirtLevel * 4);
+    //dirtinessMap = (dirtinessMap + 1) * 0.5; // Scale the noise from -1.0 - 1.0 to 0.0 - 1.0
+    dirtinessMap = 1.0 - dirtinessMap; // Invert the noise map
+   // dirtinessMap +=  * 1; //TODO here just put how clean it is ^^
     
+    dirtinessMap -= (1 - texture(material.depthTextureArray, vec3( fs_in.TexCoords, currentTextures[3])).r) *  0.8;
     texCoords = ParallaxMapping(texCoords,  viewDir);
  
 
@@ -172,15 +175,19 @@ void main()
 
     
     vec3 diffuse = vec3(texture(material.diffuseTextureArray, vec3(texCoords, float(currentTextures[0]))));
-    diffuse  = mix(diffuse,vec3(dirtinessMap),1 - dirtinessMap.r);
 
     vec3 specular = vec3(texture(material.specularTextureArray, vec3(texCoords,float(currentTextures[1]))));
-    specular  = mix(specular,vec3(dirtinessMap),1 - dirtinessMap.r);
 
+
+    if(dirtinessMap > 0.1){
+        diffuse -= vec3(dirtinessMap);
+        specular -= vec3(dirtinessMap);
+    }
+    
     vec3 result = vec3(0);
     if (currentWallData[1] != 1){
 
-        result = 0.2f * vec3(texture(material.diffuseTextureArray, vec3(texCoords, float(currentTextures[0]))));//We do be calculating ambient here
+        result = 0.2f * diffuse;//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLightAmount; ++i) {
             result += CalcDirLight(dirLights[i], normal, viewDir, index++,  diffuse,specular);

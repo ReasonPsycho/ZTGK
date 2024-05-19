@@ -474,9 +474,9 @@ void load_enteties() {
     Entity *gameObject;
     
 //    //Gabka
-//    gameObject = scene.addEntity("Gabka");
-//    gameObject->addComponent(make_unique<Render>(&gabka));;
-//    gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
+    gameObject = scene.addEntity("Gabka");
+    gameObject->addComponent(make_unique<Render>(&gabka));;
+    gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
 //    //Gabka
 //
 //    //Zuczek
