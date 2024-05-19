@@ -45,7 +45,7 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
     glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));
     regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
     regularShader->setFloat("biasMuliplayer", biasMuliplayer);
-    regularShader->setFloat("heightScale", 1.0);
+    regularShader->setFloat("heightScale", 0.03);
     
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);

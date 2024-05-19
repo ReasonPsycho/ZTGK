@@ -467,7 +467,7 @@ void load_enteties() {
     wall.loadModel();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[1], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[1]);
+    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
     gabka.loadModel();
     zuczek.loadModel();
     tileModel.loadModel();

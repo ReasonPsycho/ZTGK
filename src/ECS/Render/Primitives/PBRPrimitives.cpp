@@ -150,7 +150,7 @@ void PBRPrimitives::createSubdividedPlane(int subdivisions) {
     for (int i = 0; i <= subdivisions; ++i) {
         for (int j = 0; j <= subdivisions; ++j) {
             float xT = (float) i / (float) subdivisions;
-            float yT = (float) j / (float) subdivisions;
+            float yT =  (float) j / (float) subdivisions;
             float x = glm::mix(-1.0, 1.0, xT);
             float y = glm::mix(-1.0, 1.0, yT);
 
@@ -176,13 +176,13 @@ void PBRPrimitives::createSubdividedPlane(int subdivisions) {
             int row2 = (i + 1) * (subdivisions + 1);
 
             // Each square is divided into two triangles
+            tmpIndices.push_back(row2 + j);
+            tmpIndices.push_back(row1 + j + 1);
             tmpIndices.push_back(row1 + j);
-            tmpIndices.push_back(row1 + j + 1);
-            tmpIndices.push_back(row2 + j);
 
-            tmpIndices.push_back(row2 + j);
-            tmpIndices.push_back(row1 + j + 1);
             tmpIndices.push_back(row2 + j + 1);
+            tmpIndices.push_back(row1 + j + 1);
+            tmpIndices.push_back(row2 + j );
         }
     }
 
@@ -216,13 +216,13 @@ void PBRPrimitives::createSubdividedPlane(int subdivisions) {
                 f * (deltaUV2.y * deltaPos1.y - deltaUV1.y * deltaPos2.y),
                 f * (deltaUV2.y * deltaPos1.z - deltaUV1.y * deltaPos2.z)
         );
-        tangent = glm::normalize(tangent);
+        tangent = glm::normalize(-tangent);
         glm::vec3 bitangent = glm::vec3(
                 f * (-deltaUV2.x * deltaPos1.x + deltaUV1.x * deltaPos2.x),
                 f * (-deltaUV2.x * deltaPos1.y + deltaUV1.x * deltaPos2.y),
                 f * (-deltaUV2.x * deltaPos1.z + deltaUV1.x * deltaPos2.z)
         );
-        bitangent = glm::normalize(bitangent);
+        bitangent = glm::normalize(-bitangent);
 
 
         for (int j = 0; j < 3; j++) {

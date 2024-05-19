@@ -40,7 +40,7 @@ void main()
     vec3 N = normalize(mat3(model) * aNormal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-    vs_out.tangentData.ViewPos  = TBN * camPos;
+    vs_out.tangentData.ViewPos  = TBN * (camPos + vec3(0.000001));
     vs_out.tangentData.FragPos  = TBN *  vs_out.WorldPos;
     vs_out.tangentData.TBN  = TBN;
 }

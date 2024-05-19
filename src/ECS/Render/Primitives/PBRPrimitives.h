@@ -24,7 +24,7 @@ public:
     std::vector<GLuint>  subdividedPlaneVBO;
     std::vector<GLuint>  subdividedPlaneEBO;
 
-    int numberOfDetails = 2;
+    int numberOfDetails = 20;
     
     PBRPrimitives();
     ~PBRPrimitives();
