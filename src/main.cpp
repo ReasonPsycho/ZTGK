@@ -479,10 +479,10 @@ void load_enteties() {
     gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
 //    //Gabka
 //
-//    //Zuczek
-//    gameObject = scene.addEntity("Zuczek");;
-//     gameObject->addComponent(make_unique<Render>(&zuczek));;
-//    gameObject->transform.setLocalPosition(glm::vec3(95,1,95));
+    //Zuczek
+    gameObject = scene.addEntity("Zuczek");;
+     gameObject->addComponent(make_unique<Render>(&zuczek));;
+    gameObject->transform.setLocalPosition(glm::vec3(95,1,95));
 //
 //    //Zuczek
 

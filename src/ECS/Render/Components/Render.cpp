@@ -11,8 +11,10 @@ Render::Render(Model *pModel):pModel(pModel),aabb(generateAABB(*pModel)) {
 
 void Render::draw(Shader &regularShader) {
     ZoneScopedN("Draw");
+    regularShader.use();
     regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
     regularShader.setFloat("heightScale", 1.0);
+    regularShader.setFloat("saturation", 3.0);
     regularShader.setBool("useNormalMap", false);
     pModel->Draw(regularShader);
 }

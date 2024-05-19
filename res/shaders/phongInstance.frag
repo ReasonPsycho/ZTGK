@@ -87,6 +87,7 @@ uniform Material material;
 uniform float maxBias;
 uniform float biasMuliplayer;
 uniform float dirtLevel;
+uniform float saturation;
 
 vec3 selectionColor[5] = vec3[]
 (
@@ -118,34 +119,24 @@ vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
 vec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
 float cnoise(vec3 P);
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
 
 out vec4 FragColor;
-
-
-// Function to create pseudo-random noise based on world position
-float hash(vec3 p) {
-    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
-    dot(p, vec3(269.5, 183.3, 246.1)),
-    dot(p, vec3(113.5, 271.9, 124.6)));
-    return -1.0 + 2.0 * fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453123);
-}
-
-float noise(vec3 p) {
-    vec3 i = floor(p);
-    vec3 f = fract(p);
-    f = f*f*(3.0-2.0*f);
-
-    float n = mix(mix(mix( hash(i + vec3(0,0,0)),
-    hash(i + vec3(1,0,0)), f.x),
-    mix( hash(i + vec3(0,1,0)),
-    hash(i + vec3(1,1,0)), f.x), f.y),
-    mix(mix( hash(i + vec3(0,0,1)),
-    hash(i + vec3(1,0,1)), f.x),
-    mix( hash(i + vec3(0,1,1)),
-    hash(i + vec3(1,1,1)), f.x), f.y), f.z);
-    return n;
-}
-
 
 void main()
 {
@@ -212,7 +203,12 @@ void main()
         result = mix(result, selectionColor[currentWallData[2]], 0.5);
     }
 
+    vec3 rgbColor = result;
+    vec3 hsvColor = rgb2hsv(rgbColor);
 
+    hsvColor.y *= saturation;  // sat multiplier is the factor by which you increase saturation.
+
+    result = hsv2rgb(hsvColor);
     FragColor = vec4(result, 1.0);
 }
 
