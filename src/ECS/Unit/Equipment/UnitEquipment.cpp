@@ -127,7 +127,9 @@ Item *UnitEquipment::in_range_of(glm::ivec2 self, glm::ivec2 target) const {
 }
 
 bool UnitEquipment::use_default() const {
-    return (item1 != nullptr && item1->offensive) || (item2 != nullptr && item2->offensive);
+    return (item1 == nullptr && item2 == nullptr) || (item1 != nullptr && item2 != nullptr && !item1->offensive && !item2->offensive)
+            || (item1 == nullptr && item2 != nullptr && !item2->offensive) || (item1 != nullptr && item2 == nullptr && !item1->offensive);
+
 }
 
 void UnitEquipment::imgui_preview() const {
