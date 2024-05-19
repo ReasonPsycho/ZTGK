@@ -684,7 +684,7 @@ void update() {
 
     scene.systemManager.Update();
     scene.updateScene();
-    
+
     scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->PushToSSBO(&camera);
@@ -695,16 +695,16 @@ void update() {
     scene.systemManager.getSystem<UnitSystem>()->Update();
 
     update_dragged_tiles();
-    for(auto tile : selectedTiles){
+    for (auto tile: selectedTiles) {
         scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
 
 
     scene.systemManager.getSystem<CollisionSystem>()->Update();
 
-    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents)
-        //spdlog::info("{} {}",u->name, u->currentState->name); I am gonna murder u next time XoXo
-
+ //   for (auto u: scene.systemManager.getSystem<UnitSystem>()->unitComponents)
+    //spdlog::info("{} {}",u->name, u->currentState->name); I am gonna murder u next time XoXo
+   // }
 }
 
 void render() {

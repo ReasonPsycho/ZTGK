@@ -33,6 +33,7 @@ void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputScalar("biasMuliplayer",ImGuiDataType_Double, &biasMuliplayer, &step);
     ImGui::InputScalar("factor",ImGuiDataType_Double, &factor, &step);
     ImGui::InputScalar("units",ImGuiDataType_Double, &units, &step);
+    ImGui::SliderFloat("Dirt layer",&dirtLayer,0,1);
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
@@ -46,6 +47,7 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
     regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
     regularShader->setFloat("biasMuliplayer", biasMuliplayer);
     regularShader->setFloat("heightScale", 0.03);
+    regularShader->setFloat("dirtLevel",dirtLayer);
     
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);
