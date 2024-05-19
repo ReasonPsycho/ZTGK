@@ -6,6 +6,7 @@
 #include "MaterialPhong.h"
 
 Color normalColorlol = {128, 128, 128, 255};  // Normal map neutral
+Color depthColorlol = {122, 122, 122, 255};  // Normal map neutral
 Color specularColor = {255, 255, 255, 255};  // Black, no metallic
 Color shininessColor = {0, 0, 0, 255};  // 50% gray
 
@@ -20,42 +21,45 @@ void replaceAlllol(string &str, const string &from, const string &to) {
 MaterialPhong::MaterialPhong(aiMaterial *material, Model *model) {
 
 // 1. albedo maps
-    diffuseMap = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", model);
+    shared_ptr<Texture> diffuseMap = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", model);
 // 2. normal maps
     if(!diffuseMap){
-        spdlog::warn("AlbedoMap doesn't exist replacing it with white !");
+        spdlog::warn("diffuseMap doesn't exist replacing it with white !");
         diffuseMap = make_shared<Texture>();
     }
-
-    specularMap = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", model);
+    diffuseTextures.push_back(diffuseMap);
+    shared_ptr<Texture>specularMap = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", model);
 // 3. metallic maps
 
     if(!specularMap){
-        spdlog::warn("normalMap doesn't exist replacing it with default normal color!");
+        spdlog::warn("specularMap doesn't exist replacing it with default normal color!");
         specularMap = make_shared<Texture>(normalColorlol);
     }
-
-    shininessMap = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_shininess", model);
-// 4. roughness maps
-
-    if(!shininessMap){
-        spdlog::warn("MetallicMap doesn't exist replacing it with default metallic color!");
-        shininessMap = make_shared<Texture>(shininessColor);
-    }
-
-    normalMap = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_roughness", model);
+    
+    specularTextures.push_back(specularMap);
+    shared_ptr<Texture> normalMap = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_roughness", model);
 
     if(!normalMap){
-        spdlog::warn("RoughnessMap doesn't exist replacing it with default roughness color!");
+        spdlog::warn("normalMap doesn't exist replacing it with default roughness color!");
         normalMap = make_shared<Texture>(normalColorlol);
     }
+    
+    normalTextures.push_back(normalMap);
+    shared_ptr<Texture> depthMap = loadMaterialTextures(material, aiTextureType_DISPLACEMENT, "texture_depth", model);
+
+    if(!depthMap){
+        spdlog::warn("depthMap doesn't exist replacing it with default roughness color!");
+        depthMap = make_shared<Texture>(depthColorlol);
+    }
+    depthTextures.push_back(depthMap);
+
 }
 
 MaterialPhong::MaterialPhong(GLubyte *color) {
-    diffuseMap = make_shared<Texture>(*reinterpret_cast<Color*>(color));
-    specularMap = make_shared<Texture>(*reinterpret_cast<Color*>(specularColor));
-    shininessMap = make_shared<Texture>(*reinterpret_cast<Color*>(shininessColor));
-    normalMap = make_shared<Texture>(*reinterpret_cast<Color*>(normalColorlol));
+    diffuseTextures.push_back(make_shared<Texture>(*reinterpret_cast<Color*>(color)));
+    specularTextures.push_back(make_shared<Texture>(*reinterpret_cast<Color*>(specularColor)));
+    normalTextures.push_back(make_shared<Texture>(*reinterpret_cast<Color*>(normalColorlol)));
+    depthTextures .push_back(make_shared<Texture>(*reinterpret_cast<Color*>(depthColorlol)));
 }
 
 std::shared_ptr<Texture>
@@ -89,18 +93,48 @@ MaterialPhong::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string 
 void MaterialPhong::loadMaterial(Shader *shader) {
     shader->use();
     glActiveTexture(GL_TEXTURE3); // active proper texture unit before binding
-    glUniform1i(glGetUniformLocation(shader->ID, "material.diffuse"), 3);
-    glBindTexture(GL_TEXTURE_2D, diffuseMap->ID);
+    glUniform1i(glGetUniformLocation(shader->ID, "material.diffuseTexture"), 3);
+    glBindTexture(GL_TEXTURE_2D, diffuseTextures[0]->ID);
 
     glActiveTexture(GL_TEXTURE4); // active proper texture unit before binding
-    glUniform1i(glGetUniformLocation(shader->ID, "material.specular"), 4);
-    glBindTexture(GL_TEXTURE_2D, specularMap->ID);
+    glUniform1i(glGetUniformLocation(shader->ID, "material.specularTexture"), 4);
+    glBindTexture(GL_TEXTURE_2D, specularTextures[0]->ID);
     
     glActiveTexture(GL_TEXTURE5); // active proper texture unit before binding
-    glUniform1i(glGetUniformLocation(shader->ID, "material.shininess"), 5);
-    glBindTexture(GL_TEXTURE_2D, shininessMap->ID);
+    glUniform1i(glGetUniformLocation(shader->ID, "material.normalTexture"), 5);
+    glBindTexture(GL_TEXTURE_2D, normalTextures[0]->ID);
+    
+    glActiveTexture(GL_TEXTURE6); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.depthTexture"), 6);
+    glBindTexture(GL_TEXTURE_2D, depthTextures[0]->ID);
+}
+
+void MaterialPhong::loadInstancedMaterial(Shader *shader) {
+    shader->use();
+    glActiveTexture(GL_TEXTURE3); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.diffuseTextureArray"), 3);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseTextureArray->ID);
+
+    glActiveTexture(GL_TEXTURE4); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.specularTextureArray"), 4);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, specularTextureArray->ID);
+
+    glActiveTexture(GL_TEXTURE5); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.normalTextureArray"), 5);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, normalTextureArray->ID);
 
     glActiveTexture(GL_TEXTURE6); // active proper texture unit before binding
-    glUniform1i(glGetUniformLocation(shader->ID, "material.normal"), 6);
-    glBindTexture(GL_TEXTURE_2D, normalMap->ID);
+    glUniform1i(glGetUniformLocation(shader->ID, "material.depthTextureArray"), 6);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, depthTextureArray->ID);
+}
+
+MaterialPhong::MaterialPhong() {
+
+}
+
+void MaterialPhong::mapTextureArrays() {
+    diffuseTextureArray = make_shared<TextureArray>(diffuseTextures);
+    specularTextureArray = make_shared<TextureArray>(specularTextures);
+    normalTextureArray = make_shared<TextureArray>(normalTextures);
+    depthTextureArray = make_shared<TextureArray>(depthTextures);
 }

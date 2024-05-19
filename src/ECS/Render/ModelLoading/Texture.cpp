@@ -14,10 +14,8 @@ Texture::Texture(string path, string type) {
     glGenTextures(1, &ID);
     // set the texture wrapping/filtering options (on the currently bound texture object) //TODO this prob should be in class inputs
     // load and generate the texture
-    int width, height, nrChannels;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data) {
-        GLenum format;
         if (nrChannels == 1) //nifty 
             format = GL_RED;
         else if (nrChannels == 3)

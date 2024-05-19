@@ -10,14 +10,19 @@ class Chunk;
 struct WallData {
     glm::mat4x4 matrix;
     int data[4]{}; // for textures on x for example
+    int textures[4]{}; // for textures on x for example
 
     // Constructor
-    WallData(const glm::mat4x4 &matrixInput, int d1, int d2, int d3, int d4)
+    WallData(const glm::mat4x4 &matrixInput, int d1, int d2, int d3, int d4,int t1, int t2, int t3, int t4)
             : matrix(matrixInput) {
-        data[0] = d1;
+        data[0] = d1; 
         data[1] = d2;
         data[2] = d3;
         data[3] = d4;
+        textures[0] = t1; // diffuse
+        textures[1] = t2; // specular
+        textures[2] = t3; // normal
+        textures[3] = t4; // depth
     }
 };
 

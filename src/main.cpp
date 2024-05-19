@@ -463,11 +463,11 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-
     model.loadModel();
     wall.loadModel();
 
-    quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
+    //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
+    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
     gabka.loadModel();
     zuczek.loadModel();
     tileModel.loadModel();
@@ -703,8 +703,7 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
 
     for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents)
-        spdlog::info("{} {}",u->name, u->currentState->name);
-
+        //spdlog::info("{} {}",u->name, u->currentState->name); I am gonna murder u next time XoXo
 
 }
 
@@ -735,7 +734,7 @@ void render() {
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
-    scene.systemManager.getSystem<HUD>()->draw();
+ //   scene.systemManager.getSystem<HUD>()->draw();
 }
 
 void imgui_begin() {
