@@ -22,12 +22,17 @@ State *MovementState::RunCurrentState() {
         if (drop.first)
             InventoryManager::instance->spawn_item_on_map(drop.first, {unit->worldPosition.x, unit->worldPosition.z});
         if (drop.second)
-            InventoryManager::instance->spawn_item_on_map(drop.second, {unit->worldPosition.x + 0.2, unit->worldPosition.z + 0.2});
+            InventoryManager::instance->spawn_item_on_map(drop.second,
+                                                          {unit->worldPosition.x + 0.2, unit->worldPosition.z + 0.2});
 
         unit->pickupTarget->getEntity()->Destroy();
         unit->pickupTarget = nullptr;
         unit->hasPickupTarget = false;
     }
+
+//    if(unit-> hasCombatTarget && unit->combatTarget != nullptr){
+//        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, unit->combatTarget->gridPosition);
+//    }
 
     if(unit->hasMovementTarget){
         return this;
