@@ -7,6 +7,7 @@
 
 #include "ECS/SignalQueue/DataCargo/SignalData.h"
 #include "ECS/HUD/Components/AHUDComponent.h"
+#include "ECS/HUD/Components/HudCompType.h"
 
 struct HUDRemapGroupsSignalData : public SignalData {
     bool all = false;

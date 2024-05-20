@@ -33,7 +33,7 @@ void SignalReceiver::showImGuiDetailsImpl(Camera *camera) {
         ImGui::CheckboxFlags("Audio", &receive_type_mask, Signal::signal_types.audio_signal);
         ImGui::CheckboxFlags("Hud mapping UpdateImpl", &receive_type_mask, Signal::signal_types.hud_update_group_mappings_signal);
         ImGui::CheckboxFlags("Hud trigger z sort", &receive_type_mask, Signal::signal_types.hud_sort_z_depth_signal);
-        ImGui::CheckboxFlags("Hud remove group", &receive_type_mask, Signal::signal_types.hud_remove_group_signal);
+        ImGui::CheckboxFlags("Hud remove groupID", &receive_type_mask, Signal::signal_types.hud_remove_group_signal);
         ImGui::CheckboxFlags("All", &receive_type_mask, Signal::signal_types.all);
     }
 

@@ -18,7 +18,10 @@ Group::Group(/* ignored */ unsigned int id) : id(0), hidden(false), offset(0, 0,
 {}
 
 Group Group::default_group() {
-    return Group(0);
+    auto ret = Group(0);
+    ret.name = "Root";
+    ret.parent = static_cast<unsigned>(-1);
+    return ret;
 }
 
 bool Group::isHidden() const {
@@ -31,7 +34,9 @@ void Group::setHidden(bool hidden) {
 }
 
 void Group::imgui_controls() {
-    ImGui::Text("%s", std::format("Group {}", id).c_str());
+    if (id == 0) ImGui::Text("%s", std::format("Group {} - {}", id, name).c_str());
+    else         ImGui::Text("%s", std::format("Group {} - {} : parent {}", id, name, parent).c_str());
+
     ImGui::SameLine();
     if (ImGui::SmallButton(std::format("Toggle hide: {}##{}", hidden, id).c_str()))
         setHidden(!hidden);
@@ -41,11 +46,6 @@ void Group::imgui_controls() {
             *ztgk::game::scene->systemManager.getSystem<SignalQueue>()
                     += HUDRemoveGroupSignalData::signal(id,"Editor event");
         }
-        // no id input because groups are a map, so it doesn't really UpdateImpl anything, vector would work
-//        ImGui::SameLine();
-//        ImGui::InputInt(std::format("ID##{}", id).c_str(), reinterpret_cast<int *>(&id));
-//        if (ImGui::IsItemHovered())
-//            ImGui::SetTooltip("Obviously dangerous. Don't make duplicates, only fill in for deleted groups.");
     }
     static float prevz;
     prevz = offset.z;
@@ -53,5 +53,15 @@ void Group::imgui_controls() {
     if ( prevz != offset.z ) {
         *ztgk::game::scene->systemManager.getSystem<SignalQueue>()
                 += HUDSortZDepthSignalData::signal("Editor event.");
+    }
+    if (id != 0) {
+        if (ImGui::TreeNode(std::format("Config##{}", id).c_str())) {
+            ImGui::InputInt(std::format("Parent##{}", id).c_str(), reinterpret_cast<int *>(&parent));
+            static char *name_buf = new char[50];
+            strcpy_s(name_buf, 50, name.c_str());
+            ImGui::InputText(std::format("Name##{}", id).c_str(), name_buf, 50);
+            name = name_buf;
+            ImGui::TreePop();
+        }
     }
 }

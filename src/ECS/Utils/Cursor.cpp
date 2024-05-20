@@ -44,8 +44,12 @@ void Cursor::move(glm::vec2 newpos) {
         ui_prev_pos = ui_pos;
         ui_pos -= glfw_offset;
         mouseio->MousePos = {ui_pos.x, ui_pos.y};
-        if (config.forward_move)
-            *ztgk::game::signalQueue += MouseMoveSignalData::signal(ui_pos, ui_prev_pos, "Cursor forwarding MOVE");
+        if (config.forward_move) {
+            *ztgk::game::signalQueue += MouseMoveSignalData::signal({ui_pos.x, ztgk::game::window_size.y - ui_pos.y},
+                                                                    {ui_prev_pos.x,
+                                                                     ztgk::game::window_size.y - ui_prev_pos.y},
+                                                                    "Cursor forwarding MOVE");
+        }
     } else {
         ztgk::game::camera->ProcessMouseMovement(-glfw_offset.x, glfw_offset.y, true, Time::Instance().DeltaTime());
     }
@@ -55,8 +59,9 @@ void Cursor::move(glm::vec2 newpos) {
 void Cursor::scroll(glm::vec2 offset) {
     if (config.capture_scroll) {
         ImGui_ImplGlfw_ScrollCallback(ztgk::game::window, offset.x, offset.y);
-        if (config.forward_scroll)
+        if (config.forward_scroll) {
             *ztgk::game::signalQueue += MouseScrollSignalData::signal(offset, ui_pos, "Cursor forwarding SCROLL");
+        }
     } else {
         ztgk::game::camera->ProcessMouseScroll(static_cast<float>(offset.y), Time::Instance().DeltaTime());
     }
@@ -65,7 +70,10 @@ void Cursor::scroll(glm::vec2 offset) {
 void Cursor::click(int button, int action, int mods) {
     if (config.capture_click) {
         ImGui_ImplGlfw_MouseButtonCallback(ztgk::game::window, button, action, mods);
-        if (config.forward_click){}
-            *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods, ui_pos, "Cursor forwarding CLICK");
+        if (config.forward_click) {
+            *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods,
+                                          {ui_pos.x, ztgk::game::window_size.y - ui_pos.y},
+                                          "Cursor forwarding CLICK");
+        }
     }
 }

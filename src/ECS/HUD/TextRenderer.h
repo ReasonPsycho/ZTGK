@@ -19,6 +19,13 @@
 #include "Fonts.h"
 class HUD;
 
+struct TextSize {
+    glm::vec2 total{};
+    int n_lines{};
+    float first_line_height{};
+    float bottom_base_line{};
+};
+
 struct Glyph {
     unsigned int TextureID;  // ID handle of the glyph texture
     glm::ivec2 Size;         // Size of glyph
@@ -32,9 +39,11 @@ public:
     ~TextRenderer();
 
     HUD * hud;
+    int interline_px = 5;
 
     void loadFont(std::string font);
     void render(Text * text);
+    [[nodiscard]] TextSize size(Text * text) const;
 
     std::unordered_map<std::string, std::unordered_map<unsigned, Glyph>> fonts;
 
@@ -47,4 +56,6 @@ private:
     FT_Library ft;
 
     Shader shader;
+
+    glm::vec2 drawModeOffset(Text * text) const;
 };

@@ -10,6 +10,7 @@
 #include "DataCargo/EditorSignals/HUD/HUDRemapGroupsSignalData.h"
 #include "DataCargo/EditorSignals/HUD/HUDSortZDepthSignalData.h"
 #include "DataCargo/EditorSignals/HUD/HUDRemoveGroupSignalData.h"
+#include "ECS/HUD/Components/HudCompType.h"
 
 using namespace ztgk;
 void SignalQueue::init() {
@@ -187,7 +188,7 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
                     "\nThat is the first event in order of subscription that matches the typemask or id."
                     "\nThis also means any log will only print this signal if no other receiver caught it.");
         }
-        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud UpdateImpl mappings", "Hud sort z depth", "Hud remove group"};
+        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud UpdateImpl mappings", "Hud sort z depth", "Hud remove groupID"};
         ImGui::Combo("Type", &cfg.choice, types, 9);
         // assumes types are ordered the same way type id masks are initialized!!
         unsigned choicemask = 1 << cfg.choice;
