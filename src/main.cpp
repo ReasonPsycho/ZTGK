@@ -345,6 +345,7 @@ void cleanup() {
 }
 
 bool init() {
+    std::srand(std::time(0)); //Just to be sure
     spdlog::set_level(spdlog::level::trace);
 //    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
     ztgk::console.level(spdlog::level::trace);
