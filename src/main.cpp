@@ -577,7 +577,7 @@ void load_enteties() {
     fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
 
-//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
+    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
     load_units();
 
