@@ -11,6 +11,8 @@
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Utils/Time.h"
+#include <algorithm>
+#include <random>
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -129,6 +131,26 @@ void Unit::UpdateImpl() {
             return;
         }
     }
+
+    auto currentTile = grid->getTileAt(gridPosition);
+    if(isAlly && currentTile->dirtinessLevel > 0){
+        auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
+        if(newDirtLvl < 0){
+            newDirtLvl = 0;
+        }
+        currentTile->changeDirtinessLevel(newDirtLvl);
+    }
+
+    else if(!isAlly && currentTile->dirtinessLevel < 100){
+        auto newDirtLvl = currentTile->dirtinessLevel + 10 * Time::Instance().DeltaTime();
+        if(newDirtLvl > 100){
+            newDirtLvl = 100;
+        }
+        currentTile->changeDirtinessLevel(newDirtLvl);
+    }
+
+
+
 
     if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
         currentMiningTarget = nullptr;
@@ -330,5 +352,25 @@ std::vector<Unit*> enemies = GetEnemiesInSight();
         return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) < VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
     });
     return enemies.at(0);
+}
+
+Vector2Int Unit::GetDirtiestTileAround() {
+    int dirtiestLevel = 0;
+    Vector2Int dirtiestTile = gridPosition;
+    std::vector<Vector2Int> directions = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1), Vector2Int(1, 1), Vector2Int(-1, -1), Vector2Int(1, -1), Vector2Int(-1, 1)};
+    //randomize the directions vector
+    std::shuffle(directions.begin(), directions.end(), std::mt19937(std::random_device()()));
+
+    for(auto &dir : directions){
+        Vector2Int pos = gridPosition + dir;
+        if(grid->isInBounds(pos)){
+            Tile* tile = grid->getTileAt(pos);
+            if(tile->dirtinessLevel > dirtiestLevel){
+                dirtiestLevel = tile->dirtinessLevel;
+                dirtiestTile = pos;
+            }
+        }
+    }
+    return dirtiestTile;
 }
 

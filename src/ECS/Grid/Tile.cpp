@@ -50,7 +50,7 @@ TileSelectionState Tile::getTileSelectionState() {
     return tileSelectionState;
 }
 
-void Tile::changeDirtinessLevel(int newDirtLevel) {
+void Tile::changeDirtinessLevel(float newDirtLevel) {
     dirtinessLevel = newDirtLevel;
     for(auto wall : walls){
         wall->data[0] = dirtinessLevel;

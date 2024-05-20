@@ -76,6 +76,8 @@ public:
     std::vector<Unit*> GetEnemiesInSight();
     Unit* GetClosestEnemyInSight();
 
+    Vector2Int GetDirtiestTileAround();
+
     bool canFindPathToTarget(Vector2Int target);
     std::vector<IMineable> miningPath;
 

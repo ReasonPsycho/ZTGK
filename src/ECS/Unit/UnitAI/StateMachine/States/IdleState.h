@@ -19,6 +19,9 @@ public:
     MiningState* miningState;
 
     bool isTargetInRange() override;
+
+    double idleTimer = 0;
+    double randomTime = 3;
 };
 
 #endif //ZTGK_IDLESTATE_H
