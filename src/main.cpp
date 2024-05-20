@@ -547,12 +547,12 @@ void load_enteties() {
    ) );
 
     scene.systemManager.getSystem<HUD>()->createButton("Button text",
-       {500, 500}, {300, 100}, ztgk::color.TURQUOISE, ztgk::color.CYAN,
+       {500, 500}, {300, 100}, ztgk::color.CYAN, ztgk::color.TURQUOISE,
        ztgk::color.BLUE, []() { spdlog::info("Button pressed!"); },
        nullptr);
 
     scene.systemManager.getSystem<HUD>()->createButton(
-        {1000, 500}, {300, 300},
+        {1000, 200}, {300, 300},
         "res/textures/puni.png", "res/textures/container2.png",
         [](){ spdlog::info("2SPR Button pressed!"); },
         nullptr
@@ -560,49 +560,24 @@ void load_enteties() {
 
     scene.systemManager.getSystem<HUD>()->createButton(
         "Func button textt", {1000, 900}, {300, 150}, ztgk::color.BROWN,
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * 0.9f; self->collisionSprite->load(); },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); },
         [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; self->collisionSprite->load(); },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * 0.75f; self->collisionSprite->load(); },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN; self->collisionSprite->load(); spdlog::info("Func Button pressed!"); },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; self->collisionSprite->load(); },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); spdlog::info("Func Button pressed!"); },
         nullptr
     );
 
-//    auto ebg = scene.addEntity(ehud, "Background");
-//    bggroup =   scene.systemManager.getSystem<HUD>()->addGroup(glm::vec3(0, 0, 10));
-////    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
-//    auto bgelem = scene.addEntity(ebg, "Puni1");
-//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
-//                                             "res/textures/puni.png"));
-//    bgelem = scene.addEntity(ebg, "Puni2");
-//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
-//                                             "res/textures/puni.png"));
-//    bgelem = scene.addEntity(ebg, "Puni3");
-//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup,
-//                                             "res/textures/puni.png"));
-//    bgelem = scene.addEntity(ebg, "Puni4");
-//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup,
-//                                             "res/textures/puni.png"));
-//    bgelem = scene.addEntity(ebg, "Puni5");
-//    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup,
-//                                             "res/textures/puni.png"));
-//
-//    auto efg = scene.addEntity(ehud, "Foreground");
-//    auto fgelem = scene.addEntity(efg, "Fixed");
-//    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
-//    zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
-////    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
-//    fgelem = scene.addEntity(efg, "Variable Text");
-//    auto tx = Text("Ten tekst jest zmienny!\ntest\ntesttest", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
-//                                                        ztgk::game::window_size.y * 0.5));
-//    tx.groupID = zmgroup;
-//    fgelem->addComponent(make_unique<Text>(tx));
-//    zmtxt = fgelem->getComponent<Text>();
-//    fgelem = scene.addEntity(efg, "Animated Sprite");
-//    spr = Sprite("res/textures/puni.png");
-//    spr.groupID = zmgroup;
-//    fgelem->addComponent(make_unique<Sprite>(spr));
-//    zmspr = fgelem->getComponent<Sprite>();
-//    zmspr->groupID = zmgroup;
+    auto efg = scene.addEntity(ehud, "Foreground");
+    auto fgelem = scene.addEntity(efg, "Fixed");
+    fgelem->addComponent(make_unique<Text>("One line text", glm::vec2{100, 1000}));
+    zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
+    fgelem = scene.addEntity(efg, "Variable Text");
+    auto tx = Text("Multiline\ntext\nyea", glm::vec2(100, 800));
+    tx.groupID = zmgroup;
+    fgelem->addComponent(make_unique<Text>(tx));
+    zmtxt = fgelem->getComponent<Text>();
+
+    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
     load_units();
 
@@ -759,7 +734,7 @@ void render() {
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
- //   scene.systemManager.getSystem<HUD>()->draw();
+    scene.systemManager.getSystem<HUD>()->draw();
 }
 
 void imgui_begin() {
