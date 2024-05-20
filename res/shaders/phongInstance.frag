@@ -147,7 +147,7 @@ void main()
     +  0.5 * cnoise(fs_in.WorldPos*4) +
     + 0.25 * cnoise(fs_in.WorldPos*8);
     dirtinessMap = dirtinessMap / (1 + 0.5 + 0.25);
-    dirtinessMap = pow(dirtinessMap, dirtLevel * 4);
+    dirtinessMap = pow(dirtinessMap, currentWallData[0]/100.0 * 4);
     //dirtinessMap = (dirtinessMap + 1) * 0.5; // Scale the noise from -1.0 - 1.0 to 0.0 - 1.0
     dirtinessMap = 1.0 - dirtinessMap; // Invert the noise map
    // dirtinessMap +=  * 1; //TODO here just put how clean it is ^^
