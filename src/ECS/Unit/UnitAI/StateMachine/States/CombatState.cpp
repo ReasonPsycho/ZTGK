@@ -52,12 +52,22 @@ bool CombatState::isTargetInRange() {
         unit->hasCombatTarget = false;
         return false;
     }
-    bool inRange = unit->equipment.in_range_of(
-        {unit->gridPosition.x, unit->gridPosition.z},
-        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
-    ) != nullptr;
-    unit->isTargetInRange = inRange;
-    return inRange;
+//    bool inRange = unit->equipment.in_range_of(
+//        {unit->gridPosition.x, unit->gridPosition.z},
+//        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
+//    ) != nullptr;
+//    unit->isTargetInRange = inRange;
+//    return inRange;
+     Unit* targ = unit->GetClosestEnemyInWeaponRange();
+    if (targ == nullptr) {
+        unit->hasCombatTarget = false;
+        unit->isTargetInRange = false;
+        return false;
+    }
+    unit->combatTarget = targ;
+    unit->isTargetInRange = true;
+    return true;
+
 }
 
 void CombatState::AttackTarget() {

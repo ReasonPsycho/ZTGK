@@ -72,7 +72,9 @@ public:
     bool isAlly;
     UnitStats stats;
 
-    Unit* findEnemy();
+    Unit* GetClosestEnemyInWeaponRange();
+    std::vector<Unit*> GetEnemiesInSight();
+    Unit* GetClosestEnemyInSight();
 
     bool canFindPathToTarget(Vector2Int target);
     std::vector<IMineable> miningPath;
