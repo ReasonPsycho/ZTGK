@@ -7,6 +7,8 @@
 #include "MovementState.h"
 #include "CombatState.h"
 #include "MiningState.h"
+#include "ECS/Utils/Time.h"
+#include <random>
 
 State *IdleState::RunCurrentState() {
 
@@ -14,6 +16,7 @@ State *IdleState::RunCurrentState() {
     if(unit->hasMovementTarget){
         moveState = new MovementState(grid);
         moveState->unit = unit;
+        idleTimer = 0;
         return moveState;
     }
     //from Idle to Combat
@@ -21,14 +24,17 @@ State *IdleState::RunCurrentState() {
         combatState = new CombatState(grid);
         combatState->unit = unit;
 
-        if(combatState->isTargetInRange())
+        if(combatState->isTargetInRange()) {
+            idleTimer = 0;
             return combatState;
+        }
         else
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
             moveState = new MovementState(grid);
             moveState->unit = unit;
+            idleTimer = 0;
             return moveState;
         }
     }
@@ -38,8 +44,10 @@ State *IdleState::RunCurrentState() {
         miningState = new MiningState(grid);
         miningState->unit = unit;
 
-        if(miningState->isTargetInRange())
+        if(miningState->isTargetInRange()) {
+            idleTimer = 0;
             return miningState;
+        }
         else
         {
             unit->hasMovementTarget = true;
@@ -48,14 +56,26 @@ State *IdleState::RunCurrentState() {
                 unit->movementTarget = unit->findClosestMineable()->gridPosition;
                 moveState = new MovementState(grid);
                 moveState->unit = unit;
+                idleTimer = 0;
                 return moveState;
             }
             else
+                idleTimer += Time::Instance().DeltaTime();
                 return this;
 
         }
     }
 
+    idleTimer += Time::Instance().DeltaTime();
+
+    if(idleTimer > randomTime && unit->isAlly){
+        unit->hasMovementTarget = true;
+        unit->movementTarget = unit->GetDirtiestTileAround();
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+        idleTimer = 0;
+        return moveState;
+    }
     return this;
 
 }

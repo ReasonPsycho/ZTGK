@@ -58,7 +58,7 @@ public:
     TileStateData stateData;
     Unit* unit = nullptr;
     Chunk* chunk = nullptr;
-    int dirtinessLevel = 100;
+    float dirtinessLevel = 100;
     void setTileSelectionState(TileSelectionState state );
     TileSelectionState getTileSelectionState();
     // Constructors
@@ -73,7 +73,7 @@ public:
     [[nodiscard]] bool vacant() const { return state == FLOOR; };
     void showImGuiDetailsImpl(Camera *camera) override;
     void changeHitWallsState(TileSelectionState state);
-    void changeDirtinessLevel(int newDirtLevel);
+    void changeDirtinessLevel(float newDirtLevel);
     
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
 
