@@ -19,6 +19,13 @@ State *MiningState::RunCurrentState() {
         idleState = new IdleState(grid);
         idleState->unit = unit;
 
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(1.5, 5.0);
+        double random_number = dis(gen);
+
+        idleState->randomTime = random_number;
+
         return idleState;
     }
 
