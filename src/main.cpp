@@ -472,19 +472,6 @@ void load_enteties() {
     zuczek.loadModel();
     tileModel.loadModel();
     Entity *gameObject;
-    
-//    //Gabka
-    gameObject = scene.addEntity("Gabka");
-    gameObject->addComponent(make_unique<Render>(&gabka));;
-    gameObject->transform.setLocalPosition(glm::vec3(95,1,100));
-//    //Gabka
-//
-    //Zuczek
-    gameObject = scene.addEntity("Zuczek");;
-     gameObject->addComponent(make_unique<Render>(&zuczek));;
-    gameObject->transform.setLocalPosition(glm::vec3(95,1,95));
-//
-//    //Zuczek
 
     gameObject = scene.addEntity("Wall");;
     gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
