@@ -7,6 +7,8 @@
 
 
 #include "ECS/Grid/Grid.h"
+#include <algorithm>
+#include <random>
 
 class Unit;
 
