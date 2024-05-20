@@ -22,13 +22,11 @@
 #include "ECS/Utils/Cursor.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
-#include "ECS/SignalQueue/DataCargo/MouseEvents/MouseScrollSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "ECS/SignalQueue/DataCargo/KeySignalData.h"
 
 //Instancing
 #include <glm/gtc/type_ptr.hpp>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
 #include <spdlog/spdlog.h>
@@ -61,7 +59,6 @@
 
 #include "ECS/Utils/ImGuiSpdlogSink.h"
 #include "ECS/HUD/HUD.h"
-#include "ECS/Render/FrustumCulling/Frustum.h"
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Ray.h"
 #include "ECS/Render/WireRenderSystem.h"
@@ -87,26 +84,17 @@ string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
-Model *quad;
 Model gabka = Model(&modelPathGabka);
 Model zuczek = Model(&modelPathZuczek);
 Model wall = Model(&modelPathWall);
 Model *cubeModel;
-Model *bathroomWAll;
 Model *quadModel;
-Entity *gridEntity;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
 StateManager *stateManager;
-
-Entity *box1;
-Entity *box2;
 Text text = {};
-
-BoxCollider *boxCollider;
 BloomPostProcess bloomSystem;
-
 
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion constants
@@ -194,13 +182,13 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 //Camera set up
 int display_w, display_h;
 Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
-float lastX = 0;
-float lastY = 0;
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
 PhongPipeline phongPipeline;
 
+float lastY;
+float lastX;
 
 Entity *playerUnit;
 
@@ -228,7 +216,6 @@ bool timeStepKeyPressed = false;
 #pragma endregion My set up
 
 #pragma region ZTGK-Global
-
 
 #pragma endregion
 
@@ -296,29 +283,6 @@ int main(int, char **) {
         imgui_end(); // this call effectively renders ImGui
 
 
-        //_______________________________NA POTRZEBY ZADANIA NA KARTY GRAFICZNE_______________________________
-//        static bool bgup = true;
-//        auto group = hud.getGroupOrDefault(bggroup);
-//        if (group->offset.y == ztgk::config::window_size.y) {
-//            bgup = false;
-//        } else if (group->offset.y == 0) {
-//            bgup = true;
-//        }
-//        if (bgup) {
-//            group->offset.y++;
-//        } else {
-//            group->offset.y--;
-//        }
-//        zmtxt->content = std::format("Ten tekst jest zmienny! {}", Time::Instance().LastFrame());
-//        auto s = sin(Time::Instance().LastFrame());
-//        auto c = cos(Time::Instance().LastFrame());
-//        static auto ogsprsize = zmspr->size;
-//        zmspr->size = ogsprsize * glm::vec2(c,s);
-//        zmtxt->color = { s, c, s + c / 2, 1.0f };
-//        zmspr->color = { s, c, s + c / 2, 1.0f };
-        //____________________________________________________________________________________________________
-
-
         // End frame and swap buffers (double buffering)
 
         end_frame();
@@ -347,7 +311,6 @@ void cleanup() {
 bool init() {
     std::srand(std::time(0)); //Just to be sure
     spdlog::set_level(spdlog::level::trace);
-//    spdlog::get("")->sinks()[0]->set_level(spdlog::level::debug);
     ztgk::console.level(spdlog::level::trace);
 
     // Get current date and time
@@ -421,8 +384,6 @@ void init_systems() {
     scene.systemManager.getSystem<SignalQueue>()->init();
     ztgk::game::cursor.init();
 
-
-
     scene.systemManager.addSystem(std::make_unique<LightSystem>(&camera, &scene));
     scene.systemManager.addSystem(std::make_unique<RenderSystem>());
     scene.systemManager.addSystem(std::make_unique<InstanceRenderSystem>(&camera));
@@ -430,8 +391,6 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<Grid>(&scene, 100, 100, 2.0f, Vector3(0, 0, 0)));
     scene.systemManager.addSystem(std::make_unique<CollisionSystem>());
     scene.systemManager.addSystem(std::make_unique<UnitSystem>());
-
-
 
     primitives.Init();
     phongPipeline.Init();
@@ -515,8 +474,6 @@ void load_enteties() {
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
     scene.systemManager.getSystem<LightSystem>()->Init();
 
-    //gameObject = scene.addEntity("Quad");
-    // gameObject->addComponent(make_unique<Render>(quadModel));
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
@@ -708,7 +665,6 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     file_logger->info("Cleared.");
-
 
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
