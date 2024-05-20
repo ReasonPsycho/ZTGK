@@ -282,9 +282,7 @@ int main(int, char **) {
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
 
-
         // End frame and swap buffers (double buffering)
-
         end_frame();
 
     }
@@ -479,44 +477,107 @@ void load_enteties() {
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
+//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
     auto ehud = scene.addEntity("HUD DEMO");
-    auto ebg = scene.addEntity(ehud, "Background");
-    bggroup =   scene.systemManager.getSystem<HUD>()->addGroup(glm::vec3(0, 0, 10));
-    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(bggroup)->setHidden(true);
-    auto bgelem = scene.addEntity(ebg, "Puni1");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(10, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni2");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(100, 0), glm::vec2(100, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni3");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(250, 0), glm::vec2(20, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni4");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(600, 0), glm::vec2(500, 100), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
-    bgelem = scene.addEntity(ebg, "Puni5");
-    bgelem->addComponent(make_unique<Sprite>(glm::vec2(1500, 0), glm::vec2(100, 500), ztgk::color.WHITE, bggroup,
-                                             "res/textures/puni.png"));
+    auto entity = scene.addEntity(ehud, "HoverE");
+    auto egroup = scene.systemManager.getSystem<HUD>()->addGroup(0, "Hover", false, {-200, 100, 0});
+    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
+    auto spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(make_unique<Text>("Hover me!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
+    auto txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    entity->addComponent(make_unique<HUDHoverable>(entity->getComponent<Sprite>(), egroup,
+        [txt, spr](HUDHoverable * self){
+            txt->content = ":)";
+            txt->color = ztgk::color.BLACK;
+            spr->color = ztgk::color.WHITE;
+            spr->load();
+        },
+       [txt, spr](HUDHoverable * self){
+            txt->content = "Hover me!";
+            txt->color = ztgk::color.WHITE;
+            spr->color = ztgk::color.BLACK;
+            spr->load();
+        }
+       ) );
+    entity = scene.addEntity(ehud, "ButtonE");
+    egroup = scene.systemManager.getSystem<HUD>()->addGroup(0, "Button", false, {200, -100, 0});
+    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
+    spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(make_unique<Text>("Press me!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
+    txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    entity->addComponent(make_unique<HUDButton>(entity->getComponent<Sprite>(), egroup,
+        [txt](HUDButton * self){
+            txt->content = ":)";
+        },
+       [txt](HUDButton * self){
+            txt->content = "Press me!";
+        }
+   ) );
+    entity = scene.addEntity(ehud, "BothE");
+    egroup = scene.systemManager.getSystem<HUD>()->addGroup(0, "Both", false, {0, 100, 0});
+    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
+    spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(make_unique<Text>("Do it!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
+    txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    entity->addComponent(make_unique<HUDHoverable>(entity->getComponent<Sprite>(), egroup,
+    [txt, spr](HUDHoverable * self){
+        txt->color = ztgk::color.BLACK;
+        spr->color = ztgk::color.WHITE;
+        spr->load();
+    },
+   [txt, spr](HUDHoverable * self){
+        txt->color = ztgk::color.WHITE;
+        spr->color = ztgk::color.BLACK;
+        spr->load();
+    }
+       ) );
+    entity->addComponent(make_unique<HUDButton>(entity->getComponent<Sprite>(), egroup,
+        [txt](HUDButton * self){
+            txt->content = ":)";
+        },
+       [txt](HUDButton * self){
+            txt->content = "Do it!";
+        }
+   ) );
+
+    scene.systemManager.getSystem<HUD>()->createButton("Button text",
+       {500, 500}, {300, 100}, ztgk::color.CYAN, ztgk::color.TURQUOISE,
+       ztgk::color.BLUE, []() { spdlog::info("Button pressed!"); },
+       nullptr);
+
+    scene.systemManager.getSystem<HUD>()->createButton(
+        {1000, 200}, {300, 300},
+        "res/textures/puni.png", "res/textures/container2.png",
+        [](){ spdlog::info("2SPR Button pressed!"); },
+        nullptr
+    );
+
+    scene.systemManager.getSystem<HUD>()->createButton(
+        "Func button textt", {1000, 900}, {300, 150}, ztgk::color.BROWN,
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; self->collisionSprite->load(); },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; self->collisionSprite->load(); },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); spdlog::info("Func Button pressed!"); },
+        nullptr
+    );
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
-    fgelem->addComponent(make_unique<Text>("Ten tekst jest staly!", ztgk::game::window_size / 5));
+    fgelem->addComponent(make_unique<Text>("One line text", glm::vec2{100, 1000}));
     zmgroup =   scene.systemManager.getSystem<HUD>()->addGroup();
-    scene.systemManager.getSystem<HUD>()->getGroupOrDefault(zmgroup)->setHidden(true);
     fgelem = scene.addEntity(efg, "Variable Text");
-    auto tx = Text("Ten tekst jest zmienny!", glm::vec2(ztgk::game::window_size.x * 0.5 - 300,
-                                                        ztgk::game::window_size.y * 0.5));
+    auto tx = Text("Multiline\ntext\nyea", glm::vec2(100, 800));
     tx.groupID = zmgroup;
     fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
-    fgelem = scene.addEntity(efg, "Animated Sprite");
-    auto spr = Sprite("res/textures/puni.png");
-    spr.groupID = zmgroup;
-    fgelem->addComponent(make_unique<Sprite>(spr));
-    zmspr = fgelem->getComponent<Sprite>();
-    zmspr->groupID = zmgroup;
+
+    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
     load_units();
 
@@ -643,13 +704,8 @@ void update() {
     for (auto tile: selectedTiles) {
         scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
     }
-
-
+    
     scene.systemManager.getSystem<CollisionSystem>()->Update();
-
- //   for (auto u: scene.systemManager.getSystem<UnitSystem>()->unitComponents)
-    //spdlog::info("{} {}",u->name, u->currentState->name); I am gonna murder u next time XoXo
-   // }
 }
 
 void render() {
@@ -678,7 +734,7 @@ void render() {
     bloomSystem.BlurBuffer();
     bloomSystem.Render();
 
- //   scene.systemManager.getSystem<HUD>()->draw();
+    scene.systemManager.getSystem<HUD>()->draw();
 }
 
 void imgui_begin() {

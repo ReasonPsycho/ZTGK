@@ -10,6 +10,8 @@
 #include "TextRenderer.h"
 #include "SpriteRenderer.h"
 #include "ECS/SignalQueue/SignalReceiver.h"
+#include "ECS/HUD/Interactables/HUDHoverable.h"
+#include "ECS/HUD/Interactables/HUDButton.h"
 
 struct HUDRemapGroupsSignalData;
 
@@ -32,31 +34,51 @@ public:
     Group * getDefaultGroup() const;
     Group * getGroupOrDefault(unsigned groupID) const;
     Group * getGroupOrAddDefault(unsigned groupID);
-    unsigned addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false);
+    Group * findGroupByName(const std::string & name) const;
+    unsigned int
+    addGroup(unsigned int parentGroupID = 0, const string &name = "", bool hidden = false, glm::vec3 offset = {0, 0, 0});
     bool removeGroup(unsigned groupID);
 
     std::vector<AHUDComponent *> getOfGroup(unsigned groupID);
+    glm::vec3 getGroupTreeOffset(unsigned leafGroupID) const;
+    bool isGroupTreeHidden(unsigned leafGroupID) const;
 
-//    Entity * newButton(const std::string & text, const btn_callback & callback, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
-//    Entity * newCheckbox(const btn_callback & callbackOn, const btn_callback & callbackOff, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
+#pragma region Element Creation
+    Entity *createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 defaultColor,
+                         HUDHoverable::hover_func onHoverEnter, HUDHoverable::hover_func onHoverExit,
+                         HUDButton::button_func onPress, HUDButton::button_func onRelease, Entity *parent,
+                         unsigned int parentGroupID = 0);
+    Entity *
+    createButton(glm::vec2 centerPos, glm::vec2 size, const std::string &foregroundSpritePath,
+                 const std::string &backgroundSpritePath, const std::function<void()> &onRelease, Entity *parent,
+                 unsigned int parentGroupID = 0);
+    Entity *
+    createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 color, glm::vec4 hoverColor,
+                 glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
+                 unsigned int parentGroupID = 0);
+#pragma endregion
 
     void init();
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&componentTypes); }
-    int getNumComponentTypes() override { return 2; }
+    int getNumComponentTypes() override { return 4; }
     void showImGuiDetailsImpl(Camera *camera) override;
     void registerComponents() override{};
 
     std::unordered_map<unsigned, std::vector<Sprite*>> sprites;
     std::unordered_map<unsigned, std::vector<Text*>> texts;
+    std::unordered_map<unsigned, std::vector<HUDHoverable*>> hoverables;
+    std::unordered_map<unsigned, std::vector<HUDButton*>> buttons;
 
     void sort_z();
     void remap_groups(HUDRemapGroupsSignalData data);
 
 private:
-    std::array<std::type_index, 2> componentTypes = {
+    std::array<std::type_index, 4> componentTypes = {
         std::type_index(typeid(Sprite)),
-        std::type_index(typeid(Text))
+        std::type_index(typeid(Text)),
+        std::type_index(typeid(HUDHoverable)),
+        std::type_index(typeid(HUDButton))
     };
 };

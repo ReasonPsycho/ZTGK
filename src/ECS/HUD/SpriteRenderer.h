@@ -7,6 +7,8 @@
 #include "glm/detail/type_mat4x4.hpp"
 #include "ECS/Render/ModelLoading/Shader.h"
 #include "ECS/HUD/Components/Sprite.h"
+#include "Bounds.h"
+
 class HUD;
 
 class SpriteRenderer {
@@ -17,6 +19,8 @@ public:
 
     HUD * hud;
 
+    glm::vec2 size(Sprite * sprite) const;
+    Bounds bounds(Sprite * sprite) const;
     // editor
     void imgui_controls();
 private:
@@ -24,4 +28,6 @@ private:
     glm::mat4 projection;
 
     Shader shader;
+
+    glm::vec2 drawModeOffset(Sprite * sprite) const;
 };

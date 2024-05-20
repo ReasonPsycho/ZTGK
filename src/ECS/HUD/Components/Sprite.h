@@ -27,13 +27,12 @@ struct Sprite : public AHUDComponent {
     GLuint texture;
     glm::vec4 color;
 
-    void load(const std::string & path);
+    void load(const std::string & path = "");
 
     // editor
     static const unsigned editor_path_len = 100;
     char editor_path[editor_path_len];
     void showImGuiDetailsImpl(Camera *camera) override;
 
-private:
     void loadColor();
 };

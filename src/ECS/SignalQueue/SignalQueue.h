@@ -81,7 +81,7 @@ public:
         bool all{false};
         int componentID{-1}, oldGroupID{-1}, newGroupID{-1};
         int componentType{0};
-        // hud remove group
+        // hud remove groupID
         int groupId{-1};
     };
     static editor_s_new_signal_config editor_new_signal_config;

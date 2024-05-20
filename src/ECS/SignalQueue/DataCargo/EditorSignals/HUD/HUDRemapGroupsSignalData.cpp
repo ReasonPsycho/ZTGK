@@ -4,6 +4,7 @@
 
 #include "ECS/SignalQueue/Signal.h"
 #include "HUDRemapGroupsSignalData.h"
+#include "ECS/HUD/Components/HudCompType.h"
 
 HUDRemapGroupsSignalData::
 HUDRemapGroupsSignalData(bool all, unsigned componentId, hudcType componentType, unsigned oldGroup, unsigned newGroup, const std::string &message)

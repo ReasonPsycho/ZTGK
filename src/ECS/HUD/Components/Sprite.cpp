@@ -50,12 +50,13 @@ void Sprite::load(const std::string &path) {
                 format = GL_RGBA;
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
+            spdlog::trace("Loaded sprite \"" + path + "\".");
         } else {
             spdlog::error("Failed to load sprite \"" + path + "\". Generating color pixel texture.");
             loadColor();
         }
-        if (size == glm::vec2{0,0}) {
-            size = { width, height };
+        if (size == glm::vec2{0, 0}) {
+            size = {width, height };
             pos -= (size / 2.0f);
         }
 
@@ -64,27 +65,29 @@ void Sprite::load(const std::string &path) {
 }
 
 void Sprite::showImGuiDetailsImpl(Camera *camera) {
-    ImGui::InputText("Path", editor_path, editor_path_len);
+    ImGui::InputText(std::format("Path##{}", uniqueID).c_str(), editor_path, editor_path_len);
     ImGui::SameLine();
-    if (ImGui::Button("Load")) {
+    if (ImGui::Button(std::format("Load##{}", uniqueID).c_str())) {
         load(editor_path);
     }
-    ImGui::DragFloat2("Pos", glm::value_ptr(pos));
-    ImGui::DragFloat2("Size", glm::value_ptr(size));
-    ImGui::ColorEdit3("Color", glm::value_ptr(color));
+    ImGui::DragFloat2(std::format("Pos##{}", uniqueID).c_str(), glm::value_ptr(pos));
+    ImGui::DragFloat2(std::format("Size##{}", uniqueID).c_str(), glm::value_ptr(size));
+    ImGui::ColorEdit4(std::format("Color##{}", uniqueID).c_str(), glm::value_ptr(color));
     static int e_tex;
     e_tex = static_cast<int>(texture);
-    ImGui::InputInt("Texture ID", &e_tex);
+    ImGui::InputInt(std::format("Texture ID##{}", uniqueID).c_str(), &e_tex);
     texture = static_cast<GLuint>(e_tex);
     static unsigned gid;
     gid = groupID;
-    ImGui::InputInt("Group ID", reinterpret_cast<int *>(&groupID));
+    ImGui::InputInt(std::format("Group ID##{}", uniqueID).c_str(), reinterpret_cast<int *>(&groupID));
     if (gid != groupID) {
         *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += HUDRemapGroupsSignalData::signal(
             false, uniqueID, type, gid, groupID, "Editor event."
         );
         gid = groupID;
     }
+    static const char * const modes[] = MODE_NAMES;
+    ImGui::Combo(std::format("Draw Mode##{}", uniqueID).c_str(), reinterpret_cast<int *>(&mode), modes, num_modes);
 }
 
 void Sprite::loadColor() {

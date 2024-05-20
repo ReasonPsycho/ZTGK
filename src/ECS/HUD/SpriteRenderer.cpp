@@ -35,9 +35,12 @@ void SpriteRenderer::render(Sprite * sprite) {
     shader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sprite->texture);
-    auto group = hud->getGroupOrDefault(sprite->groupID);
-    float xpos = sprite->pos.x + group->offset.x;
-    float ypos = sprite->pos.y + group->offset.y;
+    auto blend = glIsEnabled(GL_BLEND);
+    glEnable(GL_BLEND);
+    auto pivotOffset = drawModeOffset(sprite);
+    auto groupOffset = hud->getGroupTreeOffset(sprite->groupID);
+    float xpos = sprite->pos.x + groupOffset.x + pivotOffset.x;
+    float ypos = sprite->pos.y + groupOffset.y + pivotOffset.y;
     float w = sprite->size.x, h = sprite->size.y;
 
     float vertices[] = {
@@ -62,8 +65,53 @@ void SpriteRenderer::render(Sprite * sprite) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    if (!blend)
+        glDisable(GL_BLEND);
 }
 
 void SpriteRenderer::imgui_controls() {
     ImGui::Text("%s", std::format("Shader ID: {}", shader.ID).c_str());
+}
+
+glm::vec2 SpriteRenderer::size(Sprite *sprite) const {
+    return sprite->size;
+}
+
+glm::vec2 SpriteRenderer::drawModeOffset(Sprite *sprite) const {
+    auto _size = size(sprite);
+    switch (sprite->mode) {
+        case TOP_LEFT:
+            return { 0, -_size.y };
+        case TOP_CENTER:
+            return { -_size.x / 2, -_size.y };
+        case TOP_RIGHT:
+            return { -_size.x, -_size.y };
+        case MIDDLE_LEFT:
+            return { 0, -_size.y / 2 };
+        case CENTER:
+            return { -_size.x / 2, -_size.y / 2 };
+        case MIDDLE_RIGHT:
+            return { -_size.x, -_size.y / 2 };
+        default:
+        case BOTTOM_LEFT:
+            return { 0, 0 };
+        case BOTTOM_CENTER:
+            return { -_size.x / 2, 0 };
+        case BOTTOM_RIGHT:
+            return { -_size.x, 0 };
+    }
+}
+
+Bounds SpriteRenderer::bounds(Sprite *sprite) const {
+    auto pivotOffset = drawModeOffset(sprite);
+    auto groupOffset = hud->getGroupTreeOffset(sprite->groupID);
+    float xpos = sprite->pos.x + groupOffset.x + pivotOffset.x;
+    float ypos = sprite->pos.y + groupOffset.y + pivotOffset.y;
+    float w = sprite->size.x, h = sprite->size.y;
+    return {
+        .top = ypos + h,
+        .bottom = ypos,
+        .left = xpos,
+        .right = xpos + w
+    };
 }
