@@ -36,17 +36,27 @@ public:
     Group * getGroupOrAddDefault(unsigned groupID);
     Group * findGroupByName(const std::string & name) const;
     unsigned int
-    addGroup(glm::vec3 offset = {0, 0, 0}, bool hidden = false, const std::string &name = "", unsigned parentGroupID = 0);
+    addGroup(unsigned int parentGroupID = 0, const string &name = "", bool hidden = false, glm::vec3 offset = {0, 0, 0});
     bool removeGroup(unsigned groupID);
 
     std::vector<AHUDComponent *> getOfGroup(unsigned groupID);
     glm::vec3 getGroupTreeOffset(unsigned leafGroupID) const;
     bool isGroupTreeHidden(unsigned leafGroupID) const;
 
-    Entity * createButton(const std::string & text, const std::function<void()> & onPress, const std::function<void()> & onRelease, glm::vec2 pos, glm::vec2 size, unsigned parentGroupID = 0);
-    Entity * createButton(const std::string & text, const std::string & foregroundSpritePath, const std::string & backgroundSpritePath, const std::function<void()> & onPress, const std::function<void()> & onRelease, glm::vec2 pos, glm::vec2 size, unsigned parentGroupID = 0);
-    Entity * createButton(const std::string & text, glm::vec4 color, glm::vec4 hoverColor, glm::vec4 pressColor, glm::vec2 centerPos, glm::vec2 size, const std::function<void()> & onRelease, Entity * parent, unsigned parentGroupID = 0);
-//    Entity * newButton(const std::string & text, const btn_callback & callback, glm::vec2 pos, glm::vec2 size, Entity * parent = nullptr);
+#pragma region Element Creation
+    Entity *createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 defaultColor,
+                         HUDHoverable::hover_func onHoverEnter, HUDHoverable::hover_func onHoverExit,
+                         HUDButton::button_func onPress, HUDButton::button_func onRelease, Entity *parent,
+                         unsigned int parentGroupID = 0);
+    Entity *
+    createButton(glm::vec2 centerPos, glm::vec2 size, const std::string &foregroundSpritePath,
+                 const std::string &backgroundSpritePath, const std::function<void()> &onRelease, Entity *parent,
+                 unsigned int parentGroupID = 0);
+    Entity *
+    createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 color, glm::vec4 hoverColor,
+                 glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
+                 unsigned int parentGroupID = 0);
+#pragma endregion
 
     void init();
     void addComponent(void *component) override;

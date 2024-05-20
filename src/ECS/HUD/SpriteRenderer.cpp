@@ -35,6 +35,8 @@ void SpriteRenderer::render(Sprite * sprite) {
     shader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sprite->texture);
+    auto blend = glIsEnabled(GL_BLEND);
+    glEnable(GL_BLEND);
     auto pivotOffset = drawModeOffset(sprite);
     auto groupOffset = hud->getGroupTreeOffset(sprite->groupID);
     float xpos = sprite->pos.x + groupOffset.x + pivotOffset.x;
@@ -63,6 +65,8 @@ void SpriteRenderer::render(Sprite * sprite) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    if (!blend)
+        glDisable(GL_BLEND);
 }
 
 void SpriteRenderer::imgui_controls() {

@@ -12,12 +12,14 @@ class Sprite;
 
 class HUDButton : public AHUDComponent {
 public:
+    using button_func = std::function<void(HUDButton * self)>;
+
     Sprite * collisionSprite;
 
-    HUDButton(Sprite * collisionSprite, unsigned groupID, std::function<void()> onPress = [](){}, std::function<void()> onRelease = [](){});
+    HUDButton(Sprite * collisionSprite, unsigned groupID, button_func onPress = [](HUDButton * self){}, button_func onRelease = [](HUDButton * self){});
 
-    std::function<void()> onPress;
-    std::function<void()> onRelease;
+    button_func onPress;
+    button_func onRelease;
 
     void showImGuiDetailsImpl(Camera *camera) override;
 };

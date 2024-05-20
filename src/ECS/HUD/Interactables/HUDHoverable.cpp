@@ -5,7 +5,7 @@
 
 #include "ECS/HUD/Components/Sprite.h"
 
-HUDHoverable::HUDHoverable(Sprite *collisionSprite, unsigned groupID, std::function<void()> onHoverEnter, std::function<void()> onHoverExit)
+HUDHoverable::HUDHoverable(Sprite * collisionSprite, unsigned groupID, hover_func onHoverEnter, hover_func onHoverExit)
 : AHUDComponent(HOVERABLE, groupID), collisionSprite(collisionSprite), onHoverEnter(std::move(onHoverEnter)), onHoverExit(std::move(onHoverExit)) {
     name = "Hoverable";
 }

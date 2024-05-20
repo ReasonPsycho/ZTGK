@@ -211,6 +211,9 @@ TextSize TextRenderer::size(Text *text) const {
     _size.x = std::max(_size.x, _linesize.x);
     _size.y += _linesize.y;
     bottom_base_line += (interline_px * text->scale.y) + (_linesize.y - line_base_down);
+    if (n_lines == 1) {
+        first_line_height = _linesize.y;
+    }
 
     return TextSize{ _size, n_lines, first_line_height, bottom_base_line };
 }
@@ -218,7 +221,7 @@ TextSize TextRenderer::size(Text *text) const {
 glm::vec2 TextRenderer::drawModeOffset(Text *text) const {
     auto _size = size(text);
     float bottom_offset = _size.n_lines > 1 ? _size.bottom_base_line : 0;
-    float middle_offset = _size.n_lines > 1 ? (_size.total.y - _size.first_line_height) / 2 : _size.first_line_height / 2;
+    float middle_offset = _size.n_lines > 1 ? (_size.total.y - _size.first_line_height) / 2 : -_size.first_line_height / 2;
 
     switch (text->mode) {
         case TOP_LEFT:

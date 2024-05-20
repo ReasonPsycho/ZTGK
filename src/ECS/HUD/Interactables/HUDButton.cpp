@@ -3,9 +3,11 @@
 //
 
 #include "HUDButton.h"
+#include "ECS/HUD/HUD.h"
 #include "ECS/HUD/Components/Sprite.h"
+#include "ECS/Entity.h"
 
-HUDButton::HUDButton(Sprite *collisionSprite, unsigned groupID, std::function<void()> onPress, std::function<void()> onRelease)
+HUDButton::HUDButton(Sprite * collisionSprite, unsigned groupID, button_func onPress, button_func onRelease)
 : AHUDComponent(BUTTON, groupID), collisionSprite(collisionSprite), onPress(std::move(onPress)), onRelease(std::move(onRelease)) {
     name = "Button";
 }

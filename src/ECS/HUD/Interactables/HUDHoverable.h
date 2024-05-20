@@ -12,12 +12,14 @@ class Sprite;
 
 class HUDHoverable : public AHUDComponent {
 public:
+    using hover_func = std::function<void(HUDHoverable * self)>;
+
     Sprite * collisionSprite;
 
-    HUDHoverable(Sprite * collisionSprite, unsigned groupID, std::function<void()> onHoverEnter = [](){}, std::function<void()> onHoverExit = [](){});
+    HUDHoverable(Sprite * collisionSprite, unsigned groupID, hover_func onHoverEnter = [](HUDHoverable * self){}, hover_func onHoverExit = [](HUDHoverable * self){});
 
-    std::function<void()> onHoverEnter;
-    std::function<void()> onHoverExit;
+    hover_func onHoverEnter;
+    hover_func onHoverExit;
 
     void showImGuiDetailsImpl(Camera *camera) override;
 

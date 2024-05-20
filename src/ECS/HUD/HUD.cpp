@@ -48,10 +48,10 @@ void HUD::init() {
                         if (hoverable != hovered) {
                             // quit the old hoverable (if possible) and enter the new one
                             if (hovered != nullptr)
-                                hovered->onHoverExit();
+                                hovered->onHoverExit(hovered);
 
                             hovered = hoverable;
-                            hovered->onHoverEnter();
+                            hovered->onHoverEnter(hovered);
                             return;
                         }
                     }
@@ -59,7 +59,7 @@ void HUD::init() {
             }
             // if no element is hovered upon, clear the old hover
             if (hovered != nullptr && !spriteRenderer->bounds(hovered->collisionSprite).contains(data->pos)) {
-                hovered->onHoverExit();
+                hovered->onHoverExit(hovered);
                 hovered = nullptr;
             }
         } else if ( signal.stype == Signal::signal_types.mouse_button_signal ) {
@@ -72,12 +72,12 @@ void HUD::init() {
                     if (spriteRenderer->bounds(button->collisionSprite).contains(data->pos)) {
                         // and the button was pressed...
                         if (data->action == GLFW_PRESS) {
-                            button->onPress();
+                            button->onPress(button);
                             return;
                         }
                         // and the button was released...
                         if (data->action == GLFW_RELEASE) {
-                            button->onRelease();
+                            button->onRelease(button);
                             return;
                         }
                     }
@@ -124,7 +124,7 @@ Group *HUD::getGroupOrAddDefault(unsigned int groupID) {
     return &groups[groupID];
 }
 
-unsigned int HUD::addGroup(glm::vec3 offset, bool hidden, const std::string &name, unsigned parentGroupID) {
+unsigned int HUD::addGroup(unsigned int parentGroupID, const string &name, bool hidden, glm::vec3 offset) {
     Group newGroup;
     newGroup.offset = offset;
     newGroup.setHidden(hidden);
@@ -414,3 +414,128 @@ Group *HUD::findGroupByName(const string &name) const {
     }
     return getDefaultGroup();
 }
+
+
+
+#pragma region Element Creation
+
+Entity *HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 defaultColor,
+                          HUDHoverable::hover_func onHoverEnter, HUDHoverable::hover_func onHoverExit,
+                          HUDButton::button_func onPress, HUDButton::button_func onRelease, Entity *parent,
+                          unsigned int parentGroupID) {
+    Entity * entity;
+    if (parent)
+        entity = ztgk::game::scene->addEntity(parent, "Button - " + text);
+    else entity = ztgk::game::scene->addEntity("Button - " + text);
+    auto group = addGroup(parentGroupID, "Button - " + text);
+    entity->addComponent(std::make_unique<Sprite>(centerPos, size, defaultColor, group));
+    auto spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(std::make_unique<Text>(text, centerPos, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, group));
+    auto txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    auto txt_size = textRenderer->size(txt);
+    glm::vec2 new_scale = glm::vec2(0.9, 0.8) * spr->size / txt_size.total;
+    txt->scale = new_scale;
+    entity->addComponent(std::make_unique<HUDHoverable>(
+        entity->getComponent<Sprite>(), group,
+        std::move(onHoverEnter), std::move(onHoverExit)
+    ));
+    entity->addComponent(std::make_unique<HUDButton>(
+        entity->getComponent<Sprite>(), group,
+        std::move(onPress), std::move(onRelease)
+    ));
+
+    return entity;
+}
+
+Entity *HUD::createButton(glm::vec2 centerPos, glm::vec2 size, const std::string &foregroundSpritePath,
+                          const std::string &backgroundSpritePath, const std::function<void()> &onRelease,
+                          Entity *parent,
+                          unsigned int parentGroupID) {
+    Entity * entity;
+    auto fgname = foregroundSpritePath.substr(foregroundSpritePath.find_last_of('/'));
+    auto bgname = backgroundSpritePath.substr(backgroundSpritePath.find_last_of('/'));
+    if (parent)
+        entity = ztgk::game::scene->addEntity(parent, "Button FG: " + fgname + "; BG: " + bgname);
+    else entity = ztgk::game::scene->addEntity("Button FG: " + fgname + "; BG: " + bgname);
+    auto group = addGroup(parentGroupID, "Button FG: " + fgname + "; BG: " + bgname);
+
+    auto bgent = ztgk::game::scene->addEntity(entity, "Background");
+    bgent->addComponent(std::make_unique<Sprite>(centerPos, size, ztgk::color.WHITE, group, backgroundSpritePath));
+    auto bgspr = bgent->getComponent<Sprite>();
+    bgspr->mode = CENTER;
+
+    entity->addComponent(std::make_unique<Sprite>(centerPos, size, ztgk::color.WHITE, group, foregroundSpritePath));
+    auto spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+
+    static glm::vec4 color = ztgk::color.WHITE;
+    static glm::vec4 hoverColor = ztgk::color.WHITE * glm::vec4{0.9, 0.9, 0.9, 1};
+    static glm::vec4 pressColor = ztgk::color.WHITE * glm::vec4{0.8f, 0.8f, 0.8f, 1};
+
+    entity->addComponent(std::make_unique<HUDHoverable>(bgspr, group,
+        [spr](HUDHoverable * self) {
+            spr->color = hoverColor;
+        },
+        [spr](HUDHoverable * self) {
+            spr->color = color;
+        }
+    ));
+    entity->addComponent(std::make_unique<HUDButton>(bgspr, group,
+        [spr](HUDButton * self) {
+            spr->color = pressColor;
+        },
+        [spr, onRelease](HUDButton * self) {
+            onRelease();
+            spr->color = hoverColor;
+        }
+    ));
+
+    return entity;
+}
+
+Entity *
+HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 color, glm::vec4 hoverColor,
+                  glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
+                  unsigned int parentGroupID) {
+    Entity * entity;
+    if (parent)
+        entity = ztgk::game::scene->addEntity(parent, "Button - " + text);
+    else entity = ztgk::game::scene->addEntity("Button - " + text);
+    auto group = addGroup(parentGroupID, "Button - " + text);
+    entity->addComponent(std::make_unique<Sprite>(centerPos, size, color, group));
+    auto spr = entity->getComponent<Sprite>();
+    spr->mode = CENTER;
+    entity->addComponent(std::make_unique<Text>(text, centerPos, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, group));
+    auto txt = entity->getComponent<Text>();
+    txt->mode = CENTER;
+    auto txt_size = textRenderer->size(txt);
+    glm::vec2 new_scale = glm::vec2(0.9, 0.8) * spr->size / txt_size.total;
+    txt->scale = new_scale;
+    entity->addComponent(std::make_unique<HUDHoverable>(entity->getComponent<Sprite>(), group,
+        [hoverColor](HUDHoverable * self) {
+            self->collisionSprite->color = hoverColor;
+            self->collisionSprite->load();
+        },
+        [color](HUDHoverable * self) {
+            self->collisionSprite->color = color;
+            self->collisionSprite->load();
+        }
+    ));
+    entity->addComponent(std::make_unique<HUDButton>(entity->getComponent<Sprite>(), group,
+        [pressColor](HUDButton * self) {
+            self->collisionSprite->color = pressColor;
+            self->collisionSprite->load();
+        },
+        [onRelease, hoverColor](HUDButton * self) {
+            onRelease();
+            self->collisionSprite->color = hoverColor;
+            self->collisionSprite->load();
+        }
+    ));
+
+    return entity;
+}
+
+#pragma endregion
