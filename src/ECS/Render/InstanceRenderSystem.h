@@ -42,10 +42,13 @@ private:
     double biasMuliplayer = 0.00001f;
     double factor = 2;
     double units = 0;
+    float dirtLayer = 0.2;
+    float saturation = 2;
     
     string tilePath =  "res/textures/tiles/Tile";
     
     std::vector<WallData> wallData;
+    MaterialPhong wallMaterial;
 };
 
 

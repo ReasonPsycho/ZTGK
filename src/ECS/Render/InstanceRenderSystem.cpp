@@ -4,6 +4,7 @@
 
 #include "ECS/SystemManager.h"
 #include "InstanceRenderSystem.h"
+#include <filesystem>
 
 unsigned char* LoadTileTexture(const std::string& file_name, int& width, int& height, int& nrChannels)
 {
@@ -32,21 +33,23 @@ void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputScalar("biasMuliplayer",ImGuiDataType_Double, &biasMuliplayer, &step);
     ImGui::InputScalar("factor",ImGuiDataType_Double, &factor, &step);
     ImGui::InputScalar("units",ImGuiDataType_Double, &units, &step);
+    ImGui::SliderFloat("Dirt layer",&dirtLayer,0,1);
+    ImGui::SliderFloat("Saturation",&saturation,0,10);
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
   //it must be here bcs if we mine wall we need to UpdateImpl walls
   //Innit();
     ZoneScopedN("Draw tiles");
-    tileModel->meshes[0].material.loadMaterial(regularShader);
-    glActiveTexture(GL_TEXTURE0 + tileTextureBindingPoint);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tileTextureArray);
-    glUniform1i(glGetUniformLocation(regularShader->ID, "diffuseTextureArray"),tileTextureBindingPoint);
+    regularShader->use();
+    wallMaterial.loadInstancedMaterial(regularShader);
     Grid* grid = systemManager->getSystem<Grid>();
-    
     glm::mat4 gridMatrix = glm::translate(glm::mat4(1.0f), (glm::vec3 (grid->Position.x,grid->Position.y,grid->Position.z)));
     regularShader->setMatrix4("gridMatrix", false,glm::value_ptr(gridMatrix));
     regularShader->setFloat("biasMuliplayer", biasMuliplayer);
+    regularShader->setFloat("heightScale", 0.03);
+    regularShader->setFloat("dirtLevel",dirtLayer);
+    regularShader->setFloat("saturation",saturation);
     
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);
@@ -100,36 +103,47 @@ void InstanceRenderSystem::UpdateImpl() {
 }
 
 void InstanceRenderSystem::Innit() {
-    glGenTextures(1, &tileTextureArray);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tileTextureArray);
-    glTexImage3D(
-            GL_TEXTURE_2D_ARRAY,  // target
-            0,                    // level, 0 is the base, no mipmap
-            GL_RGBA,              // internal format
-            512,                  // width
-            512,                  // height
-            3,                    // depth, the number of layers in the array texture.
-            0,                    // border, always 0 in OpenGL ES 
-            GL_RGBA,              // format
-            GL_UNSIGNED_BYTE,     // type
-            NULL                  // data, NULL means to reserve texture data space without loading data.
-    );    unsigned char* textureData;
-    for(int layer = 0; layer <  numberOfTextures; layer++) {
-        int width, height, nrChannels;
-        spdlog::info(tilePath + std::to_string(layer) + ".png");
-        textureData = LoadTileTexture(tilePath + std::to_string(layer) + ".png", width, height, nrChannels);
-        if (textureData) {
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, 512, 512, 1, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-            stbi_image_free(textureData);  // don't forget to free the image memory
+    glGenBuffers(1, &wallDataBufferID);
+    std::filesystem::path diffuseTexturesDictionary("res/textures/tiles/Diffuse"); // Replace with your directory
+    if (std::filesystem::exists(diffuseTexturesDictionary) && std::filesystem::is_directory(diffuseTexturesDictionary)) {
+        for (const auto& entry : std::filesystem::directory_iterator(diffuseTexturesDictionary)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                std::cout << "PNG file located: " << entry.path().string() << std::endl;
+                wallMaterial.diffuseTextures.push_back(std::make_shared<Texture>(entry.path().string(),""));
+            }
         }
     }
 
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    
-    glGenBuffers(1, &wallDataBufferID);
+    std::filesystem::path specularTexturesDictionary("res/textures/tiles/Specular"); // Replace with your directory
+    if (std::filesystem::exists(specularTexturesDictionary) && std::filesystem::is_directory(specularTexturesDictionary)) {
+        for (const auto& entry : std::filesystem::directory_iterator(specularTexturesDictionary)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                std::cout << "PNG file located: " << entry.path().string() << std::endl;
+                wallMaterial.specularTextures.push_back(std::make_shared<Texture>(entry.path().string(),""));
+            }
+        }
+    }
+
+    std::filesystem::path normalTexturesDictionary("res/textures/tiles/Normal"); // Replace with your directory
+    if (std::filesystem::exists(normalTexturesDictionary) && std::filesystem::is_directory(normalTexturesDictionary)) {
+        for (const auto& entry : std::filesystem::directory_iterator(normalTexturesDictionary)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                std::cout << "PNG file located: " << entry.path().string() << std::endl;
+                wallMaterial.normalTextures.push_back(std::make_shared<Texture>(entry.path().string(),""));
+            }
+        }
+    } 
+    std::filesystem::path depthTexturesDictionary("res/textures/tiles/Depth"); // Replace with your directory
+    if (std::filesystem::exists(depthTexturesDictionary) && std::filesystem::is_directory(depthTexturesDictionary)) {
+        for (const auto& entry : std::filesystem::directory_iterator(depthTexturesDictionary)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                std::cout << "PNG file located: " << entry.path().string() << std::endl;
+                wallMaterial.depthTextures.push_back(std::make_shared<Texture>(entry.path().string(),""));
+            }
+        }
+    }
+
+    wallMaterial.mapTextureArrays();
 }
 
 InstanceRenderSystem::InstanceRenderSystem(Camera * camera): camera(camera) {
@@ -137,10 +151,7 @@ InstanceRenderSystem::InstanceRenderSystem(Camera * camera): camera(camera) {
 }
 
 void InstanceRenderSystem::PushToSSBO(Camera* camera) {
-
-
-
-
+    
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, wallData.size() * sizeof(WallData), nullptr, //Orphaning buffer
                  GL_STREAM_DRAW);

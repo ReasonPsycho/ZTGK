@@ -105,6 +105,12 @@ private:
             std::type_index(typeid(PointLight)),
             std::type_index(typeid(SpotLight))
     };
+
+
+    GLubyte whitePixel[3] = {255, 255, 255};
+    GLubyte *whiteImage = new GLubyte[SHADOW_WIDTH * SHADOW_HEIGHT * 3];
+    float borderColor[4] = {1.0, 1.0, 1.0, 1.0};
+
 };
 
 

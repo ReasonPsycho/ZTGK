@@ -52,19 +52,22 @@ bool CombatState::isTargetInRange() {
         unit->hasCombatTarget = false;
         return false;
     }
-    return unit->equipment.in_range_of(
-        {unit->gridPosition.x, unit->gridPosition.z},
-        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
-    ) != nullptr;
+//    bool inRange = unit->equipment.in_range_of(
+//        {unit->gridPosition.x, unit->gridPosition.z},
+//        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
+//    ) != nullptr;
+//    unit->isTargetInRange = inRange;
+//    return inRange;
+     Unit* targ = unit->GetClosestEnemyInWeaponRange();
+    if (targ == nullptr) {
+        unit->hasCombatTarget = false;
+        unit->isTargetInRange = false;
+        return false;
+    }
+    unit->combatTarget = targ;
+    unit->isTargetInRange = true;
+    return true;
 
-
-//    Vector3 worldPosition = Vector3(unit->gridPosition.x, 0, unit->gridPosition.z);
-//    Vector3 combatTargetWorldPosition = Vector3(unit->combatTarget->gridPosition.x, 0, unit->combatTarget->gridPosition.z);
-//    if(VectorUtils::Distance(worldPosition, combatTargetWorldPosition) <= unit->added.range){
-//        unit->isTargetInRange = true;
-//        return true;
-//    }
-//    return false;
 }
 
 void CombatState::AttackTarget() {

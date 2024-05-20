@@ -105,6 +105,13 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     }
     if (ImGui::CollapsingHeader(std::format("Equipment:##eq_unit_{}", uniqueID).c_str()))
         equipment.imgui_preview();
+    ImGui::Text("Has movement target? %s", hasMovementTarget ? "true" : "false");
+    ImGui::Text("Movement Target: (%d, %d)", movementTarget.x, movementTarget.z);
+    ImGui::Text("Has combat target? %s", hasCombatTarget ? "true" : "false");
+    ImGui::Text("Combat Target: %s", combatTarget != nullptr ? combatTarget->name.c_str() : "This sponge is pacifist");
+    ImGui::Text("Has mining target? %s", hasMiningTarget ? "true" : "false");
+    ImGui::Text("Mining Target: %s", currentMiningTarget != nullptr ? currentMiningTarget->name.c_str() : "No mining target");
+
 
 }
 
@@ -152,7 +159,7 @@ void Unit::UpdateImpl() {
 
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
 
-    combatTarget = findEnemy();
+    combatTarget = GetClosestEnemyInSight();
     if(combatTarget != nullptr){
         hasCombatTarget = true;
     }
@@ -188,19 +195,20 @@ void Unit::UpdateImpl() {
         equipment.cd_between_sec -= Time::Instance().DeltaTime();
 }
 
-Unit *Unit::findEnemy() {
+Unit *Unit::GetClosestEnemyInWeaponRange() {
     std::vector<Unit*> enemies;
 
+    bool mySide = isAlly;
     if (equipment.use_default()) {
-        auto found = equipment.rangeEff0.find_enemies({gridPosition.x, gridPosition.z});
+        auto found = equipment.rangeEff0.find_enemies({gridPosition.x, gridPosition.z}, mySide);
         enemies.insert(enemies.end(), found.begin(), found.end());
     } else {
         if (equipment.item1 != nullptr && equipment.item1->offensive) {
-            auto found = equipment.rangeEff1.find_enemies({gridPosition.x, gridPosition.z});
+            auto found = equipment.rangeEff1.find_enemies({gridPosition.x, gridPosition.z}, mySide);
             enemies.insert(enemies.end(), found.begin(), found.end());
         }
         if (equipment.item2 != nullptr && equipment.item2->offensive) {
-            auto found = equipment.rangeEff2.find_enemies({gridPosition.x, gridPosition.z});
+            auto found = equipment.rangeEff2.find_enemies({gridPosition.x, gridPosition.z}, mySide);
             enemies.insert(enemies.end(), found.begin(), found.end());
         }
     }
@@ -214,29 +222,13 @@ Unit *Unit::findEnemy() {
     });
     return enemies.at(0);
 //
-//    int sightRange = 5 + added.range;
-//    for (int i = -sightRange; i < sightRange; i++) {
-//        for (int j = -sightRange; j < sightRange; j++) {
-//            Vector2Int pos = Vector2Int(gridPosition.x + i, gridPosition.z + j);
-//            if (grid->isInBounds(pos)) {
-//                Tile *tile = grid->getTileAt(pos);
-//                if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
-//                    return tile->unit;
-//                }
-//            }
-//        }
-//    }
-//    return nullptr;
-}
 
+}
 
 bool Unit::canFindPathToTarget(Vector2Int target) {
     pathfinding.FindPath(gridPosition, target);
     return !pathfinding.path.empty();
 }
-
-
-
 
 void Unit::serializer_init(Grid * pGrid) {
     auto playerUnit = getEntity();
@@ -310,5 +302,33 @@ void Unit::Wait(float seconds) {
     forcedIdleState = true;
     waitTimer = seconds;
 
+}
+
+std::vector<Unit *> Unit::GetEnemiesInSight() {
+    std::vector<Unit*> enemies;
+    int sightRange = isAlly ? 6 : 4;
+    for (int i = -sightRange; i < sightRange; i++) {
+        for (int j = -sightRange; j < sightRange; j++) {
+            Vector2Int pos = Vector2Int(gridPosition.x + i, gridPosition.z + j);
+            if (grid->isInBounds(pos)) {
+                Tile *tile = grid->getTileAt(pos);
+                if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
+                    enemies.push_back(tile->unit);
+                }
+            }
+        }
+    }
+    return enemies;
+}
+
+Unit *Unit::GetClosestEnemyInSight() {
+std::vector<Unit*> enemies = GetEnemiesInSight();
+    if (enemies.empty())
+        return nullptr;
+
+    std::sort(enemies.begin(), enemies.end(), [this](Unit * enemy, Unit * enemy1){
+        return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) < VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
+    });
+    return enemies.at(0);
 }
 

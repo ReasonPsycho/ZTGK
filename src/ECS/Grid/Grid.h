@@ -120,7 +120,6 @@ public:
 private:
     float offsetX = 0;
     float offsetZ = 0;
-    
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Tile))
     };

@@ -6,6 +6,7 @@ struct WallData
 {
     mat4x4 matrix;
     int[4] data;
+    int[4] textures;
 };
 
 
