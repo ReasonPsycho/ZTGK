@@ -39,9 +39,7 @@ void HUD::init() {
             static HUDHoverable * hovered = nullptr;
 
             // for each non-hidden group, in order of z-index...
-            for (auto & group : z_sorted_groups
-            | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })
-            | std::views::reverse) {
+            for (auto & group : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
                 // go through each hoverable belonging to the group...
                 for (auto & hoverable : hoverables[group->id]) {
                     // and if the mouse is within the hoverable...
@@ -54,8 +52,8 @@ void HUD::init() {
 
                             hovered = hoverable;
                             hovered->onHoverEnter(hovered);
+                            return;
                         }
-                        return;
                     }
                 }
             }
@@ -67,10 +65,7 @@ void HUD::init() {
         } else if ( signal.stype == Signal::signal_types.mouse_button_signal ) {
             auto data = dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
             // for each non-hidden group, in order of z-index...
-            // reverse
-            for (auto & group : z_sorted_groups
-            | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })
-            | std::views::reverse) {
+            for (auto & group : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
                 // go through each button belonging to the group...
                 for (auto & button : buttons[group->id]) {
                     // and if the mouse is within the button...
@@ -78,12 +73,13 @@ void HUD::init() {
                         // and the button was pressed...
                         if (data->action == GLFW_PRESS) {
                             button->onPress(button);
+                            return;
                         }
                         // and the button was released...
                         if (data->action == GLFW_RELEASE) {
                             button->onRelease(button);
+                            return;
                         }
-                        return;
                     }
                 }
             }
@@ -94,11 +90,7 @@ void HUD::init() {
 }
 
 void HUD::draw() {
-    // no reverse
-    //  same layer -> draw older elements first (in bg)
-    //  diff layer -> as per sort_z
-    for (auto pair : z_sorted_groups
-    | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
+    for (auto pair : z_sorted_groups | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
         drawGroup(pair->id);
     }
 }
@@ -276,8 +268,6 @@ void HUD::showImGuiDetailsImpl(Camera *camera) {
     }
 }
 
-// this ordering is aligned with draw order -> higher z draws first so in the background
-// to have proper event handling, the sorted collection needs to be reversed -> newer (more in fg) elems handle first
 void HUD::sort_z() {
     std::sort(z_sorted_groups.begin(), z_sorted_groups.end(), [this](Group * g1, Group * g2){ return getGroupTreeOffset(g1->id).z > getGroupTreeOffset(g2->id).z; });
 }
