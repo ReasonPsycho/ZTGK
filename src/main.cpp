@@ -567,6 +567,13 @@ void load_enteties() {
         nullptr
     );
 
+    scene.systemManager.getSystem<HUD>()->createBar({100, 100}, {1000, 100},
+                                                    ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
+                                                    false);
+    scene.systemManager.getSystem<HUD>()->createBar({100, 0}, {1000, 100},
+                                                    ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
+                                                    true, 100);
+
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");
     fgelem->addComponent(make_unique<Text>("One line text", glm::vec2{100, 1000}));

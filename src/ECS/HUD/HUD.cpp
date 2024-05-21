@@ -467,9 +467,9 @@ Entity *HUD::createButton(glm::vec2 centerPos, glm::vec2 size, const std::string
     auto fgname = foregroundSpritePath.substr(foregroundSpritePath.find_last_of('/'));
     auto bgname = backgroundSpritePath.substr(backgroundSpritePath.find_last_of('/'));
     if (parent)
-        entity = ztgk::game::scene->addEntity(parent, "Button FG: " + fgname + "; BG: " + bgname);
-    else entity = ztgk::game::scene->addEntity("Button FG: " + fgname + "; BG: " + bgname);
-    auto group = addGroup(parentGroupID, "Button FG: " + fgname + "; BG: " + bgname);
+        entity = ztgk::game::scene->addEntity(parent, "Button FG:" + fgname + "; BG:" + bgname);
+    else entity = ztgk::game::scene->addEntity("Button FG:" + fgname + "; BG:" + bgname);
+    auto group = addGroup(parentGroupID, "Button FG:" + fgname + "; BG:" + bgname);
 
     auto bgent = ztgk::game::scene->addEntity(entity, "Background");
     bgent->addComponent(std::make_unique<Sprite>(centerPos, size, ztgk::color.WHITE, group, backgroundSpritePath));
@@ -544,6 +544,31 @@ HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, 
             self->collisionSprite->load();
         }
     ));
+
+    return entity;
+}
+
+Entity *
+HUD::createBar(glm::vec2 botLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor, bool displayValue,
+               float displayMax, float displayMin, Entity *parent, unsigned int parentGroupID) {
+    Entity * entity;
+    if (parent)
+        entity = ztgk::game::scene->addEntity(parent, "Bar");
+    else entity = ztgk::game::scene->addEntity("Bar");
+    auto group = addGroup(parentGroupID, "Bar");
+
+    auto bg = ztgk::game::scene->addEntity(entity, "Background");
+    bg->addComponent(std::make_unique<Sprite>(botLeftPos, size, backgroundColor, group));
+    entity->addComponent(std::make_unique<Sprite>(botLeftPos, size, fillColor, group));
+
+    if (displayValue) {
+        auto perc = (entity->getComponent<Sprite>()->size.x / bg->getComponent<Sprite>()->size.x);
+        auto val = perc * (displayMax - displayMin) + displayMin;
+        entity->addComponent(std::make_unique<Text>(std::format("{:.0f}/{:.0f}", val, displayMax), botLeftPos + (size/2.0f), glm::vec2{1,1}, ztgk::color.WHITE, ztgk::font.default_font, NONE, group));
+        entity->getComponent<Text>()->mode = CENTER;
+        auto txtscale = 0.5f * size.y / textRenderer->size(entity->getComponent<Text>()).total.y;
+        entity->getComponent<Text>()->scale = glm::vec2(txtscale);
+    }
 
     return entity;
 }

@@ -56,6 +56,10 @@ public:
     createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 color, glm::vec4 hoverColor,
                  glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
                  unsigned int parentGroupID = 0);
+
+    Entity * createBar(glm::vec2 botLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
+                       bool displayValue, float displayMax = 0, float displayMin = 0,
+                       Entity * parent = nullptr, unsigned parentGroupID = 0);
 #pragma endregion
 
     void init();
