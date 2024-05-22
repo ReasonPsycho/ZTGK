@@ -598,32 +598,32 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-    playerUnit = scene.addEntity("Player2");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-    playerUnit = scene.addEntity("Player3");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
+//    playerUnit = scene.addEntity("Player2");
+//    playerUnit->addComponent(make_unique<Render>(&gabka));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
+//    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+//    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
+//    playerUnit = scene.addEntity("Player3");
+//    playerUnit->addComponent(make_unique<Render>(&gabka));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
+//    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+//    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
     Entity* enemyUnit = scene.addEntity("Enemy1");
     enemyUnit->addComponent(make_unique<Render>(&zuczek));
     enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -706,6 +706,9 @@ void update() {
     }
     
     scene.systemManager.getSystem<CollisionSystem>()->Update();
+
+//    auto u = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents[0];
+//    spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
 }
 
 void render() {

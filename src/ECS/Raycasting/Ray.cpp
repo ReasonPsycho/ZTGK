@@ -9,6 +9,10 @@
 #include "ECS/Entity.h"
 #include "ECS/Grid/Chunk.h"
 
+Chunk* checkCollisionWithNeighChunks(Chunk* excluding);
+bool iterateThruTilesInChunk(Chunk* chunk);
+
+
 /**
  * @brief Ray constructor
  * @param origin
@@ -60,14 +64,19 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
             if (collider->type == ColliderType::BOX) {
                 if(((BoxCollider*)collider)->collisionType == CollisionType::CHUNK){
                     Chunk * chunk = collider->getEntity()->getComponent<Chunk>();
-                    for(int x = 0;x < chunk->width;x++){
-                        for(int z = 0;z < chunk->width;z++){
-                            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
-                            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
-                                RayHit = GetRayHit(ColliderType::BOX, collider);
-                                hitEntity = tileEntity;
-                                return;
-                            }
+                    auto tileEntity = iterateThruTilesInChunk(chunk);
+                    if (tileEntity != nullptr){
+                        RayHit = GetRayHit(ColliderType::BOX, collider);
+                        hitEntity = tileEntity;
+                        return;
+                    }
+                    chunk = checkCollisionWithNeighChunks(chunk);
+                    if (chunk != nullptr){
+                        tileEntity = iterateThruTilesInChunk(chunk);
+                        if (tileEntity != nullptr){
+                            RayHit = GetRayHit(ColliderType::BOX, collider);
+                            hitEntity = tileEntity;
+                            return;
                         }
                     }
                 }else{
@@ -82,6 +91,30 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
         }
     }
 }
+
+ Chunk* Ray::checkCollisionWithNeighChunks(Chunk* excluding ){
+    Chunk* chunk = excluding->grid->getChunkAt(excluding->index.x + 1, excluding->index.z);
+    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
+        return chunk;
+    }
+    chunk = excluding->grid->getChunkAt(excluding->index.x - 1, excluding->index.z);
+    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
+        return chunk;
+    }
+    chunk = excluding->grid->getChunkAt(excluding->index.x, excluding->index.z + 1);
+    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
+        return chunk;
+    }
+    chunk = excluding->grid->getChunkAt(excluding->index.x, excluding->index.z - 1);
+    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
+        return chunk;
+    }
+
+    return nullptr;
+}
+
+
+
 
 
 /**
@@ -191,6 +224,18 @@ void Ray::drawWire(Shader *shader) {
     shader->setMatrix4("model", false, glm::value_ptr(glm::mat4x4(1)));
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 2);
+}
+
+Entity* Ray::iterateThruTilesInChunk(Chunk* chunk){
+    for(int x = 0;x < chunk->width;x++){
+        for(int z = 0;z < chunk->width;z++){
+            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
+            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
+                return tileEntity;
+            }
+        }
+    }
+    return nullptr;
 }
 
 
