@@ -19,5 +19,8 @@ namespace ztgk::game {
     std::atomic<bool> game::pause_render = false;
     glm::ivec2 game::window_size = { 1920, 1080 };
     bool game::fullscreen = false;
+    float game::saturationMultiplayer = 1.5;
+    float game::lightMultiplayer = 1.2;
+    int game::toon_color_levels = 15;
 
 }

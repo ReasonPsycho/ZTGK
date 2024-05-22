@@ -26,6 +26,9 @@ namespace ztgk::game {
     extern std::atomic<bool> pause_render;
 
     extern glm::ivec2 window_size;
+    extern float saturationMultiplayer;
+    extern float lightMultiplayer;
+    extern int toon_color_levels;
     extern bool fullscreen;
-
+    
 }
