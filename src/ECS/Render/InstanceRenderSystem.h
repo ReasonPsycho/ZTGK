@@ -14,6 +14,7 @@
 #include "ECS/Utils/VectorUtils.h"
 #include "ECS/Render/FrustumCulling/Frustum.h"
 #include "tracy/Tracy.hpp"
+#include "ECS/Utils/Globals.h"
 
 class InstanceRenderSystem : public System {
 public:

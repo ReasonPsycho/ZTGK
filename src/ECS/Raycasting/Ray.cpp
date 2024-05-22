@@ -58,35 +58,29 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
 
         if (doesCollide(collider)) {
             if (collider->type == ColliderType::BOX) {
-                BoxCollider* boxCollider = static_cast<BoxCollider*>(collider);
 
-                if (boxCollider->collisionType == CollisionType::CHUNK) {
-                    Chunk* chunk = collider->getEntity()->getComponent<Chunk>();
-
-                    auto processChunk = [&](Chunk* chk) -> bool {
-                        auto tileEntity = iterateThruTilesInChunk(chk);
-                        if (tileEntity != nullptr) {
-                            RayHit = GetRayHit(ColliderType::BOX, collider);
-                            hitEntity = tileEntity;
-                            return true;
+                if(((BoxCollider*)collider)->collisionType == CollisionType::CHUNK){
+                    Chunk * chunk = collider->getEntity()->getComponent<Chunk>();
+                    for(int x = 0;x < chunk->width;x++){
+                        for(int z = 0;z < chunk->width;z++){
+                            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
+                            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
+                                RayHit = GetRayHit(ColliderType::BOX, collider);
+                                hitEntity = tileEntity;
+                                return;
+                            }
                         }
-                        return false;
-                    };
-
-                    if (processChunk(chunk)) return;
-
-                    chunk = checkCollisionWithNeighChunks(chunk);
-                    if (chunk != nullptr && processChunk(chunk)) return;
-                }
-                else{
+                    }
+                }else{
                     RayHit = GetRayHit(ColliderType::BOX, collider);
+                    hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
+                    break;
                 }
             } else if (collider->type == ColliderType::SPHERE) {
                 RayHit = GetRayHit(ColliderType::SPHERE, collider);
+                hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
+                break;
             }
-            hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
-            // Stop after the first hit
-            break;
         }
     }
 }

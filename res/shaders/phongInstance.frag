@@ -86,8 +86,9 @@ uniform float heightScale;
 uniform Material material;
 uniform float maxBias;
 uniform float biasMuliplayer;
-uniform float dirtLevel;
-uniform float saturation;
+uniform float saturationMultiplayer;  // sat multiplier is the factor by which you increase saturation.
+uniform float lightMultiplayer;  // sat multiplier is the factor by which you increase saturation
+uniform int toon_color_levels;
 
 vec3 selectionColor[5] = vec3[]
 (
@@ -138,6 +139,13 @@ vec3 hsv2rgb(vec3 c)
 
 out vec4 FragColor;
 
+float toonify(float value,float toon_color_levels)
+{
+    return floor(value * toon_color_levels) * (1.0f / toon_color_levels);
+}
+
+
+
 void main()
 {
     vec2 texCoords = fs_in.TexCoords;
@@ -178,7 +186,7 @@ void main()
     vec3 result = vec3(0);
     if (currentWallData[1] != 1){
 
-        result = 0.2f * diffuse;//We do be calculating ambient here
+        result = 0.1f * diffuse;//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLightAmount; ++i) {
             result += CalcDirLight(dirLights[i], normal, viewDir, index++,  diffuse,specular);
@@ -203,12 +211,25 @@ void main()
         result = mix(result, selectionColor[currentWallData[2]], 0.5);
     }
 
+
+    /*
+    vec3 rimClr = {1.0, 1.0, 1.0};
+    float exponent = 3f;
+    float rimLight = (100 - (currentWallData[0] )) / 400.0f *  pow( ( 1.0f - clamp(dot(normalize(  fs_in.ViewPos - fs_in.WorldPos), fs_in.Normal), 0.0, 1.0) ), exponent );
+    rimLight = toonify(rimLight,5);
+    result = vec3(toonify(result.x,toon_color_levels),toonify(result.y,toon_color_levels),toonify(result.z,toon_color_levels));
+
+    result += rimLight;
+
     vec3 rgbColor = result;
     vec3 hsvColor = rgb2hsv(rgbColor);
 
-    hsvColor.y *= saturation;  // sat multiplier is the factor by which you increase saturation.
+    hsvColor.y *= saturationMultiplayer;  // sat multiplier is the factor by which you increase saturation.
+    hsvColor.z *= lightMultiplayer;  // sat multiplier is the factor by which you increase saturation.
 
     result = hsv2rgb(hsvColor);
+*/
+
     FragColor = vec4(result, 1.0);
 }
 

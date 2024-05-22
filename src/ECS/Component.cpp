@@ -4,7 +4,6 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Utils/Util.h"
-#include "tracy/Tracy.hpp"
 
 using namespace ztgk;
 
