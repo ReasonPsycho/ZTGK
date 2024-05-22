@@ -9,10 +9,6 @@
 #include "ECS/Entity.h"
 #include "ECS/Grid/Chunk.h"
 
-Chunk* checkCollisionWithNeighChunks(Chunk* excluding);
-bool iterateThruTilesInChunk(Chunk* chunk);
-
-
 /**
  * @brief Ray constructor
  * @param origin
@@ -62,24 +58,27 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
 
         if (doesCollide(collider)) {
             if (collider->type == ColliderType::BOX) {
-                if(((BoxCollider*)collider)->collisionType == CollisionType::CHUNK){
-                    Chunk * chunk = collider->getEntity()->getComponent<Chunk>();
-                    auto tileEntity = iterateThruTilesInChunk(chunk);
-                    if (tileEntity != nullptr){
-                        RayHit = GetRayHit(ColliderType::BOX, collider);
-                        hitEntity = tileEntity;
-                        return;
-                    }
-                    chunk = checkCollisionWithNeighChunks(chunk);
-                    if (chunk != nullptr){
-                        tileEntity = iterateThruTilesInChunk(chunk);
-                        if (tileEntity != nullptr){
+                BoxCollider* boxCollider = static_cast<BoxCollider*>(collider);
+
+                if (boxCollider->collisionType == CollisionType::CHUNK) {
+                    Chunk* chunk = collider->getEntity()->getComponent<Chunk>();
+
+                    auto processChunk = [&](Chunk* chk) -> bool {
+                        auto tileEntity = iterateThruTilesInChunk(chk);
+                        if (tileEntity != nullptr) {
                             RayHit = GetRayHit(ColliderType::BOX, collider);
                             hitEntity = tileEntity;
-                            return;
+                            return true;
                         }
-                    }
-                }else{
+                        return false;
+                    };
+
+                    if (processChunk(chunk)) return;
+
+                    chunk = checkCollisionWithNeighChunks(chunk);
+                    if (chunk != nullptr && processChunk(chunk)) return;
+                }
+                else{
                     RayHit = GetRayHit(ColliderType::BOX, collider);
                 }
             } else if (collider->type == ColliderType::SPHERE) {
@@ -92,26 +91,24 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
     }
 }
 
- Chunk* Ray::checkCollisionWithNeighChunks(Chunk* excluding ){
-    Chunk* chunk = excluding->grid->getChunkAt(excluding->index.x + 1, excluding->index.z);
-    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
-        return chunk;
-    }
-    chunk = excluding->grid->getChunkAt(excluding->index.x - 1, excluding->index.z);
-    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
-        return chunk;
-    }
-    chunk = excluding->grid->getChunkAt(excluding->index.x, excluding->index.z + 1);
-    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
-        return chunk;
-    }
-    chunk = excluding->grid->getChunkAt(excluding->index.x, excluding->index.z - 1);
-    if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())){
-        return chunk;
-    }
+Chunk* Ray::checkCollisionWithNeighChunks(Chunk* excluding) {
+    auto checkDirection = [&](int offsetX, int offsetZ) -> Chunk* {
+        Chunk* chunk = excluding->grid->getChunkAt(excluding->index.x + offsetX, excluding->index.z + offsetZ);
+        if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())) {
+            return chunk;
+        }
+        return nullptr;
+    };
+
+    Chunk* result;
+    if ((result = checkDirection(1, 0)) != nullptr) return result;
+    if ((result = checkDirection(-1, 0)) != nullptr) return result;
+    if ((result = checkDirection(0, 1)) != nullptr) return result;
+    if ((result = checkDirection(0, -1)) != nullptr) return result;
 
     return nullptr;
 }
+
 
 
 
