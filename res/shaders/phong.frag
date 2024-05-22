@@ -125,11 +125,47 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+const mat4 light_shade_mat = mat4( 251, 166, 10,  165,
+142, 9,   212, 250,
+7,   165, 250, 168,
+220, 250, 142, 4 ) / 255.0;
 
-float toonify(float value,float toon_color_levels)
+vec3 light_shade_color()
 {
-    return floor(value * toon_color_levels) * (1.0f / toon_color_levels);
+    ivec2 gridPos = ivec2(gl_FragCoord) % 4;
+    float factor  = light_shade_mat[gridPos.x][3 - gridPos.y];
+
+    return vec3(factor);
 }
+
+const mat4 dark_shade_mat = mat4( 251, 166, 10,  165,
+142, 9,   212, 8,
+7,   165, 250, 168,
+220, 8,   142, 4 ) / 255.0;
+
+vec3 dark_shade_color()
+{
+    ivec2 gridPos = ivec2(gl_FragCoord) % 4;
+    float factor  = dark_shade_mat[gridPos.x][3 - gridPos.y];
+
+    return vec3(factor);
+}
+
+vec4 reinhard(vec4 hdr_color)
+{
+    // reinhard tonemapping
+    vec3 ldr_color = hdr_color.rgb / (hdr_color.rgb + 1.0);
+
+    // gamma correction
+    ldr_color = pow(ldr_color, vec3(1.0 / 2.2)); //Gamma
+
+    return vec4(ldr_color, 1.0);
+}
+
+uniform float diffuse_levels;
+uniform float specular_levels;
+uniform float light_shade_cutoff;
+uniform float dark_shade_cutoff;
 
 void main()
 {
@@ -187,7 +223,7 @@ void main()
     result = hsv2rgb(hsvColor);
     */
     
-    FragColor = vec4(result, 1);
+    FragColor = reinhard(vec4(result,1));
 }
 
 // calculates the color when using a directional light.
@@ -213,54 +249,97 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex)
 {
     vec3 lightDir = normalize(vec3(light.position)  - worldPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  0);
+    vec3 half_vector = normalize(viewDir - lightDir);
+
     // attenuation
     float distance = length(vec3(light.position)  - worldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-    // combine results
-    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
-    vec3 specular =  vec3(light.specular) * spec * vec3(texture(material.specularTexture, fs_in.TexCoords));
-    diffuse *= attenuation;
-    specular *= attenuation;
+
+
+    // diffuse shading
+    float df = max(0.0, dot(normal, lightDir)) *attenuation;
+    // specular shading
+    float sf = max(0.0, dot(normal, half_vector)) * attenuation;
+
+
+    //flooring
+    df = ceil(df * diffuse_levels ) / diffuse_levels;
+    sf = floor((sf * specular_levels ) + 0.5) / specular_levels;
+
+    //color modulation
+    vec3 diff_color_modulation;
+
+    if (df >= light_shade_cutoff)
+    {
+        diff_color_modulation = vec3(1.0);
+    }
+    else if (df >= dark_shade_cutoff)
+    {
+        diff_color_modulation = light_shade_color();
+    }
+    else
+    {
+        diff_color_modulation = dark_shade_color();
+    }
+    
+    vec3 diffuse_color = vec3(light.diffuse) * diff_color_modulation * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
+    vec3 specular_color =  vec3(light.specular) * diff_color_modulation * vec3(texture(material.specularTexture, fs_in.TexCoords));
     
     float shadow = 1;
     shadow = (1.0 - CubeShadowCalculation(fs_in.WorldPos, light.position.xyz,light.position.w, lightIndex));
-    
-    
-    return (diffuse + specular) * shadow;
+
+    return (df * diffuse_color + sf * specular_color) * shadow; //Prob also need to style shadow or just use hard ones
 }
 
 // calculates the color when using a spot light.
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex)
 {
-    vec3 lightDir = normalize(vec3(light.position) - worldPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0),   0);
+    vec3 lightDir = normalize(vec3(light.position)  - worldPos);
+    vec3 half_vector = normalize(viewDir - lightDir);
+
     // attenuation
     float distance = length(vec3(light.position)  - worldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
     // spotlight intensity
     float theta = dot(lightDir, normalize(vec3(-light.direction)));
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results
-    vec3 diffuse = vec3(light.diffuse) * diff * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
-    vec3 specular =  vec3(light.specular) * spec * vec3(texture(material.specularTexture, fs_in.TexCoords));
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
+    
+        // diffuse shading
+    float df = max(0.0, dot(normal, lightDir)) *attenuation * intensity;
+    // specular shading
+    float sf = max(0.0, dot(normal, half_vector)) * attenuation * intensity;
+
+
+
+    //flooring
+    df = ceil(df * diffuse_levels) / diffuse_levels;
+    sf = floor((sf * specular_levels ) + 0.5) / specular_levels;
+
+    //color modulation
+    vec3 diff_color_modulation;
+
+    if (df >= light_shade_cutoff)
+    {
+        diff_color_modulation = vec3(1.0);
+    }
+    else if (df >= dark_shade_cutoff)
+    {
+        diff_color_modulation = light_shade_color();
+    }
+    else
+    {
+        diff_color_modulation = dark_shade_color();
+    }
+
+    vec3 diffuse_color = vec3(light.diffuse) * diff_color_modulation * vec3(texture(material.diffuseTexture, fs_in.TexCoords));
+    vec3 specular_color =  vec3(light.specular) * diff_color_modulation * vec3(texture(material.specularTexture, fs_in.TexCoords));
 
     float shadow = 1;
     shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, lightIndex));
     
-    
-    return (diffuse + specular) * shadow;
+    return (df * diffuse_color + sf * specular_color) * shadow; //Prob also need to style shadow or just use hard ones
 }
 
 float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex)
