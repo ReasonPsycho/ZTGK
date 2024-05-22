@@ -459,17 +459,19 @@ void load_enteties() {
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
+    gameObject->transform.setLocalPosition(glm::vec3(100,4,100));
+    
+    
     gameObject->addComponent(make_unique<PointLight>(
-            PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
-                           0.032f)));
+            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
+                           0.05f)));
     //  gameObject = scene.addEntity("Point Light 2");
     // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
-    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
+    gameObject->transform.setLocalPosition(glm::vec3(100,4,100));
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
-                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
+                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),0.1f, 0.2f,0.05f)));
     scene.systemManager.getSystem<LightSystem>()->Init();
 
 
@@ -719,7 +721,7 @@ void render() {
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
-    bloomSystem.BindBuffer();
+   // bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -734,8 +736,8 @@ void render() {
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
-    bloomSystem.BlurBuffer();
-    bloomSystem.Render();
+ //   bloomSystem.BlurBuffer();
+//    bloomSystem.Render();
 
     scene.systemManager.getSystem<HUD>()->draw();
 }

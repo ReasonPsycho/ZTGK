@@ -82,8 +82,9 @@ uniform float heightScale;
 uniform vec3 viewPos;
 uniform vec3 camPos;
 uniform Material material;
-uniform float saturation;
-
+uniform float saturationMultiplayer;  // sat multiplier is the factor by which you increase saturation.
+uniform float lightMultiplayer;  // sat multiplier is the factor by which you increase saturation
+uniform int toon_color_levels;
 
 
 vec3 gridSamplingDisk[20] = vec3[]
@@ -124,6 +125,12 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+
+float toonify(float value,float toon_color_levels)
+{
+    return floor(value * toon_color_levels) * (1.0f / toon_color_levels);
+}
+
 void main()
 {
     vec2 texCoords = fs_in.TexCoords;
@@ -132,6 +139,8 @@ void main()
     texCoords = ParallaxMapping(fs_in.TexCoords,  viewDir);
     if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
     discard;
+
+    vec3 diffuse = vec3(texture(material.diffuseTexture, texCoords));
 
 
     // properties
@@ -144,7 +153,7 @@ void main()
     }
 
     
-    vec3 result = 0.2f * vec3(texture(material.diffuseTexture, fs_in.TexCoords)); //We do be calculating ambient here
+    vec3 result = 0.1f * vec3(texture(material.diffuseTexture, fs_in.TexCoords)); //We do be calculating ambient here
     int index = 0;
     for (int i = 0; i < dirLightAmount; ++i) {
         result += CalcDirLight(dirLights[i], normal,viewDir,index++);
@@ -159,14 +168,26 @@ void main()
         result += CalcPointLight(pointLights[i], normal,fs_in.WorldPos,viewDir,index++);
     }
 
+
+    /*
+    vec3 rimClr = {1.0, 1.0, 1.0};
+    float exponent = 3f;
+    float rimLight = 0.1f *  pow( ( 1.0f - clamp(dot(viewDir, normal), 0.0, 1.0) ), exponent );
+    rimLight = toonify(rimLight,5);
+    result = vec3(toonify(result.x,toon_color_levels),toonify(result.y,toon_color_levels),toonify(result.z,toon_color_levels));
+    
+    result += rimLight;
+
     vec3 rgbColor = result;
     vec3 hsvColor = rgb2hsv(rgbColor);
 
-    hsvColor.y *= 2;  // sat multiplier is the factor by which you increase saturation.
+    hsvColor.y *= saturationMultiplayer;  // sat multiplier is the factor by which you increase saturation.
+    hsvColor.z *= lightMultiplayer;  // sat multiplier is the factor by which you increase saturation.
 
     result = hsv2rgb(hsvColor);
+    */
     
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1);
 }
 
 // calculates the color when using a directional light.
