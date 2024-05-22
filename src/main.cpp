@@ -455,6 +455,10 @@ void load_enteties() {
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
+    gameObject = scene.addEntity("Gabka");;
+    gameObject->transform.setLocalPosition(glm::vec3(100,4,100));
+    gameObject->addComponent(make_unique<Render>(&gabka));
+
 
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));

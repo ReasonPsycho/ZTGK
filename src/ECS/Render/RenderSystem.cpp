@@ -10,6 +10,10 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
     regularShader->use();
     regularShader->setFloat("saturationMultiplayer",ztgk::game::saturationMultiplayer);
     regularShader->setFloat("lightMultiplayer",ztgk::game::lightMultiplayer);
+    regularShader->setFloat("diffuse_levels",diffuse_levels);
+    regularShader->setFloat("specular_levels",specular_levels);
+    regularShader->setFloat("light_shade_cutoff",light_shade_cutoff);
+    regularShader->setFloat("dark_shade_cutoff",dark_shade_cutoff);
     regularShader->setInt("toon_color_levels",ztgk::game::toon_color_levels);
 
     Frustum frustum = createFrustumFromCamera(*camera);
@@ -28,6 +32,10 @@ void RenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::SliderFloat("saturationMultiplayer",&ztgk::game::saturationMultiplayer,0,10);
     ImGui::SliderFloat("lightMultiplayer",&ztgk::game::lightMultiplayer,0,10);
     ImGui::InputInt("toon_color_levels",&ztgk::game::toon_color_levels);
+    ImGui::InputFloat("diffuse_levels",&diffuse_levels);
+    ImGui::InputFloat("specular_levels",&specular_levels);
+    ImGui::InputFloat("light_shade_cutoff",&light_shade_cutoff);
+    ImGui::InputFloat("dark_shade_cutoff",&dark_shade_cutoff);
 }
 
 RenderSystem::RenderSystem() {
