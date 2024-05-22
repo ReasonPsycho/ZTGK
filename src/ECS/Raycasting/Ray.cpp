@@ -58,19 +58,27 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
 
         if (doesCollide(collider)) {
             if (collider->type == ColliderType::BOX) {
-                if(((BoxCollider*)collider)->collisionType == CollisionType::CHUNK){
-                    Chunk * chunk = collider->getEntity()->getComponent<Chunk>();
-                    for(int x = 0;x < chunk->width;x++){
-                        for(int z = 0;z < chunk->width;z++){
-                            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
-                            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
-                                RayHit = GetRayHit(ColliderType::BOX, collider);
-                                hitEntity = tileEntity;
-                                return;
-                            }
+                BoxCollider* boxCollider = static_cast<BoxCollider*>(collider);
+
+                if (boxCollider->collisionType == CollisionType::CHUNK) {
+                    Chunk* chunk = collider->getEntity()->getComponent<Chunk>();
+
+                    auto processChunk = [&](Chunk* chk) -> bool {
+                        auto tileEntity = iterateThruTilesInChunk(chk);
+                        if (tileEntity != nullptr) {
+                            RayHit = GetRayHit(ColliderType::BOX, collider);
+                            hitEntity = tileEntity;
+                            return true;
                         }
-                    }
-                }else{
+                        return false;
+                    };
+
+                    if (processChunk(chunk)) return;
+
+                    chunk = checkCollisionWithNeighChunks(chunk);
+                    if (chunk != nullptr && processChunk(chunk)) return;
+                }
+                else{
                     RayHit = GetRayHit(ColliderType::BOX, collider);
                 }
             } else if (collider->type == ColliderType::SPHERE) {
@@ -82,6 +90,28 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
         }
     }
 }
+
+Chunk* Ray::checkCollisionWithNeighChunks(Chunk* excluding) {
+    auto checkDirection = [&](int offsetX, int offsetZ) -> Chunk* {
+        Chunk* chunk = excluding->grid->getChunkAt(excluding->index.x + offsetX, excluding->index.z + offsetZ);
+        if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())) {
+            return chunk;
+        }
+        return nullptr;
+    };
+
+    Chunk* result;
+    if ((result = checkDirection(1, 0)) != nullptr) return result;
+    if ((result = checkDirection(-1, 0)) != nullptr) return result;
+    if ((result = checkDirection(0, 1)) != nullptr) return result;
+    if ((result = checkDirection(0, -1)) != nullptr) return result;
+
+    return nullptr;
+}
+
+
+
+
 
 
 /**
@@ -191,6 +221,18 @@ void Ray::drawWire(Shader *shader) {
     shader->setMatrix4("model", false, glm::value_ptr(glm::mat4x4(1)));
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 2);
+}
+
+Entity* Ray::iterateThruTilesInChunk(Chunk* chunk){
+    for(int x = 0;x < chunk->width;x++){
+        for(int z = 0;z < chunk->width;z++){
+            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
+            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
+                return tileEntity;
+            }
+        }
+    }
+    return nullptr;
 }
 
 
