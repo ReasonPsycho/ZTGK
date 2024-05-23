@@ -50,6 +50,9 @@ private:
     float specular_levels = 3;
     float light_shade_cutoff = 0.5f;
     float dark_shade_cutoff = 0.2f;
+
+    float rim_threshold = 10;
+    float rim_amount = 0.5f;
     
     string tilePath =  "res/textures/tiles/Tile";
     
