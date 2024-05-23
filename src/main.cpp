@@ -377,6 +377,9 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::window = window;
+    primitives.Init();
+   
+   
     scene.systemManager.addSystem(std::make_unique<SignalQueue>());
     ztgk::game::signalQueue = scene.systemManager.getSystem<SignalQueue>(); //TODO gregori and ijgor just pls use scene to get systems
     scene.systemManager.getSystem<SignalQueue>()->init();
@@ -390,8 +393,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<CollisionSystem>());
     scene.systemManager.addSystem(std::make_unique<UnitSystem>());
 
-    primitives.Init();
-    phongPipeline.Init();
+    phongPipeline.Init(&camera,&primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
@@ -733,9 +735,12 @@ void render() {
 
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
-
+    
     scene.systemManager.getSystem<RenderSystem>()->DrawScene(&phongPipeline.phongShader, &camera);
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&phongPipeline.phongInstanceShader, &camera);
+
+    phongPipeline.WriteToBackBuffer(&camera);
+    
     scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
@@ -985,6 +990,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     ztgk::game::window_size = {width, height};
     camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
+    phongPipeline.SetUpTextureBuffers(width, height);
 }
 
 

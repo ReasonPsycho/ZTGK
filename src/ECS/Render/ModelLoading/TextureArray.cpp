@@ -20,19 +20,12 @@ TextureArray::TextureArray(std::vector<shared_ptr<Texture>> textures) {
     for (GLuint i = 0; i < textures.size(); ++i)
     {
         glBindTexture(GL_TEXTURE_2D,  textures[i]->ID);
-        assert(glGetError() == GL_NO_ERROR);
 
         // Allocate memory for the texture and bind its data to the texture array
         vector<GLubyte> texData(textures[i]->width * textures[i]->height *  textures[i]->nrChannels * sizeof(GLuint) ) ; // Assuming 4 channels of data, adjust as necessary
-        assert(glGetError() == GL_NO_ERROR);
         glGetTexImage(GL_TEXTURE_2D, 0, textures[i]->format, GL_UNSIGNED_BYTE, texData.data());
-        assert(glGetError() == GL_NO_ERROR);
         glBindTexture(GL_TEXTURE_2D_ARRAY, ID);
-        assert(glGetError() == GL_NO_ERROR);
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, textures[i]->width, textures[i]->height, 1, textures[i]->format, GL_UNSIGNED_BYTE, texData.data());
-
-        assert(glGetError() == GL_NO_ERROR);
-
     }
 
     GLenum err;

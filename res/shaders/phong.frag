@@ -1,5 +1,6 @@
 #version 460
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 frag_normal_depth; //Meant for outline process
 
 struct TangentData{ // So it's easier to operate on
     vec3 ViewPos;
@@ -96,10 +97,8 @@ vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
 vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 );
 
-
 layout (binding = 8) uniform samplerCubeArray cubeShadowMaps;
 layout (binding = 9) uniform sampler2DArray planeShadowMaps;
-
 
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex);
@@ -206,25 +205,9 @@ void main()
     for (int i = 0; i < pointLightAmount; ++i) {
         result += CalcPointLight(pointLights[i], normal,fs_in.WorldPos,viewDir,index++);
     }
-
-
-    /*
-    vec3 rimClr = {1.0, 1.0, 1.0};
-    float exponent = 3f;
-    float rimLight = 0.1f *  pow( ( 1.0f - clamp(dot(viewDir, normal), 0.0, 1.0) ), exponent );
-    rimLight = toonify(rimLight,5);
-    result = vec3(toonify(result.x,toon_color_levels),toonify(result.y,toon_color_levels),toonify(result.z,toon_color_levels));
     
-    result += rimLight;
-
-    vec3 rgbColor = result;
-    vec3 hsvColor = rgb2hsv(rgbColor);
-
-    hsvColor.y *= saturationMultiplayer;  // sat multiplier is the factor by which you increase saturation.
-    hsvColor.z *= lightMultiplayer;  // sat multiplier is the factor by which you increase saturation.
-
-    result = hsv2rgb(hsvColor);
-    */
+    float depth = gl_FragCoord.z;
+    frag_normal_depth = vec4(normal, depth);
     
     FragColor = reinhard(vec4(result,1));
 }

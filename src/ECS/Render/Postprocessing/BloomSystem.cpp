@@ -9,33 +9,7 @@
 
 // renderQuad() renders a 1x1 XY quad in NDC //TODO really should build some class for primitives
 // -----------------------------------------
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
 
-void renderQuad() {
-    if (quadVAO == 0) {
-        float quadVertices[] = {
-                // positions        // texture Coords
-                -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-                -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-}
 
 
 void BloomPostProcess::Init(int SCR_WIDTH, int SCR_HEIGHT) {
@@ -68,7 +42,7 @@ void BloomPostProcess::BlurBuffer() {
         shaderBlur.setInt("horizontal", horizontal);
         glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1]
                                                      : pingpongColorbuffers[!horizontal]);  // bind texture of other framebuffer (or scene if first iteration)
-        renderQuad();
+      //  renderQuad();
         horizontal = !horizontal;
         if (first_iteration)
             first_iteration = false;
@@ -86,7 +60,7 @@ void BloomPostProcess::Render() {
     glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
     shaderBloomFinal.setInt("bloom", bloom);
     shaderBloomFinal.setFloat("exposure", exposure);
-    renderQuad();
+  //  renderQuad();
 }
 
 void BloomPostProcess::SetUpBuffers(int SCR_WIDTH, int SCR_HEIGHT) {
