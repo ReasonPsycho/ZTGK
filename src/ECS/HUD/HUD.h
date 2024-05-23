@@ -58,10 +58,6 @@ public:
                  glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
                  unsigned int parentGroupID = 0);
 
-    Entity * createBar(glm::vec2 botLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
-                       bool displayValue, float displayMax = 0, float displayMin = 0,
-                       Entity * parent = nullptr, unsigned parentGroupID = 0);
-
     Entity * createSlider_Bar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
                               Entity * parent = nullptr, unsigned parentGroupID = 0,
                               bool displayValue = false, float displayMax = 0, float displayMin = 0);

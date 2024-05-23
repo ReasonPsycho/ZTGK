@@ -40,32 +40,7 @@ void HUDSlider::set(float value) {
         break;
     }
 
-    if (display) {
-        display->content = get_display_string();
-        if (controlHandle) {
-            switch (direction) {
-            case HORIZONTAL:
-                display->pos.x = controlHandle->collisionSprite->pos.x;
-                break;
-            case VERTICAL:
-                display->pos.y = controlHandle->collisionSprite->pos.y;
-                break;
-            }
-        }
-
-    }
-    if (controlHandle && controlHandleForeground) {
-        switch (direction) {
-        case HORIZONTAL:
-            controlHandle->collisionSprite->pos.x = barBackground->pos.x + barBackground->size.x * value;
-            controlHandleForeground->pos.x = controlHandle->collisionSprite->pos.x;
-            break;
-        case VERTICAL:
-            controlHandle->collisionSprite->pos.y = barBackground->pos.y + barBackground->size.y * value;
-            controlHandleForeground->pos.y = controlHandle->collisionSprite->pos.y;
-            break;
-        }
-    }
+    update_display();
 }
 
 void HUDSlider::set_in_display_range(float value) {
@@ -122,14 +97,53 @@ void HUDSlider::init_control_listener() {
             auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
             switch (this->direction) {
             case HORIZONTAL:
-                this->set(std::clamp((data->pos.x - this->control->collisionSprite->pos.x) / this->control->collisionSprite->size.x, 0.0f, 1.0f));
+                this->set_from_pos(data->pos);
                 break;
             case VERTICAL:
-                this->set(std::clamp((data->pos.y - this->control->collisionSprite->pos.y) / this->control->collisionSprite->size.y, 0.0f, 1.0f));
+                this->set_from_pos(data->pos);
                 break;
             }
         }
     ));
     controlListener = parentEntity->getComponent<SignalReceiver>();
     *ztgk::game::signalQueue += controlListener;
+}
+
+void HUDSlider::set_from_pos(glm::vec2 pos) {
+    switch (this->direction) {
+    case HORIZONTAL:
+        this->set(std::clamp((pos.x - this->control->collisionSprite->pos.x) / this->control->collisionSprite->size.x, 0.0f, 1.0f));
+        break;
+    case VERTICAL:
+        this->set(std::clamp((pos.y - this->control->collisionSprite->pos.y) / this->control->collisionSprite->size.y, 0.0f, 1.0f));
+        break;
+    }
+}
+
+void HUDSlider::update_display() {
+    if (display) {
+        display->content = get_display_string();
+        if (controlHandle) {
+            switch (direction) {
+            case HORIZONTAL:
+                display->pos.x = controlHandle->collisionSprite->pos.x;
+                break;
+            case VERTICAL:
+                display->pos.y = controlHandle->collisionSprite->pos.y;
+                break;
+            }
+        }
+    }
+    if (controlHandle && controlHandleForeground) {
+        switch (direction) {
+        case HORIZONTAL:
+            controlHandle->collisionSprite->pos.x = barBackground->pos.x + barBackground->size.x * value;
+            controlHandleForeground->pos.x = controlHandle->collisionSprite->pos.x;
+            break;
+        case VERTICAL:
+            controlHandle->collisionSprite->pos.y = barBackground->pos.y + barBackground->size.y * value;
+            controlHandleForeground->pos.y = controlHandle->collisionSprite->pos.y;
+            break;
+        }
+    }
 }

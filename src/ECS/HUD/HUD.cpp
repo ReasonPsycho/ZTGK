@@ -589,31 +589,6 @@ HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, 
     return entity;
 }
 
-Entity *
-HUD::createBar(glm::vec2 botLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor, bool displayValue,
-               float displayMax, float displayMin, Entity *parent, unsigned int parentGroupID) {
-    Entity * entity;
-    if (parent)
-        entity = ztgk::game::scene->addEntity(parent, "Bar");
-    else entity = ztgk::game::scene->addEntity("Bar");
-    auto group = addGroup(parentGroupID, "Bar");
-
-    auto bg = ztgk::game::scene->addEntity(entity, "Background");
-    bg->addComponent(std::make_unique<Sprite>(botLeftPos, size, backgroundColor, group));
-    entity->addComponent(std::make_unique<Sprite>(botLeftPos, size, fillColor, group));
-
-    if (displayValue) {
-        auto perc = (entity->getComponent<Sprite>()->size.x / bg->getComponent<Sprite>()->size.x);
-        auto val = perc * (displayMax - displayMin) + displayMin;
-        entity->addComponent(std::make_unique<Text>(std::format("{:.0f}/{:.0f}", val, displayMax), botLeftPos + (size/2.0f), glm::vec2{1,1}, ztgk::color.WHITE, ztgk::font.default_font, NONE, group));
-        entity->getComponent<Text>()->mode = CENTER;
-        auto txtscale = 0.5f * size.y / textRenderer->size(entity->getComponent<Text>()).total.y;
-        entity->getComponent<Text>()->scale = glm::vec2(txtscale);
-    }
-
-    return entity;
-}
-
 Entity * HUD::bar_base(glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
                               Entity *parent, unsigned int parentGroupID, bool displayValue, float displayMax,
                               float displayMin) {
@@ -703,12 +678,16 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
         ent->getComponent<Sprite>(), group,
         [](HUDButton * self) {
             auto slider = self->parentEntity->parent->getComponent<HUDSlider>();
-            spdlog::trace("Bar {} subscribing.", slider->uniqueID);
             slider->isListening = true;
+            slider->set_from_pos(ztgk::game::cursor.ui_pos);
+
+            slider->display->color.a = 1;
+            slider->update_display();
         },
         [](HUDButton * self) {
             auto slider = self->parentEntity->parent->getComponent<HUDSlider>();
-            spdlog::trace("Bar {} unsubscribing.", slider->uniqueID);
+
+            slider->display->color.a = 0;
             slider->isListening = false;
         }
     ));
@@ -736,33 +715,34 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
             handle_fg->color = ztgk::color.WHITE * glm::vec4{0.9, 0.9, 0.9, 1};
             handle_fg->load();
 
-            auto display = self->parentEntity->parent->getChild("Foreground")->getComponent<Text>();
             auto slider = self->parentEntity->parent->parent->getComponent<HUDSlider>();
-            display->content = slider->get_display_string();
-            display->color.a = 1;
+            slider->update_display();
+            slider->display->color.a = 1;
         },
         [](HUDHoverable * self) {
             auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
             handle_fg->color = ztgk::color.WHITE;
             handle_fg->load();
 
-            auto display = self->parentEntity->parent->getChild("Foreground")->getComponent<Text>();
-            display->color.a = 0;
+            auto slider = self->parentEntity->parent->parent->getComponent<HUDSlider>();
+            slider->display->color.a = 0;
         }
     ));
     ent->addComponent(std::make_unique<HUDButton>(
             ent->getComponent<Sprite>(), handleGroup,
-            [](HUDButton * self){
+            [control](HUDButton * self){
                 auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
                 handle_fg->color = ztgk::color.WHITE * glm::vec4{0.8f, 0.8f, 0.8f, 1};
                 handle_fg->load();
-                self->parentEntity->parent->parent->getComponent<HUDSlider>()->isListening = true;
+
+                control->onPress(control);
             },
-            [](HUDButton * self){
+            [control](HUDButton * self){
                 auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
                 handle_fg->color = ztgk::color.WHITE * glm::vec4{0.9, 0.9, 0.9, 1};
                 handle_fg->load();
-                self->parentEntity->parent->parent->getComponent<HUDSlider>()->isListening = false;
+
+                control->onRelease(control);
             }
     ));
     ent->getComponent<HUDButton>()->allow_release_outside = true;

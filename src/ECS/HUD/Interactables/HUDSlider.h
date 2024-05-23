@@ -51,8 +51,12 @@ struct HUDSlider : public AHUDComponent {
     void set(float value);
     void set_in_display_range(float value);
     void set_direction(SliderDirection direction);
+    void set_from_pos(glm::vec2 pos);
+
     float get_in_display_range() const;
     std::string get_display_string() const;
+
+    void update_display();
 
     void showImGuiDetailsImpl(Camera * camera) override;
 };
