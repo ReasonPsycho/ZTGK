@@ -1,4 +1,6 @@
 #version 460
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 frag_normal_depth; //Meant for outline process
 
 struct TangentData{ // So it's easier to operate on
     vec3 ViewPos;
@@ -137,9 +139,6 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-out vec4 FragColor;
-
-
 const mat4 light_shade_mat = mat4( 251, 166, 10,  165,
 142, 9,   212, 250,
 7,   165, 250, 168,
@@ -250,7 +249,9 @@ void main()
     if (currentWallData[2] != 0){
         result = mix(result, selectionColor[currentWallData[2]], 0.5);
     }
-    
+
+    float depth = gl_FragCoord.z;
+    frag_normal_depth = vec4(normal, depth);
 
     FragColor = vec4(result, 1.0);
 }
