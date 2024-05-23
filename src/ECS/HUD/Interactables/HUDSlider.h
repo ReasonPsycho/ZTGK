@@ -31,6 +31,7 @@ struct HUDSlider : public AHUDComponent {
     Sprite * bar;
     Sprite * barBackground;
 
+    // optional, check control != nullptr
     HUDButton * control;
     HUDButton * controlHandle;
     Sprite * controlHandleForeground;
@@ -39,6 +40,7 @@ struct HUDSlider : public AHUDComponent {
     SignalReceiver * controlListener;
     void init_control_listener();
 
+    // optional, check display != nullptr
     Text * display;
     float displayMin;
     float displayMax;
@@ -50,6 +52,7 @@ struct HUDSlider : public AHUDComponent {
 
     void set(float value);
     void set_in_display_range(float value);
+
     void set_direction(SliderDirection direction);
     void set_from_pos(glm::vec2 pos);
 
