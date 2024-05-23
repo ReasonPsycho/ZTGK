@@ -221,7 +221,7 @@ TextSize TextRenderer::size(Text *text) const {
 glm::vec2 TextRenderer::drawModeOffset(Text *text) const {
     auto _size = size(text);
     float bottom_offset = _size.n_lines > 1 ? _size.bottom_base_line : 0;
-    float middle_offset = _size.n_lines > 1 ? (_size.total.y - _size.first_line_height) / 2 : -_size.first_line_height / 2;
+    float middle_offset = _size.n_lines > 1 ? _size.total.y / 2 - _size.first_line_height : -_size.first_line_height / 2;
 
     switch (text->mode) {
         case TOP_LEFT:
