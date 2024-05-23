@@ -12,6 +12,7 @@
 #include "ECS/SignalQueue/SignalReceiver.h"
 #include "ECS/HUD/Interactables/HUDHoverable.h"
 #include "ECS/HUD/Interactables/HUDButton.h"
+#include "ECS/HUD/Interactables/HUDSlider.h"
 
 struct HUDRemapGroupsSignalData;
 
@@ -60,13 +61,23 @@ public:
     Entity * createBar(glm::vec2 botLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
                        bool displayValue, float displayMax = 0, float displayMin = 0,
                        Entity * parent = nullptr, unsigned parentGroupID = 0);
+
+    Entity * createSlider_Bar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
+                              Entity * parent = nullptr, unsigned parentGroupID = 0,
+                              bool displayValue = false, float displayMax = 0, float displayMin = 0);
+    Entity * createSlider_BarControllable(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
+                                          Entity * parent = nullptr, unsigned parentGroupID = 0,
+                                          bool displayValue = false, float displayMax = 0, float displayMin = 0);
+    Entity * createSlider_SettingBar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size,
+                                     Entity * parent = nullptr, unsigned parentGroupID = 0,
+                                     float displayMax = 0, float displayMin = 100);
 #pragma endregion
 
     void init();
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&componentTypes); }
-    int getNumComponentTypes() override { return 4; }
+    int getNumComponentTypes() override { return 5; }
     void showImGuiDetailsImpl(Camera *camera) override;
     void registerComponents() override{};
 
@@ -74,15 +85,22 @@ public:
     std::unordered_map<unsigned, std::vector<Text*>> texts;
     std::unordered_map<unsigned, std::vector<HUDHoverable*>> hoverables;
     std::unordered_map<unsigned, std::vector<HUDButton*>> buttons;
+    std::unordered_map<unsigned, std::vector<HUDSlider*>> sliders;
 
     void sort_z();
     void remap_groups(HUDRemapGroupsSignalData data);
 
 private:
-    std::array<std::type_index, 4> componentTypes = {
+    std::array<std::type_index, 5> componentTypes = {
         std::type_index(typeid(Sprite)),
         std::type_index(typeid(Text)),
         std::type_index(typeid(HUDHoverable)),
-        std::type_index(typeid(HUDButton))
+        std::type_index(typeid(HUDButton)),
+        std::type_index(typeid(HUDSlider))
     };
+
+    Entity *bar_base(glm::vec2 midLeftPos, glm::vec2 size,
+                     glm::vec4 backgroundColor, glm::vec4 fillColor,
+                     Entity *parent, unsigned int parentGroupID,
+                     bool displayValue, float displayMax, float displayMin);
 };

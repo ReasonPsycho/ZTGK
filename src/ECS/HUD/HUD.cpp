@@ -11,6 +11,7 @@
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "Components/HudCompType.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
+#include "ECS/Utils/Cursor.h"
 #include <ranges>
 #include <algorithm>
 using namespace std;
@@ -66,8 +67,19 @@ void HUD::init() {
             }
         } else if ( signal.stype == Signal::signal_types.mouse_button_signal ) {
             auto data = dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+            static HUDButton * pressed = nullptr;
+
+            // only release previously pressed button
+            if (data->action == GLFW_RELEASE && pressed != nullptr) {
+                if (pressed->allow_release_outside || spriteRenderer->bounds(pressed->collisionSprite).contains(data->pos)) {
+                    pressed->onRelease(pressed);
+                    pressed = nullptr;
+                }
+                return;
+            }
+
             // for each non-hidden group, in order of z-index...
-            // reverse
+            // reverse to handle newer elements first (in fg within same layer)
             for (auto & group : z_sorted_groups
             | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })
             | std::views::reverse) {
@@ -78,10 +90,7 @@ void HUD::init() {
                         // and the button was pressed...
                         if (data->action == GLFW_PRESS) {
                             button->onPress(button);
-                        }
-                        // and the button was released...
-                        if (data->action == GLFW_RELEASE) {
-                            button->onRelease(button);
+                            pressed = button;
                         }
                         return;
                     }
@@ -154,6 +163,9 @@ std::vector<AHUDComponent *> HUD::getOfGroup(unsigned int groupID) {
     std::vector<AHUDComponent *> ret;
     ret.append_range(texts[groupID]);
     ret.append_range(sprites[groupID]);
+    ret.append_range(hoverables[groupID]);
+    ret.append_range(buttons[groupID]);
+    ret.append_range(sliders[groupID]);
     return ret;
 }
 
@@ -185,6 +197,11 @@ void HUD::addComponent(void *component) {
             buttons[button->groupID].push_back(button);
             break;
         }
+        case hudcType::SLIDER: {
+            HUDSlider *slider = reinterpret_cast<HUDSlider *>(component);
+            sliders[slider->groupID].push_back(slider);
+            break;
+        }
     }
 }
 
@@ -205,6 +222,10 @@ void HUD::removeComponent(void *component) {
         }
         case hudcType::BUTTON: {
             erase(buttons[c->groupID], dynamic_cast<HUDButton *>(c));
+            break;
+        }
+        case hudcType::SLIDER: {
+            erase(sliders[c->groupID], dynamic_cast<HUDSlider *>(c));
             break;
         }
     }
@@ -273,6 +294,17 @@ void HUD::showImGuiDetailsImpl(Camera *camera) {
             }
             ImGui::TreePop();
         }
+        if (ImGui::TreeNodeEx("Sliders", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+            for (auto & pair : sliders) {
+                for (auto & sld : sliders[pair.first]) {
+                    if (ImGui::TreeNodeEx(std::format("ID {0}##Slider{0}", sld->uniqueID).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth)) {
+                        sld->showImGuiDetailsImpl(camera);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
     }
 }
 
@@ -308,20 +340,27 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
                 remapped_b[btn->groupID].push_back(btn);
             }
         }
+        std::unordered_map<unsigned, std::vector<HUDSlider*>> remapped_sld;
+        for ( auto & mapping : sliders ) {
+            for ( auto sld : mapping.second ) {
+                remapped_sld[sld->groupID].push_back(sld);
+            }
+        }
         sprites = remapped_s;
         texts = remapped_t;
         hoverables = remapped_h;
         buttons = remapped_b;
+        sliders = remapped_sld;
     } else {
+         if ( !groups.contains(data.newGroup) ) {
+            spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
+         }
         switch (data.componentType) {
             case hudcType::SPRITE: {
                  auto pos = std::find_if(sprites[data.oldGroup].begin(), sprites[data.oldGroup].end(), [data](Sprite * spr){ return spr->uniqueID == data.componentID; });
                  if ( pos == sprites[data.oldGroup].end() ) {
                      spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
                      return;
-                 }
-                 if ( !groups.contains(data.newGroup) ) {
-                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
                  }
                  auto val = *pos;
                  sprites[data.oldGroup].erase(pos);
@@ -334,9 +373,6 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
                      spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
                      return;
                  }
-                 if ( !groups.contains(data.newGroup) ) {
-                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
-                 }
                  auto val = *pos;
                  texts[data.oldGroup].erase(pos);
                  texts[data.newGroup].push_back(val);
@@ -347,9 +383,6 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
                  if ( pos == hoverables[data.oldGroup].end() ) {
                      spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
                      return;
-                 }
-                 if ( !groups.contains(data.newGroup) ) {
-                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
                  }
                  auto val = *pos;
                  hoverables[data.oldGroup].erase(pos);
@@ -362,12 +395,20 @@ void HUD::remap_groups(HUDRemapGroupsSignalData data) {
                      spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
                      return;
                  }
-                 if ( !groups.contains(data.newGroup) ) {
-                     spdlog::warn("HUD groupID remap request - No such groupID pre-existing! Remap proceeding but element will not be accesible without a matching groupID element.");
-                 }
                  auto val = *pos;
                  buttons[data.oldGroup].erase(pos);
                  buttons[data.newGroup].push_back(val);
+                 return;
+            }
+            case hudcType::SLIDER: {
+                 auto pos = std::find_if(sliders[data.oldGroup].begin(), sliders[data.oldGroup].end(), [data](HUDSlider * spr){ return spr->uniqueID == data.componentID; });
+                 if ( pos == sliders[data.oldGroup].end() ) {
+                     spdlog::warn("HUD groupID remap request - Component not found. Aborting.");
+                     return;
+                 }
+                 auto val = *pos;
+                 sliders[data.oldGroup].erase(pos);
+                 sliders[data.newGroup].push_back(val);
                  return;
             }
             case hudcType::UNDEFINED: {
@@ -570,6 +611,117 @@ HUD::createBar(glm::vec2 botLeftPos, glm::vec2 size, glm::vec4 backgroundColor, 
         entity->getComponent<Text>()->scale = glm::vec2(txtscale);
     }
 
+    return entity;
+}
+
+Entity * HUD::bar_base(glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
+                              Entity *parent, unsigned int parentGroupID, bool displayValue, float displayMax,
+                              float displayMin) {
+    Entity * entity;
+    if (parent)
+        entity = ztgk::game::scene->addEntity(parent, "Display Bar");
+    else entity = ztgk::game::scene->addEntity("Display Bar");
+    auto group = addGroup(parentGroupID, "Display Bar");
+
+    auto bg = ztgk::game::scene->addEntity(entity, "Background");
+    bg->addComponent(std::make_unique<Sprite>(midLeftPos, size, backgroundColor, group));
+    entity->addComponent(std::make_unique<Sprite>(midLeftPos, size, fillColor, group));
+
+    if (displayValue) {
+        auto perc = (entity->getComponent<Sprite>()->size.x / bg->getComponent<Sprite>()->size.x);
+        auto val = perc * (displayMax - displayMin) + displayMin;
+        entity->addComponent(std::make_unique<Text>(std::format("{:.0f}/{:.0f}", val, displayMax), midLeftPos + (size/2.0f), glm::vec2{1,1}, ztgk::color.WHITE, ztgk::font.default_font, NONE, group));
+        entity->getComponent<Text>()->mode = CENTER;
+        auto txtscale = 0.5f * size.y / textRenderer->size(entity->getComponent<Text>()).total.y;
+        entity->getComponent<Text>()->scale = glm::vec2(txtscale);
+    }
+    return entity;
+}
+
+Entity *HUD::createSlider_Bar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
+                              Entity *parent, unsigned int parentGroupID, bool displayValue, float displayMax, float displayMin) {
+    Entity * entity = bar_base(midLeftPos, size, backgroundColor, fillColor, parent, parentGroupID, displayValue, displayMax, displayMin);
+    entity->addComponent(std::make_unique<HUDSlider>(
+            direction, entity->getComponent<Sprite>(), entity->getChild("Background")->getComponent<Sprite>(), entity->getComponent<Sprite>()->groupID,
+            nullptr, nullptr, nullptr,
+            displayValue ? entity->getComponent<Text>() : nullptr,
+            displayMin, displayMax
+    ));
+
+    return entity;
+}
+
+Entity *
+HUD::createSlider_BarControllable(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
+                                  Entity *parent, unsigned int parentGroupID, bool displayValue, float displayMax, float displayMin) {
+    Entity * entity = bar_base(midLeftPos, size, backgroundColor, fillColor, parent, parentGroupID, displayValue, displayMax, displayMin);
+    entity->name = "Controllable Bar";
+    auto group = entity->getComponent<Sprite>()->groupID;
+    groups.at(group).name = "Controllable Bar";
+
+    entity->addComponent(std::make_unique<HUDButton>(
+            entity->getChild("Background")->getComponent<Sprite>(), group,
+            [](HUDButton * self) {
+                auto slider = self->parentEntity->getComponent<HUDSlider>();
+                spdlog::trace("Bar {} subscribing.", slider->uniqueID);
+                slider->isListening = true;
+            },
+            [](HUDButton * self) {
+                auto slider = self->parentEntity->getComponent<HUDSlider>();
+                spdlog::trace("Bar {} unsubscribing.", slider->uniqueID);
+                slider->isListening = false;
+            }
+    ));
+    entity->getComponent<HUDButton>()->allow_release_outside = true;
+
+    entity->addComponent(std::make_unique<HUDSlider>(
+        direction, entity->getComponent<Sprite>(), entity->getChild("Background")->getComponent<Sprite>(), entity->getComponent<Sprite>()->groupID,
+        entity->getComponent<HUDButton>(), nullptr, nullptr,
+        displayValue ? entity->getComponent<Text>() : nullptr,
+        displayMin, displayMax
+    ));
+    entity->getComponent<HUDSlider>()->init_control_listener();
+    return entity;
+}
+
+Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, Entity *parent, unsigned int parentGroupID,
+                                     float displayMax, float displayMin) {
+    Entity * entity;
+   if (parent)
+        entity = ztgk::game::scene->addEntity(parent, "Setting Slider");
+    else entity = ztgk::game::scene->addEntity("Setting Slider");
+
+    auto group = addGroup(parentGroupID, "Setting Slider");
+    auto handleGroup = addGroup(group, "Setting Slider Handle");
+
+    auto ent = ztgk::game::scene->addEntity(entity, "Background (transparent collision sprite)");
+    ent->addComponent(std::make_unique<Sprite>(midLeftPos, size, ztgk::color.TRANSPARENT, group));
+    ent->addComponent(std::make_unique<HUDButton>(ent->getComponent<Sprite>(), group, nullptr, nullptr));
+
+    ent = bar_base(midLeftPos, {size.x * 0.95, size.y * 0.2}, ztgk::color.BLACK, ztgk::color.WHITE, entity, group, false, 0, 0);
+    ent->getComponent<Sprite>()->size *= 0.95f;
+
+    auto hent = ztgk::game::scene->addEntity(entity, "Handle");
+    auto handlePos = midLeftPos + glm::vec2{size.x, 0};
+    ent = ztgk::game::scene->addEntity(hent, "Background");
+    ent->addComponent(std::make_unique<Sprite>(handlePos, glm::vec2{size.y * 0.5, size.y}, ztgk::color.BLACK, handleGroup));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(std::make_unique<HUDHoverable>(ent->getComponent<Sprite>(), handleGroup, nullptr, nullptr));
+    ent->addComponent(std::make_unique<HUDButton>(ent->getComponent<Sprite>(), handleGroup, nullptr, nullptr));
+
+    ent = ztgk::game::scene->addEntity(hent, "Foreground");
+    ent->addComponent(std::make_unique<Sprite>(handlePos, glm::vec2{size.y * 0.5, size.y} * 0.95f, ztgk::color.WHITE, handleGroup));
+    ent->getComponent<Sprite>()->mode = CENTER;
+
+    hent->addComponent(std::make_unique<Text>("", handlePos + glm::vec2{0, size.y}, glm::vec2{1,1}, ztgk::color.WHITE, ztgk::font.default_font, NONE, handleGroup));
+    hent->getComponent<Text>()->mode = CENTER;
+
+    entity->addComponent(std::make_unique<HUDSlider>(
+        direction, entity->getChild("Display Bar")->getComponent<Sprite>(), entity->getChild("Display Bar")->getChild("Background")->getComponent<Sprite>(), group,
+        entity->getChild("Background")->getComponent<HUDButton>(), entity->getChild("Handle")->getChild("Background")->getComponent<HUDButton>(), entity->getChild("Handle")->getChild("Foreground")->getComponent<Sprite>(),
+        entity->getChild("Handle")->getComponent<Text>(), displayMin, displayMax
+    ));
+    
     return entity;
 }
 

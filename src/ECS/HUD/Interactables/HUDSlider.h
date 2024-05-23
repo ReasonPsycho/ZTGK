@@ -5,8 +5,52 @@
 #pragma once
 
 #include "ECS/HUD/Components/AHUDComponent.h"
+#include "ECS/SignalQueue/SignalReceiver.h"
 
-// todo incorporate it
-class HUDSlider : public AHUDComponent {
+class HUDButton;
+class Text;
+class Sprite;
 
+enum SliderStyle {
+    COLOR_BAR,
+    COLOR_BAR_CONTROLLABLE,
+    SETTING_BAR,
+    n_styles
+};
+#define SLIDER_STYLE_NAMES {"Color Bar", "Color Bar Controllable", "Setting Bar"}
+
+enum SliderDirection{
+    HORIZONTAL, VERTICAL
+};
+
+struct HUDSlider : public AHUDComponent {
+
+    float value;
+    SliderDirection direction;
+
+    Sprite * bar;
+    Sprite * barBackground;
+
+    HUDButton * control;
+    HUDButton * controlHandle;
+    Sprite * controlHandleForeground;
+
+    bool isListening = false;
+    SignalReceiver * controlListener;
+    void init_control_listener();
+
+    Text * display;
+    float displayMin;
+    float displayMax;
+
+    HUDSlider(SliderDirection direction, Sprite * displayBar, Sprite * barBackground, unsigned groupID,
+              HUDButton * control = nullptr, HUDButton * controlHandle = nullptr, Sprite * controlHandleForeground = nullptr,
+              Text * display = nullptr, float displayMin = 0, float displayMax = 0);
+
+    void set(float value);
+    void set_in_display_range(float value);
+    void set_direction(SliderDirection direction);
+    float get_in_display_range() const;
+
+    void showImGuiDetailsImpl(Camera * camera) override;
 };

@@ -567,12 +567,32 @@ void load_enteties() {
         nullptr
     );
 
-    scene.systemManager.getSystem<HUD>()->createBar({100, 100}, {1000, 100},
-                                                    ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
-                                                    false);
-    scene.systemManager.getSystem<HUD>()->createBar({100, 0}, {1000, 100},
-                                                    ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
-                                                    true, 100);
+//    scene.systemManager.getSystem<HUD>()->createBar({100, 100}, {1000, 100},
+//                                                    ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
+//                                                    false);
+//    scene.systemManager.getSystem<HUD>()->createBar({100, 0}, {1000, 100},
+//                                                    ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
+//                                                    true, 100);
+
+    scene.systemManager.getSystem<HUD>()->createSlider_Bar(HORIZONTAL, {100, 100}, {1000, 100},
+                                                           ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN);
+    scene.systemManager.getSystem<HUD>()->createSlider_Bar(HORIZONTAL, {100, 200}, {1000, 100},
+                                                           ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
+                                                           nullptr, 0,
+                                                           true, 100);
+
+    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(HORIZONTAL, {100, 300}, {1000, 100},
+                                                              ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED);
+    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(HORIZONTAL, {100, 400}, {1000, 100},
+                                                                ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
+                                                                nullptr, 0,
+                                                                true, 100);
+
+    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100});
+    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 600}, {1000, 100},
+                                                                 nullptr, 0,
+                                                                 true, 100);
+
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");

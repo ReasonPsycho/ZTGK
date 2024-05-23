@@ -20,6 +20,7 @@ public:
 
     button_func onPress;
     button_func onRelease;
+    bool allow_release_outside = false;
 
     void showImGuiDetailsImpl(Camera *camera) override;
 };
