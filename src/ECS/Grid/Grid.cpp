@@ -12,6 +12,7 @@
 #include "tracy/Tracy.hpp"
 #include "ECS/Unit/Mining/MineableChest.h"
 #include "ECS/Light/Components/PointLight.h"
+#include "ECS/Gameplay/Pranium.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -212,6 +213,9 @@ void Grid::InitializeTileEntities() {
                 default:
                 case FLOOR:
                 case ORE:
+                    tile->getEntity()->addComponent(std::make_unique<Pranium>(5.0f, Vector2Int(i, j), this));
+ //                   tile->getEntity()->addComponent(std::make_unique<PointLight>());
+                    break;
                 case CORE:
                 case UNIT:
                 case state_count:   // keep this one empty or signal error, this is unreachable
@@ -219,7 +223,7 @@ void Grid::InitializeTileEntities() {
                 case CHEST:
                     // todo item type id
                     tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
-                    tile->getEntity()->addComponent(std::make_unique<PointLight>());
+                   // tile->getEntity()->addComponent(std::make_unique<PointLight>());
                     break;
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
