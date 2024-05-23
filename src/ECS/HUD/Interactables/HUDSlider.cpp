@@ -34,16 +34,25 @@ void HUDSlider::set(float value) {
     switch (direction) {
     case HORIZONTAL:
         bar->size.x = barBackground->size.x * value;
-        bar->size.y = barBackground->size.y;
         break;
     case VERTICAL:
         bar->size.y = barBackground->size.y * value;
-        bar->size.x = barBackground->size.x;
         break;
     }
 
     if (display) {
-        display->content = std::format("{:.0f}/{:.0f}", get_in_display_range(), displayMax);
+        display->content = get_display_string();
+        if (controlHandle) {
+            switch (direction) {
+            case HORIZONTAL:
+                display->pos.x = controlHandle->collisionSprite->pos.x;
+                break;
+            case VERTICAL:
+                display->pos.y = controlHandle->collisionSprite->pos.y;
+                break;
+            }
+        }
+
     }
     if (controlHandle && controlHandleForeground) {
         switch (direction) {
@@ -79,6 +88,10 @@ void HUDSlider::set_direction(SliderDirection direction) {
 
 float HUDSlider::get_in_display_range() const {
     return displayMin + value * (displayMax - displayMin);
+}
+
+std::string HUDSlider::get_display_string() const {
+    return std::vformat(displayFormat, std::make_format_args(get_in_display_range(), displayMax));
 }
 
 void HUDSlider::showImGuiDetailsImpl(Camera *camera) {

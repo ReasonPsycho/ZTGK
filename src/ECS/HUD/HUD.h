@@ -70,7 +70,7 @@ public:
                                           bool displayValue = false, float displayMax = 0, float displayMin = 0);
     Entity * createSlider_SettingBar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size,
                                      Entity * parent = nullptr, unsigned parentGroupID = 0,
-                                     float displayMax = 0, float displayMin = 100);
+                                     float displayMax = 100, float displayMin = 0, std::string displayFormat = "{:.0f}/{:.0f}");
 #pragma endregion
 
     void init();

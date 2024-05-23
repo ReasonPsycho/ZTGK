@@ -160,7 +160,7 @@ Entity *Entity::getChild(unsigned int id) const {
     return found == children.end() ? nullptr : found->get();
 }
 
-Entity *Entity::getChild(const string &name) const {
+Entity *Entity::getChild(const std::string &name) const {
     auto found = std::find_if(children.begin(), children.end(), [name](auto & child){
         return child->name == name;
     });

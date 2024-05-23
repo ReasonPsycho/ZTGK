@@ -42,6 +42,7 @@ struct HUDSlider : public AHUDComponent {
     Text * display;
     float displayMin;
     float displayMax;
+    std::string displayFormat = "{:.0f}/{:.0f}";
 
     HUDSlider(SliderDirection direction, Sprite * displayBar, Sprite * barBackground, unsigned groupID,
               HUDButton * control = nullptr, HUDButton * controlHandle = nullptr, Sprite * controlHandleForeground = nullptr,
@@ -51,6 +52,7 @@ struct HUDSlider : public AHUDComponent {
     void set_in_display_range(float value);
     void set_direction(SliderDirection direction);
     float get_in_display_range() const;
+    std::string get_display_string() const;
 
     void showImGuiDetailsImpl(Camera * camera) override;
 };

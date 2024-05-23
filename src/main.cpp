@@ -591,7 +591,7 @@ void load_enteties() {
     scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100});
     scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 600}, {1000, 100},
                                                                  nullptr, 0,
-                                                                 true, 100);
+                                                                 1, 0, "{:.2f}/{:.2f}");
 
 
     auto efg = scene.addEntity(ehud, "Foreground");
@@ -604,7 +604,7 @@ void load_enteties() {
     fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
 
-    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
+//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
     load_units();
 
