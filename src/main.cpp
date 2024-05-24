@@ -533,24 +533,36 @@ void load_enteties() {
         ehud
     );
 
-    scene.systemManager.getSystem<HUD>()->createSlider_Bar(HORIZONTAL, {100, 100}, {1000, 100},
-                                                           ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN);
-    scene.systemManager.getSystem<HUD>()->createSlider_Bar(HORIZONTAL, {100, 200}, {1000, 100},
-                                                           ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
-                                                           ehud, 0,
-                                                           true, 100);
+    scene.systemManager.getSystem<HUD>()->createSlider_Bar(
+        HORIZONTAL, {100, 100}, {1000, 100},
+        ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN,
+        ehud
+    );
+    scene.systemManager.getSystem<HUD>()->createSlider_Bar(
+        HORIZONTAL, {100, 200}, {1000, 100},
+        ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
+        ehud, 0,
+        true, 100
+        );
 
-    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(HORIZONTAL, {100, 300}, {1000, 100},
-                                                              ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED);
-    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(HORIZONTAL, {100, 400}, {1000, 100},
-                                                                ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
-                                                                ehud, 0,
-                                                                true, 100);
+    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
+        HORIZONTAL, {100, 300}, {1000, 100},
+        ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
+        ehud
+    );
+    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
+        HORIZONTAL, {100, 400}, {1000, 100},
+        ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
+        ehud, 0,
+        true, 100
+    );
 
-    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100});
-    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 600}, {1000, 100},
-                                                                 ehud, 0,
-                                                                 1, 0, "{:.2f}/{:.2f}");
+    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100}, ehud);
+    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(
+        HORIZONTAL, {100, 600}, {1000, 100},
+        ehud, 0,
+        1, 0, "{:.2f}/{:.2f}"
+    );
 
 
     auto efg = scene.addEntity(ehud, "Foreground");
@@ -563,7 +575,7 @@ void load_enteties() {
     fgelem->addComponent(make_unique<Text>(tx));
     zmtxt = fgelem->getComponent<Text>();
 
-//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
+    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
     load_units();
 

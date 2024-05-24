@@ -638,14 +638,10 @@ HUD::createSlider_BarControllable(SliderDirection direction, glm::vec2 midLeftPo
     entity->addComponent(std::make_unique<HUDButton>(
             entity->getChild("Background")->getComponent<Sprite>(), group,
             [](HUDButton * self) {
-                auto slider = self->parentEntity->getComponent<HUDSlider>();
-                spdlog::trace("Bar {} subscribing.", slider->uniqueID);
-                slider->isListening = true;
+                self->parentEntity->getComponent<HUDSlider>()->isListening = true;
             },
             [](HUDButton * self) {
-                auto slider = self->parentEntity->getComponent<HUDSlider>();
-                spdlog::trace("Bar {} unsubscribing.", slider->uniqueID);
-                slider->isListening = false;
+                self->parentEntity->getComponent<HUDSlider>()->isListening = false;
             }
     ));
     entity->getComponent<HUDButton>()->allow_release_outside = true;
