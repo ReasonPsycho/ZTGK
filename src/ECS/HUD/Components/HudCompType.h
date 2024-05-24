@@ -10,6 +10,6 @@
 enum hudcType {
     UNDEFINED,
     SPRITE, TEXT,
-    HOVERABLE, BUTTON
+    HOVERABLE, BUTTON, SLIDER
 };
 #endif //ZTGK_HUDCOMPTYPE_H

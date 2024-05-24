@@ -485,95 +485,85 @@ void load_enteties() {
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
+
     auto ehud = scene.addEntity("HUD DEMO");
-    auto entity = scene.addEntity(ehud, "HoverE");
-    auto egroup = scene.systemManager.getSystem<HUD>()->addGroup(0, "Hover", false, {-200, 100, 0});
-    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
-    auto spr = entity->getComponent<Sprite>();
-    spr->mode = CENTER;
-    entity->addComponent(make_unique<Text>("Hover me!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
-    auto txt = entity->getComponent<Text>();
-    txt->mode = CENTER;
-    entity->addComponent(make_unique<HUDHoverable>(entity->getComponent<Sprite>(), egroup,
-        [txt, spr](HUDHoverable * self){
-            txt->content = ":)";
-            txt->color = ztgk::color.BLACK;
-            spr->color = ztgk::color.WHITE;
-            spr->load();
+
+    auto drag = scene.systemManager.getSystem<HUD>()->createButton(
+        "Drag\nme!",
+        {1000, 1000}, {100, 100}, ztgk::color.BLACK,
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BLACK; },
+        [](HUDButton * self){
+            self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.75, 0.75, 0.75, 1};
+            self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = Signal::signal_types.mouse_move_signal;
         },
-       [txt, spr](HUDHoverable * self){
-            txt->content = "Hover me!";
-            txt->color = ztgk::color.WHITE;
-            spr->color = ztgk::color.BLACK;
-            spr->load();
-        }
-       ) );
-    entity = scene.addEntity(ehud, "ButtonE");
-    egroup = scene.systemManager.getSystem<HUD>()->addGroup(0, "Button", false, {200, -100, 0});
-    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
-    spr = entity->getComponent<Sprite>();
-    spr->mode = CENTER;
-    entity->addComponent(make_unique<Text>("Press me!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
-    txt = entity->getComponent<Text>();
-    txt->mode = CENTER;
-    entity->addComponent(make_unique<HUDButton>(entity->getComponent<Sprite>(), egroup,
-        [txt](HUDButton * self){
-            txt->content = ":)";
+        [](HUDButton * self){
+            self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1};
+            self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = 0;
         },
-       [txt](HUDButton * self){
-            txt->content = "Press me!";
+        ehud
+   );
+    drag->addComponent(std::make_unique<SignalReceiver>(
+        0,
+        [drag](const Signal & signal) {
+            auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
+            drag->getComponent<Sprite>()->pos = data->pos;
+            drag->getComponent<Text>()->pos = data->pos;
         }
-   ) );
-    entity = scene.addEntity(ehud, "BothE");
-    egroup = scene.systemManager.getSystem<HUD>()->addGroup(0, "Both", false, {0, 100, 0});
-    entity->addComponent(make_unique<Sprite>(ztgk::game::window_size / 2, glm::vec2(100, 100), ztgk::color.BLACK, egroup));
-    spr = entity->getComponent<Sprite>();
-    spr->mode = CENTER;
-    entity->addComponent(make_unique<Text>("Do it!", ztgk::game::window_size / 2, glm::vec2(1, 1), ztgk::color.WHITE, ztgk::font.default_font, NONE, egroup));
-    txt = entity->getComponent<Text>();
-    txt->mode = CENTER;
-    entity->addComponent(make_unique<HUDHoverable>(entity->getComponent<Sprite>(), egroup,
-    [txt, spr](HUDHoverable * self){
-        txt->color = ztgk::color.BLACK;
-        spr->color = ztgk::color.WHITE;
-        spr->load();
-    },
-   [txt, spr](HUDHoverable * self){
-        txt->color = ztgk::color.WHITE;
-        spr->color = ztgk::color.BLACK;
-        spr->load();
-    }
-       ) );
-    entity->addComponent(make_unique<HUDButton>(entity->getComponent<Sprite>(), egroup,
-        [txt](HUDButton * self){
-            txt->content = ":)";
-        },
-       [txt](HUDButton * self){
-            txt->content = "Do it!";
-        }
-   ) );
+    ));
 
     scene.systemManager.getSystem<HUD>()->createButton("Button text",
-       {500, 500}, {300, 100}, ztgk::color.CYAN, ztgk::color.TURQUOISE,
+       {1750, 575}, {300, 100}, ztgk::color.CYAN, ztgk::color.TURQUOISE,
        ztgk::color.BLUE, []() { spdlog::info("Button pressed!"); },
-       nullptr);
+       ehud);
 
     scene.systemManager.getSystem<HUD>()->createButton(
-        {1000, 200}, {300, 300},
+        {1750, 775}, {300, 300},
         "res/textures/puni.png", "res/textures/container2.png",
         [](){ spdlog::info("2SPR Button pressed!"); },
-        nullptr
+        ehud
     );
 
     scene.systemManager.getSystem<HUD>()->createButton(
-        "Func button textt", {1000, 900}, {300, 150}, ztgk::color.BROWN,
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); },
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; self->collisionSprite->load(); },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; self->collisionSprite->load(); },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); spdlog::info("Func Button pressed!"); },
-        nullptr
+        "Func button textt", {1750, 1000}, {300, 150}, ztgk::color.BROWN,
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; spdlog::info("Func Button pressed!"); },
+        ehud
     );
+
+    scene.systemManager.getSystem<HUD>()->createSlider_Bar(
+        HORIZONTAL, {100, 100}, {1000, 100},
+        ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN,
+        ehud
+    );
+    scene.systemManager.getSystem<HUD>()->createSlider_Bar(
+        HORIZONTAL, {100, 200}, {1000, 100},
+        ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
+        ehud, 0,
+        true, 100
+        );
+
+    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
+        HORIZONTAL, {100, 300}, {1000, 100},
+        ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
+        ehud
+    );
+    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
+        HORIZONTAL, {100, 400}, {1000, 100},
+        ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
+        ehud, 0,
+        true, 100
+    );
+
+    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100}, ehud);
+    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(
+        HORIZONTAL, {100, 600}, {1000, 100},
+        ehud, 0,
+        1, 0, "{:.2f}/{:.2f}"
+    );
+
 
     auto efg = scene.addEntity(ehud, "Foreground");
     auto fgelem = scene.addEntity(efg, "Fixed");

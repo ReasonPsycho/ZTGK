@@ -45,27 +45,38 @@ namespace ztgk {
 
     extern Console console;
 
-    static struct {  
-        const glm::vec4 BLACK = { 0, 0, 0, 1 };
-        const glm::vec4 WHITE = { 1, 1, 1, 1 };
-        const glm::vec4 RED = { 1, 0, 0, 1 };
-        const glm::vec4 GREEN = { 0, 1, 0, 1 };
-        const glm::vec4 BLUE = { 0, 0, 1, 1 };
-        const glm::vec4 YELLOW = { 1, 1, 0, 1 };
-        const glm::vec4 CYAN = { 0, 1, 1, 1 };
-        const glm::vec4 MAGENTA = { 1, 0, 1, 1 };
-        const glm::vec4 GRAY = { 0.5, 0.5, 0.5, 1 };
-        const glm::vec4 BROWN = { 0.647, 0.165, 0.165, 1 };
-        const glm::vec4 ORANGE = { 1, 0.647, 0, 1 };
-        const glm::vec4 PURPLE = { 0.5, 0, 0.5, 1 };
-        const glm::vec4 TEAL = { 0, 0.5, 0.5, 1 };
-        const glm::vec4 PINK = { 1, 0.753, 0.796, 1 };
-        const glm::vec4 LIME = { 0, 1, 0, 1 };
-        const glm::vec4 NAVY = { 0, 0, 0.5, 1 };
-        const glm::vec4 MAROON = { 0.5, 0, 0, 1 };
-        const glm::vec4 OLIVE = { 0.5, 0.5, 0, 1 };
-        const glm::vec4 TURQUOISE = { 0.251, 0.878, 0.816, 1 };
-        const glm::vec4 INDIGO = { 0.294, 0, 0.51, 1 };
+    static struct {
+        const glm::vec4 TRANSPARENT ={ 0,    0,     0,    0 };
+        const glm::vec4 BLACK =      { 0,    0,     0,    1 };
+        const glm::vec4 WHITE =      { 1,    1,     1,    1 };
+        const glm::vec4 RED =        { 1,    0,     0,    1 };
+        const glm::vec4 GREEN =      { 0,    1,     0,    1 };
+        const glm::vec4 BLUE =       { 0,    0,     1,    1 };
+        const glm::vec4 YELLOW =     { 1,    1,     0,    1 };
+        const glm::vec4 CYAN =       { 0,    1,     1,    1 };
+        const glm::vec4 MAGENTA =    { 1,    0,     1,    1 };
+        const glm::vec4 GRAY =       { 0.5,  0.5,   0.5,  1 };
+        const glm::vec4 BROWN =      { 0.647,0.165, 0.165,1 };
+        const glm::vec4 ORANGE =     { 1,    0.647, 0,    1 };
+        const glm::vec4 PURPLE =     { 0.5,  0,     0.5,  1 };
+        const glm::vec4 TEAL =       { 0,    0.5,   0.5,  1 };
+        const glm::vec4 PINK =       { 1,    0.753, 0.796,1 };
+        const glm::vec4 LIME =       { 0,    1,     0,    1 };
+        const glm::vec4 NAVY =       { 0,    0,     0.5,  1 };
+        const glm::vec4 MAROON =     { 0.5,  0,     0,    1 };
+        const glm::vec4 OLIVE =      { 0.5,  0.5,   0,    1 };
+        const glm::vec4 TURQUOISE =  { 0.251,0.878, 0.816,1 };
+        const glm::vec4 INDIGO =     { 0.294,0,     0.51, 1 };
+        const glm::vec4 SILVER =     { 0.753,0.753, 0.753,1 };
+        const glm::vec4 GOLD =       { 1,    0.843, 0,    1 };
+        const glm::vec4 CRIMSON =    { 0.863,0.078, 0.235,1 };
+        const glm::vec4 ROSE =       { 1,    0.078, 0.576,1 };
+        const glm::vec4 BEIGE =      { 0.961,0.961, 0.863,1 };
+        const glm::vec4 CORAL =      { 1,    0.498, 0.314,1 };
+        const glm::vec4 KHAKI =      { 0.765,0.69,  0.569,1 };
+        const glm::vec4 LAVENDER =   { 0.902,0.902, 0.98, 1 };
+        const glm::vec4 PLUM =       { 0.867,0.627, 0.867,1 };
+
     } color;
 
 }

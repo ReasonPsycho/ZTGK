@@ -38,9 +38,17 @@ struct Cursor {
     cursor_conf config;
 
     glm::vec2 glfw_prev_pos {0};
+    glm::vec2 raw_pos = ztgk::game::window_size / 2;
+    glm::vec2 raw_prev_pos = ztgk::game::window_size / 2;
     glm::vec2 ui_pos = ztgk::game::window_size / 2;
     glm::vec2 ui_prev_pos = ztgk::game::window_size / 2;
     ImGuiIO * mouseio;
     SignalReceiver toggleHandler;
     dragSelectionMode dragMode = DRAG_TILE;
+
+    inline void update_ui_pos() {
+        //todo once cursor icons are real, verify if the position is correctly aligned with the icon's pivot (it seems there's a slight offset?)
+        ui_pos = {raw_pos.x, ztgk::game::window_size.y - raw_pos.y};
+        ui_prev_pos = {raw_prev_pos.x, ztgk::game::window_size.y - raw_prev_pos.y};
+    }
 };
