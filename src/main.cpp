@@ -377,6 +377,9 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::window = window;
+    primitives.Init();
+   
+   
     scene.systemManager.addSystem(std::make_unique<SignalQueue>());
     ztgk::game::signalQueue = scene.systemManager.getSystem<SignalQueue>(); //TODO gregori and ijgor just pls use scene to get systems
     scene.systemManager.getSystem<SignalQueue>()->init();
@@ -390,8 +393,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<CollisionSystem>());
     scene.systemManager.addSystem(std::make_unique<UnitSystem>());
 
-    primitives.Init();
-    phongPipeline.Init();
+    phongPipeline.Init(&camera,&primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
@@ -455,21 +457,27 @@ void load_enteties() {
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
+    gameObject = scene.addEntity("Gabka");;
+    gameObject->transform.setLocalPosition(glm::vec3(100,4,100));
+    gameObject->addComponent(make_unique<Render>(&gabka));
+
 
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
-    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
+    gameObject->transform.setLocalPosition(glm::vec3(100,4,100));
+    
+    
     gameObject->addComponent(make_unique<PointLight>(
-            PointLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(1, 1, 1, 1), 1.0f, 2,
-                           0.032f)));
+            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
+                           0.05f)));
     //  gameObject = scene.addEntity("Point Light 2");
     // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
     gameObject = scene.addEntity("Spot Light");
-    gameObject->transform.setLocalPosition(glm::vec3(100,1,100));
+    gameObject->transform.setLocalPosition(glm::vec3(100,4,100));
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
-                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 1.0f, 0.09f, 0.032f)));
+                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),0.1f, 0.2f,0.05f)));
     scene.systemManager.getSystem<LightSystem>()->Init();
 
 
@@ -576,32 +584,32 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-    playerUnit = scene.addEntity("Player2");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-    playerUnit = scene.addEntity("Player3");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
+//    playerUnit = scene.addEntity("Player2");
+//    playerUnit->addComponent(make_unique<Render>(&gabka));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
+//    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+//    playerUnit->addComponent(make_unique<Unit>("Player2",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
+//    playerUnit = scene.addEntity("Player3");
+//    playerUnit->addComponent(make_unique<Render>(&gabka));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1,1, 1)));
+//    playerUnit->getComponent<BoxCollider>()->setCenter( playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+//    playerUnit->addComponent(make_unique<Unit>("Player3",  scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState( scene.systemManager.getSystem<Grid>());
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
     Entity* enemyUnit = scene.addEntity("Enemy1");
     enemyUnit->addComponent(make_unique<Render>(&zuczek));
     enemyUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -684,6 +692,9 @@ void update() {
     }
     
     scene.systemManager.getSystem<CollisionSystem>()->Update();
+
+//    auto u = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents[0];
+//    spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
 }
 
 void render() {
@@ -694,7 +705,7 @@ void render() {
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
-    bloomSystem.BindBuffer();
+   // bloomSystem.BindBuffer();
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -702,15 +713,18 @@ void render() {
 
     file_logger->info("Set up PBR.");
     phongPipeline.PrebindPipeline(&camera);
-
+    
     scene.systemManager.getSystem<RenderSystem>()->DrawScene(&phongPipeline.phongShader, &camera);
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&phongPipeline.phongInstanceShader, &camera);
+
+    phongPipeline.WriteToBackBuffer(&camera);
+    
     scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
 
-    bloomSystem.BlurBuffer();
-    bloomSystem.Render();
+ //   bloomSystem.BlurBuffer();
+//    bloomSystem.Render();
 
     scene.systemManager.getSystem<HUD>()->draw();
 }
@@ -954,6 +968,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     ztgk::game::window_size = {width, height};
     camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
+    phongPipeline.SetUpTextureBuffers(width, height);
 }
 
 

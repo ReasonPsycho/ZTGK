@@ -58,6 +58,7 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
 
         if (doesCollide(collider)) {
             if (collider->type == ColliderType::BOX) {
+
                 if(((BoxCollider*)collider)->collisionType == CollisionType::CHUNK){
                     Chunk * chunk = collider->getEntity()->getComponent<Chunk>();
                     for(int x = 0;x < chunk->width;x++){
@@ -72,16 +73,39 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& direction, CollisionSystem *c
                     }
                 }else{
                     RayHit = GetRayHit(ColliderType::BOX, collider);
+                    hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
+                    break;
                 }
             } else if (collider->type == ColliderType::SPHERE) {
                 RayHit = GetRayHit(ColliderType::SPHERE, collider);
+                hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
+                break;
             }
-            hitEntity = dynamic_cast<Entity*>(collider->parentEntity);
-            // Stop after the first hit
-            break;
         }
     }
 }
+
+Chunk* Ray::checkCollisionWithNeighChunks(Chunk* excluding) {
+    auto checkDirection = [&](int offsetX, int offsetZ) -> Chunk* {
+        Chunk* chunk = excluding->grid->getChunkAt(excluding->index.x + offsetX, excluding->index.z + offsetZ);
+        if (chunk != nullptr && doesCollide(chunk->getEntity()->getComponent<BoxCollider>())) {
+            return chunk;
+        }
+        return nullptr;
+    };
+
+    Chunk* result;
+    if ((result = checkDirection(1, 0)) != nullptr) return result;
+    if ((result = checkDirection(-1, 0)) != nullptr) return result;
+    if ((result = checkDirection(0, 1)) != nullptr) return result;
+    if ((result = checkDirection(0, -1)) != nullptr) return result;
+
+    return nullptr;
+}
+
+
+
+
 
 
 /**
@@ -191,6 +215,18 @@ void Ray::drawWire(Shader *shader) {
     shader->setMatrix4("model", false, glm::value_ptr(glm::mat4x4(1)));
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 2);
+}
+
+Entity* Ray::iterateThruTilesInChunk(Chunk* chunk){
+    for(int x = 0;x < chunk->width;x++){
+        for(int z = 0;z < chunk->width;z++){
+            Entity* tileEntity = chunk->getTileAt(x,z)->getEntity();
+            if (doesCollide(tileEntity->getComponent<BoxCollider>())){
+                return tileEntity;
+            }
+        }
+    }
+    return nullptr;
 }
 
 

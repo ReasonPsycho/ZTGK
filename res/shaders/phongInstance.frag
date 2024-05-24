@@ -1,4 +1,6 @@
 #version 460
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 frag_normal_depth; //Meant for outline process
 
 struct TangentData{ // So it's easier to operate on
     vec3 ViewPos;
@@ -86,8 +88,9 @@ uniform float heightScale;
 uniform Material material;
 uniform float maxBias;
 uniform float biasMuliplayer;
-uniform float dirtLevel;
-uniform float saturation;
+uniform float saturationMultiplayer;  // sat multiplier is the factor by which you increase saturation.
+uniform float lightMultiplayer;  // sat multiplier is the factor by which you increase saturation
+uniform int toon_color_levels;
 
 vec3 selectionColor[5] = vec3[]
 (
@@ -136,7 +139,51 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-out vec4 FragColor;
+const mat4 light_shade_mat = mat4( 251, 166, 10,  165,
+142, 9,   212, 250,
+7,   165, 250, 168,
+220, 250, 142, 4 ) / 255.0;
+
+vec3 light_shade_color()
+{
+    ivec2 gridPos = ivec2(gl_FragCoord) % 4;
+    float factor  = light_shade_mat[gridPos.x][3 - gridPos.y];
+
+    return vec3(factor);
+}
+
+const mat4 dark_shade_mat = mat4( 251, 166, 10,  165,
+142, 9,   212, 8,
+7,   165, 250, 168,
+220, 8,   142, 4 ) / 255.0;
+
+vec3 dark_shade_color()
+{
+    ivec2 gridPos = ivec2(gl_FragCoord) % 4;
+    float factor  = dark_shade_mat[gridPos.x][3 - gridPos.y];
+
+    return vec3(factor);
+}
+
+vec4 reinhard(vec4 hdr_color)
+{
+    // reinhard tonemapping
+    vec3 ldr_color = hdr_color.rgb / (hdr_color.rgb + 1.0);
+
+    // gamma correction
+    ldr_color = pow(ldr_color, vec3(1.0 / 2.2)); //Gamma
+
+    return vec4(ldr_color, 1.0);
+}
+
+uniform float diffuse_levels;
+uniform float specular_levels;
+uniform float light_shade_cutoff;
+uniform float dark_shade_cutoff;
+
+uniform vec3 rim_color;
+uniform float rim_threshold;
+uniform float rim_amount;
 
 void main()
 {
@@ -178,7 +225,7 @@ void main()
     vec3 result = vec3(0);
     if (currentWallData[1] != 1){
 
-        result = 0.2f * diffuse;//We do be calculating ambient here
+        result = 0.1f * diffuse;//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLightAmount; ++i) {
             result += CalcDirLight(dirLights[i], normal, viewDir, index++,  diffuse,specular);
@@ -203,12 +250,9 @@ void main()
         result = mix(result, selectionColor[currentWallData[2]], 0.5);
     }
 
-    vec3 rgbColor = result;
-    vec3 hsvColor = rgb2hsv(rgbColor);
+    float depth = gl_FragCoord.z;
+    frag_normal_depth = vec4(normal, depth);
 
-    hsvColor.y *= saturation;  // sat multiplier is the factor by which you increase saturation.
-
-    result = hsv2rgb(hsvColor);
     FragColor = vec4(result, 1.0);
 }
 
@@ -235,23 +279,53 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex,vec3
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 viewDir, int lightIndex,vec3 diffuse,vec3 specular)
 {
     vec3 lightDir = normalize(  vec3(fs_in.tangentData.TBN * vec3(light.position))  - worldPos);
-    // diffuse shading
-    float diff = max(dot(lightDir, normal), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0);
+    vec3 half_vector = normalize(viewDir - lightDir);
+
     // attenuation
     float distance = length(vec3( fs_in.tangentData.TBN * vec3(light.position))  - worldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-    // combine results
-    diffuse = vec3(light.diffuse) * diff * diffuse;
-    specular = vec3(light.specular) * spec * vec3(specular);
+
+    // diffuse shading
+    float df = max(0.0, dot(normal, lightDir));
+    // specular shading
+    float sf = max(0.0, dot(normal, half_vector)) * attenuation;
+
+    /* Calculate rim lighting */
+    float rim_dot       = 1.0 - max(dot(viewDir, normal), 0.0);
+    float rim_intensity = rim_dot * pow(df, rim_threshold);
+    rim_intensity = smoothstep(rim_amount - 0.01, rim_amount + 0.01, rim_intensity);
+    vec3  rim           = rim_intensity * vec3(light.specular);
+
+    df *= attenuation;
+
+    //flooring
+    df = ceil(df * diffuse_levels ) / diffuse_levels;
+    sf = floor((sf * specular_levels ) + 0.5) / specular_levels;
+
+    //color modulation
+    vec3 diff_color_modulation;
+
+    if (df >= light_shade_cutoff)
+    {
+        diff_color_modulation = vec3(1.0);
+    }
+    else if (df >= dark_shade_cutoff)
+    {
+        diff_color_modulation = light_shade_color();
+    }
+    else
+    {
+        diff_color_modulation = dark_shade_color();
+    }
+
+    vec3 diffuse_color = vec3(light.diffuse) * diff_color_modulation * diffuse;
+    vec3 specular_color =  vec3(light.specular) * diff_color_modulation * specular;
 
     float shadow = 1;
     shadow = (1.0 - CubeShadowCalculation(fs_in.WorldPos, light.position.xyz, light.position.w, lightIndex));
 
-
-    return (diffuse + specular) * attenuation * shadow;
+ 
+    return (df * diffuse_color + sf * specular_color + rim) * shadow; //Prob also need to style shadow or just use hard ones
 }
 
 // calculates the color when using a spot light.
@@ -259,27 +333,59 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, in
 {
     vec3 tangentLightDir = normalize(  vec3(fs_in.tangentData.TBN * vec3(light.position))  - worldPos);
     vec3 lightDir = normalize(   vec3(light.position)  - fs_in.WorldPos);
-    // diffuse shading
-    float diff = max(dot(normal, tangentLightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-tangentLightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0);
+    vec3 half_vector = normalize(viewDir - tangentLightDir);
+
     // attenuation
     float distance = length(vec3( fs_in.tangentData.TBN * vec3(light.position))  - worldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
     // spotlight intensity
     float theta = dot(lightDir, normalize(vec3(-light.direction)));
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results,vec2 
-    diffuse = vec3(light.diffuse) * diff * diffuse;
-    specular = vec3(light.specular) * spec * vec3(specular);
+
+
+    // diffuse shading
+    float df = max(0.0, dot(normal, tangentLightDir));
+    // specular shading
+    float sf = max(0.0, dot(normal, half_vector)) * attenuation * intensity;
+
+    /* Calculate rim lighting */
+    float rim_dot       = 1.0 - max(dot(viewDir, normal), 0.0);
+    float rim_intensity = rim_dot * pow(df, rim_threshold);
+    rim_intensity = smoothstep(rim_amount - 0.01, rim_amount + 0.01, rim_intensity);
+    vec3  rim           = rim_intensity * vec3(light.specular);
+    
+    df*= attenuation * intensity;
+    //flooring
+    df = ceil(df * diffuse_levels) / diffuse_levels;
+    sf = floor((sf * specular_levels ) + 0.5) / specular_levels;
+
+    //color modulation
+    vec3 diff_color_modulation;
+
+    if (df >= light_shade_cutoff)
+    {
+        diff_color_modulation = vec3(1.0);
+    }
+    else if (df >= dark_shade_cutoff)
+    {
+        diff_color_modulation = light_shade_color();
+    }
+    else
+    {
+        diff_color_modulation = dark_shade_color();
+    }
+
+    vec3 diffuse_color = vec3(light.diffuse) * diff_color_modulation * diffuse;
+    vec3 specular_color =  vec3(light.specular) * diff_color_modulation * specular;
 
     float shadow = 1;
     shadow = (1.0 - PlaneShadowCalculation(light.lightSpaceMatrix, light.position.xyz, light.position.w, lightIndex));
 
 
-    return (diffuse + specular) * attenuation * intensity * shadow;
+
+    return (df * diffuse_color + sf * specular_color + rim) * shadow; //Prob also need to style shadow or just use hard ones
 }
 
 float CubeShadowCalculation(vec3 fragPos, vec3 lightPos, float far_plane, int lightIndex)
