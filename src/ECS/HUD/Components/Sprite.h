@@ -26,6 +26,7 @@ struct Sprite : public AHUDComponent {
     glm::vec2 size;
     GLuint texture;
     glm::vec4 color;
+    bool hasTexture = false;
 
     void load(const std::string & path = "");
 
@@ -33,6 +34,4 @@ struct Sprite : public AHUDComponent {
     static const unsigned editor_path_len = 100;
     char editor_path[editor_path_len];
     void showImGuiDetailsImpl(Camera *camera) override;
-
-    void loadColor();
 };

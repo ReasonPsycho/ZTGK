@@ -483,14 +483,14 @@ void load_enteties() {
     auto drag = scene.systemManager.getSystem<HUD>()->createButton(
         "Drag\nme!",
         {1000, 1000}, {100, 100}, ztgk::color.BLACK,
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); },
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BLACK; self->collisionSprite->load(); },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BLACK; },
         [](HUDButton * self){
-            self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.75, 0.75, 0.75, 1}; self->collisionSprite->load();
+            self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.75, 0.75, 0.75, 1};
             self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = Signal::signal_types.mouse_move_signal;
         },
         [](HUDButton * self){
-            self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load();
+            self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1};
             self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = 0;
         },
         ehud
@@ -518,10 +518,10 @@ void load_enteties() {
 
     scene.systemManager.getSystem<HUD>()->createButton(
         "Func button textt", {1750, 1000}, {300, 150}, ztgk::color.BROWN,
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); },
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; self->collisionSprite->load(); },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; self->collisionSprite->load(); },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; self->collisionSprite->load(); spdlog::info("Func Button pressed!"); },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; },
+        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; },
+        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; spdlog::info("Func Button pressed!"); },
         ehud
     );
 

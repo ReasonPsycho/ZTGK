@@ -567,22 +567,18 @@ HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, 
     entity->addComponent(std::make_unique<HUDHoverable>(entity->getComponent<Sprite>(), group,
         [hoverColor](HUDHoverable * self) {
             self->collisionSprite->color = hoverColor;
-            self->collisionSprite->load();
         },
         [color](HUDHoverable * self) {
             self->collisionSprite->color = color;
-            self->collisionSprite->load();
         }
     ));
     entity->addComponent(std::make_unique<HUDButton>(entity->getComponent<Sprite>(), group,
         [pressColor](HUDButton * self) {
             self->collisionSprite->color = pressColor;
-            self->collisionSprite->load();
         },
         [onRelease, hoverColor](HUDButton * self) {
             onRelease();
             self->collisionSprite->color = hoverColor;
-            self->collisionSprite->load();
         }
     ));
 
@@ -713,7 +709,6 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
         [](HUDHoverable * self) {
             auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
             handle_fg->color = ztgk::color.WHITE * glm::vec4{0.9, 0.9, 0.9, 1};
-            handle_fg->load();
 
             auto slider = self->parentEntity->parent->parent->getComponent<HUDSlider>();
             slider->update_display();
@@ -722,7 +717,6 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
         [](HUDHoverable * self) {
             auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
             handle_fg->color = ztgk::color.WHITE;
-            handle_fg->load();
 
             auto slider = self->parentEntity->parent->parent->getComponent<HUDSlider>();
             slider->display->color.a = 0;
@@ -733,14 +727,12 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
             [control](HUDButton * self){
                 auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
                 handle_fg->color = ztgk::color.WHITE * glm::vec4{0.8f, 0.8f, 0.8f, 1};
-                handle_fg->load();
 
                 control->onPress(control);
             },
             [control](HUDButton * self){
                 auto handle_fg = self->parentEntity->parent->getChild("Foreground")->getComponent<Sprite>();
                 handle_fg->color = ztgk::color.WHITE * glm::vec4{0.9, 0.9, 0.9, 1};
-                handle_fg->load();
 
                 control->onRelease(control);
             }

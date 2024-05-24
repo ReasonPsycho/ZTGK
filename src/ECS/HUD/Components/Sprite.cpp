@@ -34,7 +34,7 @@ void Sprite::load(const std::string &path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     if ( path.empty() ) {
-        loadColor();
+        hasTexture = false;
     } else {
         // load and generate the texture
         stbi_set_flip_vertically_on_load(false);
@@ -50,10 +50,11 @@ void Sprite::load(const std::string &path) {
                 format = GL_RGBA;
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
+            hasTexture = true;
             spdlog::trace("Loaded sprite \"" + path + "\".");
         } else {
-            spdlog::error("Failed to load sprite \"" + path + "\". Generating color pixel texture.");
-            loadColor();
+            spdlog::error("Failed to load sprite \"" + path + "\". Using color only.");
+            hasTexture = false;
         }
         if (size == glm::vec2{0, 0}) {
             size = {width, height };
@@ -88,10 +89,4 @@ void Sprite::showImGuiDetailsImpl(Camera *camera) {
     }
     static const char * const modes[] = MODE_NAMES;
     ImGui::Combo(std::format("Draw Mode##{}", uniqueID).c_str(), reinterpret_cast<int *>(&mode), modes, num_modes);
-}
-
-void Sprite::loadColor() {
-    GLubyte clr[4] = { static_cast<GLubyte>(color.x * 255), static_cast<GLubyte>(color.y * 255), static_cast<GLubyte>(color.z * 255), static_cast<GLubyte>(color.w * 255) };
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, clr);
-    glGenerateMipmap(GL_TEXTURE_2D);
 }
