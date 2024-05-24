@@ -67,6 +67,9 @@ void HUD::init() {
             }
         } else if ( signal.stype == Signal::signal_types.mouse_button_signal ) {
             auto data = dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+            if (filterInteractionButtons && data->button != interactableButtonFilter)
+                return;
+
             static HUDButton * pressed = nullptr;
 
             // only release previously pressed button

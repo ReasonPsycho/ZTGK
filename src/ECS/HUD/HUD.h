@@ -44,6 +44,9 @@ public:
     glm::vec3 getGroupTreeOffset(unsigned leafGroupID) const;
     bool isGroupTreeHidden(unsigned leafGroupID) const;
 
+    bool filterInteractionButtons = true;
+    int interactableButtonFilter = GLFW_MOUSE_BUTTON_LEFT;
+
 #pragma region Element Creation
     Entity *createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 defaultColor,
                          HUDHoverable::hover_func onHoverEnter, HUDHoverable::hover_func onHoverExit,
