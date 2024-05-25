@@ -214,7 +214,7 @@ void Grid::InitializeTileEntities() {
                 case FLOOR:
                 case ORE:
                     tile->getEntity()->addComponent(std::make_unique<Pranium>(5.0f, Vector2Int(i, j), this));
- //                   tile->getEntity()->addComponent(std::make_unique<PointLight>());
+                    //tile->getEntity()->addComponent(std::make_unique<PointLight>());
                     break;
                 case CORE:
                 case UNIT:

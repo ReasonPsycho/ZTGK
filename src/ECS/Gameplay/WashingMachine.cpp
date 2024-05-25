@@ -4,12 +4,13 @@
 
 #include "WashingMachine.h"
 #include <imgui.h>
+#include "ECS/Utils/Globals.h"
 
 WashingMachine::WashingMachine(int praniumNeeded, int praniumNeededToMilestone, int radiusToClearEveryMilestone) {
     name = "WashingMachine";
     this->praniumNeeded = praniumNeeded;
     this->praniumNeededToMilestone = praniumNeededToMilestone;
-    this->radiusToClearEveryMilestone = radiusToClearEveryMilestone;
+    this->radiusToClear = radiusToClearEveryMilestone;
 }
 
 void WashingMachine::addComponent(void *component) {
@@ -45,19 +46,42 @@ void WashingMachine::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void WashingMachine::UpdateImpl() {
-    if(currentPranium >= praniumNeeded){
-        //todo finisz gejm
-    }
+//    for (auto& [id, tiles] : WashingMachineTiles) {
+//        for (auto& tile : tiles) {
+//            tile->Update();
+//        }
+//    }
+}
 
-    for (auto& [id, tiles] : WashingMachineTiles) {
-        for (auto& tile : tiles) {
-            tile->Update();
+void WashingMachine::clearTilesInRadius(Vector2Int position, int radius) {
+    auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
+    for (int x = position.x - radius; x<= position.x + radius; ++x){
+        for (int z = position.z - radius; z<= position.z + radius; z++){
+            int dx = x - position.x;
+            int dz = z - position.z;
+            if(dx*dx + dz*dz <= radius*radius){
+                auto tile= grid->getTileAt(x, z);
+                if(tile != nullptr){
+                    if(tile->state == TileState::WALL) {
+                        tile->state = TileState::FLOOR;
+                    }
+                    tile->dirtinessLevel = 0;
+                }
+            }
         }
     }
 }
 
-void WashingMachine::clearTilesInRadius(Vector2Int position, int radius) {
-    //todo implement
+void WashingMachine::onPraniumDelivered() {
+    currentPranium++;
+
+    if(currentPranium >= praniumNeeded){
+        //todo finisz gejm
+    }
+
+
+    clearTilesInRadius(Vector2Int(0,0), radiusToClear);
+    radiusToClear *= 2;
 
 }
 

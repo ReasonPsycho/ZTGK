@@ -24,10 +24,11 @@ public:
     std::unordered_map<unsigned, std::vector<WashingMachineTile*>> WashingMachineTiles;
 
     int praniumNeeded;
-    int praniumNeededToMilestone;
-    int radiusToClearEveryMilestone;
+    int praniumNeededToMilestone = 1;
+    int radiusToClear = 4;
 
     void clearTilesInRadius(Vector2Int position, int radius);
+    void onPraniumDelivered();
 
 
 private:
