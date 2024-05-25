@@ -13,7 +13,7 @@ class WashingMachine;
 
 
 class WashingMachineTile : public Component{
-
+public:
     WashingMachineTile(WashingMachine* washingMachine, Vector2Int gridPosition, Grid* grid);
     ~WashingMachineTile() override = default;
 

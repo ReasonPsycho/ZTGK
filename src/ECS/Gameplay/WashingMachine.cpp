@@ -6,10 +6,9 @@
 #include <imgui.h>
 #include "ECS/Utils/Globals.h"
 
-WashingMachine::WashingMachine(int praniumNeeded, int praniumNeededToMilestone, int radiusToClearEveryMilestone) {
+WashingMachine::WashingMachine(int praniumNeeded, int radiusToClearEveryMilestone) {
     name = "WashingMachine";
     this->praniumNeeded = praniumNeeded;
-    this->praniumNeededToMilestone = praniumNeededToMilestone;
     this->radiusToClear = radiusToClearEveryMilestone;
 }
 
@@ -42,6 +41,12 @@ void WashingMachine::registerComponents() {
 void WashingMachine::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Begin("Washing Machine");
     ImGui::Text("Tiles: %zu", WashingMachineTiles.size());
+    for (auto& [id, tiles] : WashingMachineTiles) {
+        for (auto& tile : tiles) {
+            ImGui::Text("Tile: %s", tile->name.c_str());
+        }
+        ImGui::Separator();
+    }
     ImGui::End();
 }
 
@@ -81,7 +86,7 @@ void WashingMachine::onPraniumDelivered() {
 
 
     clearTilesInRadius(Vector2Int(0,0), radiusToClear);
-    radiusToClear *= 2;
+    radiusToClear *= 1.5;
 
 }
 

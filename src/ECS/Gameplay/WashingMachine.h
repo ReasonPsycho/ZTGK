@@ -10,7 +10,7 @@
 
 class WashingMachine : public System{
 public:
-    WashingMachine(int praniumNeeded, int praniumNeededToMilestone, int radiusToClearEveryMilestone);
+    WashingMachine(int praniumNeeded, int radiusToClearEveryMilestone);
     ~WashingMachine() override = default;
 
     void addComponent(void* component) override;
@@ -24,7 +24,6 @@ public:
     std::unordered_map<unsigned, std::vector<WashingMachineTile*>> WashingMachineTiles;
 
     int praniumNeeded;
-    int praniumNeededToMilestone = 1;
     int radiusToClear = 4;
 
     void clearTilesInRadius(Vector2Int position, int radius);

@@ -13,6 +13,8 @@
 #include "ECS/Unit/Mining/MineableChest.h"
 #include "ECS/Light/Components/PointLight.h"
 #include "ECS/Gameplay/Pranium.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Gameplay/WashingMachine.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -217,6 +219,9 @@ void Grid::InitializeTileEntities() {
                     //tile->getEntity()->addComponent(std::make_unique<PointLight>());
                     break;
                 case CORE:
+                    tile->getEntity()->addComponent(std::make_unique<WashingMachineTile>(ztgk::game::scene->systemManager.getSystem<WashingMachine>(), Vector2Int(i, j), this));
+                    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 5, 1);
+                    break;
                 case UNIT:
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
