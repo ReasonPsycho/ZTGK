@@ -41,6 +41,9 @@ void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat("specular_levels",&specular_levels);
     ImGui::InputFloat("light_shade_cutoff",&light_shade_cutoff);
     ImGui::InputFloat("dark_shade_cutoff",&dark_shade_cutoff);
+    
+    ImGui::InputFloat("rim_threshold",&rim_threshold);
+    ImGui::InputFloat("rim_amount",&rim_amount);
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
@@ -57,10 +60,14 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
     regularShader->setFloat("saturationMultiplayer",ztgk::game::saturationMultiplayer);
     regularShader->setFloat("lightMultiplayer",ztgk::game::lightMultiplayer);
     regularShader->setInt("toon_color_levels",ztgk::game::toon_color_levels);
+    
     regularShader->setFloat("diffuse_levels",diffuse_levels);
     regularShader->setFloat("specular_levels",specular_levels);
     regularShader->setFloat("light_shade_cutoff",light_shade_cutoff);
     regularShader->setFloat("dark_shade_cutoff",dark_shade_cutoff);
+
+    regularShader->setFloat("rim_threshold",rim_threshold);
+    regularShader->setFloat("rim_amount",rim_amount);
     
     for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
         glBindVertexArray(tileModel->meshes[i].VAO);

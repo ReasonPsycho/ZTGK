@@ -32,6 +32,10 @@ private:
     float light_shade_cutoff = 0.5f;
     float dark_shade_cutoff = 0.2f;
 
+
+    float rim_threshold = 10;
+    float rim_amount = 0.5f;
+    
     std::vector<Render *> renderComponents;
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Render))
