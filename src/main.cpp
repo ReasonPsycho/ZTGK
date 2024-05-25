@@ -71,6 +71,7 @@
 #include "ECS/LevelGenerator/LevelGenerator.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Mining/MineableChest.h"
+#include "ECS/Gameplay/WashingMachine.h"
 
 #pragma endregion Includes
 
@@ -392,6 +393,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<Grid>(&scene, 100, 100, 2.0f, Vector3(0, 0, 0)));
     scene.systemManager.addSystem(std::make_unique<CollisionSystem>());
     scene.systemManager.addSystem(std::make_unique<UnitSystem>());
+    scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
 
     phongPipeline.Init(&camera,&primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
