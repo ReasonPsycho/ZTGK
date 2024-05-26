@@ -1,9 +1,0 @@
-<map id="Camera::GetAspectRatio" name="Camera::GetAspectRatio">
-<area shape="rect" id="Node000001" title=" " alt="" coords="463,35,629,61"/>
-<area shape="rect" id="Node000002" href="$_frustum_8cpp.html#aab153ef11cb3b5a0a206d05f75547e23" title=" " alt="" coords="235,35,415,61"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="448,51,416,51,416,45,448,45"/>
-<area shape="rect" id="Node000003" href="$class_render_system.html#a30b3afb15d3e7d7f6a4388a95a2e32db" title=" " alt="" coords="5,5,187,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="219,37,187,33,188,28,219,32"/>
-<area shape="rect" id="Node000004" href="$class_instance_render_system.html#a4f27a0b0e8b80d7310f5c3f32d27ee8c" title=" " alt="" coords="18,56,174,99"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="220,64,175,70,174,65,219,59"/>
-</map>

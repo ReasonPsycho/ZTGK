@@ -1,9 +1,0 @@
-<map id="SignalQueue::showImGuiDetailsImpl" name="SignalQueue::showImGuiDetailsImpl">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,237,57"/>
-<area shape="rect" id="Node000002" href="$class_signal_queue.html#a71908c8fcfc9346ed5c714047cb006ce" title=" " alt="" coords="285,5,441,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,29,269,26,269,31,237,35"/>
-<area shape="rect" id="Node000004" href="$class_signal_queue.html#a548c55f8c0ca2103626364eb2426f000" title=" " alt="" coords="299,56,427,83"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="237,53,284,58,283,64,237,59"/>
-<area shape="rect" id="Node000003" href="$namespaceztgk.html#a9b65aed8c84426e23f1b3d1648705f8b" title=" " alt="" coords="489,5,568,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="441,16,473,16,473,21,441,21"/>
-</map>

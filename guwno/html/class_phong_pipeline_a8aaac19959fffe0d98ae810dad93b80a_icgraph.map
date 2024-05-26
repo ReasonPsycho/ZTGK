@@ -1,7 +1,0 @@
-<map id="PhongPipeline::WriteToBackBuffer" name="PhongPipeline::WriteToBackBuffer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="208,5,395,48"/>
-<area shape="rect" id="Node000002" href="$main_8cpp.html#a7d9edd8b0a8d0d2f737eb5ee0b0a5040" title=" " alt="" coords="103,13,160,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,29,160,29,160,24,193,24"/>
-<area shape="rect" id="Node000003" href="$main_8cpp.html#a2c3f6775325c30275d11c6abee2db6a0" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>

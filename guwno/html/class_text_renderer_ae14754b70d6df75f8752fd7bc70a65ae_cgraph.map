@@ -1,7 +1,0 @@
-<map id="TextRenderer::TextRenderer" name="TextRenderer::TextRenderer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,189,57"/>
-<area shape="rect" id="Node000002" href="$class_shader.html#a5af3b80cdbd90bba614ae23276f61a4e" title=" " alt="" coords="271,5,359,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,31,256,23,256,28,189,36"/>
-<area shape="rect" id="Node000003" href="$class_text_renderer.html#a50e40ebccac4cbe2fb24a54b27a6ac24" title=" " alt="" coords="237,56,393,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,52,222,56,221,61,189,57"/>
-</map>

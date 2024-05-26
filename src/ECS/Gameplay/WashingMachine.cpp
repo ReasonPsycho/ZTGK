@@ -93,22 +93,50 @@ void WashingMachine::onPraniumDelivered() {
 
 }
 
-void WashingMachine::createWashingMachine() {
+void WashingMachine::createWashingMachine(Model* model) {
+    std::vector<Vector2Int> tilePositions;
+    if(WashingMachineTiles[uniqueID].empty()){
+        spdlog::error("No tiles for washing machine");
+        return;
+    }
+
+    for(auto tile : WashingMachineTiles[uniqueID]){
+        tilePositions.push_back(tile->gridPosition);
+    }
+
+    //get position of center tile
+    Vector2Int cornerTile = tilePositions[0];
+    for(auto tile : tilePositions){
+        if(tile.x < cornerTile.x){
+            cornerTile.x = tile.x;
+        }
+        if(tile.z < cornerTile.z){
+            cornerTile.z = tile.z;
+        }
+    }
+    Vector2Int centerTileGridPos = cornerTile + Vector2Int(2, 2);
+
+    auto centerTileWorldPos = ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(centerTileGridPos);
+
+
     auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
     if(machineEntity != nullptr){
         ztgk::game::scene->removeChild(machineEntity);
+        machineEntity->Destroy();
+        delete machineEntity;
     }
     if(machineEntity == nullptr){
         machineEntity = ztgk::game::scene->addEntity("WashingMachine");
     }
-    string washingMachineModelPath = "res/models/washingmachine/uhhhh.fbx";
-    Model washingMachineModel = Model(&washingMachineModelPath);
-    washingMachineModel.loadModel();
-    machineEntity->addComponent(std::make_unique<Render>(&washingMachineModel));
 
-    machineEntity->transform.setLocalPosition(glm::vec3(100,0,100));
+    machineEntity->addComponent(std::make_unique<Render>(model));
+
+    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x,4,centerTileWorldPos.z));
     machineEntity->transform.setLocalScale(glm::vec3(5, 5, 5));
     machineEntity->updateSelfAndChild();
 
+    machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));
+
 }
+
 

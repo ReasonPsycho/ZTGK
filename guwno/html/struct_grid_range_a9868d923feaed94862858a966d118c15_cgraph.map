@@ -1,7 +1,0 @@
-<map id="GridRange::find_any" name="GridRange::find_any">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,144,32"/>
-<area shape="rect" id="Node000002" href="$struct_grid_range.html#a1c3daf97f1b79911bee95a95aa8e0180" title=" " alt="" coords="192,5,331,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,16,176,16,176,21,144,21"/>
-<area shape="rect" id="Node000003" href="$class_system_manager.html#a03bee18b510daea61c44822129a6c7fd" title=" " alt="" coords="379,5,566,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,16,363,16,363,21,332,21"/>
-</map>

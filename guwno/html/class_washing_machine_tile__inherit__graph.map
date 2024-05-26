@@ -1,5 +1,0 @@
-<map id="WashingMachineTile" name="WashingMachineTile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,320,241,517"/>
-<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="28,5,219,272"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,287,126,320,121,320,121,287"/>
-</map>

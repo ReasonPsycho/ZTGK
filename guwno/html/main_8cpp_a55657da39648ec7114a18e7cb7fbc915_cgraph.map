@@ -1,7 +1,0 @@
-<map id="init_time" name="init_time">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,76,57"/>
-<area shape="rect" id="Node000002" href="$class_time.html#ace2adacaf53de5aa26b7bd56290dd8a2" title=" " alt="" coords="140,5,247,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,36,125,27,126,33,77,41"/>
-<area shape="rect" id="Node000003" href="$class_time.html#aab342ff918304debf394c6125468cc87" title=" " alt="" coords="124,56,263,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="77,47,109,53,108,58,76,52"/>
-</map>

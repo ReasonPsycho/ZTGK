@@ -1,7 +1,0 @@
-<map id="ECS/SignalQueue/DataCargo/EditorSignals/HUD" name="ECS/SignalQueue/DataCargo/EditorSignals/HUD">
-<area shape="rect" id="node1" href="dir_ba239531937a8eed6dbcf346b7f52480.html" title="HUD" alt="" coords="40,53,88,80"/>
-<area shape="rect" id="node2" href="dir_1030e01ab71b0f65cd0b393120a6548c.html" title="HUD" alt="" coords="40,128,88,155"/>
-<area shape="poly" id="edge1" href="dir_000015_000014.html" alt="" coords="67,81,67,112,61,112,61,81"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000015_000014.html" title="3" alt="" coords="69,101,76,117"/>
-<area shape="rect" id="clust1" href="dir_3ec1538d3099549f317a4d813d776013.html" title="EditorSignals" alt="" coords="16,16,113,91"/>
-</map>

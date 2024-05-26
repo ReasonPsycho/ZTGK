@@ -1,9 +1,0 @@
-<map id="Cursor::move" name="Cursor::move">
-<area shape="rect" id="Node000001" title=" " alt="" coords="363,5,461,32"/>
-<area shape="rect" id="Node000002" href="$main_8cpp.html#af4ca2891044ac10a664b8d83ce590f1f" title=" " alt="" coords="200,5,315,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="348,21,316,21,316,16,348,16"/>
-<area shape="rect" id="Node000003" href="$main_8cpp.html#ac3bdbc826d19fb41ffb25470527c3801" title=" " alt="" coords="103,5,152,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="184,21,153,21,153,16,184,16"/>
-<area shape="rect" id="Node000004" href="$main_8cpp.html#a2c3f6775325c30275d11c6abee2db6a0" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>

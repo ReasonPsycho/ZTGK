@@ -1,9 +1,0 @@
-<map id="AsteroidsSystem::draw" name="AsteroidsSystem::draw">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,162,83"/>
-<area shape="rect" id="Node000002" href="$class_transform.html#afc204ef895c74eb08f31855f5fd3858f" title=" " alt="" coords="210,5,385,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,53,223,34,224,39,144,58"/>
-<area shape="rect" id="Node000003" href="$class_shader.html#a2a6328fa6868063d6026dfe8485e46fa" title=" " alt="" coords="232,56,363,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="162,67,216,67,216,72,162,72"/>
-<area shape="rect" id="Node000004" href="$class_shader.html#a3c7896754f0e1fca8bde860cfef63832" title=" " alt="" coords="252,107,343,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,81,237,103,236,108,142,86"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Sphere" name="Sphere">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,261,213,491"/>
-<area shape="rect" id="Node000002" href="$struct_bounding_volume.html" title=" " alt="" coords="9,5,210,213"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,228,112,262,107,262,107,228"/>
-</map>

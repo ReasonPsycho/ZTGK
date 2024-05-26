@@ -1,7 +1,0 @@
-<map id="Unit::GetDirtiestTileAround" name="Unit::GetDirtiestTileAround">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,181,57"/>
-<area shape="rect" id="Node000002" href="$class_grid.html#ac2cd00215173f206c3e3cf087867588f" title="Returns the tile at the specified index." alt="" coords="235,5,340,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,30,219,25,220,30,182,35"/>
-<area shape="rect" id="Node000003" href="$class_grid.html#aeef743a92a95ac1f4605da4bd1c18c43" title=" " alt="" coords="229,56,346,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,53,214,57,213,62,181,58"/>
-</map>

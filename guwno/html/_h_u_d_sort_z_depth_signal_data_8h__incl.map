@@ -1,9 +1,0 @@
-<map id="ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDSortZDepthSignalData.h" name="ECS/SignalQueue/DataCargo/EditorSignals/HUD/HUDSortZDepthSignalData.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,235,64"/>
-<area shape="rect" id="Node000002" href="$_signal_data_8h.html" title=" " alt="" coords="24,112,216,155"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,64,123,97,117,97,117,64"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="53,203,107,229"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="112,156,95,190,91,187,107,154"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="131,203,189,229"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="133,154,149,187,145,190,128,156"/>
-</map>

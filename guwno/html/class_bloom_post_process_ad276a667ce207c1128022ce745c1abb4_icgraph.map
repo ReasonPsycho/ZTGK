@@ -1,7 +1,0 @@
-<map id="BloomPostProcess::Init" name="BloomPostProcess::Init">
-<area shape="rect" id="Node000001" title=" " alt="" coords="246,5,404,32"/>
-<area shape="rect" id="Node000002" href="$main_8cpp.html#a5d16700c8cf4302419617394d583f764" title=" " alt="" coords="103,5,198,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,21,198,21,198,16,231,16"/>
-<area shape="rect" id="Node000003" href="$main_8cpp.html#a2c3f6775325c30275d11c6abee2db6a0" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>

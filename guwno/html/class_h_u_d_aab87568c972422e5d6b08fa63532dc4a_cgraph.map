@@ -1,7 +1,0 @@
-<map id="HUD::addGroup" name="HUD::addGroup">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,118,57"/>
-<area shape="rect" id="Node000002" href="$struct_group.html#aa2a974d17e5835e979d46e52bf9b4aa8" title=" " alt="" coords="166,5,288,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,33,150,28,151,33,118,38"/>
-<area shape="rect" id="Node000003" href="$class_h_u_d.html#ab61f88c9c759414f7cd0c8294dc575f1" title=" " alt="" coords="181,56,273,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,50,166,57,165,63,117,55"/>
-</map>

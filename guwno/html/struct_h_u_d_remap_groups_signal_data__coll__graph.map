@@ -1,5 +1,0 @@
-<map id="HUDRemapGroupsSignalData" name="HUDRemapGroupsSignalData">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,251,247,880"/>
-<area shape="rect" id="Node000002" href="$struct_signal_data.html" title=" " alt="" coords="21,5,231,203"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,218,129,251,123,251,123,218"/>
-</map>

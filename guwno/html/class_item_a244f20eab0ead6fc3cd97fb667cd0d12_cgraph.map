@@ -1,7 +1,0 @@
-<map id="Item::imgui_preview" name="Item::imgui_preview">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,140,57"/>
-<area shape="rect" id="Node000002" href="$struct_grid_range.html#af74fbb1b9ef70abc9974eeae43748908" title=" " alt="" coords="188,5,358,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,33,172,29,172,34,141,38"/>
-<area shape="rect" id="Node000003" href="$struct_modifiers.html#a474345986cbe3880e5489fe5ec43c3f5" title=" " alt="" coords="192,56,354,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,50,177,55,176,60,140,55"/>
-</map>

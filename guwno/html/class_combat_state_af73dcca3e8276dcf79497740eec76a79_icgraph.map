@@ -1,9 +1,0 @@
-<map id="CombatState::isTargetInRange" name="CombatState::isTargetInRange">
-<area shape="rect" id="Node000001" title=" " alt="" coords="248,56,446,83"/>
-<area shape="rect" id="Node000002" href="$class_idle_state.html#a8f23cae9c143e6c2ac49a2bf0d47b1c0" title=" " alt="" coords="14,5,191,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="264,55,170,35,171,30,265,50"/>
-<area shape="rect" id="Node000003" href="$class_mining_state.html#a672ddabc1270c4e89c407df4749d3c78" title=" " alt="" coords="5,56,200,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,72,200,72,200,67,232,67"/>
-<area shape="rect" id="Node000004" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="10,107,195,149"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="274,89,195,109,194,103,273,84"/>
-</map>

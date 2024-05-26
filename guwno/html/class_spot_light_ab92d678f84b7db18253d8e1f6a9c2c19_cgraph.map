@@ -1,9 +1,0 @@
-<map id="SpotLight::SetUpShadowBuffer" name="SpotLight::SetUpShadowBuffer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,205,83"/>
-<area shape="rect" id="Node000002" href="$class_shader.html#afe7367621f74c2d26431d8ac15252bf3" title=" " alt="" coords="260,5,377,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,53,244,34,245,39,165,58"/>
-<area shape="rect" id="Node000003" href="$class_shader.html#a2a6328fa6868063d6026dfe8485e46fa" title=" " alt="" coords="253,56,384,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,67,237,67,237,72,205,72"/>
-<area shape="rect" id="Node000004" href="$class_shader.html#a3c7896754f0e1fca8bde860cfef63832" title=" " alt="" coords="273,107,364,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="165,81,258,103,257,108,164,86"/>
-</map>

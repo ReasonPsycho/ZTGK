@@ -1,7 +1,0 @@
-<map id="createFrustumFromCamera" name="createFrustumFromCamera">
-<area shape="rect" id="Node000001" title=" " alt="" coords="235,35,415,61"/>
-<area shape="rect" id="Node000002" href="$class_render_system.html#a30b3afb15d3e7d7f6a4388a95a2e32db" title=" " alt="" coords="5,5,187,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,37,187,33,188,28,219,32"/>
-<area shape="rect" id="Node000003" href="$class_instance_render_system.html#a4f27a0b0e8b80d7310f5c3f32d27ee8c" title=" " alt="" coords="18,56,174,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="220,64,175,70,174,65,219,59"/>
-</map>

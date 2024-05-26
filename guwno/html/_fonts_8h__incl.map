@@ -1,7 +1,0 @@
-<map id="ECS/HUD/Fonts.h" name="ECS/HUD/Fonts.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="6,5,133,32"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,59,107"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,34,48,68,43,65,60,31"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="83,80,133,107"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="78,31,97,65,92,68,74,34"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="BoundingVolume" name="BoundingVolume">
-<area shape="rect" id="Node000001" title=" " alt="" coords="232,5,433,213"/>
-<area shape="rect" id="Node000002" href="$struct_a_a_b_b.html" title=" " alt="" coords="5,267,204,485"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,226,200,269,196,265,232,223"/>
-<area shape="rect" id="Node000003" href="$struct_sphere.html" title=" " alt="" coords="229,261,437,491"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="335,228,335,262,330,262,330,228"/>
-<area shape="rect" id="Node000004" href="$struct_square_a_a_b_b.html" title=" " alt="" coords="461,261,669,491"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="435,223,467,260,463,264,431,226"/>
-</map>

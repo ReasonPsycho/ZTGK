@@ -22,5 +22,6 @@ namespace ztgk::game {
     float game::saturationMultiplayer = 1.5;
     float game::lightMultiplayer = 1.2;
     int game::toon_color_levels = 15;
+    Model * game::washingMachineModel = nullptr;
 
 }

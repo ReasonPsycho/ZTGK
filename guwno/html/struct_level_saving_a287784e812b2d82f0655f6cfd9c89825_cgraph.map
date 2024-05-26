@@ -1,7 +1,0 @@
-<map id="LevelSaving::save" name="LevelSaving::save">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,128,61"/>
-<area shape="rect" id="Node000002" href="$class_system_manager.html#a03bee18b510daea61c44822129a6c7fd" title=" " alt="" coords="176,5,363,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,37,160,32,160,37,128,42"/>
-<area shape="rect" id="Node000003" href="$namespaceztgk.html#adcde68ea73e7e2218f320dcdbf23913e" title=" " alt="" coords="207,56,332,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="128,54,192,63,191,69,128,59"/>
-</map>

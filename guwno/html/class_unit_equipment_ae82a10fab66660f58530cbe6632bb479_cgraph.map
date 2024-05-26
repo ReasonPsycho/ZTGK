@@ -1,7 +1,0 @@
-<map id="UnitEquipment::in_range_of" name="UnitEquipment::in_range_of">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,186,61"/>
-<area shape="rect" id="Node000002" href="$struct_grid_range.html#a8d3410827fd256cfb91078d7c02c62f4" title=" " alt="" coords="234,5,390,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,33,217,29,218,34,187,38"/>
-<area shape="rect" id="Node000003" href="$class_unit_equipment.html#a031730f4a72a9cbf84a66e2021a863a6" title=" " alt="" coords="244,56,380,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,58,229,63,228,69,186,63"/>
-</map>

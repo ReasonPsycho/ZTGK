@@ -1,7 +1,0 @@
-<map id="ECS/Raycasting/Colliders" name="ECS/Raycasting/Colliders">
-<area shape="rect" id="node1" href="dir_7c93c6bd890fb86d8b763e0639a0c361.html" title="Colliders" alt="" coords="27,53,98,80"/>
-<area shape="rect" id="node2" href="dir_5432892f977964284c23164cc51b2839.html" title="Render" alt="" coords="32,128,94,155"/>
-<area shape="poly" id="edge1" href="dir_000002_000028.html" alt="" coords="65,81,65,112,60,112,60,81"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000002_000028.html" title="4" alt="" coords="68,101,75,117"/>
-<area shape="rect" id="clust1" href="dir_69e3cbc121cd5026a6ea72a606c19cc9.html" title="Raycasting" alt="" coords="16,16,109,91"/>
-</map>

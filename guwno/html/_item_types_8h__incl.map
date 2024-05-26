@@ -1,7 +1,0 @@
-<map id="ECS/Unit/Equipment/ConcreteItems/ItemTypes.h" name="ECS/Unit/Equipment/ConcreteItems/ItemTypes.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="20,5,205,48"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,96,116,123"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,50,79,84,75,81,97,47"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="139,96,193,123"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="128,47,151,81,147,84,124,50"/>
-</map>

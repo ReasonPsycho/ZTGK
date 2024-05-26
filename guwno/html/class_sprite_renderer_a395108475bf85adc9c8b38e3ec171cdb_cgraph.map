@@ -1,9 +1,0 @@
-<map id="SpriteRenderer::bounds" name="SpriteRenderer::bounds">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,163,32"/>
-<area shape="rect" id="Node000002" href="$class_h_u_d.html#a163770ea5379d57256372ce4bbec9b03" title=" " alt="" coords="211,5,379,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,16,195,16,195,21,163,21"/>
-<area shape="rect" id="Node000003" href="$class_h_u_d.html#a31f1c4e49d4e1aefe52dcdfa5c6557e8" title=" " alt="" coords="427,5,590,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,16,411,16,411,21,380,21"/>
-<area shape="rect" id="Node000004" href="$class_h_u_d.html#a9d0db3cfa18a3303055a3b8e089f8367" title=" " alt="" coords="638,5,788,32"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="591,16,623,16,623,21,591,21"/>
-</map>

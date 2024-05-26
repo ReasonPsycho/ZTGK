@@ -1,9 +1,0 @@
-<map id="CombatState::isAttackOnCooldown" name="CombatState::isAttackOnCooldown">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,232,61"/>
-<area shape="rect" id="Node000002" href="$struct_grid_range.html#a4822d198b3bc231b9c828329b12078ff" title=" " alt="" coords="280,5,436,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,31,264,27,264,33,233,37"/>
-<area shape="rect" id="Node000004" href="$class_unit_equipment.html#a031730f4a72a9cbf84a66e2021a863a6" title=" " alt="" coords="290,56,426,99"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="233,59,275,65,275,70,232,65"/>
-<area shape="rect" id="Node000003" href="$struct_grid_range.html#a8d3410827fd256cfb91078d7c02c62f4" title=" " alt="" coords="484,5,640,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="437,16,469,16,469,21,437,21"/>
-</map>

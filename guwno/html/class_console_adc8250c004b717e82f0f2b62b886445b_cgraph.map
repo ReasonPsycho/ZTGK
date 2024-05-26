@@ -1,9 +1,0 @@
-<map id="Console::imguiWindow" name="Console::imguiWindow">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,159,83"/>
-<area shape="rect" id="Node000002" href="$class_console.html#a8b4ffaeabbea48e1f3aa1e535ee88ab8" title=" " alt="" coords="207,5,311,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,53,195,34,196,39,132,58"/>
-<area shape="rect" id="Node000003" href="$class_console.html#ae1620e9b4966c0328ee14de9f88e5e43" title=" " alt="" coords="208,56,310,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,67,193,67,193,72,159,72"/>
-<area shape="rect" id="Node000004" href="$class_console.html#a03b47e783c277ee8da18912bddf008f6" title=" " alt="" coords="212,107,306,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="132,81,198,100,197,105,131,86"/>
-</map>

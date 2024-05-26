@@ -1,5 +1,0 @@
-<map id="UnitAI" name="UnitAI">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,320,215,485"/>
-<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="15,5,205,272"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,287,113,320,107,320,107,287"/>
-</map>

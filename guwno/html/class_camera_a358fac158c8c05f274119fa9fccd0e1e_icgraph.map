@@ -1,9 +1,0 @@
-<map id="Camera::ProcessKeyboard" name="Camera::ProcessKeyboard">
-<area shape="rect" id="Node000001" title=" " alt="" coords="343,5,521,32"/>
-<area shape="rect" id="Node000002" href="$main_8cpp.html#a2d03c6f2666863543429a06ef642fe6a" title=" " alt="" coords="200,5,295,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="328,21,296,21,296,16,328,16"/>
-<area shape="rect" id="Node000003" href="$main_8cpp.html#ac3bdbc826d19fb41ffb25470527c3801" title=" " alt="" coords="103,5,152,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="185,21,152,21,152,16,185,16"/>
-<area shape="rect" id="Node000004" href="$main_8cpp.html#a2c3f6775325c30275d11c6abee2db6a0" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>

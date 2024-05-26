@@ -1,9 +1,0 @@
-<map id="InventoryManager::assign_item" name="InventoryManager::assign_item">
-<area shape="rect" id="Node000001" title=" " alt="" coords="238,80,438,107"/>
-<area shape="rect" id="Node000002" href="$class_inventory_manager.html#a5ef36872d20a9ee0a00b84a9978fc7b7" title=" " alt="" coords="14,5,181,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="271,78,176,51,178,46,273,73"/>
-<area shape="rect" id="Node000003" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="5,72,190,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,96,190,96,190,91,222,91"/>
-<area shape="rect" id="Node000004" href="$class_inventory_manager.html#af21c04ccafdbd8e6909199a95bdf6ddb" title=" " alt="" coords="10,139,185,181"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="273,114,178,141,176,135,271,109"/>
-</map>

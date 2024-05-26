@@ -1,7 +1,0 @@
-<map id="Camera::getDirFromCameraToCursor" name="Camera::getDirFromCameraToCursor">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,189,65"/>
-<area shape="rect" id="Node000002" href="$class_camera.html#ab0a4bf5a65d45f25529e3cffda1c361b" title=" " alt="" coords="237,5,426,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,31,221,28,222,33,190,37"/>
-<area shape="rect" id="Node000003" href="$class_camera.html#affa333055635aed96518c4c66be9a70c" title=" " alt="" coords="252,56,411,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,51,236,56,236,62,189,57"/>
-</map>

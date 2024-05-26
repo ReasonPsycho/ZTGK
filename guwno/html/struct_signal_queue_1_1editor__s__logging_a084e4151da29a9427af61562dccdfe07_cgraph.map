@@ -1,7 +1,0 @@
-<map id="SignalQueue::editor_s_logging::new_receiver" name="SignalQueue::editor_s_logging::new_receiver">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,171,65"/>
-<area shape="rect" id="Node000002" href="$namespaceztgk.html#a9b65aed8c84426e23f1b3d1648705f8b" title=" " alt="" coords="237,5,316,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,30,221,23,222,29,172,35"/>
-<area shape="rect" id="Node000003" href="$struct_signal.html#a4a119577245e9ab117bd1dd48c107319" title=" " alt="" coords="219,56,334,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,53,204,57,203,62,171,58"/>
-</map>

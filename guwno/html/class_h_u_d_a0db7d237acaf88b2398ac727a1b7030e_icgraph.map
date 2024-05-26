@@ -1,7 +1,0 @@
-<map id="HUD::isGroupTreeHidden" name="HUD::isGroupTreeHidden">
-<area shape="rect" id="Node000001" title=" " alt="" coords="137,31,303,57"/>
-<area shape="rect" id="Node000002" href="$class_h_u_d.html#ace77b78644c4dae7f73ff518b39fc553" title=" " alt="" coords="5,5,89,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,32,89,27,89,22,122,27"/>
-<area shape="rect" id="Node000003" href="$class_h_u_d.html#a9230bc58227e9f7222489ce5701882ed" title=" " alt="" coords="10,56,84,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,61,85,67,84,61,121,56"/>
-</map>

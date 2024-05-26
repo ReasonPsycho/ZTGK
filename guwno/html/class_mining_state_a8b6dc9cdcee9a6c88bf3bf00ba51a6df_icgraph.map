@@ -1,5 +1,0 @@
-<map id="MiningState::ReconstructPath" name="MiningState::ReconstructPath">
-<area shape="rect" id="Node000001" title=" " alt="" coords="237,5,432,32"/>
-<area shape="rect" id="Node000002" href="$class_mining_state.html#a21ad481683def723953c6532ed46a3a8" title=" " alt="" coords="5,5,189,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,21,189,21,189,16,221,16"/>
-</map>

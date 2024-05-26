@@ -1,9 +1,0 @@
-<map id="ECS/Render/ModelLoading/ComputeShader.h" name="ECS/Render/ModelLoading/ComputeShader.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="141,5,318,48"/>
-<area shape="rect" id="Node000002" href="$_asteroids_system_8h.html" title=" " alt="" coords="12,104,228,131"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,60,137,106,134,102,191,56"/>
-<area shape="rect" id="Node000004" href="$_compute_shader_8cpp.html" title=" " alt="" coords="251,96,429,139"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="269,56,316,93,312,97,265,60"/>
-<area shape="rect" id="Node000003" href="$_asteroids_system_8cpp.html" title=" " alt="" coords="5,187,235,213"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,146,123,187,117,187,117,146"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Model::SimpleDraw" name="Model::SimpleDraw">
-<area shape="rect" id="Node000001" title=" " alt="" coords="191,29,324,56"/>
-<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="288,16,278,10,257,8,238,10,228,15,226,20,230,27,226,30,220,21,224,11,237,5,257,3,279,5,291,12"/>
-<area shape="rect" id="Node000002" href="$class_render.html#ac2662c7850a6372e15a1f62c743471a6" title=" " alt="" coords="5,29,143,56"/>
-<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="175,45,143,45,143,40,175,40"/>
-</map>

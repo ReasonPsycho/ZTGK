@@ -1,7 +1,0 @@
-<map id="BloomPostProcess::BlurBuffer" name="BloomPostProcess::BlurBuffer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,203,57"/>
-<area shape="rect" id="Node000002" href="$class_shader.html#ad362e2b654cd95a3574cd505411e41fd" title=" " alt="" coords="251,5,353,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,29,235,25,235,30,203,34"/>
-<area shape="rect" id="Node000003" href="$class_shader.html#a3c7896754f0e1fca8bde860cfef63832" title=" " alt="" coords="256,56,348,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,54,241,59,240,64,203,59"/>
-</map>

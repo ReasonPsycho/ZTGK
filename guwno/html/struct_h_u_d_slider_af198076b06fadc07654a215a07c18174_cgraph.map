@@ -1,7 +1,0 @@
-<map id="HUDSlider::update_display" name="HUDSlider::update_display">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,182,40"/>
-<area shape="rect" id="Node000002" href="$struct_h_u_d_slider.html#a8d714b881c2ea521562cdf0f3ad24f2b" title=" " alt="" coords="230,5,385,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,24,214,24,214,29,182,29"/>
-<area shape="rect" id="Node000003" href="$struct_h_u_d_slider.html#a8e43e09d0143c2470f7dbfd4af6e1264" title=" " alt="" coords="433,5,605,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="385,24,417,24,417,29,385,29"/>
-</map>

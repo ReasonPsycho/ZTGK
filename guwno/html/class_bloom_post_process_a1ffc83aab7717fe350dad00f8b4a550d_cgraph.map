@@ -1,9 +1,0 @@
-<map id="BloomPostProcess::Render" name="BloomPostProcess::Render">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,188,83"/>
-<area shape="rect" id="Node000002" href="$class_shader.html#afe7367621f74c2d26431d8ac15252bf3" title=" " alt="" coords="236,5,353,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,53,224,34,225,39,152,58"/>
-<area shape="rect" id="Node000003" href="$class_shader.html#ad362e2b654cd95a3574cd505411e41fd" title=" " alt="" coords="243,56,346,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,67,228,67,228,72,188,72"/>
-<area shape="rect" id="Node000004" href="$class_shader.html#a3c7896754f0e1fca8bde860cfef63832" title=" " alt="" coords="249,107,340,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="152,81,234,102,233,107,151,86"/>
-</map>

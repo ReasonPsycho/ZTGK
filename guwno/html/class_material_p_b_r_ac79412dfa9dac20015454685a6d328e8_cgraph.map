@@ -1,9 +1,0 @@
-<map id="MaterialPBR::MaterialPBR" name="MaterialPBR::MaterialPBR">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,181,73"/>
-<area shape="rect" id="Node000002" href="$class_material_p_b_r.html#aa646776b00dbe4c1961c13007b87efac" title=" " alt="" coords="229,5,433,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,45,213,41,213,46,182,50"/>
-<area shape="rect" id="Node000003" href="$class_material_p_b_r.html#a26cf0e8507869311f62e6e37dccdc661" title=" " alt="" coords="245,72,417,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,70,229,76,229,82,181,75"/>
-<area shape="rect" id="Node000004" href="$_material_p_b_r_8cpp.html#a4073b78831bd3ba1a744f5221a0c2b32" title=" " alt="" coords="481,80,559,107"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="417,91,466,91,466,96,417,96"/>
-</map>

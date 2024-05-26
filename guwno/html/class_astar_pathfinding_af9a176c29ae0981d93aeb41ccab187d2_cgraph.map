@@ -1,7 +1,0 @@
-<map id="AstarPathfinding::GetNearestVacantTile" name="AstarPathfinding::GetNearestVacantTile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,196,65"/>
-<area shape="rect" id="Node000002" href="$class_grid.html#ac2cd00215173f206c3e3cf087867588f" title="Returns the tile at the specified index." alt="" coords="244,5,348,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,29,227,25,228,30,196,34"/>
-<area shape="rect" id="Node000003" href="$class_tile.html#a081d89431483d3f49514dc8f97171a5c" title=" " alt="" coords="253,56,339,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,54,237,59,237,64,196,59"/>
-</map>

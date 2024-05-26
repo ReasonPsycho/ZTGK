@@ -1,9 +1,0 @@
-<map id="SignalReceiver::showImGuiDetailsImpl" name="SignalReceiver::showImGuiDetailsImpl">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,184,91"/>
-<area shape="rect" id="Node000002" href="$class_system_manager.html#a03bee18b510daea61c44822129a6c7fd" title=" " alt="" coords="238,5,425,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,48,250,33,252,38,185,53"/>
-<area shape="rect" id="Node000003" href="$struct_signal_receiver.html#aa20a1f07b5b88219a40bf0de55df209b" title=" " alt="" coords="232,56,431,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,67,216,67,216,72,184,72"/>
-<area shape="rect" id="Node000004" href="$namespaceztgk.html#a9b65aed8c84426e23f1b3d1648705f8b" title=" " alt="" coords="292,107,371,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="185,86,277,106,276,111,183,91"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="SignalQueue::post" name="SignalQueue::post">
-<area shape="rect" id="Node000001" title=" " alt="" coords="285,31,413,57"/>
-<area shape="rect" id="Node000002" href="$class_signal_queue.html#ae6b1b98027bd6ce3408f510cd39a4cce" title=" " alt="" coords="38,5,204,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,38,204,31,205,25,270,33"/>
-<area shape="rect" id="Node000003" href="$class_signal_queue.html#a23d6e4132106070c1b43e0e6c391e967" title=" " alt="" coords="5,56,237,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="269,55,238,59,237,54,269,50"/>
-</map>

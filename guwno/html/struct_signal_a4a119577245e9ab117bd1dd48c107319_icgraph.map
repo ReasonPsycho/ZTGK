@@ -1,7 +1,0 @@
-<map id="Signal::to_string" name="Signal::to_string">
-<area shape="rect" id="Node000001" title=" " alt="" coords="387,13,502,40"/>
-<area shape="rect" id="Node000002" href="$struct_signal_queue_1_1editor__s__logging.html#a084e4151da29a9427af61562dccdfe07" title=" " alt="" coords="174,5,339,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="372,29,340,29,340,24,372,24"/>
-<area shape="rect" id="Node000003" href="$class_signal_queue.html#ae53316860b4b619d3b30fdb720b0f282" title=" " alt="" coords="5,13,126,40"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="158,29,126,29,126,24,158,24"/>
-</map>

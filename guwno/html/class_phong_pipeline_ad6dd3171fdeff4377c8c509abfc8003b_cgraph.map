@@ -1,7 +1,0 @@
-<map id="PhongPipeline::Init" name="PhongPipeline::Init">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,135,61"/>
-<area shape="rect" id="Node000002" href="$class_shader.html#a5af3b80cdbd90bba614ae23276f61a4e" title=" " alt="" coords="235,5,322,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,36,219,24,220,30,136,42"/>
-<area shape="rect" id="Node000003" href="$class_phong_pipeline.html#a020f6fe96d29ac2ec58c47338e08cffb" title=" " alt="" coords="183,56,374,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,54,168,59,167,64,135,60"/>
-</map>
