@@ -1,0 +1,13 @@
+<map id="init_managers" name="init_managers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,108,83"/>
+<area shape="rect" id="Node000002" href="$class_entity.html#a4bfd796705e58336551dbfd01871ea91" title=" " alt="" coords="156,5,306,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,53,167,34,168,39,106,58"/>
+<area shape="rect" id="Node000004" href="$class_scene.html#a9678082c8d2c457994adfbba906bf70e" title=" " alt="" coords="170,56,292,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="108,67,155,67,155,72,108,72"/>
+<area shape="rect" id="Node000005" href="$main_8cpp.html#aee8048628ff2b5c026c9e15acdcaacb8" title=" " alt="" coords="212,107,250,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="106,81,197,108,196,113,104,86"/>
+<area shape="rect" id="Node000003" href="$class_system_manager.html#a0edc21b8662b6aa9c795be08c4a2ecd5" title=" " alt="" coords="354,5,565,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="306,16,338,16,338,21,306,21"/>
+<area shape="rect" id="Node000006" href="$class_console.html#ae1620e9b4966c0328ee14de9f88e5e43" title=" " alt="" coords="409,107,510,133"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="251,117,394,117,394,123,251,123"/>
+</map>

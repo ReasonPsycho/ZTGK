@@ -1,0 +1,9 @@
+<map id="MiningState::isTargetInRange" name="MiningState::isTargetInRange">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,197,83"/>
+<area shape="rect" id="Node000002" href="$class_vector_utils.html#a07880bbabf80a4a86e038daeb8abdc49" title=" " alt="" coords="276,5,420,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,53,264,33,265,38,170,58"/>
+<area shape="rect" id="Node000003" href="$class_vector_utils.html#afe7643b5f00ba0627b0f8dbf9fa73774" title=" " alt="" coords="245,56,451,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,67,229,67,229,72,197,72"/>
+<area shape="rect" id="Node000004" href="$class_grid.html#aa06be690e87f9ea052d259a721e017ed" title=" " alt="" coords="262,107,434,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,81,265,100,264,106,169,86"/>
+</map>

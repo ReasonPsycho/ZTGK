@@ -1,0 +1,15 @@
+<map id="LightSystem" name="LightSystem">
+<area shape="rect" id="Node000001" title=" " alt="" coords="17,720,185,997"/>
+<area shape="rect" id="Node000002" href="$class_system.html" title=" " alt="" coords="5,411,196,640"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,654,103,720,98,720,98,654"/>
+<area shape="rect" id="Node000003" href="$class_system_manager.html" title=" " alt="" coords="189,5,421,347"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="207,348,178,398,174,395,203,345"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="220,424,389,627"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="307,347,307,407,302,407,302,347"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="353,704,523,1013"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="446,704,447,626,442,542,432,455,413,371,410,363,415,361,418,370,437,454,448,541,452,626,452,704"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="524,824,542,836,549,858,547,873,539,884,535,881,542,871,544,859,538,839,521,828"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="347,625,372,687,367,689,342,627"/>
+<area shape="rect" id="Node000006" href="$class_transform.html" title=" " alt="" coords="557,419,741,632"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="584,633,534,711,530,709,579,630"/>
+</map>

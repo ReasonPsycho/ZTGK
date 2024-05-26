@@ -1,0 +1,7 @@
+<map id="ItemStats" name="ItemStats">
+<area shape="rect" id="Node000001" title=" " alt="" coords="217,411,342,501"/>
+<area shape="rect" id="Node000002" href="$struct_grid_range.html" title=" " alt="" coords="5,5,308,347"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,346,255,394,251,396,229,348"/>
+<area shape="rect" id="Node000003" href="$struct_modifiers.html" title=" " alt="" coords="332,64,472,288"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="356,289,308,396,303,394,351,287"/>
+</map>

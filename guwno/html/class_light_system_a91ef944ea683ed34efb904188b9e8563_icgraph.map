@@ -1,0 +1,9 @@
+<map id="LightSystem::GenerateShadowBuffers" name="LightSystem::GenerateShadowBuffers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="474,23,675,65"/>
+<area shape="rect" id="Node000002" href="$class_light_system.html#abd2b659b46f00aaf9b382bedda14ca4e" title=" " alt="" coords="243,31,426,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="458,47,426,47,426,41,458,41"/>
+<area shape="rect" id="Node000003" href="$class_light_system.html#a11cb0820571a03bf2c9786624d33997a" title=" " alt="" coords="5,5,195,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="227,35,195,32,195,26,227,30"/>
+<area shape="rect" id="Node000004" href="$class_light_system.html#a7fd68935f54609732e2b7754ccd22677" title=" " alt="" coords="40,56,160,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="227,58,161,66,160,60,227,53"/>
+</map>

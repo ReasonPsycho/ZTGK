@@ -1,0 +1,19 @@
+<map id="PointLight" name="PointLight">
+<area shape="rect" id="Node000001" title=" " alt="" coords="260,1371,437,1536"/>
+<area shape="rect" id="Node000002" href="$class_i_light.html" title=" " alt="" coords="29,1088,220,1280"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,1290,283,1369,279,1373,212,1293"/>
+<area shape="rect" id="Node000003" href="$class_component.html" title=" " alt="" coords="5,704,196,949"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,964,121,1088,116,1089,107,964"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="252,283,421,592"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="254,579,186,691,181,689,250,576"/>
+<area shape="poly" id="edge7_Node000004_Node000004" title=" " alt="" coords="422,402,441,415,448,437,445,452,438,463,434,460,440,450,443,438,436,418,419,407"/>
+<area shape="rect" id="Node000006" href="$class_system_manager.html" title=" " alt="" coords="221,656,453,997"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="339,591,339,639,334,639,334,591"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="252,1083,421,1285"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="415,1081,445,1036,472,985,490,938,500,895,502,853,499,810,490,765,462,657,447,614,427,573,432,570,452,612,467,655,495,763,504,810,508,853,505,896,495,940,477,987,450,1039,420,1084"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="339,997,339,1066,334,1066,334,997"/>
+<area shape="rect" id="Node000007" href="$class_transform.html" title=" " alt="" coords="245,5,429,219"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="339,219,339,266,334,266,334,219"/>
+<area shape="rect" id="Node000008" href="$struct_point_light_data.html" title=" " alt="" coords="446,1061,702,1307"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="474,1308,430,1359,426,1356,470,1305"/>
+</map>

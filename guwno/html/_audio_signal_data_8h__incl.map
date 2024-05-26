@@ -1,0 +1,10 @@
+<map id="ECS/SignalQueue/DataCargo/AudioSignalData.h" name="ECS/SignalQueue/DataCargo/AudioSignalData.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,197,48"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="34,171,88,197"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,49,71,156,65,155,93,48"/>
+<area shape="rect" id="Node000003" href="$_signal_data_8h.html" title=" " alt="" coords="96,96,191,123"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,47,132,81,127,83,110,50"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="131,125,88,162,85,158,128,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="115,171,172,197"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="146,123,146,155,141,155,141,123"/>
+</map>

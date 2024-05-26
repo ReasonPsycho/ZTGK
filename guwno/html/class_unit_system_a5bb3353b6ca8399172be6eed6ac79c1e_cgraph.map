@@ -1,0 +1,9 @@
+<map id="UnitSystem::UpdateImpl" name="UnitSystem::UpdateImpl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,168,69"/>
+<area shape="rect" id="Node000002" href="$class_unit_system.html#aa971fdf2a1b53c89585715e82964988f" title=" " alt="" coords="216,5,393,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,42,200,38,200,43,168,48"/>
+<area shape="rect" id="Node000003" href="$class_system.html#a465a0bf5bc7c6abf0042bbd85449a023" title=" " alt="" coords="247,72,362,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,64,232,73,231,78,168,70"/>
+<area shape="rect" id="Node000004" href="$class_system.html#a97b4b9d020274db85b33805a28ae3b70" title=" " alt="" coords="441,72,580,99"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="362,83,425,83,425,88,362,88"/>
+</map>

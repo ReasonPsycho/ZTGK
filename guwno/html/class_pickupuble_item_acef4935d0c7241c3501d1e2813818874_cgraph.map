@@ -1,0 +1,11 @@
+<map id="PickupubleItem::showImGuiDetailsImpl" name="PickupubleItem::showImGuiDetailsImpl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,188,91"/>
+<area shape="rect" id="Node000002" href="$class_item.html#a244f20eab0ead6fc3cd97fb667cd0d12" title=" " alt="" coords="280,31,415,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,57,264,50,265,55,188,63"/>
+<area shape="rect" id="Node000005" href="$class_component.html#afdc5e340473ab8791efc53eb54b1cae3" title=" " alt="" coords="236,81,459,108"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="188,76,220,79,220,84,188,81"/>
+<area shape="rect" id="Node000003" href="$struct_grid_range.html#af74fbb1b9ef70abc9974eeae43748908" title=" " alt="" coords="507,5,677,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="415,34,491,26,492,32,415,40"/>
+<area shape="rect" id="Node000004" href="$struct_modifiers.html#a474345986cbe3880e5489fe5ec43c3f5" title=" " alt="" coords="512,56,673,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="415,48,496,57,495,62,415,54"/>
+</map>

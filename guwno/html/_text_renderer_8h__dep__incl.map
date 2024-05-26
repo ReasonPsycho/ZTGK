@@ -1,0 +1,17 @@
+<map id="ECS/HUD/TextRenderer.h" name="ECS/HUD/TextRenderer.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="571,5,743,32"/>
+<area shape="rect" id="Node000002" href="$_h_u_d_8h.html" title=" " alt="" coords="440,80,562,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="617,41,530,82,527,77,615,36"/>
+<area shape="rect" id="Node000006" href="$_text_renderer_8cpp.html" title=" " alt="" coords="564,163,750,189"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="660,48,660,162,654,162,654,48"/>
+<area shape="rect" id="Node000007" href="$main_8cpp.html" title=" " alt="" coords="773,163,848,189"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="682,41,800,160,796,164,678,45"/>
+<area shape="rect" id="Node000003" href="$_h_u_d_8cpp.html" title=" " alt="" coords="5,163,141,189"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="425,109,298,130,154,157,122,165,120,159,152,152,297,125,424,104"/>
+<area shape="rect" id="Node000004" href="$_h_u_d_button_8cpp.html" title=" " alt="" coords="165,155,322,197"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="447,114,311,157,309,151,445,109"/>
+<area shape="rect" id="Node000005" href="$_sprite_renderer_8cpp.html" title=" " alt="" coords="347,163,541,189"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="486,121,455,164,450,161,481,118"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="540,112,634,160,632,165,538,116"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="578,106,667,126,763,152,783,160,781,165,762,157,666,131,576,111"/>
+</map>

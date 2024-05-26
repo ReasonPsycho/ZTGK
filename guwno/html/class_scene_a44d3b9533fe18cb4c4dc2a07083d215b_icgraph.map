@@ -1,0 +1,16 @@
+<map id="Scene::removeChild" name="Scene::removeChild">
+<area shape="rect" id="Node000001" title=" " alt="" coords="684,55,821,81"/>
+<area shape="rect" id="Node000002" href="$class_washing_machine.html#a7d97d7cc865fd693b226ddbc1cbdb8d5" title=" " alt="" coords="420,5,636,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="669,55,636,49,637,44,670,50"/>
+<area shape="rect" id="Node000003" href="$class_entity.html#aa75151fc607686b42d27f8c3ba73143d" title=" " alt="" coords="474,96,582,123"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="670,86,583,102,582,97,669,81"/>
+<area shape="poly" id="edge5_Node000003_Node000003" title=" " alt="" coords="567,83,553,77,528,75,505,77,492,81,489,87,495,94,490,97,484,87,488,77,503,71,528,69,555,72,569,78"/>
+<area shape="rect" id="Node000004" href="$class_grid.html#a1c093ec8e1b26ed3280c0731109937c1" title=" " alt="" coords="238,37,322,64"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="458,96,321,63,322,58,460,91"/>
+<area shape="rect" id="Node000006" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="188,88,372,131"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="458,112,373,112,373,107,458,107"/>
+<area shape="rect" id="Node000007" href="$class_entity.html#a52dbec6aaba5ff8357b12c938245c1d5" title=" " alt="" coords="196,155,364,181"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="460,128,340,157,339,151,458,123"/>
+<area shape="rect" id="Node000005" href="$class_grid.html#a3f784f5077956986b5635ab043b4d10e" title=" " alt="" coords="5,37,140,64"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="222,53,140,53,140,48,222,48"/>
+</map>

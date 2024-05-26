@@ -1,0 +1,11 @@
+<map id="SystemManager" name="SystemManager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="41,5,273,347"/>
+<area shape="rect" id="Node000003" href="$class_scene.html" title=" " alt="" coords="5,416,175,619"/>
+<area shape="poly" id="edge3_Node000003_Node000001" title=" " alt="" coords="107,347,102,371,98,400,93,399,97,370,102,346"/>
+<area shape="rect" id="Node000002" href="$class_entity.html" title=" " alt="" coords="139,688,308,997"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,688,218,534,202,371,201,363,206,363,207,370,223,534,228,688"/>
+<area shape="poly" id="edge4_Node000002_Node000002" title=" " alt="" coords="309,808,327,820,335,842,332,857,325,868,320,865,327,855,329,843,323,823,306,812"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="134,618,156,672,151,674,129,620"/>
+<area shape="rect" id="Node000004" href="$class_transform.html" title=" " alt="" coords="342,411,526,624"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="368,625,319,699,315,696,363,622"/>
+</map>

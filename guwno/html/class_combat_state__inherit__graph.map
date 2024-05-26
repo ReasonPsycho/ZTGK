@@ -1,0 +1,5 @@
+<map id="CombatState" name="CombatState">
+<area shape="rect" id="Node000001" title=" " alt="" coords="13,224,201,453"/>
+<area shape="rect" id="Node000002" href="$class_state.html" title=" " alt="" coords="5,5,209,176"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,191,110,224,105,224,105,191"/>
+</map>

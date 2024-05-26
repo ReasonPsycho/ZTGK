@@ -1,0 +1,11 @@
+<map id="WireRenderSystem::DrawColliders" name="WireRenderSystem::DrawColliders">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,227,108"/>
+<area shape="rect" id="Node000002" href="$class_camera.html#ab0a4bf5a65d45f25529e3cffda1c361b" title=" " alt="" coords="275,5,464,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,78,274,41,300,34,301,39,275,47,159,83"/>
+<area shape="rect" id="Node000003" href="$class_camera.html#affa333055635aed96518c4c66be9a70c" title=" " alt="" coords="290,56,449,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="227,81,274,76,274,81,228,86"/>
+<area shape="rect" id="Node000004" href="$class_shader.html#a2a6328fa6868063d6026dfe8485e46fa" title=" " alt="" coords="304,107,435,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="228,103,288,109,288,115,227,108"/>
+<area shape="rect" id="Node000005" href="$class_shader.html#a3c7896754f0e1fca8bde860cfef63832" title=" " alt="" coords="324,157,415,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="159,106,275,143,309,152,308,158,274,148,158,111"/>
+</map>

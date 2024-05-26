@@ -1,0 +1,23 @@
+<map id="Unit::UpdateStats" name="Unit::UpdateStats">
+<area shape="rect" id="Node000001" title=" " alt="" coords="500,231,624,257"/>
+<area shape="rect" id="Node000002" href="$class_inventory_manager.html#af1728635a95997f5b6ad672dbb46a890" title=" " alt="" coords="245,96,445,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="538,221,499,182,451,145,405,126,407,121,453,140,503,178,542,217"/>
+<area shape="rect" id="Node000006" href="$class_unit.html#a4dcc86d8785c5cfc84d7898ab5a41a5e" title=" " alt="" coords="290,155,400,181"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="521,226,451,196,400,181,401,176,453,191,523,221"/>
+<area shape="rect" id="Node000007" href="$class_unit.html#a04492d9915574aa8cabb91eaa2c41f25" title=" " alt="" coords="281,205,409,232"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="485,238,409,229,410,223,485,232"/>
+<area shape="rect" id="Node000009" href="$class_inventory_manager.html#aa30b71b3d6505e350df986faf3fcbdb7" title=" " alt="" coords="238,256,452,283"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="485,256,453,259,452,254,485,250"/>
+<area shape="rect" id="Node000010" href="$class_unit.html#ac1b0e2532f09252d2599b7fc22f14452" title=" " alt="" coords="283,307,407,333"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="523,267,453,297,408,310,406,305,451,292,521,262"/>
+<area shape="rect" id="Node000011" href="$class_unit.html#a75b9bde692790ad18563b7425dafe780" title=" " alt="" coords="307,357,383,384"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="542,271,504,311,480,331,453,348,418,361,384,369,383,364,417,356,451,343,476,327,500,307,538,268"/>
+<area shape="rect" id="Node000003" href="$class_inventory_manager.html#a5ef36872d20a9ee0a00b84a9978fc7b7" title=" " alt="" coords="14,5,181,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="287,93,163,51,165,46,289,88"/>
+<area shape="rect" id="Node000004" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="5,72,190,115"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="229,105,190,102,190,97,229,99"/>
+<area shape="rect" id="Node000005" href="$class_inventory_manager.html#af21c04ccafdbd8e6909199a95bdf6ddb" title=" " alt="" coords="10,139,185,181"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="262,129,185,145,184,140,261,124"/>
+<area shape="rect" id="Node000008" href="$struct_y_a_m_l_1_1convert_3_01_unit_01_4.html#a6c675728547546ecfad76b1abfe7d518" title=" " alt="" coords="27,205,168,248"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="265,224,169,227,168,222,265,219"/>
+</map>

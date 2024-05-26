@@ -1,0 +1,7 @@
+<map id="SphereCollider" name="SphereCollider">
+<area shape="rect" id="Node000001" title=" " alt="" coords="19,512,183,635"/>
+<area shape="rect" id="Node000002" href="$class_collider.html" title=" " alt="" coords="12,320,189,464"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,479,103,512,98,512,98,479"/>
+<area shape="rect" id="Node000003" href="$class_component.html" title=" " alt="" coords="5,5,196,272"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,287,103,321,98,321,98,287"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="WashingMachine::clearTilesInRadius" name="WashingMachine::clearTilesInRadius">
+<area shape="rect" id="Node000001" title=" " alt="" coords="245,5,429,48"/>
+<area shape="rect" id="Node000002" href="$class_washing_machine.html#a43c9ef88255b58f7e033bf5898e21531" title=" " alt="" coords="5,5,197,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
+</map>

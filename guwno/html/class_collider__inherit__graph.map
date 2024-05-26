@@ -1,0 +1,9 @@
+<map id="Collider" name="Collider">
+<area shape="rect" id="Node000001" title=" " alt="" coords="128,320,305,464"/>
+<area shape="rect" id="Node000003" href="$class_box_collider.html" title=" " alt="" coords="5,512,217,789"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,479,170,513,165,511,179,477"/>
+<area shape="rect" id="Node000004" href="$class_sphere_collider.html" title=" " alt="" coords="241,589,405,712"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="254,477,301,588,296,590,249,479"/>
+<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="121,5,312,272"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,287,219,321,214,321,214,287"/>
+</map>

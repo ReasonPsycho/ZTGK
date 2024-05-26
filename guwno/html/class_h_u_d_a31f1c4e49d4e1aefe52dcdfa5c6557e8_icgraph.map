@@ -1,0 +1,17 @@
+<map id="HUD::getGroupOrDefault" name="HUD::getGroupOrDefault">
+<area shape="rect" id="Node000001" title=" " alt="" coords="427,132,590,159"/>
+<area shape="rect" id="Node000002" href="$class_h_u_d.html#a163770ea5379d57256372ce4bbec9b03" title=" " alt="" coords="211,81,379,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="434,130,354,111,355,106,435,125"/>
+<area shape="rect" id="Node000006" href="$class_h_u_d.html#a0db7d237acaf88b2398ac727a1b7030e" title=" " alt="" coords="212,157,378,184"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="412,159,379,163,378,158,412,154"/>
+<area shape="rect" id="Node000003" href="$class_sprite_renderer.html#a395108475bf85adc9c8b38e3ec171cdb" title=" " alt="" coords="5,5,163,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="244,78,162,47,128,35,130,30,164,41,246,73"/>
+<area shape="rect" id="Node000004" href="$class_sprite_renderer.html#a94054520b2f7bc1a269a4791eda00730" title=" " alt="" coords="8,56,160,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="195,85,160,81,160,76,195,80"/>
+<area shape="rect" id="Node000005" href="$class_text_renderer.html#a25a0322b1f3f50735bd7e66be136fe06" title=" " alt="" coords="13,107,155,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="195,109,156,114,155,109,195,104"/>
+<area shape="rect" id="Node000007" href="$class_h_u_d.html#ace77b78644c4dae7f73ff518b39fc553" title=" " alt="" coords="42,157,126,184"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="196,173,126,173,126,168,196,168"/>
+<area shape="rect" id="Node000008" href="$class_h_u_d.html#a9230bc58227e9f7222489ce5701882ed" title=" " alt="" coords="47,208,121,235"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="222,191,122,215,120,210,221,186"/>
+</map>

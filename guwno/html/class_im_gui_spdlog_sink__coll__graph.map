@@ -1,0 +1,7 @@
+<map id="ImGuiSpdlogSink" name="ImGuiSpdlogSink">
+<area shape="rect" id="Node000001" title=" " alt="" coords="89,283,233,405"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,69,135,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,168,140,282,135,284,89,169"/>
+<area shape="rect" id="Node000003" href="$class_console.html" title=" " alt="" coords="159,5,346,219"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,220,193,268,188,266,208,218"/>
+</map>

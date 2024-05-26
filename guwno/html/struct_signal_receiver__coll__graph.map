@@ -1,0 +1,15 @@
+<map id="SignalReceiver" name="SignalReceiver">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,1061,233,1419"/>
+<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="24,704,215,949"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,964,122,1061,117,1061,117,964"/>
+<area shape="rect" id="Node000003" href="$class_entity.html" title=" " alt="" coords="271,283,440,592"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="273,579,204,691,200,689,269,576"/>
+<area shape="poly" id="edge6_Node000003_Node000003" title=" " alt="" coords="441,402,459,415,467,437,464,452,457,463,452,460,459,450,461,438,455,418,438,407"/>
+<area shape="rect" id="Node000005" href="$class_system_manager.html" title=" " alt="" coords="239,656,471,997"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="358,591,358,639,353,639,353,591"/>
+<area shape="rect" id="Node000004" href="$class_scene.html" title=" " alt="" coords="363,1139,532,1341"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="477,1138,498,1037,511,929,516,845,507,761,481,657,465,615,446,575,450,572,470,613,486,655,512,760,521,844,517,930,503,1038,482,1139"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="390,997,398,1037,419,1122,414,1123,393,1038,384,998"/>
+<area shape="rect" id="Node000006" href="$class_transform.html" title=" " alt="" coords="263,5,447,219"/>
+<area shape="poly" id="edge7_Node000003_Node000006" title=" " alt="" coords="358,219,358,266,353,266,353,219"/>
+</map>

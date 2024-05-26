@@ -1,0 +1,9 @@
+<map id="GridRange::get_indices" name="GridRange::get_indices">
+<area shape="rect" id="Node000001" title=" " alt="" coords="508,31,664,57"/>
+<area shape="rect" id="Node000002" href="$class_unit_equipment.html#ae82a10fab66660f58530cbe6632bb479" title=" " alt="" coords="280,5,460,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="492,36,460,32,461,27,493,30"/>
+<area shape="rect" id="Node000003" href="$struct_grid_range.html#a4822d198b3bc231b9c828329b12078ff" title=" " alt="" coords="292,56,448,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="493,58,449,63,448,58,492,52"/>
+<area shape="rect" id="Node000004" href="$class_combat_state.html#a5c651559f7d6253ba836e82e3c05cd33" title=" " alt="" coords="5,56,232,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="276,72,232,72,232,67,276,67"/>
+</map>

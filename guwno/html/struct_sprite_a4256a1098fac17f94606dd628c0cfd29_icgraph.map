@@ -1,0 +1,7 @@
+<map id="Sprite::load" name="Sprite::load">
+<area shape="rect" id="Node000001" title=" " alt="" coords="245,31,332,57"/>
+<area shape="rect" id="Node000002" href="$struct_sprite.html#a27dd89965bf2c0d8c4c0cc9bd16af556" title=" " alt="" coords="5,5,197,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,39,197,34,197,29,230,33"/>
+<area shape="rect" id="Node000003" href="$struct_sprite.html#a22f16016244195cac32cfe60d5375127" title=" " alt="" coords="52,56,150,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="229,55,150,65,150,60,229,49"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Transform::ManipulateModelMatrix" name="Transform::ManipulateModelMatrix">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,190,91"/>
+<area shape="rect" id="Node000002" href="$class_transform.html#afc204ef895c74eb08f31855f5fd3858f" title=" " alt="" coords="245,5,420,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,47,252,33,253,38,190,52"/>
+<area shape="rect" id="Node000003" href="$class_camera.html#ab0a4bf5a65d45f25529e3cffda1c361b" title=" " alt="" coords="238,56,427,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,67,222,67,222,72,190,72"/>
+<area shape="rect" id="Node000004" href="$class_camera.html#affa333055635aed96518c4c66be9a70c" title=" " alt="" coords="253,107,412,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="190,87,253,100,252,105,189,92"/>
+</map>

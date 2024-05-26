@@ -1,0 +1,9 @@
+<map id="SignalQueue::update_delta" name="SignalQueue::update_delta">
+<area shape="rect" id="Node000001" title=" " alt="" coords="439,23,581,65"/>
+<area shape="rect" id="Node000002" href="$class_signal_queue.html#ae53316860b4b619d3b30fdb720b0f282" title=" " alt="" coords="246,5,367,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="423,36,367,29,367,23,424,31"/>
+<area shape="rect" id="Node000003" href="$class_signal_queue.html#aa3adf4f75638f1dffaf8f8d41cd136fd" title=" " alt="" coords="222,56,391,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="424,57,392,61,391,56,423,52"/>
+<area shape="rect" id="Node000004" href="$class_signal_queue.html#a32339d6563f209fe2f640a719ef7cc8a" title=" " alt="" coords="5,56,174,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,72,174,72,174,67,206,67"/>
+</map>

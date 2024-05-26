@@ -83,11 +83,13 @@ string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
 string modelPathZuczek= "res/models/properZuczek/Zuczek.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
+
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
 Model gabka = Model(&modelPathGabka);
 Model zuczek = Model(&modelPathZuczek);
 Model wall = Model(&modelPathWall);
+
 Model *cubeModel;
 Model *quadModel;
 unsigned bggroup, zmgroup;
@@ -433,6 +435,10 @@ void load_enteties() {
     gabka.loadModel();
     zuczek.loadModel();
     tileModel.loadModel();
+
+    //ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine();
+
+
     Entity *gameObject;
 
     gameObject = scene.addEntity("Wall");;

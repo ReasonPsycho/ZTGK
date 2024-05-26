@@ -1,0 +1,13 @@
+<map id="Console::log" name="Console::log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="468,56,562,83"/>
+<area shape="rect" id="Node000002" href="$class_console.html#adc8250c004b717e82f0f2b62b886445b" title=" " alt="" coords="257,5,410,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="453,55,383,35,385,30,454,50"/>
+<area shape="rect" id="Node000005" href="$class_console.html#a54765a1b76ea4119303488edbfc5f675" title=" " alt="" coords="287,56,380,83"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="453,72,380,72,380,67,453,67"/>
+<area shape="rect" id="Node000006" href="$class_im_gui_spdlog_sink.html#a728dbb118f7395d25c2b13b814391c43" title=" " alt="" coords="246,107,420,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="454,89,385,109,383,103,453,84"/>
+<area shape="rect" id="Node000003" href="$main_8cpp.html#a0feb77c6baad55bcf81db1246d1d83ba" title=" " alt="" coords="103,5,198,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="241,21,198,21,198,16,241,16"/>
+<area shape="rect" id="Node000004" href="$main_8cpp.html#a2c3f6775325c30275d11c6abee2db6a0" title=" " alt="" coords="5,5,55,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

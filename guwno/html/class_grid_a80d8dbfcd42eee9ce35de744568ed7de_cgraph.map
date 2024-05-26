@@ -1,0 +1,7 @@
+<map id="Grid::ClearWall" name="Grid::ClearWall">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,115,57"/>
+<area shape="rect" id="Node000002" href="$class_grid.html#ab7a32ee3f2de25e22e6e3d195deb3151" title=" " alt="" coords="182,5,304,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,34,166,27,167,32,115,39"/>
+<area shape="rect" id="Node000003" href="$class_chunk.html#a67d3e73fe0c4b79100d28e6e80535e6c" title=" " alt="" coords="163,56,323,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="115,49,147,53,147,59,115,54"/>
+</map>

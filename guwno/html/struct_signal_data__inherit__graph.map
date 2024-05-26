@@ -1,0 +1,21 @@
+<map id="SignalData" name="SignalData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="971,5,1180,203"/>
+<area shape="rect" id="Node000002" href="$struct_audio_signal_data.html" title=" " alt="" coords="5,469,215,661"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="956,114,770,128,555,154,451,173,358,195,281,222,251,237,228,253,205,274,186,299,156,355,135,414,122,470,117,469,130,412,151,353,182,296,201,271,224,249,249,232,279,217,356,190,450,167,554,149,769,123,955,109"/>
+<area shape="rect" id="Node000003" href="$struct_h_u_d_remap_groups_signal_data.html" title=" " alt="" coords="239,251,480,880"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="956,125,830,146,694,176,573,211,526,231,493,253,481,263,478,259,490,249,524,227,571,206,693,170,829,141,955,120"/>
+<area shape="rect" id="Node000004" href="$struct_h_u_d_remove_group_signal_data.html" title=" " alt="" coords="504,469,713,661"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="957,132,898,150,837,176,778,210,727,253,689,302,660,358,640,416,625,470,620,469,634,414,655,356,684,299,723,249,775,205,834,171,896,145,955,126"/>
+<area shape="rect" id="Node000005" href="$struct_h_u_d_sort_z_depth_signal_data.html" title=" " alt="" coords="737,504,947,627"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="983,216,960,252,927,317,900,385,860,505,855,503,895,383,923,315,956,249,979,213"/>
+<area shape="rect" id="Node000006" href="$struct_key_signal_data.html" title=" " alt="" coords="971,421,1180,709"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1078,218,1078,422,1073,422,1073,218"/>
+<area shape="rect" id="Node000007" href="$struct_mouse_button_signal_data.html" title=" " alt="" coords="1204,421,1413,709"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1172,213,1195,249,1236,334,1269,421,1264,423,1232,336,1190,252,1167,216"/>
+<area shape="rect" id="Node000008" href="$struct_mouse_move_signal_data.html" title=" " alt="" coords="1437,443,1593,688"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1195,124,1255,143,1317,169,1377,204,1428,249,1459,293,1482,342,1498,393,1509,442,1503,443,1493,394,1477,344,1455,295,1424,252,1374,208,1315,173,1253,148,1193,129"/>
+<area shape="rect" id="Node000009" href="$struct_mouse_scroll_signal_data.html" title=" " alt="" coords="1617,443,1776,688"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1195,121,1309,143,1431,172,1538,208,1579,228,1608,249,1641,291,1666,340,1682,392,1692,442,1687,443,1677,393,1661,342,1637,294,1604,253,1576,232,1536,213,1430,178,1308,149,1194,127"/>
+<area shape="rect" id="Node000010" href="$struct_test_signal_data.html" title=" " alt="" coords="1801,501,1966,629"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1195,112,1352,130,1528,157,1611,175,1686,196,1747,221,1790,249,1815,275,1835,306,1851,339,1863,373,1879,441,1885,502,1880,502,1873,442,1858,374,1846,341,1830,308,1811,279,1787,253,1745,226,1684,201,1610,180,1527,163,1351,135,1194,118"/>
+</map>

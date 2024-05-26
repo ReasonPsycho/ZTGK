@@ -1,0 +1,17 @@
+<map id="InstanceRenderSystem" name="InstanceRenderSystem">
+<area shape="rect" id="Node000001" title=" " alt="" coords="240,816,399,997"/>
+<area shape="rect" id="Node000002" href="$class_system.html" title=" " alt="" coords="5,435,196,664"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,675,267,815,262,818,176,678"/>
+<area shape="rect" id="Node000003" href="$class_system_manager.html" title=" " alt="" coords="649,5,881,347"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="650,210,550,242,436,286,319,343,263,376,210,413,196,425,192,421,207,409,260,372,316,338,434,281,548,237,648,205"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="680,448,849,651"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="767,346,767,431,762,431,762,346"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="680,752,849,1061"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="839,752,859,687,880,599,892,529,890,459,873,371,871,363,876,362,878,370,896,458,897,529,886,600,865,689,844,753"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="850,872,869,884,876,906,873,921,866,932,862,929,868,919,871,907,864,887,847,876"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="767,650,767,735,762,735,762,650"/>
+<area shape="rect" id="Node000006" href="$class_transform.html" title=" " alt="" coords="471,443,655,656"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="625,654,674,741,670,743,621,657"/>
+<area shape="rect" id="Node000007" href="$class_model.html" title=" " alt="" coords="221,411,447,688"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="331,688,326,799,321,799,326,688"/>
+</map>

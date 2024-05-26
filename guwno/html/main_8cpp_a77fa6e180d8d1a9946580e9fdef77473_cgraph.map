@@ -1,0 +1,26 @@
+<map id="handle_picking" name="handle_picking">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,215,113,241"/>
+<area shape="rect" id="Node000002" href="$class_vector_utils.html#a90a376c8a86d9a5c35de0f6489fe7135" title=" " alt="" coords="187,5,341,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="62,213,74,182,94,140,122,96,159,58,172,49,175,53,162,62,127,99,99,143,79,184,67,215"/>
+<area shape="rect" id="Node000003" href="$class_entity.html#ad489ee0d44f9c35d1a61d3a726c5923c" title=" " alt="" coords="436,185,583,212"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="79,212,116,191,160,175,232,164,306,164,375,170,435,179,434,184,375,175,306,169,233,170,161,180,118,196,82,216"/>
+<area shape="rect" id="Node000004" href="$class_camera.html#ac1cfd1a8b820088c7b7fd40263b7dfeb" title=" " alt="" coords="172,72,356,115"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="70,212,107,173,159,131,181,119,184,124,162,136,111,177,74,216"/>
+<area shape="rect" id="Node000007" href="$class_transform.html#a9e10247b5b24be58ba1e1b92e811d9d1" title=" " alt="" coords="170,189,358,216"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="113,219,154,214,154,219,113,224"/>
+<area shape="rect" id="Node000008" href="$class_entity.html#a4829450399e08de1d7f4a99ab85f45a0" title=" " alt="" coords="164,240,364,267"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="113,232,149,236,148,242,113,237"/>
+<area shape="rect" id="Node000009" href="$class_system_manager.html#a03bee18b510daea61c44822129a6c7fd" title=" " alt="" coords="170,291,358,317"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="85,239,121,258,162,276,184,283,182,289,160,281,118,263,83,244"/>
+<area shape="rect" id="Node000010" href="$class_vector_utils.html#afe7643b5f00ba0627b0f8dbf9fa73774" title=" " alt="" coords="161,341,367,368"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="72,240,108,284,134,307,162,327,174,333,171,338,159,332,130,311,105,287,68,244"/>
+<area shape="rect" id="Node000011" href="$class_tile.html#a98e6eae3007c0daa21287607903baddc" title=" " alt="" coords="178,392,350,419"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="68,241,80,270,100,307,128,346,162,378,170,383,167,387,159,382,124,349,96,310,76,272,63,243"/>
+<area shape="rect" id="Node000005" href="$class_camera.html#ab0a4bf5a65d45f25529e3cffda1c361b" title=" " alt="" coords="415,55,604,81"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="356,81,399,77,400,82,356,87"/>
+<area shape="rect" id="Node000006" href="$class_camera.html#affa333055635aed96518c4c66be9a70c" title=" " alt="" coords="430,105,589,132"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="356,100,415,106,414,112,356,105"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="327,237,431,213,432,218,328,242"/>
+<area shape="rect" id="Node000012" href="$class_tile.html#ae4b86fa98529d35de15f8ba43f36fe7b" title=" " alt="" coords="424,392,595,419"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="351,403,408,403,408,408,351,408"/>
+</map>

@@ -1,0 +1,31 @@
+<map id="Time::Instance" name="Time::Instance">
+<area shape="rect" id="Node000001" title=" " alt="" coords="634,183,740,209"/>
+<area shape="rect" id="Node000002" href="$main_8cpp.html#ae626b0bc0beef8063902f6e70eb00f73" title=" " alt="" coords="103,5,198,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="671,170,637,116,613,89,584,68,535,45,483,29,430,18,376,12,277,9,199,15,198,10,276,4,376,6,430,12,485,23,537,40,587,63,617,85,641,113,675,167"/>
+<area shape="rect" id="Node000004" href="$main_8cpp.html#a0feb77c6baad55bcf81db1246d1d83ba" title=" " alt="" coords="256,56,351,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="664,172,630,135,608,118,585,104,524,83,461,72,402,68,352,69,352,63,402,63,462,67,526,78,587,99,611,113,634,131,668,168"/>
+<area shape="rect" id="Node000005" href="$main_8cpp.html#a55657da39648ec7114a18e7cb7fbc915" title=" " alt="" coords="115,107,186,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="650,177,619,161,585,148,529,135,472,126,359,118,259,117,186,120,186,115,259,112,359,112,473,121,530,130,586,143,621,156,653,172"/>
+<area shape="rect" id="Node000006" href="$class_i_mineable.html#ad24ccd21e761cb4a4772d6d3ff47242e" title=" " alt="" coords="441,157,554,184"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="618,189,554,181,555,176,618,184"/>
+<area shape="rect" id="Node000007" href="$struct_cursor.html#a1659ade606fa517613089aeb00cd448c" title=" " alt="" coords="449,208,546,235"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="618,208,547,218,546,212,618,203"/>
+<area shape="rect" id="Node000010" href="$class_idle_state.html#a8f23cae9c143e6c2ac49a2bf0d47b1c0" title=" " alt="" coords="409,259,586,285"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="649,219,587,249,553,261,551,256,585,244,647,215"/>
+<area shape="rect" id="Node000011" href="$struct_cursor.html#acaf5265a03e726ba06b68d7bf883d3e4" title=" " alt="" coords="448,309,547,336"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="669,223,634,262,587,300,548,316,546,311,584,295,630,259,665,219"/>
+<area shape="rect" id="Node000013" href="$class_unit.html#a08fd11e5ed7e87cfa9c72c65f2b0fc8f" title=" " alt="" coords="439,360,556,387"/>
+<area shape="poly" id="edge16_Node000001_Node000013" title=" " alt="" coords="677,225,643,288,618,321,587,350,558,365,555,360,584,346,614,318,639,285,672,222"/>
+<area shape="rect" id="Node000003" href="$main_8cpp.html#a2c3f6775325c30275d11c6abee2db6a0" title=" " alt="" coords="5,81,55,108"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="116,43,54,83,51,79,114,38"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="241,78,55,95,55,90,240,72"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="99,112,55,102,56,97,101,107"/>
+<area shape="rect" id="Node000008" href="$main_8cpp.html#af4ca2891044ac10a664b8d83ce590f1f" title=" " alt="" coords="246,208,361,235"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="433,224,362,224,362,219,433,219"/>
+<area shape="rect" id="Node000009" href="$main_8cpp.html#ac3bdbc826d19fb41ffb25470527c3801" title=" " alt="" coords="126,208,175,235"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="230,224,176,224,176,219,230,219"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="124,199,42,110,46,107,128,195"/>
+<area shape="rect" id="Node000012" href="$main_8cpp.html#a06ad2502008f16fbcf01dfaa7f7bc9ea" title=" " alt="" coords="250,284,357,311"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="433,317,358,307,358,302,433,312"/>
+<area shape="poly" id="edge15_Node000012_Node000009" title=" " alt="" coords="260,279,174,236,177,231,262,274"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="SpotLight::UpdateData" name="SpotLight::UpdateData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,158,83"/>
+<area shape="rect" id="Node000002" href="$_light_helpers_8cpp.html#a43f29512d1091de2ecd34af1cb1253df" title=" " alt="" coords="218,5,344,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,53,210,34,211,39,138,58"/>
+<area shape="rect" id="Node000003" href="$class_component.html#a9fe6eb1bf8552b6a48ad404ad0ec3ad8" title=" " alt="" coords="207,56,355,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,67,192,67,192,72,158,72"/>
+<area shape="rect" id="Node000004" href="$class_component.html#aa52309ed4376db2689f8900e663b04e9" title=" " alt="" coords="206,107,356,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="138,81,211,100,210,105,136,86"/>
+</map>

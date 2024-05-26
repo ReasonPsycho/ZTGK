@@ -1,0 +1,17 @@
+<map id="Sprite" name="Sprite">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,1312,203,1707"/>
+<area shape="rect" id="Node000002" href="$struct_a_h_u_d_component.html" title=" " alt="" coords="11,1069,197,1256"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,1271,107,1312,101,1312,101,1271"/>
+<area shape="rect" id="Node000003" href="$class_component.html" title=" " alt="" coords="9,704,199,949"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="107,964,107,1069,101,1069,101,964"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="255,283,425,592"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="258,579,189,691,184,689,253,576"/>
+<area shape="poly" id="edge7_Node000004_Node000004" title=" " alt="" coords="426,402,444,415,451,437,449,452,441,463,437,460,444,450,446,438,440,418,423,407"/>
+<area shape="rect" id="Node000006" href="$class_system_manager.html" title=" " alt="" coords="224,656,456,997"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="343,591,343,639,337,639,337,591"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="347,1061,517,1264"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="476,1061,483,1037,501,930,505,845,493,761,465,657,450,615,430,575,435,572,455,613,471,655,499,760,510,845,507,931,488,1038,481,1062"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="372,997,383,1037,385,1044,380,1046,378,1038,367,998"/>
+<area shape="rect" id="Node000007" href="$class_transform.html" title=" " alt="" coords="248,5,432,219"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="343,219,343,266,337,266,337,219"/>
+</map>

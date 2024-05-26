@@ -1,0 +1,13 @@
+<map id="AstarPathfinding::FindPath" name="AstarPathfinding::FindPath">
+<area shape="rect" id="Node000001" title="Uses A* algorithm to find the shortest path from start tile to target tile. &#160;Stores the path in the p..." alt="" coords="5,85,182,112"/>
+<area shape="rect" id="Node000002" href="$class_vector_utils.html#a07880bbabf80a4a86e038daeb8abdc49" title=" " alt="" coords="253,5,397,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,82,229,48,267,35,269,40,231,53,134,87"/>
+<area shape="rect" id="Node000003" href="$class_astar_pathfinding.html#af9a176c29ae0981d93aeb41ccab187d2" title=" " alt="" coords="230,107,420,149"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,107,214,111,214,117,182,112"/>
+<area shape="rect" id="Node000004" href="$class_grid.html#ac2cd00215173f206c3e3cf087867588f" title="Returns the tile at the specified index." alt="" coords="468,88,572,115"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="182,93,295,91,420,92,453,94,452,99,420,97,295,96,182,98"/>
+<area shape="rect" id="Node000005" href="$class_tile.html#a081d89431483d3f49514dc8f97171a5c" title=" " alt="" coords="477,143,563,169"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="118,110,168,137,230,159,291,168,353,170,461,162,462,168,353,175,291,173,229,164,166,142,115,115"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="420,112,452,108,453,113,421,118"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="421,139,462,145,461,150,420,144"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="MiningState::isTargetInRange" name="MiningState::isTargetInRange">
+<area shape="rect" id="Node000001" title=" " alt="" coords="255,81,446,108"/>
+<area shape="rect" id="Node000002" href="$class_combat_state.html#ae23fd1dc65a2f7072b21fc21072f0b3f" title=" " alt="" coords="5,5,207,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="298,78,206,47,165,35,167,30,207,41,300,73"/>
+<area shape="rect" id="Node000003" href="$class_idle_state.html#a8f23cae9c143e6c2ac49a2bf0d47b1c0" title=" " alt="" coords="18,56,194,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,86,195,81,195,76,240,81"/>
+<area shape="rect" id="Node000004" href="$class_mining_state.html#a672ddabc1270c4e89c407df4749d3c78" title=" " alt="" coords="9,107,203,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="239,109,204,113,203,107,239,104"/>
+<area shape="rect" id="Node000005" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="14,157,198,200"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="297,116,208,148,174,159,172,154,206,143,295,111"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="InventoryManager::create_default_item" name="InventoryManager::create_default_item">
+<area shape="rect" id="Node000001" title=" " alt="" coords="253,5,419,48"/>
+<area shape="rect" id="Node000002" href="$class_unit_equipment.html#a288cbd4b5f542cc1326359ce503447b7" title=" " alt="" coords="5,13,205,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,29,205,29,205,24,237,24"/>
+</map>

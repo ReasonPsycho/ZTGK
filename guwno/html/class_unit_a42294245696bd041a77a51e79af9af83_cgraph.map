@@ -1,0 +1,9 @@
+<map id="Unit::GetEnemiesInSight" name="Unit::GetEnemiesInSight">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,170,83"/>
+<area shape="rect" id="Node000002" href="$class_grid.html#ac2cd00215173f206c3e3cf087867588f" title="Returns the tile at the specified index." alt="" coords="224,5,329,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,53,209,34,210,39,141,58"/>
+<area shape="rect" id="Node000003" href="$class_unit.html#a69fc544287c29fae98a4978ddc1c33f1" title=" " alt="" coords="234,56,319,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,67,218,67,218,72,170,72"/>
+<area shape="rect" id="Node000004" href="$class_grid.html#aeef743a92a95ac1f4605da4bd1c18c43" title=" " alt="" coords="218,107,335,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,81,210,100,209,105,139,86"/>
+</map>

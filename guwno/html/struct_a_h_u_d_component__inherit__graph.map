@@ -1,0 +1,15 @@
+<map id="AHUDComponent" name="AHUDComponent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="601,320,786,507"/>
+<area shape="rect" id="Node000003" href="$class_h_u_d_button.html" title=" " alt="" coords="5,627,237,877"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="586,430,507,446,420,472,331,508,290,531,251,557,216,590,186,629,181,625,212,586,248,553,287,526,329,503,418,467,506,441,585,425"/>
+<area shape="rect" id="Node000004" href="$class_h_u_d_hoverable.html" title=" " alt="" coords="262,645,538,859"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="592,514,553,556,478,647,474,644,549,553,588,510"/>
+<area shape="rect" id="Node000005" href="$struct_h_u_d_slider.html" title=" " alt="" coords="563,597,824,907"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="696,522,696,598,691,598,691,522"/>
+<area shape="rect" id="Node000006" href="$struct_sprite.html" title=" " alt="" coords="848,555,1045,949"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="798,507,838,553,850,570,846,573,834,556,794,510"/>
+<area shape="rect" id="Node000007" href="$class_text.html" title=" " alt="" coords="1069,584,1339,920"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="801,436,863,455,930,480,997,513,1059,553,1093,582,1089,586,1056,557,994,517,928,485,861,460,799,441"/>
+<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="598,5,789,272"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="696,287,696,320,691,320,691,287"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="AHUDComponent" name="AHUDComponent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="8,1069,193,1256"/>
+<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="5,704,196,949"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,964,103,1069,98,1069,98,964"/>
+<area shape="rect" id="Node000003" href="$class_entity.html" title=" " alt="" coords="252,283,421,592"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="254,579,186,691,181,689,250,576"/>
+<area shape="poly" id="edge6_Node000003_Node000003" title=" " alt="" coords="422,402,441,415,448,437,445,452,438,463,434,460,440,450,443,438,436,418,419,407"/>
+<area shape="rect" id="Node000005" href="$class_system_manager.html" title=" " alt="" coords="221,656,453,997"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="339,591,339,639,334,639,334,591"/>
+<area shape="rect" id="Node000004" href="$class_scene.html" title=" " alt="" coords="344,1061,513,1264"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="473,1061,479,1037,498,930,502,845,490,761,462,657,447,615,427,575,432,572,452,613,467,655,495,760,507,845,503,931,485,1038,478,1062"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="369,997,380,1037,382,1044,377,1046,374,1038,364,998"/>
+<area shape="rect" id="Node000006" href="$class_transform.html" title=" " alt="" coords="245,5,429,219"/>
+<area shape="poly" id="edge7_Node000003_Node000006" title=" " alt="" coords="339,219,339,266,334,266,334,219"/>
+</map>

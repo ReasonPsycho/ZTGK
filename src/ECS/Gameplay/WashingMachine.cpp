@@ -5,6 +5,9 @@
 #include "WashingMachine.h"
 #include <imgui.h>
 #include "ECS/Utils/Globals.h"
+#include "ECS/Render/Components/Render.h"
+#include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Entity.h"
 
 WashingMachine::WashingMachine(int praniumNeeded, int radiusToClearEveryMilestone) {
     name = "WashingMachine";
@@ -87,6 +90,25 @@ void WashingMachine::onPraniumDelivered() {
 
     clearTilesInRadius(Vector2Int(0,0), radiusToClear);
     radiusToClear *= 1.5;
+
+}
+
+void WashingMachine::createWashingMachine() {
+    auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
+    if(machineEntity != nullptr){
+        ztgk::game::scene->removeChild(machineEntity);
+    }
+    if(machineEntity == nullptr){
+        machineEntity = ztgk::game::scene->addEntity("WashingMachine");
+    }
+    string washingMachineModelPath = "res/models/washingmachine/uhhhh.fbx";
+    Model washingMachineModel = Model(&washingMachineModelPath);
+    washingMachineModel.loadModel();
+    machineEntity->addComponent(std::make_unique<Render>(&washingMachineModel));
+
+    machineEntity->transform.setLocalPosition(glm::vec3(100,0,100));
+    machineEntity->transform.setLocalScale(glm::vec3(5, 5, 5));
+    machineEntity->updateSelfAndChild();
 
 }
 

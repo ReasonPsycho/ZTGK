@@ -1,0 +1,12 @@
+<map id="SignalQueue::init" name="SignalQueue::init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,126,73"/>
+<area shape="rect" id="Node000002" href="$struct_signal_queue_1_1editor__s__logging.html#a084e4151da29a9427af61562dccdfe07" title=" " alt="" coords="174,72,339,115"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,68,159,74,158,79,125,73"/>
+<area shape="rect" id="Node000005" href="$class_signal_queue.html#a9328d32604ed2f390752f62597b0a028" title=" " alt="" coords="185,5,328,48"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="125,47,169,39,170,44,126,52"/>
+<area shape="rect" id="Node000003" href="$namespaceztgk.html#a9b65aed8c84426e23f1b3d1648705f8b" title=" " alt="" coords="405,21,484,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="326,69,389,49,391,54,328,74"/>
+<area shape="rect" id="Node000004" href="$struct_signal.html#a4a119577245e9ab117bd1dd48c107319" title=" " alt="" coords="387,80,502,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="340,91,372,91,372,96,340,96"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="328,27,390,30,390,35,328,32"/>
+</map>

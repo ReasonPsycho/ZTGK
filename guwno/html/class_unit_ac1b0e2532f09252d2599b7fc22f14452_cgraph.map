@@ -1,0 +1,11 @@
+<map id="Unit::UnequipItem" name="Unit::UnequipItem">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,130,57"/>
+<area shape="rect" id="Node000002" href="$class_unit_equipment.html#addf9bdda2b5bbb13b06e95390055b71a" title=" " alt="" coords="178,5,362,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,34,162,30,162,35,130,39"/>
+<area shape="rect" id="Node000003" href="$class_unit.html#a911833d40b76445cfdca352c4116de12" title=" " alt="" coords="208,56,332,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,49,193,57,192,62,129,54"/>
+<area shape="rect" id="Node000004" href="$struct_grid_range.html#a688909f788fcd2ec02ca2c16fa42b58f" title=" " alt="" coords="410,56,536,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="332,67,394,67,394,72,332,72"/>
+<area shape="rect" id="Node000005" href="$struct_grid_range.html#a119282a8d0190452da895b7fb3f2125c" title=" " alt="" coords="584,56,736,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="537,67,569,67,569,72,537,72"/>
+</map>

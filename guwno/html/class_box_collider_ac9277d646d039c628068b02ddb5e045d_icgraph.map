@@ -1,0 +1,7 @@
+<map id="BoxCollider::getCenter" name="BoxCollider::getCenter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="296,5,447,32"/>
+<area shape="rect" id="Node000002" href="$class_ray.html#ad7881515bdf74c3d2439ce1c072aef5d" title="Checks if the ray collides with the collider." alt="" coords="129,5,248,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="281,21,249,21,249,16,281,16"/>
+<area shape="rect" id="Node000003" href="$class_ray.html#acac06ec2832e93bd28df5d295339ad46" title="Ray constructor." alt="" coords="5,5,81,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,21,81,21,81,16,113,16"/>
+</map>

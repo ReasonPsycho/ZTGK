@@ -1,0 +1,7 @@
+<map id="Shader::setVec4" name="Shader::setVec4">
+<area shape="rect" id="Node000001" title=" " alt="" coords="205,31,323,57"/>
+<area shape="rect" id="Node000002" href="$class_sprite_renderer.html#a94054520b2f7bc1a269a4791eda00730" title=" " alt="" coords="5,5,157,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,36,157,32,157,27,189,31"/>
+<area shape="rect" id="Node000003" href="$class_text_renderer.html#a25a0322b1f3f50735bd7e66be136fe06" title=" " alt="" coords="10,56,152,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,57,153,62,152,57,189,52"/>
+</map>

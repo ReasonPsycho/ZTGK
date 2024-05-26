@@ -1,0 +1,17 @@
+<map id="Text" name="Text">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,1312,275,1648"/>
+<area shape="rect" id="Node000002" href="$struct_a_h_u_d_component.html" title=" " alt="" coords="47,1069,233,1256"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,1271,143,1312,137,1312,137,1271"/>
+<area shape="rect" id="Node000003" href="$class_component.html" title=" " alt="" coords="45,704,235,949"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="143,964,143,1069,137,1069,137,964"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="291,283,461,592"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="294,579,225,691,220,689,289,576"/>
+<area shape="poly" id="edge7_Node000004_Node000004" title=" " alt="" coords="462,402,480,415,487,437,485,452,477,463,473,460,480,450,482,438,476,418,459,407"/>
+<area shape="rect" id="Node000006" href="$class_system_manager.html" title=" " alt="" coords="260,656,492,997"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="379,591,379,639,373,639,373,591"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="383,1061,553,1264"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="512,1061,519,1037,537,930,541,845,529,761,501,657,486,615,466,575,471,572,491,613,507,655,535,760,546,845,543,931,524,1038,517,1062"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="408,997,419,1037,421,1044,416,1046,414,1038,403,998"/>
+<area shape="rect" id="Node000007" href="$class_transform.html" title=" " alt="" coords="284,5,468,219"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="379,219,379,266,373,266,373,219"/>
+</map>

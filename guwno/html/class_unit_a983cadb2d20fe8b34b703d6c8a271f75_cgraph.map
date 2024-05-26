@@ -1,0 +1,13 @@
+<map id="Unit::showImGuiDetailsImpl" name="Unit::showImGuiDetailsImpl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,21,186,48"/>
+<area shape="rect" id="Node000002" href="$struct_modifiers.html#a474345986cbe3880e5489fe5ec43c3f5" title=" " alt="" coords="614,5,775,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,29,234,28,598,18,599,24,234,33,186,35"/>
+<area shape="rect" id="Node000003" href="$class_unit_equipment.html#a662c921b4308e2712ed6f2728e1796c7" title=" " alt="" coords="234,43,379,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,45,218,49,218,54,186,50"/>
+<area shape="rect" id="Node000004" href="$struct_grid_range.html#af74fbb1b9ef70abc9974eeae43748908" title=" " alt="" coords="609,68,780,95"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="380,73,427,79,512,82,594,82,594,87,512,88,427,84,379,79"/>
+<area shape="rect" id="Node000005" href="$class_item.html#a244f20eab0ead6fc3cd97fb667cd0d12" title=" " alt="" coords="427,43,561,69"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="379,58,412,57,412,62,379,64"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="561,41,604,33,605,38,562,46"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="562,62,594,66,593,71,562,67"/>
+</map>

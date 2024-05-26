@@ -1,0 +1,15 @@
+<map id="WaterGun" name="WaterGun">
+<area shape="rect" id="Node000001" title=" " alt="" coords="234,1051,325,1120"/>
+<area shape="rect" id="Node000002" href="$class_item.html" title=" " alt="" coords="186,752,373,1003"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="282,1017,282,1051,277,1051,277,1017"/>
+<area shape="rect" id="Node000003" href="$structs__item__types.html" title=" " alt="" coords="36,445,192,653"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="164,652,200,727,205,736,200,738,196,729,159,654"/>
+<area shape="rect" id="Node000004" href="$struct_item_stats.html" title=" " alt="" coords="217,504,342,595"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="282,595,282,735,277,735,277,595"/>
+<area shape="rect" id="Node000005" href="$struct_grid_range.html" title=" " alt="" coords="5,5,308,347"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="215,346,262,487,257,489,210,347"/>
+<area shape="rect" id="Node000006" href="$struct_modifiers.html" title=" " alt="" coords="332,64,472,288"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="368,288,302,489,297,487,363,287"/>
+<area shape="rect" id="Node000007" href="$class_model.html" title=" " alt="" coords="366,411,593,688"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="397,689,367,739,362,736,393,686"/>
+</map>

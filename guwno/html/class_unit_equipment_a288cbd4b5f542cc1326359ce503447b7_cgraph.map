@@ -1,0 +1,5 @@
+<map id="UnitEquipment::UnitEquipment" name="UnitEquipment::UnitEquipment">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,205,40"/>
+<area shape="rect" id="Node000002" href="$class_inventory_manager.html#a12ee195d602b58efd940235e4f6b87d3" title=" " alt="" coords="253,5,419,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,24,237,24,237,29,205,29"/>
+</map>

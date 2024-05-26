@@ -1,0 +1,11 @@
+<map id="Component::Update" name="Component::Update">
+<area shape="rect" id="Node000001" title=" " alt="" coords="453,64,589,91"/>
+<area shape="rect" id="Node000002" href="$class_inventory_manager.html#a1263e9559c794da65457026a7ae339d3" title=" " alt="" coords="238,56,405,99"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="437,80,405,80,405,75,437,75"/>
+<area shape="rect" id="Node000003" href="$class_mineable_chest.html#aceb3ace944adae5358ffa859ceace03c" title=" " alt="" coords="15,5,180,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="222,54,150,35,152,30,224,49"/>
+<area shape="rect" id="Node000004" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="5,56,190,99"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="222,80,190,80,190,75,222,75"/>
+<area shape="rect" id="Node000005" href="$class_inventory_manager.html#af21c04ccafdbd8e6909199a95bdf6ddb" title=" " alt="" coords="10,123,185,165"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="234,106,173,125,171,119,232,101"/>
+</map>

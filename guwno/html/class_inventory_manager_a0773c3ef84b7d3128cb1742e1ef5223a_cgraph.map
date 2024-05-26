@@ -1,0 +1,10 @@
+<map id="InventoryManager::unassign_and_delete_item" name="InventoryManager::unassign_and_delete_item">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,188,77"/>
+<area shape="rect" id="Node000002" href="$class_inventory_manager.html#a2805a4acc1f67db127c3d2efffa2e8ff" title=" " alt="" coords="236,35,418,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,53,220,53,220,59,188,59"/>
+<area shape="rect" id="Node000003" href="$class_inventory_manager.html#a86135d398978d13f723583ee5a68921a" title=" " alt="" coords="475,5,672,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="418,40,465,32,466,38,419,45"/>
+<area shape="rect" id="Node000004" href="$class_inventory_manager.html#aaa3c13687b1af7243afb1d35ef2739ff" title=" " alt="" coords="466,80,680,107"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="419,67,466,74,465,80,418,72"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="532,81,524,71,530,61,546,55,573,53,603,56,618,63,616,68,602,61,573,59,547,61,533,65,530,71,536,78"/>
+</map>

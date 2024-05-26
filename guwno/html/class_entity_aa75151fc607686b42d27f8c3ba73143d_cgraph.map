@@ -1,0 +1,8 @@
+<map id="Entity::Destroy" name="Entity::Destroy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,114,57"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="30,32,25,22,29,12,40,6,60,4,80,7,91,13,88,18,78,12,59,9,42,11,33,16,30,21,35,29"/>
+<area shape="rect" id="Node000002" href="$class_entity.html#a45d5a3b92478ad8b4fb305b9b3e08c7a" title=" " alt="" coords="163,5,297,32"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="113,33,147,28,148,33,114,39"/>
+<area shape="rect" id="Node000003" href="$class_scene.html#a44d3b9533fe18cb4c4dc2a07083d215b" title=" " alt="" coords="162,56,298,83"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="114,49,147,54,146,60,113,55"/>
+</map>

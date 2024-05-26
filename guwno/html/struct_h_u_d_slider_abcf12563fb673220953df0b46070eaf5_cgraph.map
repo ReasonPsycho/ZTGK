@@ -1,0 +1,11 @@
+<map id="HUDSlider::set_from_pos" name="HUDSlider::set_from_pos">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,173,40"/>
+<area shape="rect" id="Node000002" href="$struct_h_u_d_slider.html#a2c14639078228dd52f3326d88e594171" title=" " alt="" coords="221,13,328,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,24,205,24,205,29,173,29"/>
+<area shape="rect" id="Node000003" href="$struct_h_u_d_slider.html#af198076b06fadc07654a215a07c18174" title=" " alt="" coords="376,13,552,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="328,24,360,24,360,29,328,29"/>
+<area shape="rect" id="Node000004" href="$struct_h_u_d_slider.html#a8d714b881c2ea521562cdf0f3ad24f2b" title=" " alt="" coords="600,5,756,48"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="553,24,585,24,585,29,553,29"/>
+<area shape="rect" id="Node000005" href="$struct_h_u_d_slider.html#a8e43e09d0143c2470f7dbfd4af6e1264" title=" " alt="" coords="804,5,976,48"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="756,24,788,24,788,29,756,29"/>
+</map>

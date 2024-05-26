@@ -1,0 +1,35 @@
+<map id="IMineable::Mine" name="IMineable::Mine">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,118,196"/>
+<area shape="rect" id="Node000002" href="$class_time.html#a52e5ea54bf43e2c27f187aa01aeedde2" title=" " alt="" coords="194,17,310,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,167,104,113,132,81,164,54,178,46,181,51,167,58,136,85,109,116,72,170"/>
+<area shape="rect" id="Node000003" href="$class_grid.html#aa01c3db55bcbd1a433cffa186625c0e4" title=" " alt="" coords="168,68,336,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="76,167,115,136,164,104,178,98,181,103,167,109,118,140,80,171"/>
+<area shape="rect" id="Node000012" href="$class_entity.html#ad489ee0d44f9c35d1a61d3a726c5923c" title=" " alt="" coords="178,119,326,145"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="114,166,184,147,185,152,115,171"/>
+<area shape="rect" id="Node000013" href="$class_grid.html#aa06be690e87f9ea052d259a721e017ed" title=" " alt="" coords="166,169,338,196"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="118,180,150,180,150,185,118,185"/>
+<area shape="rect" id="Node000014" href="$class_time.html#ace2adacaf53de5aa26b7bd56290dd8a2" title=" " alt="" coords="199,220,305,247"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="115,194,185,213,184,218,114,199"/>
+<area shape="rect" id="Node000015" href="$class_i_mineable.html#a8e8aa8afe27091ddd83a6b268ed68739" title=" " alt="" coords="189,271,315,297"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="80,195,118,225,167,256,181,262,178,267,164,261,115,230,76,199"/>
+<area shape="rect" id="Node000016" href="$class_i_mineable.html#a8833b32bbc6bb7549b004cf2a42b4a2a" title=" " alt="" coords="185,321,319,348"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="72,195,109,250,136,281,167,307,175,312,173,317,164,312,132,284,104,253,68,198"/>
+<area shape="rect" id="Node000004" href="$class_grid.html#ac2cd00215173f206c3e3cf087867588f" title="Returns the tile at the specified index." alt="" coords="585,5,689,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="336,65,569,27,570,32,337,70"/>
+<area shape="rect" id="Node000005" href="$class_grid.html#a29c8c216c30dfb0a3c68e5b4d84cd4c7" title=" " alt="" coords="386,107,501,133"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="322,93,371,103,370,108,321,98"/>
+<area shape="poly" id="edge12_Node000005_Node000004" title=" " alt="" coords="459,104,498,73,548,42,569,33,571,38,551,46,501,77,462,108"/>
+<area shape="rect" id="Node000006" href="$class_chunk.html#a7c4a737ac51101d661326bbae8d135b0" title=" " alt="" coords="567,56,707,83"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="497,103,568,84,570,90,498,109"/>
+<area shape="rect" id="Node000007" href="$class_grid.html#a80d8dbfcd42eee9ce35de744568ed7de" title=" " alt="" coords="582,157,692,184"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="498,131,570,150,568,156,497,137"/>
+<area shape="rect" id="Node000008" href="$class_grid.html#ab7a32ee3f2de25e22e6e3d195deb3151" title=" " alt="" coords="792,107,914,133"/>
+<area shape="poly" id="edge9_Node000005_Node000008" title=" " alt="" coords="502,117,776,117,776,123,502,123"/>
+<area shape="rect" id="Node000010" href="$class_component.html#a9fe6eb1bf8552b6a48ad404ad0ec3ad8" title=" " alt="" coords="563,208,711,235"/>
+<area shape="poly" id="edge10_Node000005_Node000010" title=" " alt="" coords="462,132,501,163,551,194,565,200,563,205,548,198,498,167,459,136"/>
+<area shape="rect" id="Node000011" href="$class_transform.html#afc204ef895c74eb08f31855f5fd3858f" title=" " alt="" coords="549,259,725,285"/>
+<area shape="poly" id="edge11_Node000005_Node000011" title=" " alt="" coords="455,132,491,187,519,218,551,244,559,250,557,254,548,249,515,222,487,190,450,135"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="692,155,777,135,779,140,693,160"/>
+<area shape="rect" id="Node000009" href="$class_chunk.html#a67d3e73fe0c4b79100d28e6e80535e6c" title=" " alt="" coords="773,157,933,184"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="692,168,757,168,757,173,692,173"/>
+</map>

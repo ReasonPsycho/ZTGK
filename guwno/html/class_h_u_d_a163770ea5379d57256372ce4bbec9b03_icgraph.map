@@ -1,0 +1,9 @@
+<map id="HUD::getGroupTreeOffset" name="HUD::getGroupTreeOffset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="211,56,379,83"/>
+<area shape="rect" id="Node000002" href="$class_sprite_renderer.html#a395108475bf85adc9c8b38e3ec171cdb" title=" " alt="" coords="5,5,163,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,54,142,35,143,30,222,49"/>
+<area shape="rect" id="Node000003" href="$class_sprite_renderer.html#a94054520b2f7bc1a269a4791eda00730" title=" " alt="" coords="8,56,160,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,72,160,72,160,67,195,67"/>
+<area shape="rect" id="Node000004" href="$class_text_renderer.html#a25a0322b1f3f50735bd7e66be136fe06" title=" " alt="" coords="13,107,155,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="222,89,143,109,142,103,221,84"/>
+</map>

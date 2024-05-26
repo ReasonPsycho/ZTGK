@@ -1,0 +1,20 @@
+<map id="ztgk::time" name="ztgk::time">
+<area shape="rect" id="Node000001" title=" " alt="" coords="727,97,807,124"/>
+<area shape="rect" id="Node000002" href="$class_signal_queue.html#a71908c8fcfc9346ed5c714047cb006ce" title=" " alt="" coords="512,5,668,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="739,89,711,67,678,46,650,35,652,30,681,42,714,62,742,85"/>
+<area shape="rect" id="Node000004" href="$struct_signal_queue_1_1editor__s__logging.html#a084e4151da29a9427af61562dccdfe07" title=" " alt="" coords="508,56,673,99"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="712,103,673,96,674,90,713,98"/>
+<area shape="rect" id="Node000006" href="$struct_signal_receiver.html#a909503dda896062da8f4ee00183fb0b1" title=" " alt="" coords="501,123,679,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="713,124,680,130,679,124,712,118"/>
+<area shape="rect" id="Node000007" href="$class_signal_queue.html#a9328d32604ed2f390752f62597b0a028" title=" " alt="" coords="519,189,661,232"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="741,136,713,159,681,180,657,191,655,186,678,175,710,154,738,132"/>
+<area shape="rect" id="Node000003" href="$class_signal_queue.html#a23d6e4132106070c1b43e0e6c391e967" title=" " alt="" coords="222,5,453,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="496,21,453,21,453,16,496,16"/>
+<area shape="rect" id="Node000005" href="$class_signal_queue.html#ae53316860b4b619d3b30fdb720b0f282" title=" " alt="" coords="277,105,398,132"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="493,96,399,111,398,106,492,91"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="514,186,376,135,377,130,516,181"/>
+<area shape="rect" id="Node000008" href="$class_signal_queue.html#aa3adf4f75638f1dffaf8f8d41cd136fd" title=" " alt="" coords="253,197,422,224"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="503,213,422,213,422,208,503,208"/>
+<area shape="rect" id="Node000009" href="$class_signal_queue.html#a32339d6563f209fe2f640a719ef7cc8a" title=" " alt="" coords="5,197,174,224"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="237,213,174,213,174,208,237,208"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="WashingMachine" name="WashingMachine">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,715,204,1003"/>
+<area shape="rect" id="Node000002" href="$class_system.html" title=" " alt="" coords="9,411,200,640"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,655,107,715,102,715,102,655"/>
+<area shape="rect" id="Node000003" href="$class_system_manager.html" title=" " alt="" coords="193,5,425,347"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="211,348,182,398,178,395,207,345"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="224,424,393,627"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="311,347,311,407,306,407,306,347"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="357,704,527,1013"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="450,704,451,626,446,542,436,455,417,371,414,363,419,361,422,370,441,454,452,541,456,626,456,704"/>
+<area shape="poly" id="edge6_Node000004_Node000004" title=" " alt="" coords="528,824,546,836,553,858,551,873,543,884,539,881,546,871,548,859,542,839,525,828"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="351,625,376,687,371,689,346,627"/>
+<area shape="rect" id="Node000006" href="$class_transform.html" title=" " alt="" coords="561,419,745,632"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="588,633,538,711,534,709,583,630"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="HUDSlider::showImGuiDetailsImpl" name="HUDSlider::showImGuiDetailsImpl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,68,223,95"/>
+<area shape="rect" id="Node000002" href="$struct_h_u_d_slider.html#a8e43e09d0143c2470f7dbfd4af6e1264" title=" " alt="" coords="1074,13,1246,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,65,235,46,329,26,435,9,543,3,736,3,907,9,1059,21,1058,26,906,14,736,8,543,8,436,15,330,31,236,51,163,70"/>
+<area shape="rect" id="Node000003" href="$struct_h_u_d_slider.html#a2c14639078228dd52f3326d88e594171" title=" " alt="" coords="491,51,598,77"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,74,475,64,475,69,223,80"/>
+<area shape="rect" id="Node000006" href="$struct_h_u_d_slider.html#a771429f0d1a0485f6a4d80bc289f5ac3" title=" " alt="" coords="275,93,439,120"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="223,90,260,94,259,99,223,95"/>
+<area shape="rect" id="Node000007" href="$struct_h_u_d_slider.html#ac5cfe4bd068a6ca81f80c62ab6746e59" title=" " alt="" coords="271,144,443,187"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="156,93,279,136,278,141,154,98"/>
+<area shape="rect" id="Node000004" href="$struct_h_u_d_slider.html#af198076b06fadc07654a215a07c18174" title=" " alt="" coords="646,51,823,77"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="599,61,631,61,631,67,599,67"/>
+<area shape="rect" id="Node000005" href="$struct_h_u_d_slider.html#a8d714b881c2ea521562cdf0f3ad24f2b" title=" " alt="" coords="871,43,1026,85"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="823,61,855,61,855,67,823,67"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="1026,51,1058,46,1059,51,1027,56"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="418,141,442,130,512,85,515,89,444,134,420,146"/>
+</map>

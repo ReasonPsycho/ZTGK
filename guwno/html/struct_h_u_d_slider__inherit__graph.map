@@ -1,0 +1,7 @@
+<map id="HUDSlider" name="HUDSlider">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,555,267,864"/>
+<area shape="rect" id="Node000002" href="$struct_a_h_u_d_component.html" title=" " alt="" coords="43,320,229,507"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,521,139,555,133,555,133,521"/>
+<area shape="rect" id="Node000003" href="$class_component.html" title=" " alt="" coords="41,5,231,272"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="139,287,139,320,133,320,133,287"/>
+</map>

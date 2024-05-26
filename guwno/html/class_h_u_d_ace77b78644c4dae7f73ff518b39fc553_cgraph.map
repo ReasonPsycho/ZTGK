@@ -1,0 +1,11 @@
+<map id="HUD::draw" name="HUD::draw">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,89,57"/>
+<area shape="rect" id="Node000002" href="$class_h_u_d.html#a1ef4d3869cb6dd43ddbed438fdaa8ebc" title=" " alt="" coords="161,5,279,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,35,145,27,145,32,89,41"/>
+<area shape="rect" id="Node000003" href="$class_h_u_d.html#a0db7d237acaf88b2398ac727a1b7030e" title=" " alt="" coords="137,56,303,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="89,47,122,52,121,58,89,53"/>
+<area shape="rect" id="Node000004" href="$class_h_u_d.html#a31f1c4e49d4e1aefe52dcdfa5c6557e8" title=" " alt="" coords="351,56,514,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="304,67,335,67,335,72,304,72"/>
+<area shape="rect" id="Node000005" href="$class_h_u_d.html#a9d0db3cfa18a3303055a3b8e089f8367" title=" " alt="" coords="562,56,712,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="515,67,547,67,547,72,515,72"/>
+</map>

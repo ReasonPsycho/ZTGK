@@ -1,0 +1,19 @@
+<map id="AsteroidsSystem" name="AsteroidsSystem">
+<area shape="rect" id="Node000001" title=" " alt="" coords="522,800,750,1045"/>
+<area shape="rect" id="Node000002" href="$class_entity.html" title=" " alt="" coords="142,283,311,592"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="323,548,535,799,531,802,319,551"/>
+<area shape="poly" id="edge5_Node000002_Node000002" title=" " alt="" coords="312,402,331,415,338,437,335,452,328,463,324,460,330,450,333,438,326,418,309,407"/>
+<area shape="rect" id="Node000004" href="$class_system_manager.html" title=" " alt="" coords="5,752,237,1093"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="180,592,174,617,150,736,145,735,169,615,175,591"/>
+<area shape="rect" id="Node000003" href="$class_scene.html" title=" " alt="" coords="119,1157,289,1360"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,1157,264,1133,280,1056,290,990,294,932,294,877,282,762,264,616,263,609,268,609,269,616,288,761,299,876,299,932,295,991,286,1057,269,1134,262,1158"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,1092,164,1133,166,1140,161,1142,159,1134,149,1094"/>
+<area shape="rect" id="Node000005" href="$class_transform.html" title=" " alt="" coords="135,5,319,219"/>
+<area shape="poly" id="edge6_Node000002_Node000005" title=" " alt="" coords="229,219,229,266,224,266,224,219"/>
+<area shape="rect" id="Node000006" href="$class_model.html" title=" " alt="" coords="408,299,635,576"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="556,575,606,783,601,784,551,576"/>
+<area shape="rect" id="Node000007" href="$class_shader.html" title=" " alt="" coords="659,331,842,544"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="731,544,689,729,675,785,670,783,684,727,726,543"/>
+<area shape="rect" id="Node000008" href="$class_compute_shader.html" title=" " alt="" coords="867,363,1019,512"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="921,513,878,618,850,675,818,729,763,801,759,798,814,727,846,673,873,616,916,511"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ray::doesCollide" name="Ray::doesCollide">
+<area shape="rect" id="Node000001" title="Checks if the ray collides with the collider." alt="" coords="5,5,125,32"/>
+<area shape="rect" id="Node000002" href="$class_box_collider.html#ac9277d646d039c628068b02ddb5e045d" title=" " alt="" coords="173,5,324,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,16,157,16,157,21,125,21"/>
+</map>

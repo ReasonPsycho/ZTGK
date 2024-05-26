@@ -1,0 +1,30 @@
+<map id="VectorUtils::Distance" name="VectorUtils::Distance">
+<area shape="rect" id="Node000001" title=" " alt="" coords="725,208,870,235"/>
+<area shape="rect" id="Node000002" href="$class_unit.html#a7cced87ebfa6a6a20a0e42ccba49f166" title=" " alt="" coords="266,157,435,184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="723,207,677,199,550,185,435,177,435,171,550,179,678,193,724,202"/>
+<area shape="rect" id="Node000007" href="$class_mining_state.html#a21ad481683def723953c6532ed46a3a8" title=" " alt="" coords="494,259,677,285"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="724,242,645,261,644,255,723,236"/>
+<area shape="rect" id="Node000008" href="$class_astar_pathfinding.html#ae804019384b1ec713e45ace943417b83" title="Uses A* algorithm to find the shortest path from start tile to target tile. &#160;Stores the path in the p..." alt="" coords="498,208,674,235"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="710,224,674,224,674,219,710,219"/>
+<area shape="rect" id="Node000010" href="$class_astar_pathfinding.html#aee6217e2828ecc169a0eae4f5994af98" title=" " alt="" coords="498,309,674,336"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="768,246,727,274,678,300,647,311,645,306,676,295,724,269,765,242"/>
+<area shape="rect" id="Node000011" href="$class_mining_state.html#a3ca6c901def6a3f347a960fd1a3fd460" title=" " alt="" coords="255,107,446,133"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="756,203,718,187,677,172,558,146,446,130,447,125,558,140,678,167,720,182,758,199"/>
+<area shape="rect" id="Node000003" href="$class_combat_state.html#ae23fd1dc65a2f7072b21fc21072f0b3f" title=" " alt="" coords="5,56,207,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="264,153,253,148,238,135,229,121,220,109,205,97,180,86,182,81,208,92,224,105,233,118,242,131,256,143,267,149"/>
+<area shape="rect" id="Node000004" href="$class_idle_state.html#a8f23cae9c143e6c2ac49a2bf0d47b1c0" title=" " alt="" coords="18,107,194,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="267,156,173,137,174,131,268,151"/>
+<area shape="rect" id="Node000005" href="$class_movement_state.html#a122847da712cbd28dd020baab6b1039a" title=" " alt="" coords="14,157,198,200"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="251,177,199,178,198,173,251,171"/>
+<area shape="rect" id="Node000006" href="$class_unit.html#a08fd11e5ed7e87cfa9c72c65f2b0fc8f" title=" " alt="" coords="47,224,165,251"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="288,192,207,215,164,226,162,221,206,209,287,186"/>
+<area shape="poly" id="edge9_Node000008_Node000002" title=" " alt="" coords="505,207,415,187,416,182,506,202"/>
+<area shape="poly" id="edge10_Node000008_Node000006" title=" " alt="" coords="482,227,165,238,165,233,482,222"/>
+<area shape="rect" id="Node000009" href="$class_unit.html#a5f44fe1c8b6a3512392b3b553022e970" title=" " alt="" coords="263,259,438,285"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="506,241,416,261,415,255,505,236"/>
+<area shape="poly" id="edge13_Node000011_Node000003" title=" " alt="" coords="267,106,173,86,174,81,268,100"/>
+<area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="239,123,195,123,195,117,239,117"/>
+<area shape="poly" id="edge16_Node000011_Node000005" title=" " alt="" coords="278,140,198,159,197,154,276,135"/>
+<area shape="rect" id="Node000012" href="$class_mining_state.html#a672ddabc1270c4e89c407df4749d3c78" title=" " alt="" coords="9,5,203,32"/>
+<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="313,101,263,73,206,46,171,35,172,30,208,42,265,68,315,96"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="IMineable" name="IMineable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="103,320,285,587"/>
+<area shape="rect" id="Node000003" href="$class_mineable_chest.html" title=" " alt="" coords="5,645,183,837"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,602,130,646,125,644,140,600"/>
+<area shape="rect" id="Node000004" href="$class_pranium.html" title=" " alt="" coords="207,635,381,848"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="248,600,260,634,255,636,243,602"/>
+<area shape="rect" id="Node000002" href="$class_component.html" title=" " alt="" coords="99,5,289,272"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,287,197,320,191,320,191,287"/>
+</map>

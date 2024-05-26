@@ -1,0 +1,11 @@
+<map id="LightSystem::addComponent" name="LightSystem::addComponent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,64,195,91"/>
+<area shape="rect" id="Node000002" href="$class_light_system.html#abd2b659b46f00aaf9b382bedda14ca4e" title=" " alt="" coords="243,64,426,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,75,227,75,227,80,195,80"/>
+<area shape="rect" id="Node000003" href="$class_light_system.html#ac87ba94246f4e79af0cd297b1e878cec" title=" " alt="" coords="474,5,713,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="392,61,473,41,510,33,512,38,475,47,393,66"/>
+<area shape="rect" id="Node000004" href="$class_light_system.html#a455d408d58e254a5af8a3d1e85c7f937" title=" " alt="" coords="508,56,679,99"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="427,75,493,75,493,80,427,80"/>
+<area shape="rect" id="Node000005" href="$class_light_system.html#a91ef944ea683ed34efb904188b9e8563" title=" " alt="" coords="493,123,694,165"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="390,89,494,116,493,121,389,94"/>
+</map>

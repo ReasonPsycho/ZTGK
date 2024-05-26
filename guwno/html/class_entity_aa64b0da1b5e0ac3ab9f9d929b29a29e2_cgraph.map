@@ -1,0 +1,9 @@
+<map id="Entity::forceUpdateSelfAndChild" name="Entity::forceUpdateSelfAndChild">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,183,73"/>
+<area shape="rect" id="Node000002" href="$class_transform.html#ab689097e5fde5755ad4f388a9854e8ae" title=" " alt="" coords="231,13,438,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,40,215,37,215,42,183,45"/>
+<area shape="rect" id="Node000004" href="$class_transform.html#afc204ef895c74eb08f31855f5fd3858f" title=" " alt="" coords="247,64,422,91"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="183,59,231,64,231,69,183,64"/>
+<area shape="rect" id="Node000003" href="$class_transform.html#a92c27786c47512c6c32972feec77fbf8" title=" " alt="" coords="486,5,656,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="438,24,470,24,470,29,438,29"/>
+</map>

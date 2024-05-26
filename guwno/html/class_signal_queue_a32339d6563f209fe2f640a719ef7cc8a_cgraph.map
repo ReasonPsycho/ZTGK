@@ -1,0 +1,11 @@
+<map id="SignalQueue::UpdateImpl" name="SignalQueue::UpdateImpl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,174,61"/>
+<area shape="rect" id="Node000002" href="$class_signal_queue.html#aa3adf4f75638f1dffaf8f8d41cd136fd" title=" " alt="" coords="222,35,391,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,45,206,45,206,51,174,51"/>
+<area shape="rect" id="Node000003" href="$class_signal_queue.html#a833ba2ee625d15942aba4bbffbd5414a" title=" " alt="" coords="439,5,616,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="391,34,423,30,424,35,392,39"/>
+<area shape="rect" id="Node000004" href="$class_signal_queue.html#a9328d32604ed2f390752f62597b0a028" title=" " alt="" coords="457,56,599,99"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="392,57,442,63,441,69,391,62"/>
+<area shape="rect" id="Node000005" href="$namespaceztgk.html#a9b65aed8c84426e23f1b3d1648705f8b" title=" " alt="" coords="664,64,744,91"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="599,75,649,75,649,80,599,80"/>
+</map>

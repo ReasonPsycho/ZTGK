@@ -1,0 +1,17 @@
+<map id="Ray::Ray" name="Ray::Ray">
+<area shape="rect" id="Node000001" title="Ray constructor." alt="" coords="5,132,81,159"/>
+<area shape="rect" id="Node000002" href="$class_ray.html#ad7881515bdf74c3d2439ce1c072aef5d" title="Checks if the ray collides with the collider." alt="" coords="165,5,284,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,130,80,86,102,62,127,42,149,31,151,36,130,46,105,66,84,90,54,133"/>
+<area shape="rect" id="Node000004" href="$class_collision_system.html#a81dbca6525ed9a17a5e767c1d8b9b1f9" title=" " alt="" coords="129,56,320,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="63,129,92,110,128,92,146,85,148,90,130,97,95,115,65,134"/>
+<area shape="rect" id="Node000005" href="$class_entity.html#ad489ee0d44f9c35d1a61d3a726c5923c" title=" " alt="" coords="151,107,298,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="81,138,135,130,136,135,81,143"/>
+<area shape="rect" id="Node000006" href="$class_component.html#a9fe6eb1bf8552b6a48ad404ad0ec3ad8" title=" " alt="" coords="151,157,298,184"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="81,148,136,156,135,161,81,153"/>
+<area shape="rect" id="Node000007" href="$class_ray.html#ab0c66b22eb97a7c967a18833e2e6ed56" title="Returns the point where the ray hits the collider." alt="" coords="168,208,281,235"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="65,157,95,176,130,194,154,203,153,208,128,198,92,180,63,162"/>
+<area shape="rect" id="Node000008" href="$class_chunk.html#a400dc5686ee82be9ef0bab15b57024a4" title=" " alt="" coords="166,259,283,285"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="54,158,84,201,105,225,130,244,152,255,150,260,127,249,102,228,80,204,50,161"/>
+<area shape="rect" id="Node000003" href="$class_box_collider.html#ac9277d646d039c628068b02ddb5e045d" title=" " alt="" coords="368,5,519,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="284,16,353,16,353,21,284,21"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="BoxCollider" name="BoxCollider">
+<area shape="rect" id="Node000001" title=" " alt="" coords="238,1328,427,1584"/>
+<area shape="rect" id="Node000002" href="$class_collider.html" title=" " alt="" coords="41,1091,219,1235"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,1245,247,1327,242,1330,186,1248"/>
+<area shape="rect" id="Node000003" href="$class_component.html" title=" " alt="" coords="5,704,196,949"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,964,126,1091,121,1091,110,965"/>
+<area shape="rect" id="Node000004" href="$class_entity.html" title=" " alt="" coords="252,283,421,592"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="254,579,186,691,181,689,250,576"/>
+<area shape="poly" id="edge7_Node000004_Node000004" title=" " alt="" coords="422,402,441,415,448,437,445,452,438,463,434,460,440,450,443,438,436,418,419,407"/>
+<area shape="rect" id="Node000006" href="$class_system_manager.html" title=" " alt="" coords="221,656,453,997"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="339,591,339,639,334,639,334,591"/>
+<area shape="rect" id="Node000005" href="$class_scene.html" title=" " alt="" coords="252,1061,421,1264"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="419,1072,445,1036,456,1017,462,997,481,902,489,826,483,751,462,657,447,614,427,573,432,570,452,612,467,655,488,750,494,826,486,902,467,998,461,1019,450,1039,423,1075"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="339,997,339,1045,334,1045,334,997"/>
+<area shape="rect" id="Node000007" href="$class_transform.html" title=" " alt="" coords="245,5,429,219"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="339,219,339,266,334,266,334,219"/>
+<area shape="rect" id="Node000008" href="$struct_box_collider_data.html" title=" " alt="" coords="445,1101,625,1224"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="496,1225,433,1316,428,1313,491,1222"/>
+</map>

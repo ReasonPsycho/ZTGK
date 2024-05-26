@@ -1,0 +1,11 @@
+<map id="Entity::removeComponentFromMap" name="Entity::removeComponentFromMap">
+<area shape="rect" id="Node000001" title=" " alt="" coords="409,56,634,83"/>
+<area shape="rect" id="Node000002" href="$class_component.html#a5999e21c784d01225c4981fb14314fec" title=" " alt="" coords="207,5,348,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="438,55,345,35,346,30,440,50"/>
+<area shape="rect" id="Node000004" href="$class_entity.html#a52dbec6aaba5ff8357b12c938245c1d5" title=" " alt="" coords="194,56,361,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="393,72,361,72,361,67,393,67"/>
+<area shape="rect" id="Node000005" href="$class_entity.html#adf6d3f7cb1b2ba029b6b048a395cc8ae" title=" " alt="" coords="225,107,330,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="439,89,331,112,330,107,438,84"/>
+<area shape="rect" id="Node000003" href="$class_chunk.html#a960ec88d92728b4f1d9428c78ae6924e" title=" " alt="" coords="5,5,146,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="191,21,146,21,146,16,191,16"/>
+</map>
