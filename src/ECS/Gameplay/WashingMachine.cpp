@@ -5,6 +5,9 @@
 #include "WashingMachine.h"
 #include <imgui.h>
 #include "ECS/Utils/Globals.h"
+#include "ECS/Render/Components/Render.h"
+#include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Entity.h"
 
 WashingMachine::WashingMachine(int praniumNeeded, int radiusToClearEveryMilestone) {
     name = "WashingMachine";
@@ -89,4 +92,51 @@ void WashingMachine::onPraniumDelivered() {
     radiusToClear *= 1.5;
 
 }
+
+void WashingMachine::createWashingMachine(Model* model) {
+    std::vector<Vector2Int> tilePositions;
+    if(WashingMachineTiles[uniqueID].empty()){
+        spdlog::error("No tiles for washing machine");
+        return;
+    }
+
+    for(auto tile : WashingMachineTiles[uniqueID]){
+        tilePositions.push_back(tile->gridPosition);
+    }
+
+    //get position of center tile
+    Vector2Int cornerTile = tilePositions[0];
+    for(auto tile : tilePositions){
+        if(tile.x < cornerTile.x){
+            cornerTile.x = tile.x;
+        }
+        if(tile.z < cornerTile.z){
+            cornerTile.z = tile.z;
+        }
+    }
+    Vector2Int centerTileGridPos = cornerTile + Vector2Int(2, 2);
+
+    auto centerTileWorldPos = ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(centerTileGridPos);
+
+
+    auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
+    if(machineEntity != nullptr){
+        ztgk::game::scene->removeChild(machineEntity);
+        machineEntity->Destroy();
+        delete machineEntity;
+    }
+    if(machineEntity == nullptr){
+        machineEntity = ztgk::game::scene->addEntity("WashingMachine");
+    }
+
+    machineEntity->addComponent(std::make_unique<Render>(model));
+
+    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x,4,centerTileWorldPos.z));
+    machineEntity->transform.setLocalScale(glm::vec3(5, 5, 5));
+    machineEntity->updateSelfAndChild();
+
+    machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));
+
+}
+
 

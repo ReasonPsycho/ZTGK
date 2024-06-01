@@ -21,6 +21,10 @@ public:
 
     void showImGuiDetailsImpl(Camera *camera) override;
 
+    void createWashingMachine(Model* model);
+
+    Model* model;
+
     std::unordered_map<unsigned, std::vector<WashingMachineTile*>> WashingMachineTiles;
 
     int praniumNeeded;
