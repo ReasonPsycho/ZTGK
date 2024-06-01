@@ -19,6 +19,7 @@ namespace ztgk::game {
     extern Model * cube_model;
     extern Camera * camera;
     extern SignalQueue * signalQueue;
+    extern Model * washingMachineModel;
 
     extern Cursor cursor;
 

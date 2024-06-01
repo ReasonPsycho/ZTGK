@@ -16,6 +16,8 @@ public:
     void onMine(Unit * unit) override;
     void onMined(Unit * unit) override;
 
+    void generatePranium(Model * model);
+
 
 };
 

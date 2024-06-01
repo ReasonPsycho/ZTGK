@@ -214,9 +214,13 @@ void Grid::InitializeTileEntities() {
                 // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
                 default:
                 case FLOOR:
+                    break;
                 case ORE:
                     tile->getEntity()->addComponent(std::make_unique<Pranium>(5.0f, Vector2Int(i, j), this));
-                    //tile->getEntity()->addComponent(std::make_unique<PointLight>());
+                    tile->getEntity()->getComponent<Pranium>()->generatePranium(ztgk::game::washingMachineModel);
+                    tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
+                    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
+                    tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
                     break;
                 case CORE:
                     tile->getEntity()->addComponent(std::make_unique<WashingMachineTile>(ztgk::game::scene->systemManager.getSystem<WashingMachine>(), Vector2Int(i, j), this));
