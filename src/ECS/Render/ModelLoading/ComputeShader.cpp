@@ -5,6 +5,7 @@
 #include "ComputeShader.h"
 
 
+
 ComputeShader::ComputeShader(const char *shaderPath) : computeShaderPath(shaderPath) {
     std::ifstream cShaderFile;
     // ensure ifstream objects can throw exceptions:
@@ -87,13 +88,20 @@ void ComputeShader::setMatrix4(const std::string &name, bool transpose, const GL
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, transpose, value);
 }
 
+void ComputeShader::setVec2(const std::string &name, glm::vec2 vec2) {
+    glUniform2f(glGetUniformLocation(ID, name.c_str()), vec2.x, vec2.y);
+}
+
 void ComputeShader::setVec3(const std::string &name, float d, float d1, float d2) {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), d, d1, d2);
 }
 
 void ComputeShader::setVec3(const std::string &name, glm::vec3 vec3) {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), vec3.x, vec3.y, vec3.z);
+}
 
+void ComputeShader::setVec4(const std::string &name, glm::vec4 vec4) {
+    glUniform4f(glGetUniformLocation(ID, name.c_str()), vec4.x, vec4.y, vec4.z, vec4.w);
 }
 
 void ComputeShader::checkCompileErrors(unsigned int shader, std::string type) {
