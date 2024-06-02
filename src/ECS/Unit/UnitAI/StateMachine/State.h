@@ -19,7 +19,7 @@ public:
      string name;
      Unit* unit;
      Grid* grid;
-     virtual State* RunCurrentState() = 0;
+     virtual std::unique_ptr<State> RunCurrentState() = 0;
      virtual bool isTargetInRange() = 0;
 };
 

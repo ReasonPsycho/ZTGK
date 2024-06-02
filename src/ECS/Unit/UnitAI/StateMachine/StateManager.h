@@ -10,10 +10,10 @@ public:
     StateManager(Unit *pUnit);
 
     Unit* unit;
-    State* currentState;
+    unique_ptr<State> currentState;
     void RunStateMachine();
 private:
-    void SwitchToTheNextState(State* nextState);
+    void SwitchToTheNextState(std::unique_ptr<State> nextState);
 };
 
 #endif //ZTGK_STATEMANAGER_H

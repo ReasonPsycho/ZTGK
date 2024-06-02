@@ -63,9 +63,6 @@ void UnitSystem::UpdateImpl() {
 
     }
 
-    float xd = glfwGetTime();
-    int xdd = (int)xd;
-    int xddd = xdd % 2;
     if((int)glfwGetTime() % 2 == 0){
         fixOverlappingUnits();
     }

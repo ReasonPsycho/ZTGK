@@ -1,91 +1,94 @@
-//
-// Created by igork on 22.03.2024.
-//
-
 #include "IdleState.h"
 #include "ECS/Unit/Unit.h"
 #include "MovementState.h"
 #include "CombatState.h"
 #include "MiningState.h"
 #include "ECS/Utils/Time.h"
-#include <random>
 
-State *IdleState::RunCurrentState() {
+// Static member initialization
+std::unique_ptr<IdleState> IdleState::instance = nullptr;
 
-    //from Idle to Movement
-    if(unit->hasMovementTarget){
-        moveState = new MovementState(grid);
-        moveState->unit = unit;
-        idleTimer = 0;
-        return moveState;
+// Constructor
+IdleState::IdleState(Grid* grid, Unit* unit){
+    this->name = "Idle";
+    this->grid = grid;
+    this->unit = unit;
+}
+
+// Static method to get the instance of IdleState
+std::unique_ptr<IdleState> IdleState::getInstance(Grid* grid, Unit* unit) {
+    if (!instance) {
+        instance = std::unique_ptr<IdleState>(new IdleState(grid, unit));
     }
-    //from Idle to Combat
-    if(unit->hasCombatTarget){
-        combatState = new CombatState(grid);
-        combatState->unit = unit;
+    auto ins = std::unique_ptr<IdleState>(instance.get());
+    return std::unique_ptr<IdleState>(instance.get());
+}
 
-        if(combatState->isTargetInRange()) {
+// Method to run the current state
+std::unique_ptr<State> IdleState::RunCurrentState() {
+    // Check for movement target
+    if (unit->hasMovementTarget) {
+        auto moveState = MovementState::getInstance(grid, unit);
+        idleTimer = 0;
+        return std::move(moveState);
+    }
+
+    // Check for combat target
+    if (unit->hasCombatTarget) {
+        auto combatState = CombatState::getInstance(grid, unit);
+
+        if (combatState->isTargetInRange()) {
             idleTimer = 0;
-            return combatState;
-        }
-        else
-        {
+            return std::move(combatState);
+        } else {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
-            moveState = new MovementState(grid);
-            moveState->unit = unit;
+            auto moveState = MovementState::getInstance(grid, unit);
+
             idleTimer = 0;
-            return moveState;
+            return std::move(moveState);
         }
     }
 
-    //from Idle to Mining
-    if(unit->hasMiningTarget){
-        miningState = new MiningState(grid);
-        miningState->unit = unit;
+    // Check for mining target
+    if (unit->hasMiningTarget) {
+        auto miningState = MiningState::getInstance(grid, unit);
 
-        if(miningState->isTargetInRange()) {
+        if (miningState->isTargetInRange()) {
             idleTimer = 0;
-            return miningState;
-        }
-        else
-        {
+            return std::move(miningState);
+        } else {
             unit->hasMovementTarget = true;
             IMineable* mineable = unit->findClosestMineable();
-            if(mineable != nullptr) {
-                unit->movementTarget = unit->findClosestMineable()->gridPosition;
-                moveState = new MovementState(grid);
-                moveState->unit = unit;
+            if (mineable != nullptr) {
+                unit->movementTarget = mineable->gridPosition;
+                auto moveState = MovementState::getInstance(grid, unit);
                 idleTimer = 0;
-                return moveState;
-            }
-            else
+                return std::move(moveState);
+            } else {
                 idleTimer += Time::Instance().DeltaTime();
-                return this;
-
+                return getInstance(grid, unit);
+            }
         }
     }
 
+    // Increment idle timer
     idleTimer += Time::Instance().DeltaTime();
 
-    if(idleTimer > randomTime && unit->isAlly){
+    // Check if it's time to perform a random movement
+    if (idleTimer > randomTime && unit->isAlly) {
         unit->hasMovementTarget = true;
         unit->movementTarget = unit->GetDirtiestTileAround();
-        moveState = new MovementState(grid);
-        moveState->unit = unit;
+        auto moveState = MovementState::getInstance(grid, unit);
         idleTimer = 0;
-        return moveState;
+        return std::move(moveState);
     }
-    return this;
 
+    // Stay in idle state
+    return getInstance(grid, unit);
 }
 
+// Method to check if the target is in range
 bool IdleState::isTargetInRange() {
     return false;
-}
-
-IdleState::IdleState(Grid *grid) {
-    this->grid = grid;
-    this->name = "Idle";
-
 }

@@ -5,7 +5,7 @@ UnitAI::UnitAI(Unit *pUnit, StateManager *pStateManager) {
     unit = pUnit;
     stateManager = pStateManager;
     stateManager->unit = unit;
-    unit->currentState = stateManager->currentState;
+    unit->currentState = std::move(stateManager->currentState);
 }
 
 UnitAI::~UnitAI() {
@@ -15,7 +15,7 @@ UnitAI::~UnitAI() {
 
 void UnitAI::UpdateImpl() {
     stateManager->RunStateMachine();
-    unit->currentState = stateManager->currentState;
+    unit->currentState = std::move(stateManager->currentState);
 }
 
 void UnitAI::showImGuiDetailsImpl(Camera *camera) {

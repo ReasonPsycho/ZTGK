@@ -1,7 +1,3 @@
-//
-// Created by igork on 22.03.2024.
-//
-
 #include "MovementState.h"
 #include "ECS/Unit/Unit.h"
 #include "CombatState.h"
@@ -10,12 +6,29 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 
+// Static member initialization
+std::unique_ptr<MovementState> MovementState::instance = nullptr;
 
-State *MovementState::RunCurrentState() {
+// Constructor
+MovementState::MovementState(Grid* grid, Unit* unit){
+    this->name = "Movement";
+    this->grid = grid;
+    this->unit = unit;
+}
+
+// Static method to get the instance of MovementState
+std::unique_ptr<MovementState> MovementState::getInstance(Grid* grid, Unit* unit) {
+    if (!instance) {
+        instance = std::unique_ptr<MovementState>(new MovementState(grid, unit));
+    }
+    return std::unique_ptr<MovementState>(instance.get());
+}
+
+// Method to run the current state
+std::unique_ptr<State> MovementState::RunCurrentState() {
 
     MoveOnPath();
 
-    // todo calculate from centers
     if (unit->hasPickupTarget && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1.5) {
         std::pair<Item *, Item *> drop = {unit->equipment[1], unit->equipment[2]};
         InventoryManager::instance->assign_item(unit->pickupTarget->item, unit, -1);
@@ -30,18 +43,13 @@ State *MovementState::RunCurrentState() {
         unit->hasPickupTarget = false;
     }
 
-//    if(unit-> hasCombatTarget && unit->combatTarget != nullptr){
-//        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, unit->combatTarget->gridPosition);
-//    }
-
     if(unit->hasMovementTarget){
-        return this;
+        return getInstance(grid, unit);
     }
 
     //from Movement to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
-        idleState = new IdleState(grid);
-        idleState->unit = unit;
+        auto idleState = IdleState::getInstance(grid, unit);
 
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -50,31 +58,29 @@ State *MovementState::RunCurrentState() {
 
         idleState->randomTime = random_number;
 
-        return idleState;
+        return std::move(idleState);
     }
 
     //from Movement to Combat
     if (unit->hasCombatTarget) {
-        combatState = new CombatState(grid);
-        combatState->unit = unit;
+        auto combatState = CombatState::getInstance(grid, unit);
 
         if(combatState->isTargetInRange())
-            return combatState;
+            return std::move(combatState);
         else
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
-            return this;
+            return std::make_unique<MovementState>(grid, unit);
         }
     }
 
     //from Movement to Mining
     if (unit->hasMiningTarget) {
-        miningState = new MiningState(grid);
-        miningState->unit = unit;
+        auto miningState = MiningState::getInstance(grid, unit);
 
         if(miningState->isTargetInRange())
-            return miningState;
+            return std::move(miningState);
         else
         {
             auto closestMineable = unit->findClosestMineable();
@@ -83,21 +89,17 @@ State *MovementState::RunCurrentState() {
                 unit->movementTarget = unit->findClosestMineable()->gridPosition;
                 unit->currentMiningTarget = nullptr;
                 unit->hasMiningTarget = false;
-
-                //spdlog::info("Target not in range, moving to mining target");
             }
             else{
                 unit->hasMiningTarget = false;
-                idleState = new IdleState(grid);
-                idleState->unit = unit;
-                //spdlog::info("No mineable targets found, returning to idle state");
-                return idleState;
+                auto idleState = IdleState::getInstance(grid, unit);
+                return std::move(idleState);
             }
-            return this;
+            return getInstance(grid, unit);
         }
     }
 
-    return this;
+    return getInstance(grid, unit);
 }
 
 void MovementState::MoveOnPath() {
@@ -120,8 +122,6 @@ void MovementState::MoveOnPath() {
         }
         else{
             float rotationAngle = atan2(nextTileWorldPosition.x - unit->worldPosition.x, nextTileWorldPosition.z - unit->worldPosition.z);
-
-
             Vector3 worldPos = Vector3(unit->worldPosition.x, unit->worldPosition.y, unit->worldPosition.z);
             Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, nextTileWorldPosition.y, nextTileWorldPosition.z);
             Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, (unit->stats.move_spd + unit->stats.added.move_speed) * Time::Instance().DeltaTime());
@@ -133,10 +133,4 @@ void MovementState::MoveOnPath() {
 
 bool MovementState::isTargetInRange() {
     return false;
-}
-
-MovementState::MovementState(Grid *grid) {
-    this->grid = grid;
-    this->name = "Movement";
-
 }

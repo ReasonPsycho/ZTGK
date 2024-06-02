@@ -34,7 +34,7 @@ public:
     float rotation = 0;
     float currentRotation = 0;
 
-    State* currentState;
+    std::unique_ptr<State> currentState;
     AstarPathfinding pathfinding;
     Grid* grid;
 

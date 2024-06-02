@@ -1,27 +1,27 @@
-#ifndef ZTGK_IDLESTATE_H
-#define ZTGK_IDLESTATE_H
+#ifndef IDLESTATE_H
+#define IDLESTATE_H
 
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
-
-class MovementState;
-class CombatState;
-class MiningState;
-
+#include <memory>
 
 class IdleState : public State {
 public:
-    IdleState(Grid* grid);
+    // Constructor
+    IdleState(Grid* grid, Unit* unit);
 
-    State* RunCurrentState() override;
+    // Static method to get the instance of IdleState
+    static std::unique_ptr<IdleState> getInstance(Grid* grid, Unit* unit);
 
-    MovementState* moveState;
-    CombatState* combatState;
-    MiningState* miningState;
-
+    // Methods
+    std::unique_ptr<State> RunCurrentState() override;
     bool isTargetInRange() override;
 
-    double idleTimer = 0;
     double randomTime = 3;
+    double idleTimer = 0;
+
+private:
+    // Static member to hold the singleton instance
+    static std::unique_ptr<IdleState> instance;
 };
 
-#endif //ZTGK_IDLESTATE_H
+#endif // IDLESTATE_H

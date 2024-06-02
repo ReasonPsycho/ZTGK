@@ -1,8 +1,3 @@
-//
-// Created by igork on 22.03.2024.
-//
-
-
 #include "CombatState.h"
 #include "ECS/Unit/Unit.h"
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
@@ -10,13 +5,30 @@
 #include "MiningState.h"
 #include "IdleState.h"
 
-State *CombatState::RunCurrentState() {
+// Static member initialization
+std::unique_ptr<CombatState> CombatState::instance = nullptr;
 
+// Constructor
+CombatState::CombatState(Grid* grid, Unit* unit){
+    this->name = "Combat";
+    this->grid = grid;
+    this->unit = unit;
+}
+
+// Static method to get the instance of CombatState
+std::unique_ptr<CombatState> CombatState::getInstance(Grid* grid, Unit* unit) {
+    if (!instance) {
+        instance = std::unique_ptr<CombatState>(new CombatState(grid, unit));
+    }
+    return std::unique_ptr<CombatState>(instance.get());
+}
+
+// Method to run the current state
+std::unique_ptr<State> CombatState::RunCurrentState() {
 
     //from Combat to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
-        idleState = new IdleState(grid);
-        idleState->unit = unit;
+        auto idleState = IdleState::getInstance(grid, unit);
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_real_distribution<> dis(1.5, 5.0);
@@ -24,33 +36,33 @@ State *CombatState::RunCurrentState() {
 
         idleState->randomTime = random_number;
 
-        return idleState;
+        return std::move(idleState);
     }
 
     //from Combat to Movement
     if (unit->hasMovementTarget) {
-        moveState = new MovementState(grid);
-        moveState->unit = unit;
+        auto moveState = MovementState::getInstance(grid, unit);
 
-        return moveState;
+        return std::move(moveState);
     }
 
     //from Combat to Mining
     if (unit->hasMiningTarget) {
-        miningState = new MiningState(grid);
-        miningState->unit = unit;
+        auto miningState = MiningState::getInstance(grid, unit);
 
         if(miningState->isTargetInRange())
-            return miningState;
+            return std::move(miningState);
         else
         {
+            auto moveState = MovementState::getInstance(grid, unit);
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->findClosestMineable()->gridPosition;
-            return moveState;
+            return std::move(moveState);
         }
     }
+
     AttackTarget();
-    return this;
+    return getInstance(grid, unit);
 }
 
 bool CombatState::isTargetInRange() {
@@ -58,13 +70,8 @@ bool CombatState::isTargetInRange() {
         unit->hasCombatTarget = false;
         return false;
     }
-//    bool inRange = unit->equipment.in_range_of(
-//        {unit->gridPosition.x, unit->gridPosition.z},
-//        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
-//    ) != nullptr;
-//    unit->isTargetInRange = inRange;
-//    return inRange;
-     Unit* targ = unit->GetClosestEnemyInWeaponRange();
+
+    Unit* targ = unit->GetClosestEnemyInWeaponRange();
     if (targ == nullptr) {
         unit->hasCombatTarget = false;
         unit->isTargetInRange = false;
@@ -73,7 +80,6 @@ bool CombatState::isTargetInRange() {
     unit->combatTarget = targ;
     unit->isTargetInRange = true;
     return true;
-
 }
 
 void CombatState::AttackTarget() {
@@ -108,14 +114,6 @@ void CombatState::AttackTarget() {
         target->parentEntity->Destroy();
         unit->combatTarget = nullptr;
     }
-}
-
-
-
-
-CombatState::CombatState(Grid *grid) {
-    this->grid = grid;
-    name = "Combat";
 }
 
 bool CombatState::isAttackOnCooldown() {
@@ -155,13 +153,13 @@ bool CombatState::isAttackOnCooldown() {
                 } else {
                     it = unit->equipment.item2; sec_it = unit->equipment.item1;
                 }
-            // set the one that's in range
+                // set the one that's in range
             } else if (in_range_1) {
                 it = unit->equipment.item1;
             } else {
                 it = unit->equipment.item2;
             }
-        // set the one that's in range
+            // set the one that's in range
         } else {
             if (unit->equipment.item1->offensive && unit->equipment.rangeEff1.is_in_range(pos, tpos))
                 it = unit->equipment.item1;
@@ -179,11 +177,4 @@ bool CombatState::isAttackOnCooldown() {
         return false;
     }
     return true;
-
-//    float time = unit->attackCooldown;
-//
-//    if(time > 1 / unit->added.attackSpeed){
-//        return false;
-//    }
-//    return true;
 }

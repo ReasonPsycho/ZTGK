@@ -1,40 +1,28 @@
-//
-// Created by igork on 22.03.2024.
-//
+#ifndef MININGSTATE_H
+#define MININGSTATE_H
 
-#ifndef ZTGK_MININGSTATE_H
-#define ZTGK_MININGSTATE_H
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
 #include "ECS/Grid/Grid.h"
 #include "ECS/Unit/Mining/IMineable.h"
 #include <unordered_set>
+#include <memory>
 
-class MovementState;
-class CombatState;
-class IdleState;
-class MiningState : public State{
+class MiningState : public State {
 public:
-    MiningState(Grid* grid);
-    State* RunCurrentState() override;
+    // Constructor
+    MiningState(Grid* grid, Unit* unit);
+
+    // Static method to get the instance of MiningState
+    static std::unique_ptr<MiningState> getInstance(Grid* grid, Unit* unit);
+
+    // Methods
+    std::unique_ptr<State> RunCurrentState() override;
     bool isTargetInRange() override;
-    MovementState* moveState;
-    CombatState* combatState;
-    IdleState* idleState;
-
-    std::vector<IMineable> findMiningPath();
-
-    Vector2Int GetNearestFloorTile(Vector2Int target, Vector2Int origin);
-    Vector2Int GetLowestFScore(unordered_set<Vector2Int> &openSet, unordered_map<Vector2Int, float> &fScore);
-
-    std::vector<Vector2Int> ReconstructPath(unordered_map<Vector2Int, Vector2Int> &cameFrom, Vector2Int current);
-    std::vector<Vector2Int> GetNeighbours(Vector2Int current, bool includeDiagonals = false);
-
-
-
 
 private:
     void Mine();
+    // Static member to hold the singleton instance
+    static std::unique_ptr<MiningState> instance;
 };
 
-
-#endif //ZTGK_MININGSTATE_H
+#endif // MININGSTATE_H

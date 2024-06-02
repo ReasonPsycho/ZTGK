@@ -1,32 +1,24 @@
-//
-// Created by igork on 22.03.2024.
-//
+#ifndef MOVEMENTSTATE_H
+#define MOVEMENTSTATE_H
 
-#ifndef ZTGK_MOVEMENTSTATE_H
-#define ZTGK_MOVEMENTSTATE_H
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
-class CombatState;
-class MiningState;
-class IdleState;
 
-class MovementState : public State{
-
+class MovementState : public State {
 public:
-    MovementState(Grid* grid);
+    // Constructor
+    MovementState(Grid* grid, Unit* unit);
 
-    State* RunCurrentState() override;
+    // Static method to get the instance of MovementState
+    static std::unique_ptr<MovementState> getInstance(Grid* grid, Unit* unit);
 
-    CombatState* combatState;
-    MiningState* miningState;
-    IdleState* idleState;
-
+    // Methods
+    std::unique_ptr<State> RunCurrentState() override;
     bool isTargetInRange() override;
-    bool hasCombatTarget{};
-    bool isAttackTargetInRange{};
 
 private:
     void MoveOnPath();
+    static std::unique_ptr<MovementState> instance;
+
 };
 
-
-#endif //ZTGK_MOVEMENTSTATE_H
+#endif // MOVEMENTSTATE_H

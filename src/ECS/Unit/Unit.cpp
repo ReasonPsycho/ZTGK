@@ -46,7 +46,7 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
 }
 
 Unit::~Unit() {
-    delete currentState;
+
 }
 
 bool Unit::IsAlly() const {
@@ -101,6 +101,7 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);
     ImGui::Text("Ally: %s", isAlly ? "true" : "false");
     ImGui::Text("Selected: %s", isSelected ? "true" : "false");
+//    ImGui::Text("Current State: %s", currentState->name.c_str());
     ImGui::Text("HP %f / %f (%f + %f)", stats.hp, stats.max_hp + stats.added.max_hp, stats.max_hp, stats.added.max_hp);
     if (ImGui::CollapsingHeader(std::format("Added stats:##+stats_unit_{}", uniqueID).c_str())) {
         stats.added.imgui_preview();
@@ -118,80 +119,65 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
-    if(forcedIdleState){
-        currentState = new IdleState(grid);
+    // Handle forced idle state
+    if (forcedIdleState) {
+        currentState = std::make_unique<IdleState>(grid, this);
         currentState->unit = this;
         waitTimer -= Time::Instance().DeltaTime();
 
-        if(waitTimer <= 0){
+        if (waitTimer <= 0) {
             forcedIdleState = false;
             waitTimer = 0;
-        }
-        else{
+        } else {
             return;
         }
     }
 
+    // Update dirtiness level based on ally status
     auto currentTile = grid->getTileAt(gridPosition);
-    if(isAlly && currentTile->dirtinessLevel > 0){
+    if (isAlly && currentTile->dirtinessLevel > 0) {
         auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
-        if(newDirtLvl < 0){
-            newDirtLvl = 0;
-        }
-        currentTile->changeDirtinessLevel(newDirtLvl);
-    }
-
-    else if(!isAlly && currentTile->dirtinessLevel < 100){
+        currentTile->changeDirtinessLevel(std::max(newDirtLvl, 0.0));
+    } else if (!isAlly && currentTile->dirtinessLevel < 100) {
         auto newDirtLvl = currentTile->dirtinessLevel + 10 * Time::Instance().DeltaTime();
-        if(newDirtLvl > 100){
-            newDirtLvl = 100;
-        }
-        currentTile->changeDirtinessLevel(newDirtLvl);
+        currentTile->changeDirtinessLevel(std::min(newDirtLvl, 100.0));
     }
 
-
-
-
-    if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
+    // Clear mined targets and update current mining target
+    if (currentMiningTarget != nullptr && currentMiningTarget->isMined) {
         currentMiningTarget = nullptr;
     }
 
-    for(auto &mineable : miningTargets){
-        if(mineable->isMined){
-            miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), mineable), miningTargets.end());
-        }
-    }
+    miningTargets.erase(
+            std::remove_if(miningTargets.begin(), miningTargets.end(),
+                           [](const auto& mineable) { return mineable->isMined; }),
+            miningTargets.end()
+    );
 
-    if(!miningTargets.empty() && currentMiningTarget == nullptr){
+    if (!miningTargets.empty() && currentMiningTarget == nullptr) {
         currentMiningTarget = findClosestMineable();
-        if(currentMiningTarget != nullptr){
-            hasMiningTarget = true;
-        }
-        else{
-            hasMiningTarget = false;
-        }
+        hasMiningTarget = (currentMiningTarget != nullptr);
     }
 
-    if(hasMovementTarget){
-        if(!grid->getTileAt(movementTarget)->vacant()){
+    // Handle movement target
+    if (hasMovementTarget) {
+        if (!grid->getTileAt(movementTarget)->vacant()) {
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
             pathfinding.FindPath(gridPosition, movementTarget);
-            if(!pathfinding.path.empty() && pathfinding.path.front() == gridPosition){
+            if (!pathfinding.path.empty() && pathfinding.path.front() == gridPosition) {
                 pathfinding.path.erase(pathfinding.path.begin());
             }
         }
     }
 
+    // Update grid position
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
 
+    // Update combat target
     combatTarget = GetClosestEnemyInSight();
-    if(combatTarget != nullptr){
-        hasCombatTarget = true;
-    }
-    else{
-        hasCombatTarget = false;
-    }
+    hasCombatTarget = (combatTarget != nullptr);
 
+    // Update grid tile states and unit positions
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->state = FLOOR;
         grid->getTileAt(gridPosition)->state = UNIT;
@@ -199,26 +185,37 @@ void Unit::UpdateImpl() {
         grid->getTileAt(gridPosition)->unit = this;
     }
 
+    // Update entity transform
     getEntity()->transform.setLocalPosition(worldPosition);
-    if(currentRotation > rotation){
+    if (currentRotation > rotation) {
         currentRotation -= 0.1f;
-    }
-    if(currentRotation < rotation){
+    } else if (currentRotation < rotation) {
         currentRotation += 0.1f;
+    }
+    if(std::abs(currentRotation - rotation) < 0.1f){
+        currentRotation = rotation;
     }
     getEntity()->transform.setLocalRotation(glm::vec3(0, currentRotation, 0));
 
+    // Update previous grid position
     previousGridPosition = gridPosition;
 
-    if (equipment.item0->cd_sec > 0)
-        equipment.item0->cd_sec -= Time::Instance().DeltaTime();
-    if (equipment.item1 != nullptr && equipment.item1->cd_sec > 0)
-        equipment.item1->cd_sec -= Time::Instance().DeltaTime();
-    if (equipment.item2 != nullptr && equipment.item2->cd_sec > 0)
-        equipment.item2->cd_sec -= Time::Instance().DeltaTime();
-    if (equipment.cd_between_sec > 0)
-        equipment.cd_between_sec -= Time::Instance().DeltaTime();
+    // Handle equipment cooldowns
+    auto updateCooldown = [](float& cooldown) {
+        if (cooldown > 0) {
+            cooldown -= Time::Instance().DeltaTime();
+        }
+    };
+    updateCooldown(equipment.item0->cd_sec);
+    if (equipment.item1 != nullptr) {
+        updateCooldown(equipment.item1->cd_sec);
+    }
+    if (equipment.item2 != nullptr) {
+        updateCooldown(equipment.item2->cd_sec);
+    }
+    updateCooldown(equipment.cd_between_sec);
 }
+
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {
     std::vector<Unit*> enemies;
@@ -258,7 +255,7 @@ bool Unit::canFindPathToTarget(Vector2Int target) {
 void Unit::serializer_init(Grid * pGrid) {
     auto playerUnit = getEntity();
     auto stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(pGrid);
+    stateManager->currentState = std::make_unique<IdleState>(pGrid, this);
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 

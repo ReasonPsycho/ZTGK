@@ -1,34 +1,30 @@
-//
-// Created by igork on 22.03.2024.
-//
-
-#ifndef ZTGK_COMBATSTATE_H
-#define ZTGK_COMBATSTATE_H
+#ifndef COMBATSTATE_H
+#define COMBATSTATE_H
 
 #include "ECS/Unit/UnitAI/StateMachine/State.h"
 #include "ECS/Unit/Equipment/Item.h"
-class MovementState;
-class MiningState;
-class IdleState;
+#include <memory>
 
-class CombatState : public State{
+class CombatState : public State {
 public:
-    CombatState(Grid* grid);
+    // Constructor
+    CombatState(Grid* grid, Unit* unit);
 
-    State* RunCurrentState() override;
+    // Static method to get the instance of CombatState
+    static std::unique_ptr<CombatState> getInstance(Grid* grid, Unit* unit);
+
+    // Methods
+    std::unique_ptr<State> RunCurrentState() override;
     bool isTargetInRange() override;
 
-    MovementState *moveState;
-    MiningState* miningState;
-    IdleState* idleState;
-
-    Item * useItem;
-
-    bool isAttackOnCooldown();
+    Item* useItem;
 
 private:
     void AttackTarget();
+    bool isAttackOnCooldown();
+
+    // Static member to hold the singleton instance
+    static std::unique_ptr<CombatState> instance;
 };
 
-
-#endif //ZTGK_COMBATSTATE_H
+#endif // COMBATSTATE_H
