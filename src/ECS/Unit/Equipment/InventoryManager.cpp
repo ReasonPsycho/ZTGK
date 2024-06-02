@@ -9,6 +9,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Hands.h"
 #include "ECS/Unit/Equipment/ConcreteItems/TestBuffItem.h"
+#include "ECS/Unit/Equipment/ConcreteItems/PraniumOre.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
 
 InventoryManager * InventoryManager::instance = nullptr;
@@ -20,6 +21,7 @@ void InventoryManager::init() {
     item_constructors.emplace(Item::item_types.mop, [](){ return new Mop(); });
     item_constructors.emplace(Item::item_types.water_gun, [](){ return new WaterGun(); });
     item_constructors.emplace(Item::item_types.test_buff_item, [](){ return new TestBuffItem(); });
+    item_constructors.emplace(Item::item_types.pranium_ore, [](){ return new PraniumOre(); });
 }
 
 Item *InventoryManager::create_item(unsigned int type_id) {

@@ -14,6 +14,7 @@ struct s_item_types {
     unsigned mop;
     unsigned water_gun;
     unsigned test_buff_item;
+    unsigned pranium_ore;
 
     std::unordered_map<unsigned, std::string> map;
 
