@@ -7,6 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include "ECS/Utils/Globals.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "ECS/Gameplay/WashingMachine.h";
 
 using namespace ztgk;
 
@@ -181,6 +182,7 @@ void LevelSaving::load(const std::string& path) {
                 YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
             }
         }
+        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(ztgk::game::washingMachineModel);
         // todo chests and stuff, once relevant
 
         spdlog::info("Finished loading");

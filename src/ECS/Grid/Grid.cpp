@@ -12,6 +12,9 @@
 #include "tracy/Tracy.hpp"
 #include "ECS/Unit/Mining/MineableChest.h"
 #include "ECS/Light/Components/PointLight.h"
+#include "ECS/Gameplay/Pranium.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Gameplay/WashingMachine.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -211,15 +214,25 @@ void Grid::InitializeTileEntities() {
                 // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
                 default:
                 case FLOOR:
+                    break;
                 case ORE:
+                    tile->getEntity()->addComponent(std::make_unique<Pranium>(5.0f, Vector2Int(i, j), this));
+                    tile->getEntity()->getComponent<Pranium>()->generatePranium(ztgk::game::washingMachineModel);
+                    tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
+                    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
+                    tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
+                    break;
                 case CORE:
+                    tile->getEntity()->addComponent(std::make_unique<WashingMachineTile>(ztgk::game::scene->systemManager.getSystem<WashingMachine>(), Vector2Int(i, j), this));
+                    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 5, 1);
+                    break;
                 case UNIT:
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
                 case CHEST:
                     // todo item type id
                     tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
-                    tile->getEntity()->addComponent(std::make_unique<PointLight>());
+                   // tile->getEntity()->addComponent(std::make_unique<PointLight>());
                     break;
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
@@ -260,6 +273,12 @@ void Grid::LoadTileEntities(float scale) {
                         tileEntity->addComponent(std::make_unique<IMineable>(1.0f, tileEntity->getComponent<Tile>()->index , this));
 
                     }
+                    if(i*x > 40 && i*x < 44 && j*z> 40 && j*z < 44)
+                    {
+                        tileEntity->getComponent<Tile>()->state = ORE;
+                        tileEntity->addComponent(std::make_unique<Pranium>(5.0f, tileEntity->getComponent<Tile>()->index, this));
+                        tileEntity->getComponent<Pranium>()->generatePranium(ztgk::game::washingMachineModel);
+                    }
                     
                     tileEntity->forceUpdateSelfAndChild();
                     tileEntity->addComponent(
@@ -268,6 +287,7 @@ void Grid::LoadTileEntities(float scale) {
                             tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
                 }
             }
+
         }
     }
     gridEntity->forceUpdateSelfAndChild();

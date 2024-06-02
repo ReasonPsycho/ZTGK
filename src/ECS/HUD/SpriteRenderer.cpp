@@ -54,7 +54,8 @@ void SpriteRenderer::render(Sprite * sprite) {
     };
 
     shader.setMatrix4("projection", false, glm::value_ptr(projection));
-    shader.setVec4("texColor", sprite->color);
+    shader.setVec4("inColor", sprite->color);
+    shader.setBool("hasTex", sprite->hasTexture);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

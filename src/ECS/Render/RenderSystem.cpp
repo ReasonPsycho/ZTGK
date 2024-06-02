@@ -32,6 +32,7 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
 
 void RenderSystem::SimpleDrawScene(Shader *regularShader) {
     for (auto &renderComponent: renderComponents) {
+        auto rc = renderComponent;
         renderComponent->simpleDraw(*regularShader);
     }
 }

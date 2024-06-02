@@ -14,7 +14,8 @@ class CollisionSystem;
 enum CollisionType{
     NORMAL,
     CHUNK,
-    TILE
+    TILE,
+    WASHING_MACHINE
 };
 struct BoxColliderData{
     glm::mat4x4 matrix;

@@ -55,11 +55,16 @@ void LevelGenerator::operator()(const Config& config) {
 	auto basePocketIndex = tryMakePocket(center, config.baseRadius + padding, Pocket::Type::base);
 	if (basePocketIndex >= 0) {
 		hollowOutPocket(basePocketIndex, padding, 0.f);
-		getTile(glm::ivec2(pockets[basePocketIndex].center))->type = Tile::Type::core;
+		for(int i = -2; i <= 2; i++){
+            for(int j = -2; j <= 2; j++){
+                getTile(glm::ivec2(pockets[basePocketIndex].center) + glm::ivec2(i, j))->type = Tile::Type::core;
+            }
+        }
+//        getTile(glm::ivec2(pockets[basePocketIndex].center))->type = Tile::Type::core;
 		addAtRandomToPocket(basePocketIndex, config.unitCount, Tile::Type::unit, rand, [this](glm::ivec2 pos) {
 			return !isTileAdjacentTo(pos, [this](glm::ivec2 otherPos) {
 				auto other = getTile(otherPos);
-				return other != nullptr && other->type == Tile::Type::wall;
+				return other != nullptr && (other->type == Tile::Type::wall || other->type == Tile::Type::core);
 			});
 		});
 	}
