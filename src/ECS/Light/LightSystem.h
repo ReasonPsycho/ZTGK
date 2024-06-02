@@ -96,7 +96,8 @@ private:
     int maxDirLight = 1;
     int maxPointLight = 20;
     int maxSpotLight = 20;
-    
+
+
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
     std::array<std::type_index, 4> componentTypes = {

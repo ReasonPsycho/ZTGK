@@ -1,6 +1,7 @@
 #version 460
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 frag_normal_depth; //Meant for outline process
+layout (location = 2) out vec4 BloomBuffer; //Meant for outline process
 
 struct TangentData{ // So it's easier to operate on
     vec3 ViewPos;
@@ -18,7 +19,7 @@ in VS_OUT {
  in flat int[4] currentWallData;
  in flat int[4] currentTextures;
 
-struct Material { //TODO here switch to array sampler material
+struct Material { 
     sampler2DArray diffuseTextureArray;
     sampler2DArray specularTextureArray;
     sampler2DArray normalTextureArray;
@@ -201,7 +202,7 @@ void main()
     
     dirtinessMap -= (1 - texture(material.depthTextureArray, vec3( fs_in.TexCoords, currentTextures[3])).r) *  0.8;
     texCoords = ParallaxMapping(texCoords,  viewDir);
- 
+    dirtinessMap = ceil(dirtinessMap * diffuse_levels ) / diffuse_levels;
 
     
     // properties
@@ -213,7 +214,6 @@ void main()
 
     
     vec3 diffuse = vec3(texture(material.diffuseTextureArray, vec3(texCoords, float(currentTextures[0]))));
-
     vec3 specular = vec3(texture(material.specularTextureArray, vec3(texCoords,float(currentTextures[1]))));
 
 
@@ -250,10 +250,19 @@ void main()
         result = mix(result, selectionColor[currentWallData[2]], 0.5);
     }
 
+
+
+    FragColor = vec4(result, 1.0);
+
     float depth = gl_FragCoord.z;
     frag_normal_depth = vec4(normal, depth);
 
-    FragColor = vec4(result, 1.0);
+    float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+
+    if(brightness > 1.0)
+        BloomBuffer = vec4(FragColor.rgb, 1.0);
+    else
+        BloomBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 // calculates the color when using a directional light.

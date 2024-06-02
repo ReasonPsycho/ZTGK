@@ -9,6 +9,7 @@ out vec4 fragColor;
 
 layout(binding = 0) uniform sampler2D colorTexture;
 layout(binding = 1) uniform sampler2D normals_depth_texture;
+layout(binding = 2) uniform sampler2D bloomTexture;
 
 uniform float depth_threshold;
 uniform float depth_normal_threshold;
@@ -17,6 +18,10 @@ uniform float normal_threshold;
 
 uniform float outline_width;
 uniform vec3  outline_color;
+
+uniform float exposure;
+uniform float gamma;
+
 
 vec4 alpha_blend(vec4 top, vec4 bottom)
 {
@@ -80,7 +85,19 @@ void main()
     float edge = max(edge_depth, edge_normal);
 
     vec4 edge_color = vec4(outline_color, 1.0 * edge);
-    vec4 color = texture(colorTexture, texcoord);
+    vec4 color = texture(colorTexture, texcoord) + texture(bloomTexture,texcoord);
 
-    fragColor = alpha_blend(edge_color, color);
+
+
+    vec3 result = vec3(alpha_blend(edge_color, color)); //Do gamma here and only here
+
+
+    //gamma maping
+    // apply exposure (controls the intensity of the lighting)
+    result = vec3(1.0) - exp(-result * exposure);
+
+    // gamma correction
+    vec3 gammaColor = pow(result, vec3(1.0/gamma));
+
+    fragColor = vec4(gammaColor, 1.0);
 }

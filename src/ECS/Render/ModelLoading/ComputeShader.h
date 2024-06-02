@@ -13,7 +13,8 @@
 #include "glm/detail/type_vec3.hpp"
 #include "glm/vec3.hpp"
 #include "glad/glad.h"
-
+#include "glm/vec2.hpp"
+#include "glm/vec4.hpp"
 
 class ComputeShader {
 public:
@@ -40,10 +41,14 @@ public:
     void setGLuint(const std::string &name, GLuint value) const;
 
     void setMatrix4(const std::string &name, bool transpose, const GLfloat *value) const;
+    
+    void setVec2(const std::string &name, glm::vec2 vec2);
 
     void setVec3(const std::string &name, float d, float d1, float d2);
 
     void setVec3(const std::string &name, glm::vec3 vec3);
+
+    void setVec4(const std::string &name, glm::vec4 vec4);
 
 private:
     std::string shaderCode;

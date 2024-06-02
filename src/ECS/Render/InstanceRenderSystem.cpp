@@ -19,7 +19,6 @@ unsigned char* LoadTileTexture(const std::string& file_name, int& width, int& he
 }
 
 void InstanceRenderSystem::addComponent(void *component) {
-
 }
 
 void InstanceRenderSystem::removeComponent(void *component) {
@@ -122,7 +121,11 @@ void InstanceRenderSystem::UpdateImpl() {
 }
 
 void InstanceRenderSystem::Innit() {
+    
+    //Buffers
     glGenBuffers(1, &wallDataBufferID);
+    
+    //Wall material
     std::filesystem::path diffuseTexturesDictionary("res/textures/tiles/Diffuse"); // Replace with your directory
     if (std::filesystem::exists(diffuseTexturesDictionary) && std::filesystem::is_directory(diffuseTexturesDictionary)) {
         for (const auto& entry : std::filesystem::directory_iterator(diffuseTexturesDictionary)) {
@@ -163,6 +166,14 @@ void InstanceRenderSystem::Innit() {
     }
 
     wallMaterial.mapTextureArrays();
+    
+    //Light material
+    
+    lightMaterial.depthTextures.push_back(std::make_shared<Texture>("res/textures/lights/Depth/DepthMap.png",""));
+    lightMaterial.diffuseTextures.push_back(std::make_shared<Texture>("res/textures/lights/Diffuse/bubble2.png",""));
+    lightMaterial.normalTextures.push_back(std::make_shared<Texture>("res/textures/lights/Normal/NormalMap.png",""));
+    lightMaterial.specularTextures.push_back(std::make_shared<Texture>("res/textures/lights/Specular/bubble2.png",""));
+
 }
 
 InstanceRenderSystem::InstanceRenderSystem(Camera * camera): camera(camera) {
@@ -179,5 +190,24 @@ void InstanceRenderSystem::PushToSSBO(Camera* camera) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, wallDataBufferBindingPoint, wallDataBufferID);
    
    
+}
+
+void InstanceRenderSystem::DrawLights(Shader *regularShader, Camera *camera) {
+    ZoneScopedN("Simple draw tiles");
+    LightSystem* lightSystem = systemManager->getSystem<LightSystem>();
+    glEnable(GL_BLEND);
+    regularShader->use();
+    lightMaterial.loadMaterial(regularShader);
+    regularShader->setInt("spotLightAmount", lightSystem->spotLights.size());
+    regularShader->setInt("dirLightAmount", lightSystem->dirLights.size());
+    regularShader->setInt("pointLightAmount", lightSystem->pointLights.size());
+    int lightAmount = lightSystem->spotLights.size() + lightSystem->dirLights.size()+ lightSystem->pointLights.size();
+    for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
+        glBindVertexArray(tileModel->meshes[i].VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[i].indices.size()),
+                                GL_UNSIGNED_INT, 0,lightAmount);
+        glBindVertexArray(0);
+    }
+    glDisable(GL_BLEND);
 }
 

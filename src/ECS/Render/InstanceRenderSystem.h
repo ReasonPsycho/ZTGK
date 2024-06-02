@@ -15,23 +15,27 @@
 #include "ECS/Render/FrustumCulling/Frustum.h"
 #include "tracy/Tracy.hpp"
 #include "ECS/Utils/Globals.h"
+#include "ECS/Light/LightSystem.h"
 
 class InstanceRenderSystem : public System {
 public:
     InstanceRenderSystem(Camera * camera);
     void Innit();
-    const std::type_index* getComponentTypes() override { return nullptr; };
-    int getNumComponentTypes() override { return 0;};
+
     void registerComponents() override{};
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
     void showImGuiDetailsImpl(Camera *camera) override;
     void DrawTiles(Shader* regularShader,Camera * camera);
+    void DrawLights(Shader* regularShader,Camera * camera);
     void SimpleDrawTiles(Shader* regularShader,Camera * camera);
     void PushToSSBO(Camera* camera);
     void UpdateImpl();
 
     Model* tileModel;
+
+    const std::type_index* getComponentTypes() override {return nullptr; };
+    int getNumComponentTypes() override { return 0;};
 private:
     Camera * camera;
     GLuint wallDataBufferID;
@@ -48,8 +52,8 @@ private:
 
     float diffuse_levels = 3;
     float specular_levels = 3;
-    float light_shade_cutoff = 0.5f;
-    float dark_shade_cutoff = 0.2f;
+    float light_shade_cutoff = 0.8f;
+    float dark_shade_cutoff = 0.5f;
 
     float rim_threshold = 10;
     float rim_amount = 0.5f;
@@ -58,6 +62,8 @@ private:
     
     std::vector<WallData> wallData;
     MaterialPhong wallMaterial;
+    MaterialPhong lightMaterial;
+    std::array<std::type_index, 0> componentTypes = {};
 };
 
 
