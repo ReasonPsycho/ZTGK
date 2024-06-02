@@ -7,6 +7,7 @@
 
 
 #include "glm/vec3.hpp"
+#include "glm/vec2.hpp"
 #include <cmath>
 #include <vector>
 
@@ -165,6 +166,14 @@ public:
 
     static float DistanceSquared(Vector3 a, Vector3 b) {
         return pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2);
+    }
+
+    static glm::vec2 Vector2IntToGlmVec2(const Vector2Int &vector) {
+        return {vector.x, vector.z};
+    }
+
+    static Vector2Int GlmVec2ToVector2Int(const glm::vec2 &vector) {
+        return {static_cast<int>(vector.x), static_cast<int>(vector.y)};
     }
 
 

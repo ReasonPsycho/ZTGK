@@ -273,6 +273,12 @@ void Grid::LoadTileEntities(float scale) {
                         tileEntity->addComponent(std::make_unique<IMineable>(1.0f, tileEntity->getComponent<Tile>()->index , this));
 
                     }
+                    if(i*x > 40 && i*x < 44 && j*z> 40 && j*z < 44)
+                    {
+                        tileEntity->getComponent<Tile>()->state = ORE;
+                        tileEntity->addComponent(std::make_unique<Pranium>(5.0f, tileEntity->getComponent<Tile>()->index, this));
+                        tileEntity->getComponent<Pranium>()->generatePranium(ztgk::game::washingMachineModel);
+                    }
                     
                     tileEntity->forceUpdateSelfAndChild();
                     tileEntity->addComponent(
@@ -281,6 +287,7 @@ void Grid::LoadTileEntities(float scale) {
                             tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
                 }
             }
+
         }
     }
     gridEntity->forceUpdateSelfAndChild();

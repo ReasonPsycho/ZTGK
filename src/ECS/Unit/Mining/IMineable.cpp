@@ -29,8 +29,11 @@ void IMineable::Mine(Unit * unit) {
         grid->DestroyWallsOnTile(gridPosition);
         isMined = true;
         onMined(unit);
-        parentEntity->getComponent<BoxCollider>()->setCenter(glm::vec3(grid->GridToWorldPosition(gridPosition).x, -2, grid->GridToWorldPosition(gridPosition).z));
-
+        auto boxcoll = parentEntity->getComponent<BoxCollider>();
+        if(boxcoll != nullptr)
+            boxcoll->setCenter(glm::vec3(grid->GridToWorldPosition(gridPosition).x, -2, grid->GridToWorldPosition(gridPosition).z));
+        else
+            spdlog::error("BoxCollider not found in IMineable");
     }
 }
 
