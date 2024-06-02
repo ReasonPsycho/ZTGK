@@ -77,6 +77,7 @@ bool CombatState::isTargetInRange() {
 }
 
 void CombatState::AttackTarget() {
+
     if(isAttackOnCooldown()) return;
 
     if (unit-> combatTarget == nullptr) {
@@ -88,6 +89,8 @@ void CombatState::AttackTarget() {
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;
     }
+    float angle = atan2(unit->combatTarget->gridPosition.z - unit->gridPosition.z, unit->combatTarget->gridPosition.x - unit->gridPosition.x);
+    unit->rotation = angle;
 
     auto target = unit->combatTarget;
 
