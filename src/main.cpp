@@ -195,6 +195,8 @@ PhongPipeline phongPipeline;
 float lastY;
 float lastX;
 
+bool deleteThisVariable = false;
+
 Entity *playerUnit;
 
 std::vector<Vector2Int> selectedTiles;
@@ -977,6 +979,15 @@ void processInput(GLFWwindow *window) {
     else if(glfwGetKey(window,  GLFW_KEY_M) == GLFW_PRESS){
         ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_TILE;
         spdlog::info("Drag mode set to DRAG_TILE");
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !deleteThisVariable){
+        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+        deleteThisVariable = true;
+        spdlog::info("Pranium delivered");
+    }
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+        deleteThisVariable = false;
     }
 
 }

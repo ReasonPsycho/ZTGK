@@ -176,6 +176,9 @@ void Unit::UpdateImpl() {
         if(!grid->getTileAt(movementTarget)->vacant()){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
             pathfinding.FindPath(gridPosition, movementTarget);
+            if(!pathfinding.path.empty() && pathfinding.path.front() == gridPosition){
+                pathfinding.path.erase(pathfinding.path.begin());
+            }
         }
     }
 
@@ -315,7 +318,7 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToEx
 
 void Unit::sortMiningTargetsByDistance() {
     std::sort(miningTargets.begin(), miningTargets.end(), [this](IMineable* mineable, IMineable* mineable1){
-        return VectorUtils::Distance(this->gridPosition, Vector2Int(mineable->gridPosition.x, mineable->gridPosition.z)) > VectorUtils::Distance(this->gridPosition, Vector2Int(mineable1->gridPosition.x, mineable1->gridPosition.z));
+        return VectorUtils::Distance(this->gridPosition, Vector2Int(mineable->gridPosition.x, mineable->gridPosition.z)) < VectorUtils::Distance(this->gridPosition, Vector2Int(mineable1->gridPosition.x, mineable1->gridPosition.z));
     });
 
 }

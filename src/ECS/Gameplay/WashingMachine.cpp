@@ -43,6 +43,10 @@ void WashingMachine::registerComponents() {
 
 void WashingMachine::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Begin("Washing Machine");
+
+    ImGui::Text("Current pranium: %d", currentPranium);
+    ImGui::Text("Pranium needed: %d", praniumNeeded);
+    ImGui::Separator();
     ImGui::Text("Tiles: %zu", WashingMachineTiles.size());
     for (auto& [id, tiles] : WashingMachineTiles) {
         for (auto& tile : tiles) {
@@ -72,8 +76,10 @@ void WashingMachine::clearTilesInRadius(Vector2Int position, int radius) {
                 if(tile != nullptr){
                     if(tile->state == TileState::WALL) {
                         tile->state = TileState::FLOOR;
+                        grid->DestroyWallsOnTile(tile->index);
                     }
-                    tile->dirtinessLevel = 0;
+                    tile->changeDirtinessLevel(0);
+                    tile->Update();
                 }
             }
         }
@@ -88,8 +94,8 @@ void WashingMachine::onPraniumDelivered() {
     }
 
 
-    clearTilesInRadius(Vector2Int(0,0), radiusToClear);
-    radiusToClear *= 1.5;
+    clearTilesInRadius(Vector2Int(50,50), radiusToClear);
+    radiusToClear *= 1.2;
 
 }
 

@@ -32,6 +32,8 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
         spdlog::error("PATHFINDING: Start tile is nullptr");
     }
 
+
+
     if(grid->getTileAt(target)->vacant()){
         target = GetNearestVacantTile(target, start);
     }
@@ -51,6 +53,7 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
         Vector2Int current = GetLowestFScore(openSet, fScore);
         if (current == target){
             path = ReconstructPath(cameFrom, current);
+
             return path;
         }
 
