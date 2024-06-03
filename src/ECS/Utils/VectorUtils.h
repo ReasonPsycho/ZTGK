@@ -11,6 +11,8 @@
 #include <cmath>
 #include <vector>
 
+
+
 struct Vector2Int {
     int x;
     int z;
@@ -206,5 +208,19 @@ public:
     }
 
 };
+
+namespace std { //To be able ysing of an unorded map
+    template <>
+    struct hash<Vector2Int> {
+        std::size_t operator()(const Vector2Int& v) const {
+            using std::size_t;
+            using std::hash;
+
+            // Create a hash value using 'x' and 'z'.
+            return ((hash<int>()(v.x)
+                     ^ (hash<int>()(v.z) << 1)) >> 1);
+        }
+    };
+}
 
 #endif //ZTGK_VECTORUTILS_H

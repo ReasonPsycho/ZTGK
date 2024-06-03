@@ -15,8 +15,8 @@ struct WallData {
     // Constructor
     WallData(const glm::mat4x4 &matrixInput, int d1, int d2, int d3, int d4,int t1, int t2, int t3, int t4)
             : matrix(matrixInput) {
-        data[0] = d1; 
-        data[1] = d2;
+        data[0] = d1; //Dirtness 0-100
+        data[1] = d2; //Is in fog of war
         data[2] = d3;
         data[3] = d4;
         textures[0] = t1; // diffuse
@@ -58,6 +58,7 @@ public:
     TileStateData stateData;
     Unit* unit = nullptr;
     Chunk* chunk = nullptr;
+    bool isInFogOfWar = false;
     float dirtinessLevel = 100;
     void setTileSelectionState(TileSelectionState state );
     TileSelectionState getTileSelectionState();
@@ -72,7 +73,8 @@ public:
     // Methods
     [[nodiscard]] bool vacant() const { return state == FLOOR; };
     void showImGuiDetailsImpl(Camera *camera) override;
-    void changeHitWallsState(TileSelectionState state);
+    void changeWallsSelection(TileSelectionState state);
+    void changeWallsFogOfWarState(bool isInFogOfWar);
     void changeDirtinessLevel(float newDirtLevel);
     
     constexpr static const char * state_names[] = TILE_STATE_NAMES;

@@ -35,14 +35,14 @@ void Tile::showImGuiDetailsImpl(Camera *camera) {
     state = (TileState)state_select;
 }
 
-void Tile::changeHitWallsState(TileSelectionState state) {
+void Tile::changeWallsSelection(TileSelectionState state) {
     for(auto wall : walls){
         wall->data[2] = state;
     }
 }
 
 void Tile::setTileSelectionState(TileSelectionState state) {
-    changeHitWallsState(state);
+    changeWallsSelection(state);
     tileSelectionState = state;
 }
 
@@ -54,6 +54,12 @@ void Tile::changeDirtinessLevel(float newDirtLevel) {
     dirtinessLevel = newDirtLevel;
     for(auto wall : walls){
         wall->data[0] = dirtinessLevel;
+    }
+}
+
+void Tile::changeWallsFogOfWarState(bool isInFogOfWar) {
+    for(auto wall : walls){
+        wall->data[1] = isInFogOfWar;
     }
 }
 

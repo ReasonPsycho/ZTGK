@@ -31,7 +31,7 @@ public:
     //2D array of tiles
     std::vector<std::vector<Chunk*>> chunkArray;
     Entity *gridEntity;
-
+    Tile* centerTile;
     Scene *scene;
     Vector3 Position;
     unsigned entityId = (unsigned) -1;
@@ -96,10 +96,12 @@ public:
     void ClearAllWallData();
 
     void SetUpWalls();
+    void SetUpChunks();
 
     void ClearWalls();
 
     void SetUpWall(Tile *tile);
+    void UpdateFogData(Tile *tile);
 
     void ClearWall(Tile *tile);
 
@@ -120,6 +122,7 @@ public:
 private:
     float offsetX = 0;
     float offsetZ = 0;
+    int visibilityRange = 3;
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Tile))
     };

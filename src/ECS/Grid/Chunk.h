@@ -8,6 +8,7 @@
 
 #include "Tile.h"
 #include "ECS/Render/FrustumCulling/BoundingVolume.h"
+#include "ECS/Light/Components/PointLight.h"
 
 
 class Grid;
@@ -21,7 +22,10 @@ public:
     int width;
     int height;
     bool isVisible;
+    int minedTiles;
+    bool isAccessibleFromCore;
     
+    PointLight* localLight;
     Vector2Int index{};
     
     std::vector<std::unique_ptr<WallData>> wallDataArray;
@@ -36,7 +40,7 @@ public:
     void removeTileAt(int x, int z);
     void removeTileAt(Vector2Int index);
     
-    
+    void CalculateChunkData();
     glm::vec3 chunkRealPosition();
     AABB getBoundingVolume(); //TODO cash it somewhere
     WallData *addWallData(std::unique_ptr<WallData>  wallData);

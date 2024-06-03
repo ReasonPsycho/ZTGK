@@ -596,7 +596,7 @@ void load_enteties() {
 }
 
 void load_units() {
-    /*
+    
     playerUnit = scene.addEntity("Player1");
     playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -651,7 +651,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-    */
+    
 
 }
 
