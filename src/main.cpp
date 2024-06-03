@@ -39,6 +39,7 @@
 #include "ECS/Scene.h"
 #include "ECS/Unit/Unit.h"
 
+
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -72,6 +73,7 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Mining/MineableChest.h"
 #include "ECS/Gameplay/WashingMachine.h"
+#include "ECS/Audio/AudioManager.h"
 
 #pragma endregion Includes
 
@@ -117,6 +119,8 @@ void init_systems();
 void load_enteties();
 
 void init_managers();
+
+void load_sounds();
 
 void load_units();
 
@@ -307,6 +311,8 @@ void cleanup() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    ztgk::game::audioManager->close();
+
     glfwDestroyWindow(window);
     glfwTerminate();
 }
@@ -382,6 +388,15 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::window = window;
+
+    ztgk::game::audioManager = new AudioManager();
+    ztgk::game::audioManager->init();
+    spdlog::info("Initialized audio manager.");
+    load_sounds();
+    spdlog::info("Loaded sounds.");
+
+
+
     primitives.Init();
 
 
@@ -420,6 +435,26 @@ void init_managers() {
     auto ent = scene.addEntity("Controllers");
     ent->addComponent(make_unique<InventoryManager>());
     ent->getComponent<InventoryManager>()->init();
+}
+
+void load_sounds() {
+    ztgk::game::audioManager->loadSound("res/sounds/test.wav", "test");
+
+    ztgk::game::audioManager->setSoundVolume("test", 128);
+    ztgk::game::audioManager->setGlobalVolume(128);
+
+    //ztgk::game::audioManager->playSound("test", 0);
+
+    ztgk::game::audioManager->loadSound("res/sounds/test2.wav", "test2");
+    //ztgk::game::audioManager->playSound("test2", 1);
+    ztgk::game::audioManager->loadSound("res/sounds/freebird.wav", "freebird");
+
+    for (int i = 1; i <= 8; i++) {
+        ztgk::game::audioManager->loadSound("res/sounds/punch" + std::to_string(i) + ".wav",
+                                            "punch" + std::to_string(i));
+        ztgk::game::audioManager->setSoundVolume("punch" + std::to_string(i), 50);
+    }
+
 }
 
 void load_enteties() {
@@ -596,7 +631,7 @@ void load_enteties() {
 }
 
 void load_units() {
-    /*
+
     playerUnit = scene.addEntity("Player1");
     playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -611,33 +646,33 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-    playerUnit = scene.addEntity("Player2");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player2", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-    playerUnit = scene.addEntity("Player3");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player3", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//    playerUnit = scene.addEntity("Player2");
+//    playerUnit->addComponent(make_unique<Render>(&gabka));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
+//    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+//    playerUnit->addComponent(make_unique<Unit>("Player2", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+//
+//    playerUnit = scene.addEntity("Player3");
+//    playerUnit->addComponent(make_unique<Render>(&gabka));
+//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
+//    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
+//    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+//    playerUnit->addComponent(make_unique<Unit>("Player3", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
+//    stateManager = new StateManager(playerUnit->getComponent<Unit>());
+//    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
+//    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+//    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
     Entity *enemyUnit = scene.addEntity("Enemy1");
     enemyUnit->addComponent(make_unique<Render>(&zuczek));
@@ -651,7 +686,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-    */
+
 
 }
 
