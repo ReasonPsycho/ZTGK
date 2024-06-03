@@ -59,7 +59,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     switch (fb_status) {
         case GL_FRAMEBUFFER_COMPLETE:
-            std::cout << "SUCCESS::FRAMEBUFFER:: Framebuffer is complete." << std::endl;
+            //std::cout << "SUCCESS::FRAMEBUFFER:: Framebuffer is complete." << std::endl;
             break;
         case GL_FRAMEBUFFER_UNDEFINED:
             std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNDEFINED:: Default framebuffer does not exist." << std::endl;
