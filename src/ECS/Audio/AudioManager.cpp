@@ -1,7 +1,7 @@
 #include "AudioManager.h"
 #include "spdlog/spdlog.h"
 
-AudioManager::AudioManager() : globalVolume(MIX_MAX_VOLUME) {
+AudioManager::AudioManager(){
 }
 
 AudioManager::~AudioManager() {
@@ -19,11 +19,13 @@ bool AudioManager::init() {
         return false;
     }
 
-    int flags = MIX_INIT_MP3;
-    if(!(Mix_Init(flags) & flags)) {
-        spdlog::error("IN AUDIO MANAGER INIT - SDL_mixer MP3 initialization failed: {}", Mix_GetError());
-        return false;
-    }
+    // Unable to initialize MP3 support
+
+//    int flags = MIX_INIT_MP3;
+//    if(!(Mix_Init(flags) & flags)) {
+//        spdlog::error("IN AUDIO MANAGER INIT - SDL_mixer MP3 initialization failed: {}", Mix_GetError());
+//        return false;
+//    }
 
     return true;
 }
@@ -118,6 +120,5 @@ void AudioManager::setGlobalVolume(int volume) {
         spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME : Volume must be between 0 - 128. Clamping to 128.");
         volume = 128;
     }
-    this->globalVolume = volume;
     Mix_Volume(-1, volume);
 }

@@ -82,7 +82,6 @@ public:
 
 private:
     std::unordered_map<std::string, Mix_Chunk*> soundMap; ///< Map of sound keys to their corresponding Mix_Chunk objects.
-    int globalVolume; ///< Global volume level for all sounds.
 };
 
 #endif // AUDIOMANAGER_H
