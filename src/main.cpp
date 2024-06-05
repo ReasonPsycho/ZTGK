@@ -253,6 +253,7 @@ int main(int, char **) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
+    
     glfwSwapInterval(1);
 
     init_managers();
@@ -741,10 +742,12 @@ void render() {
     file_logger->info("Cleared.");
 
     file_logger->info("Set up PBR.");
+    phongPipeline.PrepareFoamMap(&camera);
+    
     phongPipeline.PrebindPipeline(&camera);
 
-    scene.systemManager.getSystem<RenderSystem>()->DrawScene(&phongPipeline.phongShader, &camera);
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&phongPipeline.phongInstanceShader, &camera);
+    scene.systemManager.getSystem<RenderSystem>()->DrawScene(&phongPipeline.phongShader, &camera);
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(&phongPipeline.phongInstanceLightShader, &camera);
 
     phongPipeline.WriteToBackBuffer(&camera);
@@ -752,9 +755,7 @@ void render() {
     scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
-
-    //   bloomSystem.BlurBuffer();
-//    bloomSystem.Render();
+    
 
     scene.systemManager.getSystem<HUD>()->draw();
 }

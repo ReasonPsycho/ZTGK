@@ -88,6 +88,13 @@ uniform float saturationMultiplayer;  // sat multiplier is the factor by which y
 uniform float lightMultiplayer;  // sat multiplier is the factor by which you increase saturation
 uniform int toon_color_levels;
 
+uniform float diffuse_levels;
+uniform float specular_levels;
+uniform float light_shade_cutoff;
+uniform float dark_shade_cutoff;
+
+uniform float rim_threshold;
+uniform float rim_amount;
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -162,13 +169,7 @@ vec4 reinhard(vec4 hdr_color)
     return vec4(ldr_color, 1.0);
 }
 
-uniform float diffuse_levels;
-uniform float specular_levels;
-uniform float light_shade_cutoff;
-uniform float dark_shade_cutoff;
 
-uniform float rim_threshold;
-uniform float rim_amount;
 
 void main()
 {

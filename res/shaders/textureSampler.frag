@@ -10,6 +10,8 @@ out vec4 fragColor;
 layout(binding = 0) uniform sampler2D colorTexture;
 layout(binding = 1) uniform sampler2D normals_depth_texture;
 layout(binding = 2) uniform sampler2D bloomTexture;
+layout(binding = 3) uniform sampler2D FogOfWarMask;
+layout(binding = 4) uniform sampler2D foamMask;
 
 uniform float depth_threshold;
 uniform float depth_normal_threshold;
@@ -90,12 +92,12 @@ void main()
 
 
     vec3 result = vec3(alpha_blend(edge_color, color)); //Do gamma here and only here
-
+    result = mix(result,texture(foamMask,texcoord).rgb,texture(FogOfWarMask,texcoord).a);
 
     //gamma maping
     // apply exposure (controls the intensity of the lighting)
     result = vec3(1.0) - exp(-result * exposure);
-
+    
     // gamma correction
     vec3 gammaColor = pow(result, vec3(1.0/gamma));
 
