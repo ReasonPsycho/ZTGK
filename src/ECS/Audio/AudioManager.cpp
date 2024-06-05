@@ -1,5 +1,8 @@
 #include "AudioManager.h"
 #include "spdlog/spdlog.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
+#include <mpg123.h>
 
 AudioManager::AudioManager(){
 }
@@ -19,13 +22,22 @@ bool AudioManager::init() {
         return false;
     }
 
-    // Unable to initialize MP3 support
+    int flags = MIX_INIT_MP3;
+    int initialized = Mix_Init(flags);
+    if((initialized & flags) != flags) {
+        spdlog::error("IN AUDIO MANAGER INIT - SDL_mixer MP3 initialization failed: {}", Mix_GetError());
+        return false;
+    }
 
-//    int flags = MIX_INIT_MP3;
-//    if(!(Mix_Init(flags) & flags)) {
-//        spdlog::error("IN AUDIO MANAGER INIT - SDL_mixer MP3 initialization failed: {}", Mix_GetError());
-//        return false;
-//    }
+    spdlog::info("SDL_mixer initialized successfully with MP3 support.");
+
+    // Check available music formats
+    int availableFormats = Mix_Init(0);
+    if (availableFormats & MIX_INIT_MP3) {
+        spdlog::info("MP3 support is available in SDL_mixer.");
+    } else {
+        spdlog::warn("MP3 support is NOT available in SDL_mixer.");
+    }
 
     return true;
 }
@@ -37,13 +49,14 @@ void AudioManager::close() {
     soundMap.clear();
 
     Mix_CloseAudio();
+    Mix_Quit();
     SDL_Quit();
 }
 
 bool AudioManager::loadSound(const std::string& filePath, const std::string& soundKey) {
     Mix_Chunk* sound = Mix_LoadWAV(filePath.c_str());
     if (!sound) {
-        spdlog::error("IN AUDIO MANAGER LOAD SOUND : Failed to load sound: {}", Mix_GetError());
+        spdlog::error("IN AUDIO MANAGER LOAD SOUND: Failed to load sound from {}: {}", filePath, Mix_GetError());
         return false;
     }
 
@@ -53,7 +66,11 @@ bool AudioManager::loadSound(const std::string& filePath, const std::string& sou
 
 void AudioManager::playSound(const std::string& soundKey, int loops) {
     if (soundKey.empty()) {
-        spdlog::warn("IN AUDIO MANAGER PLAY SOUND : Sound key is empty. No action taken.");
+        spdlog::warn("IN AUDIO MANAGER PLAY SOUND: Sound key is empty. No action taken.");
+        return;
+    }
+    if (soundMap.find(soundKey) == soundMap.end()) {
+        spdlog::warn("IN AUDIO MANAGER PLAY SOUND: Sound key {} not found. No action taken.", soundKey);
         return;
     }
     Mix_PlayChannel(-1, soundMap[soundKey], loops);
@@ -97,15 +114,15 @@ void AudioManager::resumeSound(const std::string& soundKey) {
 
 void AudioManager::setSoundVolume(const std::string& soundKey, int volume) {
     if (volume < 0) {
-        spdlog::warn("IN AUDIO MANAGER SET VOLUME | FOR SOUND {} | Volume must be between 0 - 128. Clamping to 0.", soundKey);
+        spdlog::warn("IN AUDIO MANAGER SET VOLUME | FOR SOUND {}: Volume must be between 0 - 128. Clamping to 0.", soundKey);
         volume = 0;
     }
     if (volume > 128) {
-        spdlog::warn("IN AUDIO MANAGER SET VOLUME | FOR SOUND {} | Volume must be between 0 - 128. Clamping to 128.", soundKey);
+        spdlog::warn("IN AUDIO MANAGER SET VOLUME | FOR SOUND {}: Volume must be between 0 - 128. Clamping to 128.", soundKey);
         volume = 128;
     }
     if (soundKey.empty()) {
-        spdlog::warn("IN AUDIO MANAGER SET VOLUME : Sound key is empty. No action taken.");
+        spdlog::warn("IN AUDIO MANAGER SET VOLUME: Sound key is empty. No action taken.");
         return;
     }
     Mix_VolumeChunk(soundMap[soundKey], volume);
@@ -113,11 +130,11 @@ void AudioManager::setSoundVolume(const std::string& soundKey, int volume) {
 
 void AudioManager::setGlobalVolume(int volume) {
     if (volume < 0) {
-        spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME : Volume must be between 0 - 128. Clamping to 0.");
+        spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME: Volume must be between 0 - 128. Clamping to 0.");
         volume = 0;
     }
     if (volume > 128) {
-        spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME : Volume must be between 0 - 128. Clamping to 128.");
+        spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME: Volume must be between 0 - 128. Clamping to 128.");
         volume = 128;
     }
     Mix_Volume(-1, volume);
