@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include "spdlog/spdlog.h"
+#include <queue>
 
 /**
  * @class AudioManager
@@ -80,8 +81,20 @@ public:
      */
     void setGlobalVolume(int volume);
 
+    bool isSoundPlaying(const std::string& soundKey);
+
+    void setVolumeForGroup(const std::string& groupName, int volume);
+
+    void playAmbientMusic();
+
+    void playRandomSoundFromGroup(const std::string& groupName);
+
 private:
     std::unordered_map<std::string, Mix_Chunk*> soundMap; ///< Map of sound keys to their corresponding Mix_Chunk objects.
+
+    std::queue<std::string> soundQueue; ///< Queue of sound keys to play
+
+    void setAmbientQueue();
 };
 
 #endif // AUDIOMANAGER_H

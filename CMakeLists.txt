@@ -71,6 +71,7 @@ find_package(yaml-cpp CONFIG REQUIRED)
 find_package(Tracy CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_mixer CONFIG REQUIRED)
+find_package(mpg123 CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_opengl_LIBRARY})
 target_link_libraries(${PROJECT_NAME} PRIVATE glad::glad)
@@ -90,7 +91,7 @@ target_link_libraries(${PROJECT_NAME}
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>)
-
+target_link_libraries(${PROJECT_NAME} PRIVATE MPG123::libmpg123 MPG123::libout123 MPG123::libsyn123)
 #Asssimp config
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT FALSE)
 set(ASSIMP_BUILD_FBX_IMPORTER TRUE)
