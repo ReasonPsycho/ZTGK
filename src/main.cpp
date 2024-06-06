@@ -444,6 +444,8 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/ambient3.mp3", "ambient3");
     ztgk::game::audioManager->loadSound("res/sounds/ambient4.mp3", "ambient4");
 
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 64);
+
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
 

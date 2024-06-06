@@ -104,16 +104,13 @@ void CombatState::AttackTarget() {
     target->stats.hp -= totalAttackDamage;
     spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
 
-    //generate random number in range 1 - 8
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 8);
-    int random_number = dis(gen);
 
-    ztgk::game::audioManager->playSound("punch" + std::to_string(random_number), 0);
+    ztgk::game::audioManager->playRandomSoundFromGroup("punch");
 
 
     if(target->stats.hp <= 0){
+        ztgk::game::audioManager->playRandomSoundFromGroup(unit->combatTarget->isAlly ? "deathSponge" : "deathEnemy");
+
         unit->hasCombatTarget = false;
         target->parentEntity->Destroy();
         unit->combatTarget = nullptr;

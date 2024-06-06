@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <mpg123.h>
+#include <random>
 
 AudioManager::AudioManager(){
 }
@@ -31,13 +32,7 @@ bool AudioManager::init() {
 
     spdlog::info("SDL_mixer initialized successfully with MP3 support.");
 
-    // Check available music formats
-    int availableFormats = Mix_Init(0);
-    if (availableFormats & MIX_INIT_MP3) {
-        spdlog::info("MP3 support is available in SDL_mixer.");
-    } else {
-        spdlog::warn("MP3 support is NOT available in SDL_mixer.");
-    }
+    setAmbientQueue();
 
     return true;
 }
@@ -139,3 +134,98 @@ void AudioManager::setGlobalVolume(int volume) {
     }
     Mix_Volume(-1, volume);
 }
+
+bool AudioManager::isSoundPlaying(const std::string &soundKey) {
+    if (soundKey.empty()) {
+        spdlog::warn("IN AUDIO MANAGER IS SOUND PLAYING: Sound key is empty. No action taken.");
+        return false;
+    }
+    for (int i = 0; i < Mix_AllocateChannels(-1); ++i) {
+        if (Mix_GetChunk(i) == soundMap[soundKey]) {
+            return Mix_Playing(i) == 1;
+        }
+    }
+    return false;
+}
+
+
+
+void AudioManager::playAmbientMusic() {
+    if (soundQueue.empty()) {
+        setAmbientQueue();
+    }
+
+    std::vector<std::string> keys = {"ambient1", "ambient2", "ambient3", "ambient4"};
+    for (auto& key : keys) {
+        if (isSoundPlaying(key)) {
+            return;
+        }
+    }
+
+    playSound(soundQueue.front(), -1);
+    soundQueue.pop();
+}
+
+void AudioManager::setVolumeForGroup(const std::string &groupName, int volume) {
+    if (volume < 0) {
+        spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME: Volume must be between 0 - 128. Clamping to 0.");
+        volume = 0;
+    }
+    if (volume > 128) {
+        spdlog::warn("IN AUDIO MANAGER SET GLOBAL VOLUME: Volume must be between 0 - 128. Clamping to 128.");
+        volume = 128;
+    }
+
+
+    std::vector<std::string> keys;
+    for (auto& sound : soundMap) {
+        if (sound.first.find(groupName) != std::string::npos) {
+            keys.push_back(sound.first);
+        }
+    }
+
+    for (auto& key : keys) {
+        setSoundVolume(key, volume);
+    }
+
+
+
+}
+
+void AudioManager::setAmbientQueue() {
+    std::vector<int> randomNumbers = {1, 2, 3, 4};
+    std::shuffle(randomNumbers.begin(), randomNumbers.end(), std::mt19937(std::random_device()()));
+
+    soundQueue.emplace("ambient"+std::to_string(randomNumbers[0]));
+    soundQueue.emplace("ambient"+std::to_string(randomNumbers[1]));
+    soundQueue.emplace("ambient"+std::to_string(randomNumbers[2]));
+    soundQueue.emplace("ambient"+std::to_string(randomNumbers[3]));
+
+
+}
+
+void AudioManager::playRandomSoundFromGroup(const std::string &groupName) {
+    std::vector<std::string> keys;
+    for (auto& sound : soundMap) {
+        if (sound.first.find(groupName) != std::string::npos) {
+            keys.push_back(sound.first);
+        }
+    }
+
+    if (keys.empty()) {
+        spdlog::warn("IN AUDIO MANAGER PLAY SOUND FROM GROUP: No sounds found for group {}", groupName);
+        return;
+    }
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, keys.size()-1);
+    int random_number = dis(gen);
+
+    playSound(keys[random_number], 0);
+
+}
+
+
+
+

@@ -139,6 +139,9 @@ void Unit::UpdateImpl() {
             newDirtLvl = 0;
         }
         currentTile->changeDirtinessLevel(newDirtLvl);
+        if(newDirtLvl == 0){
+            ztgk::game::audioManager->playRandomSoundFromGroup("idle");
+        }
     }
 
     else if(!isAlly && currentTile->dirtinessLevel < 100){
@@ -148,6 +151,7 @@ void Unit::UpdateImpl() {
         }
         currentTile->changeDirtinessLevel(newDirtLvl);
     }
+
 
 
 
@@ -194,6 +198,8 @@ void Unit::UpdateImpl() {
         grid->getTileAt(gridPosition)->state = UNIT;
         grid->getTileAt(previousGridPosition)->unit = nullptr;
         grid->getTileAt(gridPosition)->unit = this;
+
+        ztgk::game::audioManager->playRandomSoundFromGroup(isAlly ? "gabka" : "bug");
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
