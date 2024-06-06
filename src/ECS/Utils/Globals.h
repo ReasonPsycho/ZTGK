@@ -7,6 +7,7 @@
 #include <memory>
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
+#include "ECS/Audio/AudioManager.h"
 
 struct Cursor;
 class SignalQueue;
@@ -20,6 +21,7 @@ namespace ztgk::game {
     extern Camera * camera;
     extern SignalQueue * signalQueue;
     extern Model * washingMachineModel;
+    extern AudioManager * audioManager;
 
     extern Cursor cursor;
 

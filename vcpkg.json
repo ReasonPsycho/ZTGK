@@ -1,50 +1,37 @@
 {
-  "name": "ztgk",
-  "version-string": "1.0.0",
-  "dependencies": [
-    {
-      "name": "opengl"
-    },
-    {
-      "name": "stb"
-    },
-    {
-      "name": "assimp"
-    },
-    {
-      "name": "glfw3"
-    },
-    {
-      "name": "imgui",
-      "features": [
-        "docking-experimental",
-        "opengl3-binding",
-        "glfw-binding"
-      ]
-    },
-    {
-      "name": "imguizmo"
-    },
-    {
-      "name": "spdlog"
-    },
-    {
-      "name": "glm"
-    },
-    {
-      "name": "glad"
-    },
-    {
-      "name": "freetype-gl"
-    },
-    {
-      "name": "miniaudio"
-    },
-    {
-      "name": "yaml-cpp"
-    },
-    {
-      "name": "tracy"
-    }
-  ]
+  "name" : "ztgk",
+  "version-string" : "1.0.0",
+  "dependencies" : [ {
+    "name" : "opengl"
+  }, {
+    "name" : "stb"
+  }, {
+    "name" : "assimp"
+  }, {
+    "name" : "glfw3"
+  }, {
+    "name" : "imgui",
+    "features" : [ "docking-experimental", "opengl3-binding", "glfw-binding" ]
+  }, {
+    "name" : "imguizmo"
+  }, {
+    "name" : "spdlog"
+  }, {
+    "name" : "glm"
+  }, {
+    "name" : "glad"
+  }, {
+    "name" : "freetype-gl"
+  }, {
+    "name" : "yaml-cpp"
+  }, {
+    "name" : "tracy"
+  }, {
+    "name" : "sdl2"
+  }, {
+    "name" : "sdl2-mixer",
+    "features" : [ "mpg123" ]
+  }, {
+    "name" : "mpg123"
+  } ]
 }

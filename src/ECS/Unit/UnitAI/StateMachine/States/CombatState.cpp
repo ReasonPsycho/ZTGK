@@ -9,6 +9,7 @@
 #include "MovementState.h"
 #include "MiningState.h"
 #include "IdleState.h"
+#include "ECS/Utils/Globals.h"
 
 State *CombatState::RunCurrentState() {
 
@@ -103,7 +104,13 @@ void CombatState::AttackTarget() {
     target->stats.hp -= totalAttackDamage;
     spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
 
+
+    ztgk::game::audioManager->playRandomSoundFromGroup("punch");
+
+
     if(target->stats.hp <= 0){
+        ztgk::game::audioManager->playRandomSoundFromGroup(unit->combatTarget->isAlly ? "deathSponge" : "deathEnemy");
+
         unit->hasCombatTarget = false;
         target->parentEntity->Destroy();
         unit->combatTarget = nullptr;

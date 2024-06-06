@@ -99,7 +99,11 @@ void MiningState::Mine() {
     }
 
     if(isTargetInRange()){
+        if(unit->currentMiningTarget->getTimeToMineRemaining() == unit->currentMiningTarget->timeToMine){
+            ztgk::game::audioManager->playRandomSoundFromGroup("mining");
+        }
         unit->currentMiningTarget->Mine(unit);
+
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
             miningTargets.erase(miningTargets.begin());
             if(miningTargets.empty()){
