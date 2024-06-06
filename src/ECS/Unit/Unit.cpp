@@ -13,6 +13,7 @@
 #include "ECS/Utils/Time.h"
 #include <algorithm>
 #include <random>
+#include "ECS/Gameplay/WashingMachine.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -152,10 +153,6 @@ void Unit::UpdateImpl() {
         currentTile->changeDirtinessLevel(newDirtLvl);
     }
 
-
-
-
-
     if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
         currentMiningTarget = nullptr;
     }
@@ -210,6 +207,21 @@ void Unit::UpdateImpl() {
         currentRotation += 0.1f;
     }
     getEntity()->transform.setLocalRotation(glm::vec3(0, currentRotation, 0));
+
+    if(equipment.item1->name == "Pranium Ore" || equipment.item2->name == "Pranium Ore"){
+        std::vector<Tile*> neighTiles = grid->GetNeighbours(gridPosition);
+        for(auto &tile : neighTiles){
+            if(tile->state == TileState::CORE){
+                ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+                if(equipment.item1->name == "Pranium Ore"){
+                    equipment.unequipItem(1);
+                }
+                else if(equipment.item2->name == "Pranium Ore"){
+                    equipment.unequipItem(2);
+                }
+            }
+        }
+    }
 
     previousGridPosition = gridPosition;
 

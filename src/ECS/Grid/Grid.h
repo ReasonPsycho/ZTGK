@@ -117,6 +117,8 @@ public:
 
     bool isInBounds(Vector2Int anInt);
 
+    std::vector<Tile*> GetNeighbours(Vector2Int gridpos);
+
 private:
     float offsetX = 0;
     float offsetZ = 0;
