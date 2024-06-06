@@ -29,13 +29,12 @@ public:
     ~ILight();
 
     enum LightType lightType;
-
+    bool active = true;
 
     virtual void showImGuiDetailsImpl(Camera *camera) = 0; // Pure virtual function
 
     virtual void
-    SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                      GLuint ShadowMapArrayId, int index, int layer) = 0; // Pure virtual function
+    SetUpDepthShader(Shader *shadowMapShader, int layer) = 0; // Pure virtual function
     virtual void Innit(int width, int height, int index) = 0;
     virtual void UpdateData(int height, int width) = 0;
     void DeleteShadow();

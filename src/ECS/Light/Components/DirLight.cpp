@@ -19,59 +19,15 @@ void DirLight::Innit(int width, int height, int index) {
 }
 
 void
-DirLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                            GLuint ShadowMapArrayId, int index, int layer) {
+DirLight::SetUpDepthShader(Shader *shadowMapShader, int layer) {
     ZoneScopedN("SetUpShadowBuffer");
 
     shadowMapShader->use();
     shadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
     shadowMapShader->setFloat("far_plane", far_plane);
     shadowMapShader->setFloat("near_plane", near_plane);
-    instanceShadowMapShader->use();
-    instanceShadowMapShader->setMatrix4("lightSpaceMatrix", false, glm::value_ptr(data.lightSpaceMatrix));
-    instanceShadowMapShader->setFloat("far_plane", far_plane);
-    instanceShadowMapShader->setFloat("near_plane", near_plane);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, index);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, width, height);
 
 
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        const char *errorType = "";
-        switch (status) {
-            case GL_FRAMEBUFFER_UNDEFINED:
-                errorType = "GL_FRAMEBUFFER_UNDEFINED";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
-                break;
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                errorType = "GL_FRAMEBUFFER_UNSUPPORTED";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS";
-                break;
-            default:
-                errorType = "UNKNOWN_ERROR";
-                break;
-        }
-        spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete! Error: {}", errorType);
-    }
 }
 
 DirLight::DirLight(DirLightData data) :

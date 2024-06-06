@@ -17,7 +17,7 @@ void LightSystem::PushToSSBO() {
         glDeleteBuffers(1, &pointLightBufferId);
         glDeleteBuffers(1, &spotLightBufferId);
     } else {
-        GenerateShadowBuffers();
+        InnitLights();
     }
 
     glGenBuffers(1, &dirLightBufferId);
@@ -99,7 +99,7 @@ LightSystem::LightSystem(Camera *camera, Scene *scene) : camera(camera), scene(s
     name = "Light system";
 }
 
-void LightSystem::GenerateShadowBuffers() {
+void LightSystem::InnitLights() {
     int index = 0;
     for (auto &light: dirLights) {
         light->Innit(SHADOW_WIDTH, SHADOW_HEIGHT, index++);
@@ -169,17 +169,10 @@ void LightSystem::UpdateImpl() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
         ZoneScopedN("DirLight");
-
         if (light->getIsDirty()) {  // Only push it if it's dirty
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(DirLightData), &light->data);
         }
-        light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
-                                 planeShadowMaps, index++, 0);
-        planeDepthShader.use();
-        renderSystem->SimpleDrawScene(&planeDepthShader);
-        instancePlaneDepthShader.use();
-        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera);
         offset += sizeof(light->data);
     }
 
@@ -192,17 +185,9 @@ void LightSystem::UpdateImpl() {
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(SpotLightData), &light->data);
         }
-        light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
-                                 planeShadowMaps, index++, 0);
-        planeDepthShader.use();
-        renderSystem->SimpleDrawScene(&planeDepthShader);
-        instancePlaneDepthShader.use();
-        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera);
-
         offset += sizeof(light->data);
     }
 
-    index = 0;
     offset = 0;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
     for (auto &light: pointLights) {
@@ -212,22 +197,14 @@ void LightSystem::UpdateImpl() {
             light->UpdateData(SHADOW_HEIGHT, SHADOW_WIDTH);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, sizeof(PointLightData), &light->data);
         }
-        for (int i = 0; i < 6; i++) {
-
-            light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
-                                     cubeShadowMaps, index, i);
-            cubeDepthShader.use();
-            renderSystem->SimpleDrawScene(&cubeDepthShader);
-            instanceCubeDepthShader.use();
-            instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader, camera);
-        }
-        index++;
         offset += sizeof(light->data);
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDrawBuffer(GL_BACK);
-    glClear(GL_DEPTH_BUFFER_BIT);
+
+    RenderUsingInstancePlaneDepthShader();
+    RenderUsingInstanceCubeDepthShader();
+    RenderUsingPlaneDepthShader();
+    RenderUsingCubeDepthShader();
 
 }
 
@@ -331,4 +308,142 @@ void LightSystem::createCubeShadowMap() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);;
     
+}
+
+void LightSystem::RenderUsingInstancePlaneDepthShader() {
+
+    instancePlaneDepthShader.use();
+    int index = 0;
+    InstanceRenderSystem *instanceRenderSystem = scene->systemManager.getSystem<InstanceRenderSystem>();
+    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+    for (auto &light: dirLights) {
+        ZoneScopedN("DirLight");
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, planeShadowMaps, 0, index);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        
+        light->SetUpDepthShader(&instancePlaneDepthShader, 0);
+        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera);
+        index++;
+    }
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
+    for (auto &light: spotLights) {
+        ZoneScopedN("SpotLight");
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, planeShadowMaps, 0, index);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        
+        light->SetUpDepthShader(&instancePlaneDepthShader, 0);
+        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera);
+        index++;
+
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK);
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void LightSystem::RenderUsingInstanceCubeDepthShader() {
+
+    instanceCubeDepthShader.use();
+    int index = 0;
+    InstanceRenderSystem *instanceRenderSystem = scene->systemManager.getSystem<InstanceRenderSystem>();
+    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    
+    index = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
+    for (auto &light: pointLights) {
+        ZoneScopedN("PointLight");
+        for (int i = 0; i < 6; i++) {
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeShadowMaps, 0, i + index * 6);
+            glClear(GL_DEPTH_BUFFER_BIT);
+
+            light->SetUpDepthShader(&instanceCubeDepthShader, i);
+            instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader, camera);
+        }
+        index++;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK);
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void LightSystem::RenderUsingPlaneDepthShader() {
+    instancePlaneDepthShader.use();
+    int index = 0;
+    RenderSystem *renderSystem = scene->systemManager.getSystem<RenderSystem>();
+    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+    for (auto &light: dirLights) {
+        ZoneScopedN("DirLight");
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, planeShadowMaps, 0, index);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        light->SetUpDepthShader(&planeDepthShader, 0);
+        renderSystem->SimpleDrawScene(&planeDepthShader);
+        index++;
+    }
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
+    for (auto &light: spotLights) {
+        ZoneScopedN("SpotLight");
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, planeShadowMaps, 0, index);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        light->SetUpDepthShader(&planeDepthShader, 0);
+        renderSystem->SimpleDrawScene(&planeDepthShader);
+        index++;
+
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK);
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void LightSystem::RenderUsingCubeDepthShader() {
+    instanceCubeDepthShader.use();
+    int index = 0;
+    RenderSystem *renderSystem = scene->systemManager.getSystem<RenderSystem>();
+    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+    index = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
+    for (auto &light: pointLights) {
+        ZoneScopedN("PointLight");
+        for (int i = 0; i < 6; i++) {
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeShadowMaps, 0, i + index * 6);
+            glClear(GL_DEPTH_BUFFER_BIT);
+
+            light->SetUpDepthShader(&cubeDepthShader, i);
+            renderSystem->SimpleDrawScene(&cubeDepthShader);
+        }
+        index++;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK);
+    glClear(GL_DEPTH_BUFFER_BIT);
 }

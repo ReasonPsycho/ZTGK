@@ -35,69 +35,14 @@ void PointLight::Innit(int width, int height, int index) {
 
 }
 
-void PointLight::SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                                   GLuint ShadowMapArrayId, int index, int layer) {
+void PointLight::SetUpDepthShader(Shader *shadowMapShader, int layer) {
     ZoneScopedN("SetUpShadowBuffer");
 
-        shadowMapShader->use();
-        shadowMapShader->setMatrix4("shadowMatrice", false,
-                                    glm::value_ptr(shadowTransforms[layer]));
-        shadowMapShader->setFloat("far_plane", far_plane);
-        shadowMapShader->setFloat("near_plane", near_plane);
-        shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-
-        instanceShadowMapShader->use();
-        instanceShadowMapShader->setMatrix4("shadowMatrice", false,
-                                            glm::value_ptr(shadowTransforms[layer]));
-        instanceShadowMapShader->use();
-        instanceShadowMapShader->setFloat("far_plane", far_plane);
-        instanceShadowMapShader->setFloat("near_plane", near_plane);
-        instanceShadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
-        
-    
-        
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, ShadowMapArrayId, 0, layer + index * 6);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-
-    glViewport(0, 0, width, height);
-
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        const char *errorType = "";
-        switch (status) {
-            case GL_FRAMEBUFFER_UNDEFINED:
-                errorType = "GL_FRAMEBUFFER_UNDEFINED";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
-                break;
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                errorType = "GL_FRAMEBUFFER_UNSUPPORTED";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-                errorType = "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS";
-                break;
-            default:
-                errorType = "UNKNOWN_ERROR";
-                break;
-        }
-        spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete! Error: {}", errorType);
-    }
+    shadowMapShader->use();
+    shadowMapShader->setMatrix4("shadowMatrice", false, glm::value_ptr(shadowTransforms[layer]));
+    shadowMapShader->setFloat("far_plane", far_plane);
+    shadowMapShader->setFloat("near_plane", near_plane);
+    shadowMapShader->setVec3("lightPos", data.position.x, data.position.y, data.position.z);
 }
 
 PointLight::PointLight(PointLightData data) :
@@ -114,7 +59,7 @@ void PointLight::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat("Constant", &data.constant);
     ImGui::InputFloat("Linear", &data.linear);
     ImGui::InputFloat("Quadratic", &data.quadratic);
-    if(ImGui::Button("Update")){
+    if (ImGui::Button("Update")) {
         this->setIsDirty(true);
     }
 }
@@ -152,7 +97,7 @@ void PointLight::UpdateData(int height, int width) {
     this->setIsDirty(false); //Just assume is dirty even when I just show it. Lol
 }
 
-PointLight::PointLight(): data(PointLightData()) {
+PointLight::PointLight() : data(PointLightData()) {
     name = "Point light";
 
     lightType = Point;

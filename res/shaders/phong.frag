@@ -196,16 +196,22 @@ void main()
     vec3 result = 0.1f * vec3(texture(material.diffuseTexture, fs_in.TexCoords)); //We do be calculating ambient here
     int index = 0;
     for (int i = 0; i < dirLightAmount; ++i) {
-        result += CalcDirLight(dirLights[i], normal,viewDir,index++);
+        if(dirLights[i].diffuse != 0){
+            result += CalcDirLight(dirLights[i], normal,viewDir,index++);
+        }
     }
   
     for (int i = 0; i < spotLightAmount; ++i) {
-        result += CalcSpotLight(spotLights[i], normal,fs_in.WorldPos,viewDir,index++);
+        if(spotLights[i].diffuse != 0){
+            result += CalcSpotLight(spotLights[i], normal,fs_in.WorldPos,viewDir,index++);
+        }
     }
     
     index = 0;
     for (int i = 0; i < pointLightAmount; ++i) {
-        result += CalcPointLight(pointLights[i], normal,fs_in.WorldPos,viewDir,index++);
+        if(pointLights[i].diffuse != 0){
+            result += CalcPointLight(pointLights[i], normal,fs_in.WorldPos,viewDir,index++);
+        }
     }
 
     FragColor = vec4(result, 1.0);

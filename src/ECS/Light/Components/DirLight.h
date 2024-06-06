@@ -22,12 +22,12 @@ struct DirLightData {
 
     DirLightData(glm::vec4 diffuse= glm::vec4(glm::vec3 (255.0f),1),
                  glm::vec4 specular= glm::vec4(glm::vec3 (0),1),
-                 glm::vec4 position = glm::vec4(0.0f),
+                 glm::vec4 position = glm::vec4(1.0f),
     glm::vec4 direction = glm::vec4(1.0f),
     glm::mat4x4 lightSpaceMatrix = glm::mat4x4(1.0f))
-            : diffuse(diffuse),
+            : diffuse(diffuse),//4th data in diffuse stores active bool
               specular(specular),
-              position(position),
+              position(position), 
               direction(direction),
               lightSpaceMatrix(lightSpaceMatrix) // set to identity matrix
     {}
@@ -45,8 +45,7 @@ public:
     
     void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                           GLuint ShadowMapArrayId, int index, int layer) override; // Pure virtual function
+    void SetUpDepthShader(Shader *shadowMapShader, int layer) override; // Pure virtual function
 
 
     void UpdateData(int height, int width) override;

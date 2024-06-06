@@ -230,16 +230,22 @@ void main()
         result = 0.1f * diffuse;//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLightAmount; ++i) {
-            result += CalcDirLight(dirLights[i], normal, viewDir, index++,  diffuse,specular);
+            if(dirLights[i].diffuse != 0){
+                result += CalcDirLight(dirLights[i], normal, viewDir, index++,  diffuse,specular);
+            }
         }
 
         for (int i = 0; i < spotLightAmount; ++i) {
-            result += CalcSpotLight(spotLights[i], normal, fs_in.tangentData.FragPos, viewDir, index++, diffuse,specular);
+            if(spotLights[i].diffuse != 0){
+                result += CalcSpotLight(spotLights[i], normal, fs_in.tangentData.FragPos, viewDir, index++, diffuse,specular);
+            }
         }
 
         index = 0;
         for (int i = 0; i < pointLightAmount; ++i) {
-            result += CalcPointLight(pointLights[i], normal, fs_in.tangentData.FragPos, viewDir, index++,  diffuse,specular);
+            if(pointLights[i].diffuse != 0){
+                result += CalcPointLight(pointLights[i], normal, fs_in.tangentData.FragPos, viewDir, index++,  diffuse,specular);
+            }
         }
 
     }

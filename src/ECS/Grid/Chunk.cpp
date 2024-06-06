@@ -80,14 +80,16 @@ void Chunk::removeTileAt(int x, int z) {
 
 void Chunk::CalculateChunkData() {
     minedTiles = 0;
+    visibleTiles = 0;
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
-            TileState state = chunkTileArray[x][y]->state;
-            if (state != WALL && state != ORE){
+            if (chunkTileArray[x][y]->state != WALL && chunkTileArray[x][y]->state != ORE){
                 minedTiles++;
+            }
+            if (chunkTileArray[x][y]->isInFogOfWar){
+                visibleTiles++;
             }
         }   
     }
-    isAccessibleFromCore = true; // TODO do here A*
 }
 

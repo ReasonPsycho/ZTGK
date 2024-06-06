@@ -294,6 +294,7 @@ void Grid::LoadTileEntities(float scale) {
     gridEntity->forceUpdateSelfAndChild();
 
     SetUpWalls();
+    SetUpChunks();
 }
 
 
@@ -509,13 +510,20 @@ void Grid::removeTileAt(Vector2Int index) {
 }
 
 void Grid::SetUpChunks() {
-    for (int i = 0; i < width / tileSize; i++) {
-        for (int j = 0; j < height / tileSize; j++) {
-            Chunk *currentChunk = getChunkAt(i, j);
-            if (currentChunk != nullptr)
+    for (int i = 0; i < width / chunkWidth; i++) {
+        for (int j = 0; j < height / chunkWidth; j++) {
+            Chunk *currentChunk = chunkArray[i][j];
+            if (currentChunk != nullptr){
                 currentChunk->CalculateChunkData();
+                if(currentChunk->localLight == nullptr){
+                    Entity* lightEntity = scene->addEntity(currentChunk->parentEntity,"Point light " + currentChunk->parentEntity->name);
+                    lightEntity->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.1f,0.005f)));
+                    currentChunk->localLight = lightEntity->getComponent<PointLight>();
+                }
+            }
         }
     }
+    
 }
 
 void Grid::UpdateFogData(Tile *tile) {

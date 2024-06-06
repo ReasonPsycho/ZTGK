@@ -168,8 +168,8 @@ void LevelSaving::load(const std::string& path) {
         spdlog::trace("Initializing tiles with loaded state");
         grid->InitializeTileEntities();
         grid->SetUpWalls();
-    grid->UpdateFogData(grid->centerTile);
-
+        grid->UpdateFogData(grid->centerTile);
+        grid->SetUpChunks();
         spdlog::trace("Reading node");
         auto units = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
         if (!units.empty()) {

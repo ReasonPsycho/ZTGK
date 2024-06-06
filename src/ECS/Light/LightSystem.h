@@ -34,9 +34,11 @@ public:
     void PushToSSBO();
     void UpdateImpl() override;
 
-    void GenerateShadowBuffers();
-
-
+    void InnitLights();
+    void RenderUsingInstancePlaneDepthShader();
+    void RenderUsingInstanceCubeDepthShader();
+    void RenderUsingPlaneDepthShader();
+    void RenderUsingCubeDepthShader();
     const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
     int getNumComponentTypes() override { return 4;};
 
@@ -94,7 +96,7 @@ private:
     GLuint cubeShadowMaps;
 
     int maxDirLight = 1;
-    int maxPointLight = 20;
+    int maxPointLight = 110;
     int maxSpotLight = 20;
 
 

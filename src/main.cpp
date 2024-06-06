@@ -482,10 +482,11 @@ void load_enteties() {
 
 
     gameObject->addComponent(make_unique<PointLight>(
-            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
-                           0.05f)));
+            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.1f,
+                           0.005f)));
     //  gameObject = scene.addEntity("Point Light 2");
     // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+
     gameObject = scene.addEntity("Spot Light");
     gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
     gameObject->addComponent(make_unique<SpotLight>(

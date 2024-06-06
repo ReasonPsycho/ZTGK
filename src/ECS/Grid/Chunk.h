@@ -23,9 +23,9 @@ public:
     int height;
     bool isVisible;
     int minedTiles;
-    bool isAccessibleFromCore;
+    int visibleTiles;
     
-    PointLight* localLight;
+    PointLight* localLight = nullptr;
     Vector2Int index{};
     
     std::vector<std::unique_ptr<WallData>> wallDataArray;
