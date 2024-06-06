@@ -438,22 +438,77 @@ void init_managers() {
 }
 
 void load_sounds() {
-    ztgk::game::audioManager->loadSound("res/sounds/test.wav", "test");
+    //background music
+    ztgk::game::audioManager->loadSound("res/sounds/ambient1.mp3", "ambient1");
+    ztgk::game::audioManager->loadSound("res/sounds/ambient2.mp3", "ambient2");
+    ztgk::game::audioManager->loadSound("res/sounds/ambient3.mp3", "ambient3");
+    ztgk::game::audioManager->loadSound("res/sounds/ambient4.mp3", "ambient4");
 
-    ztgk::game::audioManager->setSoundVolume("test", 128);
-    ztgk::game::audioManager->setGlobalVolume(128);
+    //intro music
+    ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
 
-    //ztgk::game::audioManager->playSound("test", 0);
+    //lose music
+    ztgk::game::audioManager->loadSound("res/sounds/lose.mp3", "lose");
 
-    ztgk::game::audioManager->loadSound("res/sounds/test2.wav", "test2");
-    //ztgk::game::audioManager->playSound("test2", 1);
-    ztgk::game::audioManager->loadSound("res/sounds/freebird.wav", "freebird");
+    //win music
+    ztgk::game::audioManager->loadSound("res/sounds/win.mp3", "win");
 
-    for (int i = 1; i <= 8; i++) {
-        ztgk::game::audioManager->loadSound("res/sounds/punch" + std::to_string(i) + ".wav",
-                                            "punch" + std::to_string(i));
-        ztgk::game::audioManager->setSoundVolume("punch" + std::to_string(i), 50);
-    }
+    //punch sounds
+    ztgk::game::audioManager->loadSound("res/sounds/punch1.wav", "punch1");
+    ztgk::game::audioManager->loadSound("res/sounds/punch2.wav", "punch2");
+    ztgk::game::audioManager->loadSound("res/sounds/punch3.wav", "punch3");
+    ztgk::game::audioManager->loadSound("res/sounds/punch4.wav", "punch4");
+    ztgk::game::audioManager->loadSound("res/sounds/punch5.wav", "punch5");
+    ztgk::game::audioManager->loadSound("res/sounds/punch6.wav", "punch6");
+    ztgk::game::audioManager->loadSound("res/sounds/punch7.wav", "punch7");
+
+    //bubble pop
+    ztgk::game::audioManager->loadSound("res/sounds/bubble1.mp3", "bubble1");
+
+    //bubbles bulbulbulbul
+    ztgk::game::audioManager->loadSound("res/sounds/bubbles.mp3", "bubbles");
+
+    //bug walking
+    ztgk::game::audioManager->loadSound("res/sounds/bug1.mp3", "bug2");
+
+    //clicks for UI
+    ztgk::game::audioManager->loadSound("res/sounds/click1.mp3", "click1");
+    ztgk::game::audioManager->loadSound("res/sounds/click2.mp3", "click2");
+
+    //death sounds OOF
+    ztgk::game::audioManager->loadSound("res/sounds/deathEnemy1.mp3", "deathEnemy1");
+    ztgk::game::audioManager->loadSound("res/sounds/deathEnemy2.mp3", "deathEnemy2");
+    ztgk::game::audioManager->loadSound("res/sounds/deathSponge1.wav", "deathSponge1");
+    ztgk::game::audioManager->loadSound("res/sounds/deathSponge2.wav", "deathSponge2");
+    ztgk::game::audioManager->loadSound("res/sounds/deathSponge3.mp3", "deathSponge3");
+
+    //gabka walking
+    ztgk::game::audioManager->loadSound("res/sounds/gabka1.mp3", "gabka1");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka2.mp3", "gabka2");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka3.mp3", "gabka3");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka4.mp3", "gabka4");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka5.mp3", "gabka5");
+
+    //gabka celaning tiles
+    ztgk::game::audioManager->loadSound("res/sounds/idle1.mp3", "idle1");
+    ztgk::game::audioManager->loadSound("res/sounds/idle2.mp3", "idle2");
+
+    //mining sound
+    ztgk::game::audioManager->loadSound("res/sounds/mining1.mp3", "mining1");
+    ztgk::game::audioManager->loadSound("res/sounds/mining2.mp3", "mining2");
+    ztgk::game::audioManager->loadSound("res/sounds/mining3.mp3", "mining3");
+    ztgk::game::audioManager->loadSound("res/sounds/mining4.mp3", "mining4");
+
+    //pralka 1 - slow pralka sounds
+    ztgk::game::audioManager->loadSound("res/sounds/pralka1.mp3", "pralka1");
+
+    //pralka 2 - crazy fast pralka sounds
+    ztgk::game::audioManager->loadSound("res/sounds/pralka2.mp3", "pralka2");
+
+    //quack
+    ztgk::game::audioManager->loadSound("res/sounds/rubberduck1.mp3", "rubberduck1");
+    ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
+
 
 }
 
@@ -733,6 +788,11 @@ void input() {
 
 void update() {
     ZoneScopedN("Update");
+
+    //no need to check every frame, every 5 sec is good enough
+    if((int)glfwGetTime()%5 == 0 && glfwGetTime() - (int)glfwGetTime() < 0.02) {
+        ztgk::game::audioManager->playAmbientMusic();
+    }
 
     //UpdateImpl mouse position
     mouseX = mouseio.MousePos.x;
