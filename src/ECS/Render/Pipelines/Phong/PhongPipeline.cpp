@@ -9,7 +9,7 @@
 void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
 
     _primitives = primitives;
-    
+
     phongShader.init();
     phongInstanceShader.init();
     phongInstanceLightShader.init();
@@ -19,10 +19,10 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
 
     downscale.init();
     upscale.init();
-    
-    m_mip_levels =4 ; //It dosn't work above it
+
+    m_mip_levels =4 ; //It doesn't work above it
     //CalculateMipmapLevels(camera->saved_display_w,camera->saved_display_h);
-    
+
     glCreateFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
@@ -30,7 +30,7 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     glBindFramebuffer(GL_FRAMEBUFFER, foamFrameBuffer);
     
     SetUpTextureBuffers(camera->saved_display_w, camera->saved_display_h);
-    
+
     bloomDirtTexture = new Texture("res/textures/bloom_dirt_mask.png","");
 
     Color foamColor = {0, 0, 0, 0};  // Normal map neutral
@@ -66,6 +66,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     switch (fb_status) {
         case GL_FRAMEBUFFER_COMPLETE:
+            //std::cout << "SUCCESS::FRAMEBUFFER:: Framebuffer is complete." << std::endl;
             break;
         case GL_FRAMEBUFFER_UNDEFINED:
             std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNDEFINED:: Default framebuffer does not exist." << std::endl;
@@ -95,10 +96,10 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
             std::cout << "ERROR::FRAMEBUFFER:: Unknown error." << std::endl;
             break;
     }
-    
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Depends on your needs
 
-    
+
     phongInstanceShader.use();
     phongInstanceShader.setBool("shadows", true);
     phongInstanceShader.setMatrix4("projection", false, glm::value_ptr(projection));
@@ -118,7 +119,6 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
 
     phongInstanceShader.setFloat("rim_threshold", rim_threshold);
     phongInstanceShader.setFloat("rim_amount", rim_amount);
-
     phongShader.use();
 
     phongShader.setBool("shadows", true);
@@ -153,7 +153,7 @@ void PhongPipeline::SetUpTextureBuffers(int width, int height) {
     if(isInnit){
         glDeleteTextures(3, colorAttachments);
     }
-    
+
     GLubyte whitePixel[4] = {255, 255, 255,255};
     GLubyte *whiteImage = new GLubyte[width * height * 4];
     for (int i = 0; i < width * height * 4; i += 4) {
@@ -220,7 +220,7 @@ void PhongPipeline::SetUpTextureBuffers(int width, int height) {
 }
 
 void PhongPipeline::WriteToBackBuffer(Camera *camera) {
-    
+
     if(bloomEnabled)
     {
         downscale.use();
@@ -260,7 +260,7 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
 
 
             glBindImageTexture(0, colorAttachments[2], i - 1, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-            
+
             glDispatchCompute(glm::ceil(float(mip_size.x) / 8), glm::ceil(float(mip_size.y) / 8), 1);
 
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -269,7 +269,7 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
 
     textureSampler.use();
     glActiveTexture(GL_TEXTURE0); // Work with Texture Unit 0
-    glBindTexture(GL_TEXTURE_2D, colorAttachments[0]); // Bind it to GL_TEXTURE_2D   
+    glBindTexture(GL_TEXTURE_2D, colorAttachments[0]); // Bind it to GL_TEXTURE_2D
     glActiveTexture(GL_TEXTURE1); // Work with Texture Unit 0
     glBindTexture(GL_TEXTURE_2D, colorAttachments[1]); // Bind it to GL_TEXTURE_2D
     glActiveTexture(GL_TEXTURE2); // Work with Texture Unit 0

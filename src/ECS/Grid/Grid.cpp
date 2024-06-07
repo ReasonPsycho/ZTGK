@@ -517,6 +517,37 @@ void Grid::SetUpChunks() {
         }
     }
 }
+std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos) {
+    std::vector<Tile *> neighbours;
+    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z))) {
+        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z));
+    }
+    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z))) {
+        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z));
+    }
+    if (isInBounds(Vector2Int(gridpos.x, gridpos.z + 1))) {
+        neighbours.push_back(getTileAt(gridpos.x, gridpos.z + 1));
+    }
+    if (isInBounds(Vector2Int(gridpos.x, gridpos.z - 1))) {
+        neighbours.push_back(getTileAt(gridpos.x, gridpos.z - 1));
+    }
+    //diagonals
+    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z + 1))) {
+        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z + 1));
+    }
+    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z - 1))) {
+        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z - 1));
+    }
+    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z - 1))) {
+        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z - 1));
+    }
+    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z + 1))) {
+        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z + 1));
+    }
+
+    return neighbours;
+}
+
 
 void Grid::UpdateFogData(Tile *tile) {
     Vector2Int neighboursIndexes[4] = {Vector2Int(0, 1), Vector2Int(0, -1), Vector2Int(-1, 0), Vector2Int(1, 0)};

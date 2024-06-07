@@ -85,6 +85,7 @@ void WashingMachine::onPraniumDelivered() {
 
     if(currentPranium >= praniumNeeded){
         //todo finisz gejm
+        ztgk::game::audioManager->playSound("win");
     }
 
 

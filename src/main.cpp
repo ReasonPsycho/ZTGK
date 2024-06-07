@@ -39,6 +39,7 @@
 #include "ECS/Scene.h"
 #include "ECS/Unit/Unit.h"
 
+
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -72,6 +73,7 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Mining/MineableChest.h"
 #include "ECS/Gameplay/WashingMachine.h"
+#include "ECS/Audio/AudioManager.h"
 
 #pragma endregion Includes
 
@@ -117,6 +119,8 @@ void init_systems();
 void load_enteties();
 
 void init_managers();
+
+void load_sounds();
 
 void load_units();
 
@@ -308,6 +312,8 @@ void cleanup() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    ztgk::game::audioManager->close();
+
     glfwDestroyWindow(window);
     glfwTerminate();
 }
@@ -383,6 +389,15 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::window = window;
+
+    ztgk::game::audioManager = new AudioManager();
+    ztgk::game::audioManager->init();
+    spdlog::info("Initialized audio manager.");
+    load_sounds();
+    spdlog::info("Loaded sounds.");
+
+
+
     primitives.Init();
 
 
@@ -421,6 +436,85 @@ void init_managers() {
     auto ent = scene.addEntity("Controllers");
     ent->addComponent(make_unique<InventoryManager>());
     ent->getComponent<InventoryManager>()->init();
+}
+
+void load_sounds() {
+    //background music
+    ztgk::game::audioManager->loadSound("res/sounds/ambient1.mp3", "ambient1");
+    ztgk::game::audioManager->loadSound("res/sounds/ambient2.mp3", "ambient2");
+    ztgk::game::audioManager->loadSound("res/sounds/ambient3.mp3", "ambient3");
+    ztgk::game::audioManager->loadSound("res/sounds/ambient4.mp3", "ambient4");
+
+
+    //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
+
+    //intro music
+    ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
+
+    //lose music
+    ztgk::game::audioManager->loadSound("res/sounds/lose.mp3", "lose");
+
+    //win music
+    ztgk::game::audioManager->loadSound("res/sounds/win.mp3", "win");
+
+    //punch sounds
+    ztgk::game::audioManager->loadSound("res/sounds/punch1.wav", "punch1");
+    ztgk::game::audioManager->loadSound("res/sounds/punch2.wav", "punch2");
+    ztgk::game::audioManager->loadSound("res/sounds/punch3.wav", "punch3");
+    ztgk::game::audioManager->loadSound("res/sounds/punch4.wav", "punch4");
+    ztgk::game::audioManager->loadSound("res/sounds/punch5.wav", "punch5");
+    ztgk::game::audioManager->loadSound("res/sounds/punch6.wav", "punch6");
+    ztgk::game::audioManager->loadSound("res/sounds/punch7.wav", "punch7");
+
+    //bubble pop
+    ztgk::game::audioManager->loadSound("res/sounds/bubble1.mp3", "bubble1");
+
+    //bubbles bulbulbulbul
+    ztgk::game::audioManager->loadSound("res/sounds/bubbles.mp3", "bubbles");
+
+    //bug walking
+    ztgk::game::audioManager->loadSound("res/sounds/bug1.mp3", "bug2");
+
+    //clicks for UI
+    ztgk::game::audioManager->loadSound("res/sounds/click1.mp3", "click1");
+    ztgk::game::audioManager->loadSound("res/sounds/click2.mp3", "click2");
+
+    //death sounds OOF
+    ztgk::game::audioManager->loadSound("res/sounds/deathEnemy1.mp3", "deathEnemy1");
+    ztgk::game::audioManager->loadSound("res/sounds/deathEnemy2.mp3", "deathEnemy2");
+    ztgk::game::audioManager->loadSound("res/sounds/deathSponge1.wav", "deathSponge1");
+    ztgk::game::audioManager->loadSound("res/sounds/deathSponge2.wav", "deathSponge2");
+    ztgk::game::audioManager->loadSound("res/sounds/deathSponge3.mp3", "deathSponge3");
+
+    //gabka walking
+    ztgk::game::audioManager->loadSound("res/sounds/gabka1.mp3", "gabka1");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka2.mp3", "gabka2");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka3.mp3", "gabka3");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka4.mp3", "gabka4");
+    ztgk::game::audioManager->loadSound("res/sounds/gabka5.mp3", "gabka5");
+
+    //gabka celaning tiles
+    ztgk::game::audioManager->loadSound("res/sounds/idle1.mp3", "idle1");
+    ztgk::game::audioManager->loadSound("res/sounds/idle2.mp3", "idle2");
+
+    //mining sound
+    ztgk::game::audioManager->loadSound("res/sounds/mining1.mp3", "mining1");
+    ztgk::game::audioManager->loadSound("res/sounds/mining2.mp3", "mining2");
+    ztgk::game::audioManager->loadSound("res/sounds/mining3.mp3", "mining3");
+    ztgk::game::audioManager->loadSound("res/sounds/mining4.mp3", "mining4");
+
+    //pralka 1 - slow pralka sounds
+    ztgk::game::audioManager->loadSound("res/sounds/pralka1.mp3", "pralka1");
+
+    //pralka 2 - crazy fast pralka sounds
+    ztgk::game::audioManager->loadSound("res/sounds/pralka2.mp3", "pralka2");
+
+    //quack
+    ztgk::game::audioManager->loadSound("res/sounds/rubberduck1.mp3", "rubberduck1");
+    ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
+
+
 }
 
 void load_enteties() {
@@ -598,7 +692,6 @@ void load_enteties() {
 }
 
 void load_units() {
-    
     playerUnit = scene.addEntity("Player1");
     playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -654,7 +747,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-    */
+
 
 }
 
@@ -701,6 +794,11 @@ void input() {
 
 void update() {
     ZoneScopedN("Update");
+
+    //no need to check every frame, every 5 sec is good enough
+    if((int)glfwGetTime()%5 == 0 && glfwGetTime() - (int)glfwGetTime() < 0.02) {
+        ztgk::game::audioManager->playAmbientMusic();
+    }
 
     //UpdateImpl mouse position
     mouseX = mouseio.MousePos.x;
