@@ -37,9 +37,25 @@ RenderSystem::RenderSystem() {
 }
 
 void RenderSystem::addComponent(void *component) {
+    Component* basePtr = static_cast<Component*>(component);
 
-        renderComponents.push_back(reinterpret_cast<Render *const>(component));
-    
+    Render* renderPtr = dynamic_cast<Render*>(basePtr);
+    if(renderPtr != nullptr)
+    {
+        renderComponents.push_back(renderPtr);
+    }
+
+    ColorMask* colorMaskPtr = dynamic_cast<ColorMask*>(basePtr);
+    if(colorMaskPtr != nullptr)
+    {
+        colorMaskComponents.push_back(colorMaskPtr);
+    }
+}
+
+void RenderSystem::UpdateImpl() {
+    for (auto colorMask: colorMaskComponents) {
+            colorMask->Update();
+    }
 }
 
 

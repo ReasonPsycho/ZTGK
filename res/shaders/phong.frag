@@ -96,6 +96,8 @@ uniform float dark_shade_cutoff;
 uniform float rim_threshold;
 uniform float rim_amount;
 
+uniform vec4 colorMask;
+
 vec3 gridSamplingDisk[20] = vec3[]
 (
 vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
@@ -169,7 +171,13 @@ vec4 reinhard(vec4 hdr_color)
     return vec4(ldr_color, 1.0);
 }
 
+vec4 alpha_blend(vec4 top, vec4 bottom)
+{
+    vec3  color = (top.rgb * top.a) + (bottom.rgb * (1 - top.a));
+    float alpha = top.a + bottom.a * (1 - top.a);
 
+    return vec4(color, alpha);
+}
 
 void main()
 {
@@ -207,7 +215,9 @@ void main()
     for (int i = 0; i < pointLightAmount; ++i) {
         result += CalcPointLight(pointLights[i], normal,fs_in.WorldPos,viewDir,index++);
     }
-
+    
+    result = mix(result,vec3(colorMask),colorMask.a);
+    
     FragColor = vec4(result, 1.0);
 
     float depth = gl_FragCoord.z;

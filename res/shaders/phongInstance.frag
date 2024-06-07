@@ -220,8 +220,8 @@ void main()
 
 
     if(dirtinessMap > 0.1){
-        diffuse -= vec3(dirtinessMap);
-        specular -= vec3(dirtinessMap);
+        diffuse -= vec3(dirtinessMap) * 0.5;
+        specular -= vec3(dirtinessMap)* 0.5;
     }
     
     vec3 result = vec3(0);
@@ -258,7 +258,7 @@ void main()
     FragColor = vec4(result, 1.0);
 
     float depth = gl_FragCoord.z;
-    frag_normal_depth = vec4(normal, depth);
+ //   frag_normal_depth = vec4(normal, depth);
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 

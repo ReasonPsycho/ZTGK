@@ -290,7 +290,7 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
     textureSampler.setFloat("depth_normal_threshold_scale",  0.2);  // Here 0 is the texture unit
     textureSampler.setFloat("normal_threshold",  0.5);  // Here 0 is the texture unit
 
-    textureSampler.setFloat("outline_width", 3);  // Here 0 is the texture unit
+    textureSampler.setFloat("outline_width", 1);  // Here 0 is the texture unit
     textureSampler.setVec3("outline_color", glm::vec3(0));  // Here 0 is the texture unit
 
     textureSampler.setFloat("exposure", exposure);  // Here 0 is the texture unit

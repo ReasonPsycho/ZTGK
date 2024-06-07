@@ -473,6 +473,7 @@ void load_enteties() {
     gameObject = scene.addEntity("Gabka");;
     gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
     gameObject->addComponent(make_unique<Render>(&gabka));
+    gameObject->addComponent(make_unique<ColorMask>()); //HERE IGORRRRRRRKUUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!!!!!!!!!!!!!!! xoxoxo
 
 
 //    gameObject = scene.addEntity("Dir light");
@@ -612,6 +613,7 @@ void load_units() {
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
+    /*
     playerUnit = scene.addEntity("Player2");
     playerUnit->addComponent(make_unique<Render>(&gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -652,7 +654,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-    
+    */
 
 }
 
@@ -722,6 +724,7 @@ void update() {
     }
 
     scene.systemManager.getSystem<CollisionSystem>()->Update();
+    scene.systemManager.getSystem<RenderSystem>()->Update();
 
 //    auto u = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents[0];
 //    spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
