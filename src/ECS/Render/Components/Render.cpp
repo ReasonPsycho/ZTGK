@@ -32,7 +32,7 @@ void Render::draw(Shader &regularShader, Frustum *frustum) {
         regularShader.setFloat("dirtLevel", dirtLevel);
         regularShader.setBool("isInFogOfWar", isInFogOfWar);
         pModel->Draw(regularShader);    
-    }`
+    }
 }
 
 void Render::showImGuiDetailsImpl(Camera *camera) {
