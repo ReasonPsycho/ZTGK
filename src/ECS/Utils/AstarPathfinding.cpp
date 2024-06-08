@@ -5,13 +5,14 @@
 #include "AstarPathfinding.h"
 #include <tracy/Tracy.hpp >
 #include <GLFW/glfw3.h>
-
+#include "ECS/Unit/Unit.h"
 /**
  * @brief AstarPathfinding constructor
  * @param grid
  */
-AstarPathfinding::AstarPathfinding(Grid *grid) {
+AstarPathfinding::AstarPathfinding(Grid *grid, Unit* unit) {
     this->grid = grid;
+    this->unit = unit;
 }
 
 /**
@@ -76,7 +77,7 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
 
 
     }
-    spdlog::error("PATHFINDING: No path found");
+    spdlog::error("PATHFINDING: No path found for unit {}", unit->name);
     path.clear();
     return path;
 }

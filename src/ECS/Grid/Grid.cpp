@@ -15,6 +15,9 @@
 #include "ECS/Gameplay/Pranium.h"
 #include "ECS/Gameplay/WashingMachineTile.h"
 #include "ECS/Gameplay/WashingMachine.h"
+#include "ECS/Unit/Unit.h"
+#include "ECS/Unit/UnitAI/UnitAI.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -228,7 +231,9 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->addComponent(std::make_unique<WashingMachineTile>(ztgk::game::scene->systemManager.getSystem<WashingMachine>(), Vector2Int(i, j), this));
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 5, 1);
                     break;
-                case UNIT:
+                case SPONGE:
+                    SpawnUnit(tile->index, true);
+                    break;
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
                 case CHEST:
@@ -238,6 +243,10 @@ void Grid::InitializeTileEntities() {
                     break;
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
+                    break;
+                case SHROOM:
+                case BUG:
+                    SpawnUnit(tile->index, false);
                     break;
             }
         }
@@ -564,7 +573,7 @@ void Grid::UpdateFogData(Tile *tile) {
             Vector2Int neighbourIndex = current + neighboursIndexes[i];
             Tile *neighbourTile = getTileAt(neighbourIndex.x, neighbourIndex.z);
             if (neighbourTile != nullptr && std::find(closed.begin(), closed.end(), neighbourTile->index) == closed.end()) {
-                if(neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == UNIT){
+                if(neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE){
                     open.push_back(neighbourIndex);
                 }else{
                     egde.push_back(neighbourIndex);
@@ -594,4 +603,20 @@ void Grid::UpdateFogData(Tile *tile) {
         getTileAt(index)->isInFogOfWar = false;
         getTileAt(index)->changeWallsFogOfWarState(false);
     }
+}
+
+void Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
+    Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
+    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : ztgk::game::bugModel));
+    UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
+    UnitEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
+    UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    UnitEntity->updateSelfAndChild();
+    UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));
+    UnitEntity->getComponent<BoxCollider>()->setCenter(UnitEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+    UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : "Enemy", this, gridPos, isAlly ? Unit::ALLY_BASE : Unit::ENEMY_BASE, isAlly));
+    auto stateManager = new StateManager(UnitEntity->getComponent<Unit>());
+    stateManager->currentState = new IdleState(this);
+    stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
+    UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
 }

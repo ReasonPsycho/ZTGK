@@ -80,3 +80,7 @@ void ColorMask::showImGuiDetailsImpl(Camera *camera) {
 ColorMask::ColorMask() {
     name = "Color mask";
 }
+
+bool ColorMask::HasMask(std::string name) {
+    return maskDataMap.find(name) != maskDataMap.end();
+}

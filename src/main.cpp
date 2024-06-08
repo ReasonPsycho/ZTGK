@@ -38,6 +38,7 @@
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Scene.h"
 #include "ECS/Unit/Unit.h"
+#include "ECS/Utils/RNG.h"
 
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD //THIS HAS TO BE RIGHT BEFORE THE PIPELINE
@@ -165,6 +166,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods);
 void processInput(GLFWwindow *window);
 
 void update_dragged_tiles();
+
+void gen_and_load_lvl(bool gen_new_lvl = false);
 
 #pragma endregion Function definitions
 
@@ -447,7 +450,7 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient", 40);
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
 
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
@@ -534,6 +537,8 @@ void load_enteties() {
     tileModel.loadModel();
     washingMachineModel.loadModel();
     ztgk::game::washingMachineModel = &washingMachineModel;
+    ztgk::game::playerModel = &gabka;
+    ztgk::game::bugModel = &zuczek;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(&washingMachineModel);
 
@@ -564,12 +569,6 @@ void load_enteties() {
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(&wall));;
 
-    gameObject = scene.addEntity("Gabka");;
-    gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
-    gameObject->addComponent(make_unique<Render>(&gabka));
-    gameObject->addComponent(make_unique<ColorMask>()); //HERE IGORRRRRRRKUUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!!!!!!!!!!!!!!! xoxoxo
-
-
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
@@ -591,6 +590,11 @@ void load_enteties() {
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
+
+    //level gen and load___________________________________________________________________________________________________________________________________________________
+    //comment it out if u want fast load for testing
+    gen_and_load_lvl(true);
+
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
 
@@ -686,7 +690,7 @@ void load_enteties() {
 
     scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-    load_units();
+   // load_units();
 
 
 }
@@ -734,7 +738,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = playerUnit->getComponent<Unit>();
     playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
+*/
     Entity *enemyUnit = scene.addEntity("Enemy1");
     enemyUnit->addComponent(make_unique<Render>(&zuczek));
     enemyUnit->transform.setLocalScale(glm::vec3(2, 2, 2));
@@ -1275,6 +1279,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                 //if hit entity is mineable, set it as mining target
                 if (mineable != nullptr && !mineable->isMined) {
+                    unit->DontLookForEnemyTarget = true;
                     unit->miningTargets.clear();
                     unit->miningTargets.emplace_back(hit->getMineableComponent<IMineable>(hit));
                     Tile *hitTile = hit->getComponent<Tile>();
@@ -1285,6 +1290,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                     //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr) {
+                    unit->DontLookForEnemyTarget = true;
+
                     unit->hasMiningTarget = false;
                     unit->miningTargets.clear();
                     unit->hasCombatTarget = false;
@@ -1333,5 +1340,54 @@ void init_time() {
     Time::Instance().SetLastFrame(glfwGetTime());
 }
 
+void gen_and_load_lvl(bool gen_new_lvl) {
+    if(!gen_new_lvl) {
+        std::ifstream file("save.txt");
+        if (file.good()) {
+            LevelSaving::load();
+            return;
+        }
+    }
+
+    static LevelGenerator::Config levelGenConfig{
+            .seed {},
+            .size {100, 100},
+            .wallThickness = 1.f,
+            .baseRadius = RNG::RandomFloat(6.f, 10.f),
+            .keyRadius = RNG::RandomFloat(3.f, 5.f),
+            .pocketRadius = RNG::RandomFloat(6.f, 10.f),
+            .noiseImpact = RNG::RandomFloat(0.1f, 0.3f),
+            .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
+            .extraPocketAttempts = 10000,
+            .keyEnemies = RNG::RandomInt(2, 3),
+            .minEnemies = 0,
+            .maxEnemies = 5,
+            .unitCount = 3,
+            .chestCount = RNG::RandomInt(8, 15),
+    };
+
+    static char seedString[64] = "";
+    std::string_view sv = seedString;
+    if (sv.empty()) {
+        levelGenConfig.seed = pcgRandomSeed();
+    } else {
+        bool isRealSeed = sv.size() == 32 && std::all_of(sv.begin(), sv.end(), [](char c) {
+            return std::isxdigit(static_cast<unsigned char>(c));
+        });
+        if (isRealSeed) {
+            std::from_chars(sv.data(), sv.data() + 16, levelGenConfig.seed.first, 16);
+            std::from_chars(sv.data() + 16, sv.data() + 32, levelGenConfig.seed.second, 16);
+        } else {
+            std::hash<std::string_view> hash;
+            levelGenConfig.seed = {hash(sv), hash(sv.substr(1))};
+        }
+    }
+    auto level = generateLevel(levelGenConfig);
+    std::ofstream("save.txt") << level;
+    spdlog::trace("New level saved to save.txt");
+
+
+    LevelSaving::load();
+}
 
 #pragma endregion Functions

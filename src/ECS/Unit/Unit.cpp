@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <random>
 #include "ECS/Gameplay/WashingMachine.h"
+#include "ECS/Render/Components/ColorMask.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -24,6 +25,8 @@ const UnitStats Unit::ALLY_BASE = {
 };
 
 const UnitStats Unit::ENEMY_BASE = {
+        //todo NOTE TO MY FUTURE SELF: when u changed UNIT for SPONGE and added BUG and SHROOM you didnt look for any tileState == UNIT checks,
+        // need to add tileState == SPONGE || tileState == BUG || tileState == SHROOM checks
         .max_hp = 100,
         .hp = 100,
         .move_spd = 20,
@@ -37,11 +40,11 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->grid = grid;
     this->gridPosition = gridPosition;
     this->worldPosition = grid->GridToWorldPosition(gridPosition);
-    this->pathfinding = AstarPathfinding(grid);
+    this->pathfinding = AstarPathfinding(grid, this);
     this->stats = baseStats;
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
-    grid->getTileAt(gridPosition)->state = UNIT;
+    grid->getTileAt(gridPosition)->state = SPONGE;
     grid->getTileAt(gridPosition)->unit = this;
     UpdateStats();
 }
@@ -98,6 +101,7 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 
     ImGui::Text("ID %d", uniqueID);
     ImGui::Text("Unit: %s", name.c_str());
+    ImGui::Text("Current State: %s", currentState->name.c_str());
     ImGui::Text("Grid Position: (%d, %d)", gridPosition.x, gridPosition.z);
     ImGui::Text("World Position: (%f, %f, %f)", worldPosition.x, worldPosition.y, worldPosition.z);
     ImGui::Text("Ally: %s", isAlly ? "true" : "false");
@@ -119,6 +123,13 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
+    if(DontLookForEnemyTarget){
+        DontLookForEnemyTargetTimer += Time::Instance().DeltaTime();
+        if(DontLookForEnemyTargetTimer >= 3){
+            DontLookForEnemyTarget = false;
+            DontLookForEnemyTargetTimer = 0;
+        }
+    }
     if(forcedIdleState){
         currentState = new IdleState(grid);
         currentState->unit = this;
@@ -182,7 +193,12 @@ void Unit::UpdateImpl() {
 
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
 
-    combatTarget = GetClosestEnemyInSight();
+    if(DontLookForEnemyTarget){
+        combatTarget = nullptr;
+        hasCombatTarget = false;
+    }
+    else{combatTarget = GetClosestEnemyInSight();}
+
     if(combatTarget != nullptr){
         hasCombatTarget = true;
     }
@@ -192,7 +208,7 @@ void Unit::UpdateImpl() {
 
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->state = FLOOR;
-        grid->getTileAt(gridPosition)->state = UNIT;
+        grid->getTileAt(gridPosition)->state = SPONGE;
         grid->getTileAt(previousGridPosition)->unit = nullptr;
         grid->getTileAt(gridPosition)->unit = this;
 
@@ -221,6 +237,20 @@ void Unit::UpdateImpl() {
                 }
             }
         }
+    }
+
+    auto cm = getEntity()->getComponent<ColorMask>();
+    if(isSelected){
+        if(cm == nullptr){
+            getEntity()->addComponent(make_unique<ColorMask>());
+            cm = getEntity()->getComponent<ColorMask>();
+        }
+        if(!cm->HasMask("selected")) {
+            cm->AddMask("selected", glm::vec4(0, 150, 20, 0.1));
+        }
+    }
+    else if (!isSelected && cm != nullptr &&cm->HasMask("selected")){
+        cm->RemoveMask("selected");
     }
 
     previousGridPosition = gridPosition;
@@ -280,7 +310,7 @@ void Unit::serializer_init(Grid * pGrid) {
     // the rest is taken care of by the serializer, all we set here are extra assignments that aren't just a param copy (except for the pGrid ptr)
     this->grid = pGrid;
     this->worldPosition = pGrid->GridToWorldPosition(gridPosition);
-    this->pathfinding = AstarPathfinding(pGrid);
+    this->pathfinding = AstarPathfinding(pGrid, this);
     this->previousGridPosition = gridPosition;
     UpdateStats();
 }
@@ -300,7 +330,7 @@ Entity *Unit::serializer_newUnitEntity(Scene * scene, const std::string & name) 
 IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToExclude) {
     ZoneScopedN("Find closest mineable");
     if(miningTargets.empty()){
-        spdlog::error("IN UNIT::findClosestMineable: No mining targets!");
+        spdlog::error("IN SPONGE::findClosestMineable: No mining targets!");
         return nullptr;
     }
 
@@ -324,7 +354,7 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToEx
         }
     }
     if(closestMineable == nullptr){
-        spdlog::error("IN UNIT::findClosestMineable: No reachable mining target in area!");
+        spdlog::error("IN SPONGE::findClosestMineable: No reachable mining target in area!");
         Wait(2);
     }
 
@@ -358,6 +388,12 @@ std::vector<Unit *> Unit::GetEnemiesInSight() {
             }
         }
     }
+
+    //if cannot path to target, remove from list
+    enemies.erase(std::remove_if(enemies.begin(), enemies.end(), [this](Unit * enemy){
+        return !canFindPathToTarget(pathfinding.GetNearestVacantTile(enemy->gridPosition, gridPosition));
+    }), enemies.end());
+
     return enemies;
 }
 
