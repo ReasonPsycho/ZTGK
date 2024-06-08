@@ -24,6 +24,9 @@ struct s_signal_types {
     unsigned hud_update_group_mappings_signal;
     unsigned hud_remove_group_signal;
 
+    unsigned level_load;
+    unsigned level_save;
+
     unsigned all;
     s_signal_types();
 };

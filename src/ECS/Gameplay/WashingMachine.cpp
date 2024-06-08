@@ -122,7 +122,6 @@ void WashingMachine::createWashingMachine(Model* model) {
 
     auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
     if(machineEntity != nullptr){
-        ztgk::game::scene->removeChild(machineEntity);
         machineEntity->Destroy();
         delete machineEntity;
     }

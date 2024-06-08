@@ -5,9 +5,15 @@
 #include "YamlConverters.h"
 #include "LevelSaving.h"
 #include <yaml-cpp/yaml.h>
+#include <filesystem>
 #include "ECS/Utils/Globals.h"
 #include "ECS/Unit/UnitSystem.h"
 #include "ECS/Gameplay/WashingMachine.h"
+#include "ECS/HUD/HUD.h"
+#include "ECS/HUD/Components/Sprite.h"
+#include "ECS/SignalQueue/Signal.h"
+#include "ECS/SignalQueue/SignalQueue.h"
+#include "ECS/SignalQueue/DataCargo/LevelSaveLoadSignals/LoadSignal.h"
 
 using namespace ztgk;
 
@@ -130,66 +136,98 @@ void LevelSaving::save(const std::string& path) {
 }
 
 void LevelSaving::load(const std::string& path) {
-//    auto thr = std::thread([path](){
-//        ztgk::game::pause_render = true;
-        spdlog::info(std::format("Loading level from {}", path));
-        auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
+    HUD * hud = ztgk::game::scene->systemManager.getSystem<HUD>();
+    Group * menuGroup = hud->findGroupByName("Menu");
+    Group * group = hud->findGroupByName("Load Screen");
+    Sprite * loadingScreen = ztgk::game::scene->getChild("HUD")->getChildR("Load Screen")->getComponent<Sprite>();
 
-        auto node = YAML::LoadFile(path);
-        spdlog::trace("Clearing grid");
-        grid->ClearWalls();
-        grid->ClearAllWallData();
-        spdlog::trace("Re-generating grid entities");
-        grid->reinitWithSize({node["grid"]["width"].as<int>(), node["grid"]["height"].as<int>()});
-
-        spdlog::trace("Reading grid layout to tile state");
-        int z = 0;
-        auto in = std::ifstream(path);
-        std::string line;
-        bool read = false;
-        while ( std::getline(in, line) && line != TOKEN_LAYOUT_END && z < grid->height ) {
-            if ( line == TOKEN_LAYOUT_START ) {
-                read = true;
-                continue;
+    std::filesystem::directory_iterator dir("res/textures/loading_screens/");
+    int num_scr = 0;
+    for (auto & entry : dir) {
+        if (entry.is_regular_file()) {
+            num_scr++;
+        }
+    }
+    auto rand = RNG::RandomInt(0, num_scr - 1);
+    dir = std::filesystem::directory_iterator("res/textures/loading_screens/");
+    for (auto & entry : dir) {
+        if (entry.is_regular_file()) {
+            if (rand == 0) {
+                loadingScreen->load(entry.path().string());
+                break;
             }
-            if ( !read ) continue;
+            rand--;
+        }
+    }
+    menuGroup->setHidden(false);
+    group->setHidden(false);
 
-            line = line.substr(line.find_first_not_of(TOKEN_LAYOUT_LINE));
-            int x = 0;
-            for (char token : line) {
-                if ( x >= grid->width ) break;
-                auto tile = grid->getTileAt(x, z);
+    auto signal = LoadSignal::signal();
+    signal.callback = [path, group, menuGroup](){
+        LevelSaving::loadImpl(path);
+        group->setHidden(true);
+        menuGroup->setHidden(true);
+    };
+    signal.time_to_live = 500; // short delay to allow the loading screen to render
+    *ztgk::game::signalQueue += signal;
+}
 
-                tile_state_from_token(token, tile);
-                ++x;
-            }
+void LevelSaving::loadImpl(const string &path) {
+    spdlog::info(std::format("Loading level from {}", path));
+    auto grid = game::scene->systemManager.getSystem<Grid>();
 
-            ++z;
+    auto node = YAML::LoadFile(path);
+    spdlog::trace("Clearing grid");
+    grid->ClearWalls();
+    grid->ClearAllWallData();
+    spdlog::trace("Re-generating grid entities");
+    grid->reinitWithSize({node["grid"]["width"].as<int>(), node["grid"]["height"].as<int>()});
+
+    spdlog::trace("Reading grid layout to tile state");
+    int z = 0;
+    auto in = ifstream(path);
+    string line;
+    bool read = false;
+    while ( getline(in, line) && line != TOKEN_LAYOUT_END && z < grid->height ) {
+        if ( line == TOKEN_LAYOUT_START ) {
+            read = true;
+            continue;
+        }
+        if ( !read ) continue;
+
+        line = line.substr(line.find_first_not_of(TOKEN_LAYOUT_LINE));
+        int x = 0;
+        for (char token : line) {
+            if ( x >= grid->width ) break;
+            auto tile = grid->getTileAt(x, z);
+
+            tile_state_from_token(token, tile);
+            ++x;
         }
 
-        spdlog::trace("Initializing tiles with loaded state");
-        grid->InitializeTileEntities();
-        grid->SetUpWalls();
+        ++z;
+    }
+
+    spdlog::trace("Initializing tiles with loaded state");
+    grid->InitializeTileEntities();
+    grid->SetUpWalls();
     grid->UpdateFogData(grid->centerTile);
 
-        spdlog::trace("Reading node");
-        auto units = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
-        if (!units.empty()) {
-            spdlog::warn("Units already existing! Aborting!");
-        } else {
-            spdlog::trace("Loading unit entities");
-            for (auto unode: node["allies"]) {
-                auto name = unode[nameof(quote(Entity::name))].as<std::string>();
+    spdlog::trace("Reading node");
+    auto units = game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
+    if (!units.empty()) {
+        spdlog::warn("Units already existing! Aborting!");
+    } else {
+        spdlog::trace("Loading unit entities");
+        for (auto unode: node["allies"]) {
+            auto name = unode[nameof(quote(Entity::name))].as<string>();
 
-                auto entity = Unit::serializer_newUnitEntity(ztgk::game::scene, name);
-                YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
-            }
+            auto entity = Unit::serializer_newUnitEntity(game::scene, name);
+            YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
         }
-        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(ztgk::game::washingMachineModel);
-        // todo chests and stuff, once relevant
+    }
+    game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(game::washingMachineModel);
+    // todo chests and stuff, once relevant
 
-        spdlog::info("Finished loading");
-//        ztgk::game::pause_render = false;
-//    });
-//    thr.detach();
+    spdlog::info("Finished loading");
 }

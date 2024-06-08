@@ -33,4 +33,5 @@ struct LevelSaving {
     static void save(const std::string& path = ztgk::DEFAULT_SAVE_PATH);
     static void load( const std::string& path = ztgk::DEFAULT_SAVE_PATH);
 
+    static void loadImpl(const string &path);
 };

@@ -15,6 +15,18 @@ struct GLFWwindow;
 
 namespace ztgk::game {
 
+    struct s_ui_data {
+        enum class ui_phase {
+            MAIN_MENU,
+            SETTINGS,
+            CREDITS,
+            GAME
+        };
+
+        ui_phase phase = ui_phase::MAIN_MENU;
+    };
+    extern s_ui_data ui_data;
+
     extern GLFWwindow * window;
     extern Scene * scene;
     extern Model * cube_model;
