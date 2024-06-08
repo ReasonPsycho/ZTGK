@@ -2,6 +2,7 @@
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 frag_normal_depth; //Meant for outline process
 layout (location = 2) out vec4 BloomBuffer; //Meant for outline process
+layout (location = 3) out vec4 FogOfWarMask; //Meant for outline process
 
 struct TangentData{ // So it's easier to operate on
     vec3 ViewPos;
@@ -190,7 +191,8 @@ void main()
 {
     vec2 texCoords = fs_in.TexCoords;
     vec3 viewDir = normalize(fs_in.tangentData.ViewPos - fs_in.tangentData.FragPos);
-
+    vec4 fogOfWarData = vec4(0);
+    
     float dirtinessMap  =  1 *  cnoise(fs_in.WorldPos*2) +
     +  0.5 * cnoise(fs_in.WorldPos*4) +
     + 0.25 * cnoise(fs_in.WorldPos*8);
@@ -218,8 +220,8 @@ void main()
 
 
     if(dirtinessMap > 0.1){
-        diffuse -= vec3(dirtinessMap);
-        specular -= vec3(dirtinessMap);
+        diffuse -= vec3(dirtinessMap) * 0.5;
+        specular -= vec3(dirtinessMap)* 0.5;
     }
     
     vec3 result = vec3(0);
@@ -242,12 +244,13 @@ void main()
 
     }
     else {
-
+        fogOfWarData.a = 1;
         result = vec3(0.5, 0.5, 0.5);
     }
 
     if (currentWallData[2] != 0){
         result = mix(result, selectionColor[currentWallData[2]], 0.5);
+        fogOfWarData = vec4(selectionColor[currentWallData[2]],fogOfWarData.a);
     }
 
 
@@ -255,7 +258,7 @@ void main()
     FragColor = vec4(result, 1.0);
 
     float depth = gl_FragCoord.z;
-    frag_normal_depth = vec4(normal, depth);
+ //   frag_normal_depth = vec4(normal, depth);
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 
@@ -263,6 +266,8 @@ void main()
         BloomBuffer = vec4(FragColor.rgb, 1.0);
     else
         BloomBuffer = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    FogOfWarMask = fogOfWarData;
 }
 
 // calculates the color when using a directional light.

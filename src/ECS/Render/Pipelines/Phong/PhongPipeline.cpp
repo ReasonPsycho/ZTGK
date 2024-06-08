@@ -14,6 +14,8 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     phongInstanceShader.init();
     phongInstanceLightShader.init();
     textureSampler.init();
+    stencilTest.init();
+    foamMaskShader.init();
 
     downscale.init();
     upscale.init();
@@ -24,11 +26,17 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     glCreateFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
+    glCreateFramebuffers(1, &foamFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, foamFrameBuffer);
+    
     SetUpTextureBuffers(camera->saved_display_w, camera->saved_display_h);
 
     bloomDirtTexture = new Texture("res/textures/bloom_dirt_mask.png","");
 
+    Color foamColor = {0, 0, 0, 0};  // Normal map neutral
 
+    foamMaterial = new MaterialPhong(foamColor);
+    foamMaterial->diffuseTextures[0] = make_shared<Texture>("res/textures/foam.png","");
     isInnit = true;
 }
 
@@ -44,18 +52,17 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     glEnable(GL_BLEND);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        std::cout << "OpenGL Error: " << error << std::endl;
-    }
-    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
     glDrawBuffers(3, attachments);
-    if (error != GL_NO_ERROR) {
-        std::cout << "OpenGL Error: " << error << std::endl;
-    }
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 
+    glDrawBuffer(GL_COLOR_ATTACHMENT3);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    GLuint bindAttachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(4, bindAttachments);
+    
     GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     switch (fb_status) {
         case GL_FRAMEBUFFER_COMPLETE:
@@ -100,6 +107,18 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongInstanceShader.setFloat("far_plane", 25.0f);
 
+    phongInstanceShader.setFloat("saturationMultiplayer", ztgk::game::saturationMultiplayer);
+    phongInstanceShader.setFloat("lightMultiplayer", ztgk::game::lightMultiplayer);
+    phongInstanceShader.setFloat("diffuse_levels", diffuse_levels);
+
+    phongInstanceShader.setFloat("specular_levels", specular_levels);
+    phongInstanceShader.setFloat("light_shade_cutoff", light_shade_cutoff);
+    phongInstanceShader.setFloat("dark_shade_cutoff", dark_shade_cutoff);
+    phongInstanceShader.setInt("toon_color_levels", ztgk::game::toon_color_levels);
+
+
+    phongInstanceShader.setFloat("rim_threshold", rim_threshold);
+    phongInstanceShader.setFloat("rim_amount", rim_amount);
     phongShader.use();
 
     phongShader.setBool("shadows", true);
@@ -107,6 +126,19 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongShader.setMatrix4("view", false, glm::value_ptr(view));
     phongShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongShader.setFloat("far_plane", 25.0f);
+
+    phongShader.setFloat("saturationMultiplayer", ztgk::game::saturationMultiplayer);
+    phongShader.setFloat("lightMultiplayer", ztgk::game::lightMultiplayer);
+    phongShader.setFloat("diffuse_levels", diffuse_levels);
+
+    phongShader.setFloat("specular_levels", specular_levels);
+    phongShader.setFloat("light_shade_cutoff", light_shade_cutoff);
+    phongShader.setFloat("dark_shade_cutoff", dark_shade_cutoff);
+    phongShader.setInt("toon_color_levels", ztgk::game::toon_color_levels);
+
+
+    phongShader.setFloat("rim_threshold", rim_threshold);
+    phongShader.setFloat("rim_amount", rim_amount);
 
 
     phongInstanceLightShader.use();
@@ -137,11 +169,11 @@ void PhongPipeline::SetUpTextureBuffers(int width, int height) {
     if (error != GL_NO_ERROR) {
         std::cout << "OpenGL Error: " << error << std::endl;
     }
-    glCreateTextures(GL_TEXTURE_2D, 3, colorAttachments);
+    glCreateTextures(GL_TEXTURE_2D, 4, colorAttachments);
     if (error != GL_NO_ERROR) {
         std::cout << "OpenGL Error: " << error << std::endl;
     }
-    for (int i = 0; i <3; ++i) {
+    for (int i = 0; i <4; ++i) {
         glTextureStorage2D(colorAttachments[i], m_mip_levels, GL_RGBA32F, width, height); // internalformat = GL_RGB32F
 
         if (error != GL_NO_ERROR) {
@@ -172,6 +204,19 @@ void PhongPipeline::SetUpTextureBuffers(int width, int height) {
     if (error != GL_NO_ERROR) {
         std::cout << "OpenGL Error: " << error << std::endl;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER,foamFrameBuffer);
+    glCreateTextures(GL_TEXTURE_2D, 1,&foamColorAttachment);
+
+    glTextureStorage2D(foamColorAttachment, 1, GL_RGBA32F, width, height); // internalformat = GL_RGB32F
+    
+    glTextureParameteri(foamColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(foamColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(foamColorAttachment, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+    glTextureParameteri(foamColorAttachment, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+
+
+    glNamedFramebufferTexture(foamFrameBuffer, GL_COLOR_ATTACHMENT0, foamColorAttachment, 0);
 }
 
 void PhongPipeline::WriteToBackBuffer(Camera *camera) {
@@ -228,18 +273,24 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
     glActiveTexture(GL_TEXTURE1); // Work with Texture Unit 0
     glBindTexture(GL_TEXTURE_2D, colorAttachments[1]); // Bind it to GL_TEXTURE_2D
     glActiveTexture(GL_TEXTURE2); // Work with Texture Unit 0
-    glBindTexture(GL_TEXTURE_2D, colorAttachments[2]); // Bind it to GL_TEXTURE_2D
+    glBindTexture(GL_TEXTURE_2D, colorAttachments[2]); // Bind it to GL_TEXTURE_2D  
+    glActiveTexture(GL_TEXTURE3); // Work with Texture Unit 0
+    glBindTexture(GL_TEXTURE_2D, colorAttachments[3]); // Bind it to GL_TEXTURE_2D
+    glActiveTexture(GL_TEXTURE4); // Work with Texture Unit 0
+    glBindTexture(GL_TEXTURE_2D, foamColorAttachment); // Bind it to GL_TEXTURE_2D
     textureSampler.setMatrix4("clip_to_view", false, glm::value_ptr(glm::inverse(camera->GetProjectionMatrix())));  // Here 0 is the texture unit
 
     textureSampler.setInt("colorTexture", 0);  // Here 0 is the texture unit
     textureSampler.setInt("normals_depth_texture", 1);  // Here 0 is the texture unit
+    textureSampler.setInt("FogOfWarMask", 3);  // Here 0 is the texture unit
+    textureSampler.setInt("foamMask", 4);  // Here 0 is the texture unit
 
     textureSampler.setFloat("depth_threshold", 1);  // Here 0 is the texture unit
     textureSampler.setFloat("depth_normal_threshold", 1);  // Here 0 is the texture unit
     textureSampler.setFloat("depth_normal_threshold_scale",  0.2);  // Here 0 is the texture unit
     textureSampler.setFloat("normal_threshold",  0.5);  // Here 0 is the texture unit
 
-    textureSampler.setFloat("outline_width", 3);  // Here 0 is the texture unit
+    textureSampler.setFloat("outline_width", 1);  // Here 0 is the texture unit
     textureSampler.setVec3("outline_color", glm::vec3(0));  // Here 0 is the texture unit
 
     textureSampler.setFloat("exposure", exposure);  // Here 0 is the texture unit
@@ -271,5 +322,87 @@ void PhongPipeline::CalculateMipmapLevels(int width, int height) {
     }
 
     m_mip_levels = mip_levels + 1;
+}
+
+void PhongPipeline::PrepareFoamMap(Camera* camera) {
+
+    glm::mat4 projection = camera->GetProjectionMatrix();
+    glm::mat4 view = camera->GetViewMatrix();
+    glm::vec3 cameraPos = camera->Position;
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+
+    glBindFramebuffer(GL_FRAMEBUFFER, foamFrameBuffer);
+    GLuint attachments[1] = { GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, attachments);
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    switch (fb_status) {
+        case GL_FRAMEBUFFER_COMPLETE:
+            break;
+        case GL_FRAMEBUFFER_UNDEFINED:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNDEFINED:: Default framebuffer does not exist." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:: Any of the framebuffer attachment points are framebuffer incomplete." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:: The framebuffer does not have at least one image attached to it." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:: The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:: GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNSUPPORTED:: The combination of internal formats of the attached images violates an implementation-dependent set of restrictions." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:: The value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES is the not same for all attached textures; or , if the attached images are a mix of renderbuffers and textures, the value of GL_RENDERBUFFER_SAMPLES does not match the value of GL_TEXTURE_SAMPLES." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:: Any framebuffer attachment is layered and any populated attachment is not layered, or all populated color attachments are not from textures of the same target." << std::endl;
+            break;
+        default:
+            std::cout << "ERROR::FRAMEBUFFER:: Unknown error." << std::endl;
+            break;
+    }
+
+    glClear(GL_COLOR_BUFFER_BIT ); //Depends on your needs
+
+    foamMaskShader.use();
+
+    foamMaskShader.setBool("shadows", true);
+    foamMaskShader.setMatrix4("projection", false, glm::value_ptr(projection));
+    foamMaskShader.setMatrix4("view", false, glm::value_ptr(view));
+    foamMaskShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    foamMaskShader.setFloat("far_plane", 25.0f);
+
+    foamMaskShader.setFloat("saturationMultiplayer", ztgk::game::saturationMultiplayer);
+    foamMaskShader.setFloat("lightMultiplayer", ztgk::game::lightMultiplayer);
+    foamMaskShader.setFloat("diffuse_levels", diffuse_levels);
+
+    foamMaskShader.setFloat("specular_levels", specular_levels);
+    foamMaskShader.setFloat("light_shade_cutoff", light_shade_cutoff);
+    foamMaskShader.setFloat("dark_shade_cutoff", dark_shade_cutoff);
+    foamMaskShader.setInt("toon_color_levels", ztgk::game::toon_color_levels);
+
+
+    foamMaskShader.setFloat("rim_threshold", rim_threshold);
+    foamMaskShader.setFloat("rim_amount", rim_amount);
+    
+    foamMaskShader.setFloat("repeatFactor", 100);
+
+    glm::mat4x4 model = glm::mat4x4 (1);
+    model = glm::translate(model,glm::vec3(100,1, 100));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    model = glm::scale(model,glm::vec3(100));
+    foamMaskShader.setMatrix4("model", false, glm::value_ptr(model));
+    foamMaterial->loadMaterial(&foamMaskShader);
+    _primitives->renderQuad();
+    
+    glDisable(GL_BLEND);
 }
 

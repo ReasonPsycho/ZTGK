@@ -6,6 +6,7 @@
 #include "Render.h"
 
 Render::Render(Model *pModel):pModel(pModel),aabb(generateAABB(*pModel)) {
+    colorMask = glm::vec4(0);
     name = "Renderer";
 }
 
@@ -14,6 +15,7 @@ void Render::draw(Shader &regularShader) {
     regularShader.use();
     regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
     regularShader.setFloat("heightScale", 1.0);
+    regularShader.setVec4("colorMask", colorMask);
     regularShader.setFloat("saturation", 3.0);
     regularShader.setBool("useNormalMap", false);
     pModel->Draw(regularShader);
@@ -23,6 +25,7 @@ void Render::draw(Shader &regularShader, Frustum *frustum) {
     ZoneScopedN("Draw");
     if(aabb.isOnFrustum(*frustum,getEntity()->transform)){
         regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
+        regularShader.setVec4("colorMask", colorMask);
         pModel->Draw(regularShader);    
     }
 }

@@ -45,17 +45,5 @@ private:
 };
 
 
-//Hash function for Vector2Int
-template<> struct std::hash<Vector2Int>{
-    std::size_t operator()(const Vector2Int& k) const
-    {
-        using std::size_t;
-        using std::hash;
-
-        return ((hash<int>()(k.x)
-                 ^ (hash<int>()(k.z) << 1)) >> 1);
-    }
-
-};
 
 #endif //ZTGK_ASTARPATHFINDING_H

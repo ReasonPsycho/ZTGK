@@ -78,3 +78,16 @@ void Chunk::removeTileAt(int x, int z) {
     chunkTileArray[x][z] = nullptr;
 }
 
+void Chunk::CalculateChunkData() {
+    minedTiles = 0;
+    for (int x = 0; x < width; ++x) {
+        for (int y = 0; y < height; ++y) {
+            TileState state = chunkTileArray[x][y]->state;
+            if (state != WALL && state != ORE){
+                minedTiles++;
+            }
+        }   
+    }
+    isAccessibleFromCore = true; // TODO do here A*
+}
+

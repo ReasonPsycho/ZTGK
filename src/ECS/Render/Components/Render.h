@@ -18,7 +18,8 @@ public:
     void draw(Shader &regularShader,Frustum * frustum);
     void simpleDraw(Shader &regularShader);
     void showImGuiDetailsImpl(Camera *camera) override;
-
+    
+    glm::vec4 colorMask;
 private:
     Model *pModel{};
     AABB aabb;
