@@ -20,22 +20,26 @@
 class InstanceRenderSystem : public System {
 public:
     InstanceRenderSystem(Camera * camera);
+    
     void Innit();
-
-    void registerComponents() override{};
-    void addComponent(void* component) override;
-    void removeComponent(void* component) override;
-    void showImGuiDetailsImpl(Camera *camera) override;
     void DrawTiles(Shader* regularShader,Camera * camera);
     void DrawLights(Shader* regularShader,Camera * camera);
     void SimpleDrawTiles(Shader* regularShader,Camera * camera);
     void PushToSSBO(Camera* camera);
-    void UpdateImpl();
 
-    Model* tileModel;
-
+    //ECS
+    void registerComponents() override{};
+    void addComponent(void* component) override;
+    void removeComponent(void* component) override;
+    void showImGuiDetailsImpl(Camera *camera) override;
+    void UpdateImpl() override;
     const std::type_index* getComponentTypes() override {return nullptr; };
     int getNumComponentTypes() override { return 0;};
+    
+    
+    Model* tileModel;
+
+
 private:
     Camera * camera;
     GLuint wallDataBufferID;
@@ -49,14 +53,16 @@ private:
     double units = 0;
     float dirtLayer = 0.2;
     float saturation = 2;
-
- 
+    
     
     string tilePath =  "res/textures/tiles/Tile";
     
     std::vector<WallData> wallData;
     MaterialPhong wallMaterial;
     MaterialPhong lightMaterial;
+    
+    
+    //ECS
     std::array<std::type_index, 0> componentTypes = {};
 };
 
