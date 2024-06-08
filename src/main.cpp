@@ -447,7 +447,7 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient", 40);
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
 
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
@@ -747,7 +747,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-
+*/
 
 }
 

@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <random>
 #include "ECS/Gameplay/WashingMachine.h"
+#include "ECS/Render/Components/ColorMask.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -221,6 +222,20 @@ void Unit::UpdateImpl() {
                 }
             }
         }
+    }
+
+    auto cm = getEntity()->getComponent<ColorMask>();
+    if(isSelected){
+        if(cm == nullptr){
+            getEntity()->addComponent(make_unique<ColorMask>());
+            cm = getEntity()->getComponent<ColorMask>();
+        }
+        if(!cm->HasMask("selected")) {
+            cm->AddMask("selected", glm::vec4(0, 150, 20, 0.1));
+        }
+    }
+    else if (!isSelected && cm != nullptr &&cm->HasMask("selected")){
+        cm->RemoveMask("selected");
     }
 
     previousGridPosition = gridPosition;

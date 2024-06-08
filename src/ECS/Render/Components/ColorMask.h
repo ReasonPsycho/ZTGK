@@ -29,6 +29,7 @@ public:
     void AddMask(std::string name,glm::vec4 color,float timer);
     void AddMask(std::string name,glm::vec4 color);
     void RemoveMask(std::string name);
+    bool HasMask(std::string name);
     void UpdateImpl() override;
     void showImGuiDetailsImpl(Camera *camera) override;
     
