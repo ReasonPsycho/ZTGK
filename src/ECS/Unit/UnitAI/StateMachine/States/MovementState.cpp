@@ -104,12 +104,16 @@ void MovementState::MoveOnPath() {
     if (unit->pathfinding.path.size() == 0 && !unit->hasMovementTarget) {
         return;
     }
-
     if(unit->pathfinding.path.size() == 0 && unit->hasMovementTarget){
         unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget);
     }
-    if (unit->pathfinding.path.size() > 0) {
+    if(unit->pathfinding.path.size() > (unit->isAlly? 1 : 0) &&  unit->pathfinding.path[0] == unit->gridPosition){
+        unit->pathfinding.path.erase(unit->pathfinding.path.begin());
+    }
+    if (!unit->pathfinding.path.empty()) {
+
         Vector2Int nextTile = unit->pathfinding.path[0];
+
         glm::vec3 nextTileWorldPosition = unit->grid->GridToWorldPosition(nextTile);
         if(unit->worldPosition == nextTileWorldPosition){
             unit->pathfinding.path.erase(unit->pathfinding.path.begin());

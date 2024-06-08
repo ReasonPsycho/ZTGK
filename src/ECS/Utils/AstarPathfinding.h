@@ -10,6 +10,7 @@
 #include "ECS/Grid/Grid.h"
 #include <unordered_set>
 
+
 using namespace std;
 
 
@@ -21,7 +22,7 @@ public:
 
     // Constructors
     AstarPathfinding() = default;
-    explicit AstarPathfinding(Grid* grid);
+    explicit AstarPathfinding(Grid* grid, Unit* unit);
 
 
     // Destructor
@@ -36,7 +37,7 @@ public:
 
 private:
     Grid* grid;
-
+    Unit* unit;
     //Helper functions
     Vector2Int GetLowestFScore(std::unordered_set<Vector2Int>& openSet, std::unordered_map<Vector2Int, float>& fScore);
     std::vector<Vector2Int> ReconstructPath(std::unordered_map<Vector2Int, Vector2Int>& cameFrom, Vector2Int current);
