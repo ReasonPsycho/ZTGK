@@ -20,6 +20,7 @@ public:
     void showImGuiDetailsImpl(Camera *camera) override;
     
     glm::vec4 colorMask;
+    float dirtLevel;
 private:
     Model *pModel{};
     AABB aabb;

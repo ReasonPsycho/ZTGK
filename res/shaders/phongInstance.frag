@@ -183,9 +183,12 @@ uniform float specular_levels;
 uniform float light_shade_cutoff;
 uniform float dark_shade_cutoff;
 
-uniform vec3 rim_color;
 uniform float rim_threshold;
 uniform float rim_amount;
+
+uniform float ambient;
+uniform bool outlineMapping;
+
 
 void main()
 {
@@ -227,7 +230,7 @@ void main()
     vec3 result = vec3(0);
     if (currentWallData[1] != 1){
 
-        result = 0.1f * diffuse;//We do be calculating ambient here
+        result = ambient * diffuse;//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLightAmount; ++i) {
             result += CalcDirLight(dirLights[i], normal, viewDir, index++,  diffuse,specular);
@@ -257,8 +260,10 @@ void main()
 
     FragColor = vec4(result, 1.0);
 
-    float depth = gl_FragCoord.z;
- //   frag_normal_depth = vec4(normal, depth);
+    if(outlineMapping){
+        float depth = gl_FragCoord.z;
+        frag_normal_depth = vec4(normal, depth);  
+    }
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 

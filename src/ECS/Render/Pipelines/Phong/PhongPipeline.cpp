@@ -62,40 +62,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
 
     GLuint bindAttachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,GL_COLOR_ATTACHMENT3};
     glDrawBuffers(4, bindAttachments);
-    
-    GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    switch (fb_status) {
-        case GL_FRAMEBUFFER_COMPLETE:
-            //std::cout << "SUCCESS::FRAMEBUFFER:: Framebuffer is complete." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_UNDEFINED:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNDEFINED:: Default framebuffer does not exist." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:: Any of the framebuffer attachment points are framebuffer incomplete." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:: The framebuffer does not have at least one image attached to it." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:: The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:: GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNSUPPORTED:: The combination of internal formats of the attached images violates an implementation-dependent set of restrictions." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:: The value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES is the not same for all attached textures; or , if the attached images are a mix of renderbuffers and textures, the value of GL_RENDERBUFFER_SAMPLES does not match the value of GL_TEXTURE_SAMPLES." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:: Any framebuffer attachment is layered and any populated attachment is not layered, or all populated color attachments are not from textures of the same target." << std::endl;
-            break;
-        default:
-            std::cout << "ERROR::FRAMEBUFFER:: Unknown error." << std::endl;
-            break;
-    }
+    CheckFramebuffer();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Depends on your needs
 
@@ -107,18 +74,21 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongInstanceShader.setFloat("far_plane", 25.0f);
 
-    phongInstanceShader.setFloat("saturationMultiplayer", ztgk::game::saturationMultiplayer);
-    phongInstanceShader.setFloat("lightMultiplayer", ztgk::game::lightMultiplayer);
+    phongInstanceShader.setFloat("ambient", ambient);
+    phongInstanceShader.setFloat("saturationMultiplayer", saturationMultiplayer);
+    phongInstanceShader.setFloat("lightMultiplayer", lightMultiplayer);
     phongInstanceShader.setFloat("diffuse_levels", diffuse_levels);
 
     phongInstanceShader.setFloat("specular_levels", specular_levels);
     phongInstanceShader.setFloat("light_shade_cutoff", light_shade_cutoff);
     phongInstanceShader.setFloat("dark_shade_cutoff", dark_shade_cutoff);
-    phongInstanceShader.setInt("toon_color_levels", ztgk::game::toon_color_levels);
+    phongInstanceShader.setInt("toon_color_levels", toon_color_levels);
 
 
     phongInstanceShader.setFloat("rim_threshold", rim_threshold);
     phongInstanceShader.setFloat("rim_amount", rim_amount);
+    phongInstanceShader.setFloat("outlineMapping", instanceShaderOutlineMapping);
+
     phongShader.use();
 
     phongShader.setBool("shadows", true);
@@ -127,25 +97,29 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongShader.setFloat("far_plane", 25.0f);
 
-    phongShader.setFloat("saturationMultiplayer", ztgk::game::saturationMultiplayer);
-    phongShader.setFloat("lightMultiplayer", ztgk::game::lightMultiplayer);
+    phongShader.setFloat("ambient", ambient);
+    phongShader.setFloat("saturationMultiplayer", saturationMultiplayer);
+    phongShader.setFloat("lightMultiplayer", lightMultiplayer);
     phongShader.setFloat("diffuse_levels", diffuse_levels);
 
     phongShader.setFloat("specular_levels", specular_levels);
     phongShader.setFloat("light_shade_cutoff", light_shade_cutoff);
     phongShader.setFloat("dark_shade_cutoff", dark_shade_cutoff);
-    phongShader.setInt("toon_color_levels", ztgk::game::toon_color_levels);
+    phongShader.setInt("toon_color_levels",toon_color_levels);
 
 
     phongShader.setFloat("rim_threshold", rim_threshold);
     phongShader.setFloat("rim_amount", rim_amount);
+    phongShader.setFloat("outlineMapping", normalShaderOutlineMapping);
 
 
     phongInstanceLightShader.use();
     phongInstanceLightShader.setMatrix4("projection", false, glm::value_ptr(projection));
     phongInstanceLightShader.setMatrix4("view", false, glm::value_ptr(view));
     phongInstanceLightShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    phongInstanceLightShader.setFloat("outlineMapping", lightShaderOutlineMapping);
 
+    
     glDisable(GL_BLEND);
 }
 
@@ -284,14 +258,14 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
     textureSampler.setInt("normals_depth_texture", 1);  // Here 0 is the texture unit
     textureSampler.setInt("FogOfWarMask", 3);  // Here 0 is the texture unit
     textureSampler.setInt("foamMask", 4);  // Here 0 is the texture unit
+    
+    textureSampler.setFloat("depth_threshold", depth_threshold);  // Here 0 is the texture unit
+    textureSampler.setFloat("depth_normal_threshold", depth_normal_threshold);  // Here 0 is the texture unit
+    textureSampler.setFloat("depth_normal_threshold_scale",  depth_normal_threshold_scale);  // Here 0 is the texture unit
+    textureSampler.setFloat("normal_threshold",  normal_threshold);  // Here 0 is the texture unit
 
-    textureSampler.setFloat("depth_threshold", 1);  // Here 0 is the texture unit
-    textureSampler.setFloat("depth_normal_threshold", 1);  // Here 0 is the texture unit
-    textureSampler.setFloat("depth_normal_threshold_scale",  0.2);  // Here 0 is the texture unit
-    textureSampler.setFloat("normal_threshold",  0.5);  // Here 0 is the texture unit
-
-    textureSampler.setFloat("outline_width", 1);  // Here 0 is the texture unit
-    textureSampler.setVec3("outline_color", glm::vec3(0));  // Here 0 is the texture unit
+    textureSampler.setFloat("outline_width", outline_width);  // Here 0 is the texture unit
+    textureSampler.setVec3("outline_color",outline_color);  // Here 0 is the texture unit
 
     textureSampler.setFloat("exposure", exposure);  // Here 0 is the texture unit
     textureSampler.setFloat("gamma", gamma);  // Here 0 is the texture unit
@@ -337,38 +311,7 @@ void PhongPipeline::PrepareFoamMap(Camera* camera) {
     GLuint attachments[1] = { GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, attachments);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    switch (fb_status) {
-        case GL_FRAMEBUFFER_COMPLETE:
-            break;
-        case GL_FRAMEBUFFER_UNDEFINED:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNDEFINED:: Default framebuffer does not exist." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:: Any of the framebuffer attachment points are framebuffer incomplete." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:: The framebuffer does not have at least one image attached to it." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:: The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:: GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNSUPPORTED:: The combination of internal formats of the attached images violates an implementation-dependent set of restrictions." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:: The value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES is the not same for all attached textures; or , if the attached images are a mix of renderbuffers and textures, the value of GL_RENDERBUFFER_SAMPLES does not match the value of GL_TEXTURE_SAMPLES." << std::endl;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:: Any framebuffer attachment is layered and any populated attachment is not layered, or all populated color attachments are not from textures of the same target." << std::endl;
-            break;
-        default:
-            std::cout << "ERROR::FRAMEBUFFER:: Unknown error." << std::endl;
-            break;
-    }
+    CheckFramebuffer();
 
     glClear(GL_COLOR_BUFFER_BIT ); //Depends on your needs
 
@@ -404,5 +347,116 @@ void PhongPipeline::PrepareFoamMap(Camera* camera) {
     _primitives->renderQuad();
     
     glDisable(GL_BLEND);
+}
+
+PhongPipeline::PhongPipeline() {
+    name = "Phong pipeline";
+}
+
+void PhongPipeline::addComponent(void *component) {
+
+}
+
+void PhongPipeline::removeComponent(void *component) {
+
+}
+
+void PhongPipeline::showImGuiDetailsImpl(Camera *camera) {
+    if (ImGui::CollapsingHeader("Exposure Settings"))
+    {
+        ImGui::Indent();
+        ImGui::DragFloat("Exposure", &exposure, 0.1f);
+        ImGui::DragFloat("Gamma", &gamma, 0.1f);
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Bloom Settings"))
+    {
+        ImGui::Indent();
+        ImGui::Checkbox("Bloom Enabled", &bloomEnabled);
+        ImGui::DragFloat("Threshold", &m_threshold, 0.1f);
+        ImGui::DragFloat("Knee", &m_knee, 0.1f);
+        ImGui::DragFloat("Bloom Intensity", &m_bloom_intensity, 0.1f);
+        ImGui::DragFloat("Bloom Dirt Intensity", &m_bloom_dirt_intensity, 0.1f);
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Toon Shader Settings"))
+    {
+        ImGui::Indent();
+        ImGui::DragFloat("Ambient light", &ambient, 0.1f);
+        ImGui::DragFloat("Diffuse Levels", &diffuse_levels, 0.1f);
+        ImGui::DragFloat("Specular Levels", &specular_levels, 0.1f);
+        ImGui::DragFloat("Light Shade Cutoff", &light_shade_cutoff, 0.1f);
+        ImGui::DragFloat("Dark Shade Cutoff", &dark_shade_cutoff, 0.1f);
+        ImGui::DragFloat("Saturation Multiplier", &saturationMultiplayer, 0.1f);
+        ImGui::DragFloat("Light Multiplier", &lightMultiplayer, 0.1f);
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Rim Light Settings"))
+    {
+        ImGui::Indent();
+        ImGui::DragFloat("Rim Threshold", &rim_threshold, 0.1f);
+        ImGui::DragFloat("Rim Amount", &rim_amount, 0.1f);
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Outlines Settings"))
+    {
+        ImGui::Indent();
+        ImGui::DragFloat("Depth Threshold", &depth_threshold, 0.1f);
+        ImGui::DragFloat("Depth Normal Threshold", &depth_normal_threshold, 0.1f);
+        ImGui::DragFloat("Depth Normal Threshold Scale", &depth_normal_threshold_scale, 0.1f);
+        ImGui::SliderFloat("Normal Threshold", &normal_threshold, 0.0f, 1.0f);
+        ImGui::DragFloat("Outline Width", &outline_width, 0.1f);
+        ImGui::ColorEdit3("Outline Color", glm::value_ptr(outline_color));
+
+
+        ImGui::Checkbox("Normal shader outline mapping", &normalShaderOutlineMapping);
+        ImGui::Checkbox("Light shader outline mapping", &lightShaderOutlineMapping);
+        ImGui::Checkbox("Instance shader outline mapping", &instanceShaderOutlineMapping);
+        ImGui::Unindent();
+    }
+}
+
+void PhongPipeline::UpdateImpl() {
+
+}
+
+void PhongPipeline::CheckFramebuffer() {
+    GLenum fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    switch (fb_status) {
+        case GL_FRAMEBUFFER_COMPLETE:
+            //std::cout << "SUCCESS::FRAMEBUFFER:: Framebuffer is complete." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_UNDEFINED:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNDEFINED:: Default framebuffer does not exist." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:: Any of the framebuffer attachment points are framebuffer incomplete." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:: The framebuffer does not have at least one image attached to it." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:: The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:: GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_UNSUPPORTED:: The combination of internal formats of the attached images violates an implementation-dependent set of restrictions." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:: The value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers; if the value of GL_TEXTURE_SAMPLES is the not same for all attached textures; or , if the attached images are a mix of renderbuffers and textures, the value of GL_RENDERBUFFER_SAMPLES does not match the value of GL_TEXTURE_SAMPLES." << std::endl;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+            std::cout << "ERROR::FRAMEBUFFER::GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:: Any framebuffer attachment is layered and any populated attachment is not layered, or all populated color attachments are not from textures of the same target." << std::endl;
+            break;
+        default:
+            std::cout << "ERROR::FRAMEBUFFER:: Unknown error." << std::endl;
+            break;
+    }
 }
 

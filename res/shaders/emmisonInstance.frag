@@ -18,6 +18,7 @@ struct Material {
 };
 
 uniform Material material;
+uniform bool outlineMapping;
 flat in vec4 specularData;
 flat in vec4 diffuseData;
 
@@ -38,8 +39,10 @@ void main()
 
     FragColor = diffuse + specular;
 
-    float depth = gl_FragCoord.z;
-    frag_normal_depth = vec4(normal, depth);
+    if(outlineMapping){
+        float depth = gl_FragCoord.z;
+        frag_normal_depth = vec4(normal, depth);
+    }
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 

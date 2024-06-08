@@ -26,9 +26,7 @@ void RenderSystem::SimpleDrawScene(Shader *regularShader) {
 }
 
 void RenderSystem::showImGuiDetailsImpl(Camera *camera) {
-    ImGui::SliderFloat("saturationMultiplayer", &ztgk::game::saturationMultiplayer, 0, 10);
-    ImGui::SliderFloat("lightMultiplayer", &ztgk::game::lightMultiplayer, 0, 10);
-    ImGui::InputInt("toon_color_levels", &ztgk::game::toon_color_levels);
+
     
 }
 

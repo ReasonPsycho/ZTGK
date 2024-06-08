@@ -22,6 +22,7 @@ struct TangentData{ // So it's easier to operate on
 out VS_OUT {
     vec2 TexCoords;
     vec3 WorldPos;
+    vec3 LocalPos;
     vec3 Normal;
     TangentData tangentData;
 }vs_out;
@@ -30,6 +31,7 @@ void main()
 {
     //Standard calculation
     vs_out.TexCoords = aTexCoords;
+    vs_out.LocalPos = aPos;
     vs_out.WorldPos = vec3(model* vec4(aPos, 1.0) );
     vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);

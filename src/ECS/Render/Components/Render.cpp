@@ -16,6 +16,7 @@ void Render::draw(Shader &regularShader) {
     regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
     regularShader.setFloat("heightScale", 1.0);
     regularShader.setVec4("colorMask", colorMask);
+    regularShader.setFloat("dirtLevel", dirtLevel);
     regularShader.setFloat("saturation", 3.0);
     regularShader.setBool("useNormalMap", false);
     pModel->Draw(regularShader);
@@ -26,12 +27,13 @@ void Render::draw(Shader &regularShader, Frustum *frustum) {
     if(aabb.isOnFrustum(*frustum,getEntity()->transform)){
         regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
         regularShader.setVec4("colorMask", colorMask);
+        regularShader.setFloat("dirtLevel", dirtLevel);
         pModel->Draw(regularShader);    
     }
 }
 
 void Render::showImGuiDetailsImpl(Camera *camera) {
-    
+    ImGui::InputFloat("Dirt level",&dirtLevel);
 }
 
 void Render::simpleDraw(Shader &regularShader) {
