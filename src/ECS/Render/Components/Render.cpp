@@ -19,6 +19,8 @@ void Render::draw(Shader &regularShader) {
     regularShader.setFloat("dirtLevel", dirtLevel);
     regularShader.setFloat("saturation", 3.0);
     regularShader.setBool("useNormalMap", false);
+    regularShader.setBool("isInFogOfWar", isInFogOfWar);
+    
     pModel->Draw(regularShader);
 }
 
@@ -28,12 +30,14 @@ void Render::draw(Shader &regularShader, Frustum *frustum) {
         regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
         regularShader.setVec4("colorMask", colorMask);
         regularShader.setFloat("dirtLevel", dirtLevel);
+        regularShader.setBool("isInFogOfWar", isInFogOfWar);
         pModel->Draw(regularShader);    
-    }
+    }`
 }
 
 void Render::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat("Dirt level",&dirtLevel);
+    ImGui::Checkbox("Is in fog of war",&isInFogOfWar);
 }
 
 void Render::simpleDraw(Shader &regularShader) {
