@@ -446,7 +446,7 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 40);
 
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");

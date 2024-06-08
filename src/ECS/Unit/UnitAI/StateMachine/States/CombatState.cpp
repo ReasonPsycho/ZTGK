@@ -47,6 +47,10 @@ State *CombatState::RunCurrentState() {
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->findClosestMineable()->gridPosition;
+
+            moveState = new MovementState(grid);
+            moveState->unit = unit;
+
             return moveState;
         }
     }
