@@ -197,7 +197,6 @@ Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
-PhongPipeline phongPipeline;
 
 float lastY;
 float lastX;
@@ -417,8 +416,9 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<CollisionSystem>());
     scene.systemManager.addSystem(std::make_unique<UnitSystem>());
     scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
+    scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
 
-    phongPipeline.Init(&camera, &primitives);
+    scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
     Color myColor = {255, 32, 21, 0};  // This defines your color.
     pbrprimitives.Init();
@@ -751,7 +751,7 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-
+    */
 
 }
 
@@ -835,8 +835,8 @@ void update() {
 void render() {
     ZoneScopedN("Render");
 
-    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&phongPipeline.phongShader);
-    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&phongPipeline.phongInstanceShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(& scene.systemManager.getSystem<PhongPipeline>()->phongShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -847,15 +847,17 @@ void render() {
     file_logger->info("Cleared.");
 
     file_logger->info("Set up PBR.");
-    phongPipeline.PrepareFoamMap(&camera);
-    
-    phongPipeline.PrebindPipeline(&camera);
 
-    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&phongPipeline.phongInstanceShader, &camera);
-    scene.systemManager.getSystem<RenderSystem>()->DrawScene(&phongPipeline.phongShader, &camera);
-    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(&phongPipeline.phongInstanceLightShader, &camera);
+    scene.systemManager.getSystem<PhongPipeline>()->PrepareFoamMap(&camera);
 
-    phongPipeline.WriteToBackBuffer(&camera);
+    scene.systemManager.getSystem<PhongPipeline>()->PrebindPipeline(&camera);
+
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
+    scene.systemManager.getSystem<RenderSystem>()->DrawScene(& scene.systemManager.getSystem<PhongPipeline>()->phongShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceLightShader, &camera);
+
+
+    scene.systemManager.getSystem<PhongPipeline>()->WriteToBackBuffer(&camera);
 
     scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
@@ -1109,7 +1111,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     ztgk::game::window_size = {width, height};
     camera.UpdateCamera(width, height);
     bloomSystem.SetUpBuffers(width, height);
-    phongPipeline.SetUpTextureBuffers(width, height);
+    scene.systemManager.getSystem<PhongPipeline>()->SetUpTextureBuffers(width, height);
 }
 
 

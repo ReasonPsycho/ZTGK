@@ -26,13 +26,7 @@ void InstanceRenderSystem::removeComponent(void *component) {
 }
 
 void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
-    ImGui::Text("Wall amount %d",wallData.size());
-    double step = 0.0001f;
-    ImGui::InputScalar("Max bias",ImGuiDataType_Double, &maxBias, &step);
-    ImGui::InputScalar("biasMuliplayer",ImGuiDataType_Double, &biasMuliplayer, &step);
-    ImGui::InputScalar("factor",ImGuiDataType_Double, &factor, &step);
-    ImGui::InputScalar("units",ImGuiDataType_Double, &units, &step);
-    ImGui::SliderFloat("Dirt layer",&dirtLayer,0,1);
+
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
