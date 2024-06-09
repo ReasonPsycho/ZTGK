@@ -86,20 +86,26 @@ Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
 string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
 string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
-string modelPathZuczek = "res/models/properZuczek/Zuczek.fbx";
+string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
+string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
+string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+string modelPathZuczek = "res/models/zuczek/Zuczek.fbx";
+string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack.fbx";
+string modelPathZuczekIddle = "res/models/zuczek/Zuczek_iddle.fbx";
+string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
 
 ModelLoadingManager modelLoadingManager;
-Model *tileModel ;
-Model *model ;
-Model *gabka ;
-Model *zuczek ;
+Model *tileModel;
+Model *model;
+Model *gabka;
+Model *zuczek;
 Model *wall;
-Model *washingMachineModel ;
-Model *chestModel ;
+Model *washingMachineModel;
+Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
 unsigned bggroup, zmgroup;
@@ -264,7 +270,7 @@ int main(int, char **) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
-    
+
     glfwSwapInterval(1);
 
     init_managers();
@@ -404,7 +410,6 @@ void init_systems() {
     spdlog::info("Loaded sounds.");
 
 
-
     primitives.Init();
 
 
@@ -542,7 +547,7 @@ void load_enteties() {
     washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
     chestModel = modelLoadingManager.GetModel(modelChestPath);
     modelLoadingManager.Innit();
-    
+
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
 
@@ -612,28 +617,29 @@ void load_enteties() {
     auto ehud = scene.addEntity("HUD DEMO");
 
     auto drag = scene.systemManager.getSystem<HUD>()->createButton(
-        "Drag\nme!",
-        {1000, 1000}, {100, 100}, ztgk::color.BLACK,
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; },
-        [](HUDHoverable *self) {
-                                                       self->collisionSprite->color = ztgk::color.BLACK; },
-                                                       [](HUDButton * self){
-                                                   self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.75, 0.75, 0.75, 1};
-            self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = Signal::signal_types.mouse_move_signal;
-        },
-        [](HUDButton *self) {
-                                                    self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1};
-            self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = 0;
-        },
-        ehud
-   );
+            "Drag\nme!",
+            {1000, 1000}, {100, 100}, ztgk::color.BLACK,
+            [](HUDHoverable *self) { self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; },
+            [](HUDHoverable *self) {
+                self->collisionSprite->color = ztgk::color.BLACK;
+            },
+            [](HUDButton *self) {
+                self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.75, 0.75, 0.75, 1};
+                self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = Signal::signal_types.mouse_move_signal;
+            },
+            [](HUDButton *self) {
+                self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1};
+                self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = 0;
+            },
+            ehud
+    );
     drag->addComponent(std::make_unique<SignalReceiver>(
-                                                       0,
-                                                       [drag](const Signal & signal) {
-    auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
-            drag->getComponent<Sprite>()->pos = data->pos;
-                                                    drag->getComponent<Text>()->pos = data->pos;
-                                                }
+            0,
+            [drag](const Signal &signal) {
+                auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
+                drag->getComponent<Sprite>()->pos = data->pos;
+                drag->getComponent<Text>()->pos = data->pos;
+            }
     ));
 
     scene.systemManager.getSystem<HUD>()->createButton("Button text",
@@ -649,43 +655,46 @@ void load_enteties() {
     );
 
     scene.systemManager.getSystem<HUD>()->createButton(
-        "Func button textt", {1750, 1000}, {300, 150}, ztgk::color.BROWN,
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; },
-        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; },
-        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; spdlog::info("Func Button pressed!"); },
-        ehud
+            "Func button textt", {1750, 1000}, {300, 150}, ztgk::color.BROWN,
+            [](HUDHoverable *self) { self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; },
+            [](HUDHoverable *self) { self->collisionSprite->color = ztgk::color.BROWN; },
+            [](HUDButton *self) { self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; },
+            [](HUDButton *self) {
+                self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1};
+                spdlog::info("Func Button pressed!");
+            },
+            ehud
     );
 
     scene.systemManager.getSystem<HUD>()->createSlider_Bar(
-        HORIZONTAL, {100, 100}, {1000, 100},
-        ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN,
-        ehud
+            HORIZONTAL, {100, 100}, {1000, 100},
+            ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN,
+            ehud
     );
     scene.systemManager.getSystem<HUD>()->createSlider_Bar(
-        HORIZONTAL, {100, 200}, {1000, 100},
-        ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
-        ehud, 0,
-        true, 100
-        );
+            HORIZONTAL, {100, 200}, {1000, 100},
+            ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
+            ehud, 0,
+            true, 100
+    );
 
     scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
-        HORIZONTAL, {100, 300}, {1000, 100},
-        ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
-        ehud
+            HORIZONTAL, {100, 300}, {1000, 100},
+            ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
+            ehud
     );
     scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
-        HORIZONTAL, {100, 400}, {1000, 100},
-        ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
-        ehud, 0,
-        true, 100
+            HORIZONTAL, {100, 400}, {1000, 100},
+            ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
+            ehud, 0,
+            true, 100
     );
 
     scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100}, ehud);
     scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(
-        HORIZONTAL, {100, 600}, {1000, 100},
-        ehud, 0,
-        1, 0, "{:.2f}/{:.2f}"
+            HORIZONTAL, {100, 600}, {1000, 100},
+            ehud, 0,
+            1, 0, "{:.2f}/{:.2f}"
     );
 
 
@@ -712,8 +721,23 @@ void load_units() {
     playerUnit->addComponent(make_unique<Render>(gabka));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(modelPathGabkaMove,gabka);
-        playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(modelPathGabkaMove, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager.GetAnimation(modelPathGabkaIdle, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(modelPathGabkaMine, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(modelPathGabkaAttack, gabka);
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+
+    playerUnit = scene.addEntity("Żuczek");
+    playerUnit->addComponent(make_unique<Render>(zuczek));
+    playerUnit->addComponent(make_unique<ColorMask>());
+ //   playerUnit->addComponent(make_unique<AnimationPlayer>());
+ //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = modelLoadingManager.GetAnimation(modelPathZuczekAttack, zuczek);
+ //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = modelLoadingManager.GetAnimation(modelPathZuczekMove, zuczek);
+ //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = modelLoadingManager.GetAnimation(modelPathZuczekIddle, zuczek);
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
@@ -821,7 +845,7 @@ void update() {
     ZoneScopedN("Update");
 
     //no need to check every frame, every 5 sec is good enough
-    if((int)glfwGetTime()%5 == 0 && glfwGetTime() - (int)glfwGetTime() < 0.02) {
+    if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
     }
 
@@ -857,8 +881,8 @@ void update() {
 void render() {
     ZoneScopedN("Render");
 
-    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(& scene.systemManager.getSystem<PhongPipeline>()->phongShader);
-    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&scene.systemManager.getSystem<PhongPipeline>()->phongShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -874,9 +898,9 @@ void render() {
 
     scene.systemManager.getSystem<PhongPipeline>()->PrebindPipeline(&camera);
 
-    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
-    scene.systemManager.getSystem<RenderSystem>()->DrawScene(& scene.systemManager.getSystem<PhongPipeline>()->phongShader, &camera);
-    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceLightShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
+    scene.systemManager.getSystem<RenderSystem>()->DrawScene(&scene.systemManager.getSystem<PhongPipeline>()->phongShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceLightShader, &camera);
 
 
     scene.systemManager.getSystem<PhongPipeline>()->WriteToBackBuffer(&camera);
@@ -884,7 +908,7 @@ void render() {
     scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
-    
+
 
     scene.systemManager.getSystem<HUD>()->draw();
 }
@@ -1048,10 +1072,10 @@ void imgui_end() {
         ImGui::Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }else{
+    } else {
         ImGui::EndFrame();
     }
-        
+
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 
         GLFWwindow *backup_current_context = glfwGetCurrentContext();
@@ -1311,7 +1335,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
                 }
 
-                //if hit entity is a tile, stop doing anything and set movement target
+                    //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr) {
                     unit->DontLookForEnemyTarget = true;
 
@@ -1326,7 +1350,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
                 }
 
-                //if hit an item model, set it as the pickup & movement target
+                    //if hit an item model, set it as the pickup & movement target
                 else if (hit->getComponent<PickupubleItem>() != nullptr) {
                     unit->DontLookForEnemyTarget = true;
 
@@ -1381,7 +1405,7 @@ void init_time() {
 }
 
 void gen_and_load_lvl(bool gen_new_lvl) {
-    if(!gen_new_lvl) {
+    if (!gen_new_lvl) {
         std::ifstream file("save.txt");
         if (file.good()) {
             LevelSaving::load();

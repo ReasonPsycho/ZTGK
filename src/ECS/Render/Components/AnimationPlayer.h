@@ -17,7 +17,9 @@ class AnimationPlayer: public Component {
 public:
     AnimationPlayer();
 
-    void PlayAnimation(std::string path);
+    void PlayAnimation(std::string path, bool looping = false, float animationSpeed = 1.0f);
+    void StopAnimation();
+
     
     void UpdateImpl() override;
     void showImGuiDetailsImpl(Camera *camera) override;
@@ -26,6 +28,9 @@ public:
     
 private:
     Animator animator = nullptr;
+    bool looping = false;
+    bool isPlaying = false;
+    float animationSpeed = 1;
 };
 
 
