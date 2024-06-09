@@ -604,7 +604,7 @@ void load_enteties() {
 
     //level gen and load___________________________________________________________________________________________________________________________________________________
     //comment it out if u want fast load for testing
-    gen_and_load_lvl(true);
+    gen_and_load_lvl();
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
@@ -1152,7 +1152,8 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
 
     ztgk::game::cursor.click(button, action, mods);
-    handle_picking(window, button, action, mods);
+    if (ztgk::game::cursor.config.capture_click)
+        handle_picking(window, button, action, mods);
 
 }
 
@@ -1310,7 +1311,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
                 }
 
-                    //if hit entity is a tile, stop doing anything and set movement target
+                //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr) {
                     unit->DontLookForEnemyTarget = true;
 
@@ -1320,7 +1321,24 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     unit->combatTarget = nullptr;
                     unit->hasMovementTarget = true;
                     unit->pathfinding.path.clear();
+                    unit->hasPickupTarget = false;
+                    unit->pickupTarget = nullptr;
                     unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                }
+
+                //if hit an item model, set it as the pickup & movement target
+                else if (hit->getComponent<PickupubleItem>() != nullptr) {
+                    unit->DontLookForEnemyTarget = true;
+
+                    unit->hasMiningTarget = false;
+                    unit->miningTargets.clear();
+                    unit->hasCombatTarget = false;
+                    unit->combatTarget = nullptr;
+                    unit->hasMovementTarget = true;
+                    unit->pathfinding.path.clear();
+                    unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    unit->hasPickupTarget = true;
+                    unit->pickupTarget = hit->getComponent<PickupubleItem>();
                 }
             }
         }

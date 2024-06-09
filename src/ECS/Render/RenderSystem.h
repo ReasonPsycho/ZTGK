@@ -27,6 +27,7 @@ public:
     void SimpleDrawScene(Shader* regularShader);
     void registerComponents() override{};
     void UpdateImpl() override;
+    void removeColorMaskComponent(void* colorMask);
 
 
 private:

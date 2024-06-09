@@ -74,3 +74,11 @@ void RenderSystem::removeComponent(void *component) {
         renderComponents.erase(component_iter);
     }
 }
+
+void RenderSystem::removeColorMaskComponent(void *component) {
+    auto component_iter = std::find(colorMaskComponents.begin(), colorMaskComponents.end(), reinterpret_cast<ColorMask *const>(component));
+
+    if (component_iter != colorMaskComponents.end()) {
+        colorMaskComponents.erase(component_iter);
+    }
+}
