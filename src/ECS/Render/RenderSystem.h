@@ -8,6 +8,7 @@
 
 #include "ECS/System.h"
 #include "Components/Render.h"
+#include "Components/AnimationPlayer.h"
 #include "Components/ColorMask.h"
 #include "ECS/Render/ModelLoading/Shader.h"
 
@@ -18,7 +19,7 @@ class RenderSystem : public System  {
 public:
     RenderSystem();
     const std::type_index* getComponentTypes() override {return reinterpret_cast<const type_index *>(&componentTypes); };
-    int getNumComponentTypes() override { return 2;};
+    int getNumComponentTypes() override { return 3;};
     void addComponent(void* component) override;
     void removeComponent(void* component) override;
     void showImGuiDetailsImpl(Camera *camera) override;
@@ -32,9 +33,11 @@ public:
 private:
     std::vector<Render *> renderComponents;
     std::vector<ColorMask *> colorMaskComponents;
-    std::array<std::type_index, 2> componentTypes = {
+    std::vector<AnimationPlayer *> animationPlayerComponents;
+    std::array<std::type_index, 3> componentTypes = {
             std::type_index(typeid(Render)),
             std::type_index(typeid(ColorMask)),
+            std::type_index(typeid(AnimationPlayer)),
     };
 };
 
