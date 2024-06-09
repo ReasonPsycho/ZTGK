@@ -8,9 +8,10 @@
 #include "ECS/Utils/Globals.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Equipment/ConcreteItems/PraniumOre.h"
-
+#include "ECS/Unit/Mining/MiningSystem.h"
 Pranium::Pranium(float timeToMine, Vector2Int gridPosition, Grid *grid) : IMineable(timeToMine, gridPosition, grid) {
     name = "Pranium";
+    //ztgk::game::scene->systemManager.getSystem<MiningSystem>()->addComponent(this);
 
 }
 
@@ -38,4 +39,15 @@ void Pranium::generatePranium(Model *model) {
     parent->addComponent(std::make_unique<Render>(model));
 
 
+}
+
+void Pranium::UpdateImpl() {
+    auto tile = grid->getTileAt(gridPosition);
+    auto render = getEntity()->getComponent<Render>();
+    if(tile == nullptr || render == nullptr) return;
+    render->isInFogOfWar = tile->isInFogOfWar;
+}
+
+Pranium::~Pranium() {
+    ztgk::game::scene->systemManager.getSystem<MiningSystem>()->removeComponent(this);
 }

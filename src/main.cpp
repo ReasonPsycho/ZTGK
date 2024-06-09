@@ -24,6 +24,7 @@
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 #include "ECS/SignalQueue/DataCargo/KeySignalData.h"
+#include "ECS/Unit/Mining/MiningSystem.h"
 
 //Instancing
 #include <glm/gtc/type_ptr.hpp>
@@ -417,6 +418,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<UnitSystem>());
     scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
     scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
+    scene.systemManager.addSystem(std::make_unique<MiningSystem>());
 
     scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -751,8 +753,6 @@ void load_units() {
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
     enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-    */
-
 }
 
 void init_imgui() {
@@ -827,6 +827,7 @@ void update() {
 
     scene.systemManager.getSystem<CollisionSystem>()->Update();
     scene.systemManager.getSystem<RenderSystem>()->Update();
+    scene.systemManager.getSystem<MiningSystem>()->Update();
 
 //    auto u = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents[0];
 //    spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);

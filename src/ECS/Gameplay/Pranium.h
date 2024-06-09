@@ -11,12 +11,14 @@
 class Pranium : public IMineable{
 public:
     Pranium(float timeToMine, Vector2Int gridPosition, Grid* grid);
-    ~Pranium() override = default;
+    ~Pranium() override;
 
     void onMine(Unit * unit) override;
     void onMined(Unit * unit) override;
 
     void generatePranium(Model * model);
+
+    void UpdateImpl() override;
 
 
 };
