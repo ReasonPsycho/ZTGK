@@ -40,13 +40,13 @@ void main()
     if(isAnimated){
         for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
         {
+            if(boneIds[i] == -1)
+            continue;
             if(boneIds[i] >=MAX_BONES)
             {
                 totalPosition = vec4(aPos,1.0f);
                 break;
             }
-            if(boneIds[i] == -1)
-                continue;
             vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(aPos,1.0f);
             totalPosition += localPosition * weights[i];
             vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * aNormal;
@@ -58,7 +58,7 @@ void main()
     
     //Standard calculation
     vs_out.TexCoords = aTexCoords;
-    vs_out.LocalPos = aPos;
+    vs_out.LocalPos = vec3(totalPosition);
     vs_out.WorldPos = vec3(model* totalPosition);
     vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);

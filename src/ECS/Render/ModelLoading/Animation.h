@@ -7,6 +7,8 @@
 
 
 #include "glm/fwd.hpp"
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include "Model.h"
 #include "Bone.h"
 #include <string>
