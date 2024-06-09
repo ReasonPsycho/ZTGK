@@ -24,5 +24,9 @@ namespace ztgk::game {
     int game::toon_color_levels = 15;
     Model * game::washingMachineModel = nullptr;
     AudioManager * game::audioManager = nullptr;
-
+    Model * game::playerModel = nullptr;
+    Model * game::bugModel = nullptr;
+    Model * game::shroomModel = nullptr;
+    Model * game::oreModel = nullptr;
+    Model * game::chestModel = nullptr;
 }

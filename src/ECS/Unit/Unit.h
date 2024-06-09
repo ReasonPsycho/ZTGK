@@ -8,6 +8,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/StateManager.h"
 #include "ECS/Unit/Equipment/Modifiers.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
+#include "ECS/Utils/RNG.h"
 
 class UnitSystem;
 
@@ -97,8 +98,10 @@ public:
     float waitTimer = 0;
     void Wait(float seconds);
 
+    bool DontLookForEnemyTarget = false;
 private:
     Vector2Int previousGridPosition;
+    float DontLookForEnemyTargetTimer = 0;
 };
 
 

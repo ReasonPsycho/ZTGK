@@ -7,7 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include "ECS/Utils/Globals.h"
 #include "ECS/Unit/UnitSystem.h"
-#include "ECS/Gameplay/WashingMachine.h";
+#include "ECS/Gameplay/WashingMachine.h"
 
 using namespace ztgk;
 
@@ -24,17 +24,21 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
             return TOKEN_ORE;
         case CORE:
             return TOKEN_CORE;
-        case UNIT: {
+        case SPONGE: {
             return TOKEN_PLAYER;
             // todo assign unit id when walking over, etc
 //            auto & units = game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
 //            auto it = std::find_if(units.begin(), units.end(), [data](Unit * unit){ return unit->uniqueID == data.unitId; });
 //            if ( it != units.end() ) {
 //                if ((*it)->IsAlly()) return TOKEN_PLAYER;
-//                else return TOKEN_ENEMY_BASIC;  // todo enemy types/items
+//                else return TOKEN_ENEMY_BUG;  // todo bug types/items
 //            }
 //            return TOKEN_ERROR;
         }
+        case BUG:
+            return TOKEN_ENEMY_BUG;
+        case SHROOM:
+            return TOKEN_ENEMY_SHROOM;
         case state_count:
             return TOKEN_ERROR;
     }
@@ -63,11 +67,16 @@ void ztgk::tile_state_from_token(char token, Tile * tile) {
         case TOKEN_ORE:
             tile->state = ORE;
             break;
-        case TOKEN_ENEMY_BASIC:
+        case TOKEN_ENEMY_BUG:
+            tile->state = BUG;
+            break;
+        case TOKEN_ENEMY_SHROOM:
+            tile->state = SHROOM;
+            break;
         case TOKEN_PLAYER:
             // tile doesn't hold any unit reference anymore (ID serialization is unreliable, some other type of manually assigned ID would be necessary)
             //  todo if there are other tokens for unit types, add them here, tile is unaware of any specifics about the unit standing on it
-            tile->state = UNIT;
+            tile->state = SPONGE;
             break;
     }
 }
@@ -108,7 +117,7 @@ void LevelSaving::save(const std::string& path) {
                 node["allies"].push_back(*unit);
             }
             else {
-                layout[unit->gridPosition.z][unit->gridPosition.x] = TOKEN_ENEMY_BASIC;
+                layout[unit->gridPosition.z][unit->gridPosition.x] = TOKEN_ENEMY_BUG;
                 node["enemies"].push_back(*unit);
             }
         }

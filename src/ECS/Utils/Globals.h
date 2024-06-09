@@ -33,5 +33,10 @@ namespace ztgk::game {
     extern float lightMultiplayer;
     extern int toon_color_levels;
     extern bool fullscreen;
+    extern Model * playerModel;
+    extern Model* bugModel;
+    extern Model* shroomModel;
+    extern Model* oreModel;
+    extern Model* chestModel;
     
 }

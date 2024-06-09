@@ -128,6 +128,8 @@ private:
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Tile))
     };
+
+    void SpawnUnit(Vector2Int gridPos, bool isAlly);
 };
 
 
