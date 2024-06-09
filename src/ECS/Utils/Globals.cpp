@@ -27,4 +27,7 @@ namespace ztgk::game {
     AudioManager * game::audioManager = nullptr;
     Model * game::playerModel = nullptr;
     Model * game::bugModel = nullptr;
+    Model * game::shroomModel = nullptr;
+    Model * game::oreModel = nullptr;
+    Model * game::chestModel = nullptr;
 }

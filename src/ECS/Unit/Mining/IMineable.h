@@ -18,7 +18,7 @@ public:
     Vector2Int gridPosition;
     Grid* grid;
     explicit  IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid);
-    ~IMineable() = default;
+    ~IMineable();
     virtual void onMine(Unit * unit) { /*todo fire particles!*/ };
     virtual void onMined(Unit * unit) { /**/ };
     void Mine(Unit * unit);

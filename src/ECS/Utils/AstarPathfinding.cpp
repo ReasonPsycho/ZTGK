@@ -22,7 +22,7 @@ AstarPathfinding::AstarPathfinding(Grid *grid, Unit* unit) {
  * @param start
  * @param target
  */
-std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target) {
+std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target, bool debug) {
     ZoneScopedN("Astar::FindPath");
     double start_time = glfwGetTime();
 
@@ -77,7 +77,7 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
 
 
     }
-    spdlog::error("PATHFINDING: No path found for unit {}", unit->name);
+    if(debug)spdlog::error("PATHFINDING: No path found for unit {}", unit->name);
     path.clear();
     return path;
 }

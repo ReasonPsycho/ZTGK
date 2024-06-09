@@ -37,10 +37,14 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
 //            auto it = std::find_if(units.begin(), units.end(), [data](Unit * unit){ return unit->uniqueID == data.unitId; });
 //            if ( it != units.end() ) {
 //                if ((*it)->IsAlly()) return TOKEN_PLAYER;
-//                else return TOKEN_ENEMY_BUG;  // todo enemy types/items
+//                else return TOKEN_ENEMY_BUG;  // todo bug types/items
 //            }
 //            return TOKEN_ERROR;
         }
+        case BUG:
+            return TOKEN_ENEMY_BUG;
+        case SHROOM:
+            return TOKEN_ENEMY_SHROOM;
         case state_count:
             return TOKEN_ERROR;
     }
@@ -71,6 +75,9 @@ void ztgk::tile_state_from_token(char token, Tile * tile) {
             break;
         case TOKEN_ENEMY_BUG:
             tile->state = BUG;
+            break;
+        case TOKEN_ENEMY_SHROOM:
+            tile->state = SHROOM;
             break;
         case TOKEN_PLAYER:
             // tile doesn't hold any unit reference anymore (ID serialization is unreliable, some other type of manually assigned ID would be necessary)

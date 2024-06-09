@@ -9,6 +9,7 @@
 #include "ECS/HUD/Components/Text.h"
 #include "ECS/Entity.h"
 #include "ECS/Unit/Unit.h"
+#include "MiningSystem.h"
 
 IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->name = "IMineable";
@@ -16,6 +17,7 @@ IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->grid = grid;
     this->timeToMine = timeToMine;
     this->timeToMineRemaining = timeToMine;
+    //ztgk::game::scene->systemManager.getSystem<MiningSystem>()->addComponent(this);
 }
 
 
@@ -38,7 +40,10 @@ void IMineable::Mine(Unit * unit) {
 }
 
 void IMineable::UpdateImpl() {
-
+//    auto tile = grid->getTileAt(gridPosition);
+//    auto render = getEntity()->getComponent<Render>();
+//    if(tile == nullptr || render == nullptr) return;
+//    render->isInFogOfWar = tile->isInFogOfWar;
 }
 
 void IMineable::showImGuiDetailsImpl(Camera *camera) {
@@ -58,5 +63,10 @@ IMineable::IMineable(IMineable *pMineable) {
     this->grid = pMineable->grid;
     this->timeToMine = pMineable->timeToMine;
     this->timeToMineRemaining = pMineable->timeToMineRemaining;
+    ztgk::game::scene->systemManager.getSystem<MiningSystem>()->addComponent(this);
 
+}
+
+IMineable::~IMineable() {
+    ztgk::game::scene->systemManager.getSystem<MiningSystem>()->removeComponent(this);
 }

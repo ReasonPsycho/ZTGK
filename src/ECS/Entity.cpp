@@ -146,6 +146,8 @@ Entity::~Entity() {
 void Entity::Destroy() {
     while (!children.empty())
         (*children.begin())->Destroy();
+    while (!components.empty())
+        removeComponentFromMap(components.begin()->second.get());
     if (parent != nullptr) {
         parent->removeChild(this);
     } else {

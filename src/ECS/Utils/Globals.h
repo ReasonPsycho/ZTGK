@@ -47,5 +47,8 @@ namespace ztgk::game {
     extern bool fullscreen;
     extern Model * playerModel;
     extern Model* bugModel;
+    extern Model* shroomModel;
+    extern Model* oreModel;
+    extern Model* chestModel;
     
 }

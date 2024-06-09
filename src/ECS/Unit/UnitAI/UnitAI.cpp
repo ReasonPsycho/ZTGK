@@ -9,7 +9,7 @@ UnitAI::UnitAI(Unit *pUnit, StateManager *pStateManager) {
 }
 
 UnitAI::~UnitAI() {
-    delete unit;
+    //delete unit;
     delete stateManager;
 }
 

@@ -15,6 +15,7 @@
 #include <random>
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Render/Components/ColorMask.h"
+#include "ECS/Render/RenderSystem.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -253,6 +254,9 @@ void Unit::UpdateImpl() {
         cm->RemoveMask("selected");
     }
 
+    getEntity()->getComponent<Render>()->isInFogOfWar = grid->getTileAt(gridPosition)->isInFogOfWar;
+
+
     previousGridPosition = gridPosition;
 
     if (equipment.item0->cd_sec > 0)
@@ -426,5 +430,15 @@ Vector2Int Unit::GetDirtiestTileAround() {
         }
     }
     return dirtiestTile;
+}
+
+void Unit::DIEXD() {
+    grid->getTileAt(gridPosition)->unit = nullptr;
+    grid->getTileAt(gridPosition)->state = FLOOR;
+    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->removeComponent(this);
+    ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeComponent(getEntity()->getComponent<Render>());
+    ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeColorMaskComponent(getEntity()->getComponent<ColorMask>());
+    getEntity()->Destroy();
+
 }
 

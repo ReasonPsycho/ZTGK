@@ -107,7 +107,7 @@ void MovementState::MoveOnPath() {
     if(unit->pathfinding.path.size() == 0 && unit->hasMovementTarget){
         unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget);
     }
-    if(unit->pathfinding.path.size() > (unit->isAlly? 1 : 0) &&  unit->pathfinding.path[0] == unit->gridPosition){
+    if(unit->pathfinding.path.size() > 1 &&  unit->pathfinding.path[0] == unit->gridPosition){
         unit->pathfinding.path.erase(unit->pathfinding.path.begin());
     }
     if (!unit->pathfinding.path.empty()) {

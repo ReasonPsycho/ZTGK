@@ -67,7 +67,7 @@ std::vector<Unit *> GridRange::find_any(glm::ivec2 center) {
     }
     return ret;
 }
-                                                                    //vv mySide defines if the unit that looks for its enemies is on player side or enemy side
+                                                                    //vv mySide defines if the unit that looks for its enemies is on player side or bug side
 std::vector<Unit *> GridRange::find_enemies(glm::ivec2 center, bool mySide) {
     auto tiles = get_tiles(center) | std::ranges::views::filter([&mySide](Tile * tile){
         return tile->unit != nullptr && tile->unit->IsAlly() != mySide;
