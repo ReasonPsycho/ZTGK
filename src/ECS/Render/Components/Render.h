@@ -22,6 +22,7 @@ public:
     glm::vec4 colorMask;
     float dirtLevel = 0;
     bool isInFogOfWar = false;
+    bool isAnimated = false;
 private:
     Model *pModel{};
     AABB aabb;

@@ -14,9 +14,10 @@ uniform mat4 view;
 uniform mat4 model;
 uniform vec3 camPos;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 20;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform bool isAnimated;
 
 struct TangentData{ // So it's easier to operate on
     vec3 ViewPos;
@@ -36,7 +37,7 @@ out VS_OUT {
 void main()
 {
     vec4 totalPosition = vec4(0.0f);
-    if(boneIds[0] != -1){
+    if(isAnimated){
         for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
         {
             if(boneIds[i] >=MAX_BONES)

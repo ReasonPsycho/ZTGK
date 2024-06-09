@@ -53,6 +53,7 @@ public:
     void SetVertexBoneDataToDefault(Vertex& vertex);
 
 
+    Model(){};
     Model(string const *path) : path(path) {};
     Model(unsigned int VAO, MaterialPhong material, vector<unsigned int> indices);
     
