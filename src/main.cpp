@@ -772,16 +772,57 @@ void load_hud() {
     auto gr_game = hud->addGroup(0, "Game");
     auto gr_settings = hud->addGroup(0, "Settings");
     auto gr_menu = hud->addGroup(0, "Menu");
-    auto gr_loadScreen = hud->addGroup(gr_menu, "Load Screen");
     auto gr_credits = hud->addGroup(0, "Credits");
+
+    auto gr_loadScreen = hud->addGroup(gr_menu, "Load Screen");
+    auto gr_mainMenu = hud->addGroup(gr_menu, "Main Menu");
 
     // menu
     auto emenu = scene.addEntity(ehud, "Menu");
+
+    emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, gr_mainMenu, "res/textures/title_screen.png"));
+    float ystep = (ztgk::game::window_size.y - 2*200) / 4.0f;
+    glm::vec2 btn_pos = {ztgk::game::window_size.x*4/5, ztgk::game::window_size.y - 200};
+    hud->createButton(
+        "Rozpocznij", btn_pos, glm::vec2{200, 80},
+        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud, gr_mainMenu]() { gen_and_load_lvl(true); hud->getGroupOrDefault(gr_mainMenu)->setHidden(true); },
+        emenu, gr_mainMenu
+    );
+    btn_pos.y -= ystep;
+    hud->createButton(
+        "Wczytaj", btn_pos, glm::vec2{200, 80},
+        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud, gr_mainMenu]() { gen_and_load_lvl(false); hud->getGroupOrDefault(gr_mainMenu)->setHidden(true); },
+        emenu, gr_mainMenu
+    );
+    btn_pos.y -= ystep;
+    hud->createButton(
+        "Ustawienia", btn_pos, glm::vec2{200, 80},
+        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud, gr_mainMenu, gr_settings]() { hud->getGroupOrDefault(gr_mainMenu)->setHidden(true); hud->getGroupOrDefault(gr_settings)->setHidden(false); },
+        emenu, gr_mainMenu
+    );
+    btn_pos.y -= ystep;
+    hud->createButton(
+        "Autorzy", btn_pos, glm::vec2{200, 80},
+        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud, gr_mainMenu, gr_credits]() { hud->getGroupOrDefault(gr_mainMenu)->setHidden(true); hud->getGroupOrDefault(gr_credits)->setHidden(false); },
+        emenu, gr_mainMenu
+    );
+    btn_pos.y -= ystep;
+    hud->createButton(
+        "Koniec", btn_pos, glm::vec2{200, 80},
+        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        []() { glfwSetWindowShouldClose(window, true); },
+        emenu, gr_mainMenu
+    );
+
+    // load/save screen
     auto eload = scene.addEntity(emenu, "Load Screen");
     eload->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, gr_loadScreen));
-    eload->addComponent(make_unique<Text>("Wczytywanie...", glm::vec2{ztgk::game::window_size.x/4, ztgk::game::window_size.y*3/4}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.default_font, NONE, gr_loadScreen));
-
-//    emenu->addComponent(make_unique<Sprite>());
+    eload->addComponent(make_unique<Text>("Wczytywanie...", glm::vec2{ztgk::game::window_size.x/4, ztgk::game::window_size.y*3/4}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_loadScreen));
+    eload->getComponent<Text>()->mode = CENTER;
 
     // game
 
@@ -791,9 +832,14 @@ void load_hud() {
 
     // credits
 
+
+
+    // groups
+    hud->getGroupOrDefault(gr_menu)->setHidden(false);
+    hud->getGroupOrDefault(gr_mainMenu)->setHidden(false);
+
     hud->getGroupOrDefault(gr_game)->setHidden(true);
     hud->getGroupOrDefault(gr_settings)->setHidden(true);
-    hud->getGroupOrDefault(gr_menu)->setHidden(true);
     hud->getGroupOrDefault(gr_loadScreen)->setHidden(true);
     hud->getGroupOrDefault(gr_credits)->setHidden(true);
 
