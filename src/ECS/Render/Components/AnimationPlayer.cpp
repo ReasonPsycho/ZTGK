@@ -18,6 +18,8 @@ void AnimationPlayer::UpdateImpl() {
         }
         if (!looping && animator.m_CurrentAnimation->GetDuration() < animator.m_CurrentTime){
             isPlaying = false;
+            looping = false;
+            animationSpeed = 1.0f;
         }
     }
 }
