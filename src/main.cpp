@@ -88,6 +88,7 @@ string modelPathZuczek = "res/models/properZuczek/Zuczek.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
+string modelChestPath = "res/models/chest/chest.fbx";
 
 Model tileModel = Model(&tileModelPath);
 Model model = Model(&modelPath);
@@ -95,6 +96,7 @@ Model gabka = Model(&modelPathGabka);
 Model zuczek = Model(&modelPathZuczek);
 Model wall = Model(&modelPathWall);
 Model washingMachineModel = Model(&washingMachinePath);
+Model chestModel = Model(&modelChestPath);
 
 Model *cubeModel;
 Model *quadModel;
@@ -538,9 +540,11 @@ void load_enteties() {
     zuczek.loadModel();
     tileModel.loadModel();
     washingMachineModel.loadModel();
+    chestModel.loadModel();
     ztgk::game::washingMachineModel = &washingMachineModel;
     ztgk::game::playerModel = &gabka;
     ztgk::game::bugModel = &zuczek;
+    ztgk::game::chestModel = &chestModel;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(&washingMachineModel);
 

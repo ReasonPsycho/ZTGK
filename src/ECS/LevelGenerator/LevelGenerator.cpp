@@ -5,17 +5,19 @@
 #include "LevelGenerator.h"
 #include <format>
 #include <map>
+#include "ECS/Utils/RNG.h"
 
 std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 	using TileType = LevelLayout::Tile::Type;
 	std::map<TileType, char> chars {
-		{TileType::wall, 'O'},
+		{TileType::wall,  'O'},
 		{TileType::floor, ' '},
 		{TileType::chest, '*'},
-		{TileType::ore, '^'},
-		{TileType::core, 'c'},
-		{TileType::unit, '+'},
-		{TileType::enemy, 'x'},
+		{TileType::ore,   '^'},
+		{TileType::core,  'c'},
+		{TileType::unit,  '+'},
+		{TileType::bug,   'x'},
+        {TileType::shroom,'s'}
 	};
 	os << "# ---LAYOUT START---";
 	for (std::size_t i = 0; i < level.grid.size(); i++) {
@@ -217,7 +219,7 @@ void LevelGenerator::hollowOutPocket(int index, float padding, float noiseImpact
 }
 
 void LevelGenerator::addEnemiesToPocket(int index, int count, PcgEngine& rand) noexcept {
-	addAtRandomToPocket(index, count, Tile::Type::enemy, rand, [](glm::ivec2) {
+	addAtRandomToPocket(index, count, RNG::RandomBool() ? Tile::Type::bug : Tile::Type::shroom, rand, [](glm::ivec2) {
 		return true;
 	});
 }

@@ -24,10 +24,10 @@ void MineableChest::onMined(Unit *unit) {
 }
 
 void MineableChest::UpdateImpl() {
-    auto tile = grid->getTileAt(gridPosition);
-    auto render = getEntity()->getComponent<Render>();
-    if(tile == nullptr || render == nullptr) return;
-    render->isInFogOfWar = tile->isInFogOfWar;
+//    auto tile = grid->getTileAt(gridPosition);
+//    auto render = getEntity()->getComponent<Render>();
+//    if(tile == nullptr || render == nullptr) return;
+//    render->isInFogOfWar = tile->isInFogOfWar;
 }
 
 MineableChest::MineableChest(const Vector2Int &gridPosition, Grid *grid, unsigned int itemTypeId) : IMineable(timeToMine, gridPosition, grid) {
