@@ -23,6 +23,7 @@ public:
     float dirtLevel = 0;
     bool isInFogOfWar = false;
     bool isAnimated = false;
+    std::vector<glm::mat4> animationTransforms;
 private:
     Model *pModel{};
     AABB aabb;

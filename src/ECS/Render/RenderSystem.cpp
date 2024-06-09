@@ -50,15 +50,19 @@ void RenderSystem::addComponent(void *component) {
     }
 
     AnimationPlayer* animationPlayerPtr = dynamic_cast<AnimationPlayer*>(basePtr);
-    if(colorMaskPtr != nullptr)
+    if(animationPlayerPtr != nullptr)
     {
-        animationPlayerComponents.push_back(colorMaskPtr);
+        animationPlayerComponents.push_back(animationPlayerPtr);
     }
 }
 
 void RenderSystem::UpdateImpl() {
     for (auto colorMask: colorMaskComponents) {
             colorMask->Update();
+    }
+
+    for (auto animationPlayer: animationPlayerComponents) {
+        animationPlayer->Update();
     }
 }
 

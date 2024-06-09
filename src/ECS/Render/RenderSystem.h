@@ -32,7 +32,7 @@ public:
 private:
     std::vector<Render *> renderComponents;
     std::vector<ColorMask *> colorMaskComponents;
-    std::vector<ColorMask *> animationPlayerComponents;
+    std::vector<AnimationPlayer *> animationPlayerComponents;
     std::array<std::type_index, 3> componentTypes = {
             std::type_index(typeid(Render)),
             std::type_index(typeid(ColorMask)),

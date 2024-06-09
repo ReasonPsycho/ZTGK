@@ -15,11 +15,11 @@ Animation * ModelLoadingManager::GetAnimation(std::string path, Model *model) {
             // The map contains the pointer
             return it->second.get();
         }
-        else
-        {
-            animationMap[path] = make_shared<Animation>(path,model);
-            return animationMap[path].get();
-        }
+    }
+    else
+    {
+        animationMap[path] = make_shared<Animation>(path,model);
+        return animationMap[path].get();
     }
     return nullptr;
 }
@@ -35,22 +35,17 @@ Model * ModelLoadingManager::GetModel(std::string path) {
             // The map contains the pointer
             return it->second.get();
         }
-        else
-        {
-            modelMap[path]= std::make_shared<Model>(&path);
-            if(isInnit){
-                modelMap[path]->loadModel();
-            }
-            return modelMap[path].get();
-            // The map does not contain the pointer
-        }
+    }
+    else
+    {
+        modelMap[path]= std::make_shared<Model>(&path);
+        modelMap[path]->loadModel();
+        return modelMap[path].get();
+        // The map does not contain the pointer
     }
     return nullptr;
 }
 
 void ModelLoadingManager::Innit() {
-    isInnit = true;
-    for (auto model: modelMap) {
-        model.second->loadModel();
-    }
+
 }
