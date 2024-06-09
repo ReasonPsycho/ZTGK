@@ -99,6 +99,9 @@ public:
     void Wait(float seconds);
 
     bool DontLookForEnemyTarget = false;
+
+    void DIEXD();
+
 private:
     Vector2Int previousGridPosition;
     float DontLookForEnemyTargetTimer = 0;

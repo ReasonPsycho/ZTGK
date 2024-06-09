@@ -100,7 +100,7 @@ void CombatState::AttackTarget() {
     auto target = unit->combatTarget;
 
     float totalAttackDamage =
-            (useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
+            (useItem->stats.dmg + useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
             * (1 - target->stats.added.def_perc) - target->stats.added.def_flat;
 
     useItem->cd_sec = useItem->stats.cd_max_sec;
@@ -116,8 +116,8 @@ void CombatState::AttackTarget() {
         ztgk::game::audioManager->playRandomSoundFromGroup(unit->combatTarget->isAlly ? "deathSponge" : "deathEnemy");
 
         unit->hasCombatTarget = false;
-        target->parentEntity->Destroy();
-        unit->combatTarget = nullptr;
+
+        target->DIEXD();
     }
 }
 

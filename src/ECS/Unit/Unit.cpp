@@ -15,6 +15,7 @@
 #include <random>
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Render/Components/ColorMask.h"
+#include "ECS/Render/RenderSystem.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -429,5 +430,15 @@ Vector2Int Unit::GetDirtiestTileAround() {
         }
     }
     return dirtiestTile;
+}
+
+void Unit::DIEXD() {
+    grid->getTileAt(gridPosition)->unit = nullptr;
+    grid->getTileAt(gridPosition)->state = FLOOR;
+    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->removeComponent(this);
+    ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeComponent(getEntity()->getComponent<Render>());
+    ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeColorMaskComponent(getEntity()->getComponent<ColorMask>());
+    getEntity()->Destroy();
+
 }
 
