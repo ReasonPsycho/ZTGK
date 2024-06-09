@@ -599,7 +599,7 @@ void load_enteties() {
 
     //level gen and load___________________________________________________________________________________________________________________________________________________
     //comment it out if u want fast load for testing
-    gen_and_load_lvl(true);
+    gen_and_load_lvl();
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
