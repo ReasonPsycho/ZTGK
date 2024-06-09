@@ -11,10 +11,12 @@ class MineableChest : public IMineable {
 public:
     unsigned item_type_id = 0;
 
-    MineableChest(const Vector2Int &gridPosition, Grid *grid, unsigned int itemTypeId)
-    : IMineable(2, gridPosition, grid), item_type_id(itemTypeId) {}
+    MineableChest(const Vector2Int &gridPosition, Grid *grid, unsigned int itemTypeId);
+    ~MineableChest() override;
 
     void onMined(Unit *unit) override;
+
+    void UpdateImpl() override;
 
     void showImGuiDetailsImpl(Camera *camera) override;
 };

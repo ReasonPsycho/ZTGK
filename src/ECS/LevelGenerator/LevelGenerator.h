@@ -22,7 +22,8 @@ struct LevelLayout {
 			ore,
 			core,
 			unit,
-			enemy,
+			bug,
+            shroom
 		};
 
 		Type type = Type::wall;

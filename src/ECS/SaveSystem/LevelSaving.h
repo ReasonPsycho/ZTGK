@@ -22,6 +22,7 @@ namespace ztgk {
     const static char TOKEN_ORE = '^';
     const static char TOKEN_PLAYER = '+';
     const static char TOKEN_ENEMY_BUG = 'x';
+    const static char TOKEN_ENEMY_SHROOM = 's';
 
     char tile_state_to_token(TileState state, TileStateData data = {});
     void tile_state_from_token(char token, Tile * tile);

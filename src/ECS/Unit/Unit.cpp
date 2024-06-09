@@ -253,6 +253,9 @@ void Unit::UpdateImpl() {
         cm->RemoveMask("selected");
     }
 
+    getEntity()->getComponent<Render>()->isInFogOfWar = grid->getTileAt(gridPosition)->isInFogOfWar;
+
+
     previousGridPosition = gridPosition;
 
     if (equipment.item0->cd_sec > 0)

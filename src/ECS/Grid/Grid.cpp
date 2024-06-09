@@ -239,12 +239,16 @@ void Grid::InitializeTileEntities() {
                 case CHEST:
                     // todo item type id
                     tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
-                    // tile->getEntity()->addComponent(std::make_unique<PointLight>());
+                    tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
+                    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
+                    tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
+                    tile->getEntity()->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
                     break;
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
                     break;
                 case SHROOM:
+                    //todo add shroom spawning with model etc
                 case BUG:
                     SpawnUnit(tile->index, false);
                     break;
