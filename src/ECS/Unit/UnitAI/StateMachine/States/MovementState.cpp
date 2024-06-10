@@ -38,7 +38,7 @@ State *MovementState::RunCurrentState() {
 //        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, unit->combatTarget->gridPosition);
 //    }
 
-    if(unit->hasMovementTarget){
+    if(unit->hasMovementTarget && unit->hasCombatTarget && unit->combatTarget != nullptr && (unit->movementTarget != unit->combatTarget->gridPosition && unit->hasMiningTarget && unit->currentMiningTarget != nullptr)){
         return this;
     }
 
@@ -57,49 +57,52 @@ State *MovementState::RunCurrentState() {
         return idleState;
     }
 
-    //from Movement to Combat
-    if (unit->hasCombatTarget) {
-        combatState = new CombatState(grid);
-        combatState->unit = unit;
-
-        if(combatState->isTargetInRange())
-            return combatState;
-        else
-        {
-            unit->hasMovementTarget = true;
-            unit->movementTarget = unit->combatTarget->gridPosition;
-            return this;
-        }
-    }
 
     //from Movement to Mining
     if (unit->hasMiningTarget) {
         miningState = new MiningState(grid);
         miningState->unit = unit;
 
-        if(miningState->isTargetInRange())
+        if (miningState->isTargetInRange() && unit->canPathToMiningTarget())
             return miningState;
-        else
-        {
+        else if (unit->canPathToMiningTarget()) {
             auto closestMineable = unit->findClosestMineable();
-            if(closestMineable != nullptr) {
+            spdlog::debug("Closest mineable: {}, {}", closestMineable->gridPosition.x, closestMineable->gridPosition.z);
+            spdlog::debug("My position: {}, {}", unit->gridPosition.x, unit->gridPosition.z);
+            if (closestMineable != nullptr) {
                 unit->hasMovementTarget = true;
-                unit->movementTarget = unit->findClosestMineable()->gridPosition;
-                unit->currentMiningTarget = nullptr;
-                unit->hasMiningTarget = false;
-
+                unit->movementTarget = closestMineable->gridPosition;
+                unit->currentMiningTarget = closestMineable;
+                unit->hasMiningTarget = true;
+                return this;
                 //spdlog::info("Target not in range, moving to mining target");
-            }
-            else{
+            } else {
                 unit->hasMiningTarget = false;
                 idleState = new IdleState(grid);
                 idleState->unit = unit;
                 //spdlog::info("No mineable targets found, returning to idle state");
                 return idleState;
             }
+        }
+    }
+
+    //from Movement to Combat
+    if (unit->hasCombatTarget) {
+        combatState = new CombatState(grid);
+        combatState->unit = unit;
+
+        if(combatState->isTargetInRange() && unit->canPathToAttackTarget())
+            return combatState;
+        else if(unit->canPathToAttackTarget())
+        {
+            spdlog::info("Target not in range, moving to attack target -> can path to attack target");
+            delete combatState;
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->combatTarget->gridPosition;
             return this;
         }
     }
+
 
     return this;
 }
@@ -148,3 +151,5 @@ MovementState::MovementState(Grid *grid) {
     this->name = "Movement";
 
 }
+
+

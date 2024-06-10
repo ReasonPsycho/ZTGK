@@ -211,6 +211,9 @@ void Grid::InitializeTileEntities() {
             tileEntity->getComponent<BoxCollider>()->setCenter(
                     tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
             tileEntity->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xz";
+            if(tileEntity->getComponent<BoxCollider>()->getCenter().y == -2){
+                tileEntity->getComponent<BoxCollider>()->boxColliderData.color = glm::vec4(0, 1, 0, 1);
+            }
 
             tile->isInFogOfWar = true;
             switch (tile->state) {

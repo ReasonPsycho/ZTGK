@@ -30,10 +30,31 @@ State *MiningState::RunCurrentState() {
     }
 
     //from Mining to Movement
-    if(unit->hasMovementTarget){
+    if(unit->hasMovementTarget && unit->combatTarget!= nullptr && unit->movementTarget != unit->combatTarget->gridPosition){
         moveState = new MovementState(grid);
         moveState->unit = unit;
 
+        return moveState;
+    }
+    if(isTargetInRange())
+        Mine();
+    else{
+        moveState = new MovementState(grid);
+        moveState->unit = unit;
+        unit->hasMovementTarget = true;
+        if(unit->currentMiningTarget == nullptr){
+            if(unit->miningTargets.empty()){
+                unit->hasMiningTarget = false;
+                idleState = new IdleState(grid);
+                idleState->unit = unit;
+                delete moveState;
+                return idleState;
+            }
+            else{
+                unit->currentMiningTarget = unit->miningTargets.front();
+            }
+        }
+        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->currentMiningTarget->gridPosition, unit->gridPosition);
         return moveState;
     }
 
@@ -52,15 +73,6 @@ State *MiningState::RunCurrentState() {
             moveState->unit = unit;
             return moveState;
         }
-    }
-    if(isTargetInRange())
-        Mine();
-    else{
-        moveState = new MovementState(grid);
-        moveState->unit = unit;
-        unit->hasMovementTarget = true;
-        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->currentMiningTarget->gridPosition, unit->gridPosition);
-        return moveState;
     }
     return this;
 }

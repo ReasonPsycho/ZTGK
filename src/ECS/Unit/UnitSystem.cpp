@@ -28,6 +28,9 @@ void UnitSystem::removeComponent(void *component) {
 
     if (component_iter != unitComponents.end()) {
         unitComponents.erase(component_iter);
+        spdlog::info("Component successfully removed {}.", typeid(*((Unit *)component)).name());
+    } else {
+        spdlog::warn("Attempted to remove a component that does not exist in the map: {}.", typeid(*((Unit *)component)).name());
     }
 }
 
@@ -57,10 +60,13 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 
 void UnitSystem::UpdateImpl() {
     for (Unit* unit: unitComponents) {
+        if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
         unit->UpdateImpl();
         unit->getEntity()->getComponent<UnitAI>()->Update();
         unit->getEntity()->getComponent<BoxCollider>()->Update();
+        if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
 
+        //those find statements are needed because unit can be deleted in the UpdateImpl() function, which does not update unitComponents vector
     }
 
     float xd = glfwGetTime();

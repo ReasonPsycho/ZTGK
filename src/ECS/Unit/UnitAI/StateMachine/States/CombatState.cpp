@@ -75,8 +75,8 @@ bool CombatState::isTargetInRange() {
 //    return inRange;
      Unit* targ = unit->GetClosestEnemyInWeaponRange();
     if (targ == nullptr) {
-        unit->hasCombatTarget = false;
-        unit->isTargetInRange = false;
+//        unit->hasCombatTarget = false;
+//        unit->isTargetInRange = false;
         return false;
     }
     unit->combatTarget = targ;
@@ -98,7 +98,7 @@ void CombatState::AttackTarget() {
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;
     }
-    float angle = atan2(unit->combatTarget->gridPosition.z - unit->gridPosition.z, unit->combatTarget->gridPosition.x - unit->gridPosition.x);
+    float angle = atan2(unit->combatTarget->worldPosition.x - unit->worldPosition.x, unit->combatTarget->worldPosition.z - unit->worldPosition.z);
     unit->rotation = angle;
 
     auto target = unit->combatTarget;

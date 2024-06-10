@@ -840,8 +840,10 @@ void update() {
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
 
-//    auto u = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents[0];
-//    spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
+//    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
+//        if(u->isAlly)
+//            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
+//    }
 }
 
 void render() {
@@ -1301,18 +1303,20 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                 //if hit entity is mineable, set it as mining target
                 if (mineable != nullptr && !mineable->isMined) {
-                    unit->DontLookForEnemyTarget = true;
                     unit->miningTargets.clear();
                     unit->miningTargets.emplace_back(hit->getMineableComponent<IMineable>(hit));
                     Tile *hitTile = hit->getComponent<Tile>();
                     hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
+//                    unit->ForcedMiningState = true;
+//                    unit->forcedMiningTarget = mineable;
                     spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
                 }
 
                     //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr) {
-                    unit->DontLookForEnemyTarget = true;
+                    unit->ForcedMovementState = true;
+                    unit->forcedMovementTarget = hit->getComponent<Tile>()->index;
 
                     unit->hasMiningTarget = false;
                     unit->miningTargets.clear();
@@ -1382,9 +1386,9 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
             .keyEnemies = RNG::RandomInt(2, 3),
-            .minEnemies = 0,
-            .maxEnemies = 5,
-            .unitCount = 3,
+            .minEnemies = 5,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 5,  //4        <---
+            .unitCount = 1,   //3        <---
             .chestCount = RNG::RandomInt(8, 15),
     };
 
