@@ -770,6 +770,8 @@ void load_hud() {
     auto hud = scene.systemManager.getSystem<HUD>();
     auto ehud = scene.addEntity("HUD");
     auto gr_game = hud->addGroup(0, "Game");
+    auto gr_pause = hud->addGroup(0, "Pause");
+
     auto gr_settings = hud->addGroup(0, "Settings");
     auto gr_menu = hud->addGroup(0, "Menu");
     auto gr_credits = hud->addGroup(0, "Credits");
@@ -831,8 +833,35 @@ void load_hud() {
 
 
     // credits
+    auto ecredits = scene.addEntity(ehud, "Credits");
+    ecredits->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, gr_credits));
 
+    std::string licenses;
+    std::ifstream file("res/sounds/CREDITS.txt");
+    std::string line;
+    while (std::getline(file, line)) {
+        licenses += line + "\n";
+    }
+    auto eteam = scene.addEntity(ecredits, "Team Credits");
+    eteam->addComponent(make_unique<Text>(
+        "Bubble Bliss Games\n\nGrzegorz Ludziejewski\nIgor Kusidel\nKrzysztof Czerwinski\nAmelia Kwasniewska\nJan Filipowicz",
+        glm::vec2{100, ztgk::game::window_size.y - 100}, glm::vec2(1), glm::vec4{36, 54, 110, 255}/255.0f, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_credits
+    ));
+    eteam->getComponent<Text>()->mode = TOP_LEFT;
+    eteam->addComponent(make_unique<Sprite>(glm::vec2{100,400}, glm::vec2{400, 225}, ztgk::color.WHITE, gr_credits, "res/textures/credits.jpg"));
+    eteam->getComponent<Sprite>()->mode = MIDDLE_LEFT;
 
+    auto elicenses = scene.addEntity(ecredits, "Licenses");
+    elicenses->addComponent(make_unique<Text>(
+        licenses,
+        glm::vec2{ztgk::game::window_size.x - 100, ztgk::game::window_size.y - 100}, glm::vec2(0.5), glm::vec4{36, 54, 110, 255}/255.0f, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_credits
+    ));
+    elicenses->getComponent<Text>()->mode = TOP_RIGHT;
+
+    hud->createButton("Powrot", {200, 125}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud, gr_credits, gr_mainMenu]() { hud->getGroupOrDefault(gr_credits)->setHidden(true); hud->getGroupOrDefault(gr_mainMenu)->setHidden(false); },
+        ecredits, gr_credits
+    );
 
     // groups
     hud->getGroupOrDefault(gr_menu)->setHidden(false);
