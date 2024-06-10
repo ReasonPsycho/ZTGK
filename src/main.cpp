@@ -779,7 +779,7 @@ void load_hud() {
     auto gr_loadScreen = hud->addGroup(gr_menu, "Load Screen");
     auto gr_mainMenu = hud->addGroup(gr_menu, "Main Menu");
 
-    // menu
+// menu
     auto emenu = scene.addEntity(ehud, "Menu");
 
     emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, gr_mainMenu, "res/textures/title_screen.png"));
@@ -820,19 +820,45 @@ void load_hud() {
         emenu, gr_mainMenu
     );
 
-    // load/save screen
+// load/save screen
     auto eload = scene.addEntity(emenu, "Load Screen");
     eload->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, gr_loadScreen));
-    eload->addComponent(make_unique<Text>("Wczytywanie...", glm::vec2{ztgk::game::window_size.x/4, ztgk::game::window_size.y*3/4}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_loadScreen));
+    eload->addComponent(make_unique<Text>("Wczytywanie...", glm::vec2{ztgk::game::window_size.x/5, ztgk::game::window_size.y*8/10}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_loadScreen));
     eload->getComponent<Text>()->mode = CENTER;
 
-    // game
+// game
 
 
-    // settings
+// settings
+    auto esettings = scene.addEntity(ehud, "Settings");
+    esettings->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, gr_settings));
+    esettings->addComponent(make_unique<Text>("Ustawienia", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_settings));
+    esettings->getComponent<Text>()->mode = TOP_CENTER;
 
+    auto eslider_master = scene.addEntity(esettings, "Master Volume ");
+    eslider_master->addComponent(make_unique<Text>("Master Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settings));
+    eslider_master->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, {1000, 80}, eslider_master, gr_settings, 128, 0, "{:.0f}/{:.0f}");
 
-    // credits
+    auto eslider_ambient = scene.addEntity(esettings, "Ambient Volume ");
+    eslider_ambient->addComponent(make_unique<Text>("Ambient Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settings));
+    eslider_ambient->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, {1000, 80}, eslider_ambient, gr_settings, 128, 0, "{:.0f}/{:.0f}");
+
+    hud->createButton("Zapisz", {ztgk::game::window_size.x/2, 100}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [eslider_master, eslider_ambient]() {
+            ztgk::game::audioManager->setGlobalVolume(eslider_master->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
+            ztgk::game::audioManager->setVolumeForGroup("ambient", eslider_ambient->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
+        },
+        esettings, gr_settings
+    );
+
+    hud->createButton("<-Powrot", {200, 125}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud, gr_settings, gr_mainMenu]() { hud->getGroupOrDefault(gr_settings)->setHidden(true); hud->getGroupOrDefault(gr_mainMenu)->setHidden(false); },
+        esettings, gr_settings
+    );
+
+// credits
     auto ecredits = scene.addEntity(ehud, "Credits");
     ecredits->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, gr_credits));
 
