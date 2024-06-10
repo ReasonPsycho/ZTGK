@@ -110,6 +110,12 @@ BloomPostProcess bloomSystem;
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion constants
 
+//MY SHIT FOR DEBUGING, IF I FORGOT TO REMOVE FEEL FREE TO DO IT <3
+bool isXpressed = false;
+int radiusToRemove = 5;
+
+
+
 #pragma region Function definitions
 
 static void glfw_error_callback(int error, const char *description) {
@@ -823,6 +829,7 @@ void update() {
     scene.systemManager.getSystem<SignalQueue>()->Update();
 
     scene.systemManager.getSystem<UnitSystem>()->Update();
+    scene.systemManager.getSystem<WashingMachine>()->Update();
 
     update_dragged_tiles();
     for (auto tile: selectedTiles) {
@@ -1101,6 +1108,16 @@ void processInput(GLFWwindow *window) {
     } else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
         ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_TILE;
         spdlog::info("Drag mode set to DRAG_TILE");
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+        spdlog::debug("clearing tiles in radius");
+        isXpressed = true;
+//        radiusToRemove +=1;
+    }
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+        isXpressed = false;
     }
 
 }

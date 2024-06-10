@@ -10,6 +10,7 @@
 #include "MiningState.h"
 #include "IdleState.h"
 #include "ECS/Utils/Globals.h"
+#include "ECS/Render/Components/ColorMask.h"
 
 State *CombatState::RunCurrentState() {
 
@@ -46,12 +47,15 @@ State *CombatState::RunCurrentState() {
         else
         {
             unit->hasMovementTarget = true;
-            unit->movementTarget = unit->findClosestMineable()->gridPosition;
-
-            moveState = new MovementState(grid);
-            moveState->unit = unit;
-
-            return moveState;
+            auto closestMineable = unit->findClosestMineable();
+            if (closestMineable != nullptr) {
+                unit->movementTarget = closestMineable->gridPosition;
+                moveState = new MovementState(grid);
+                moveState->unit = unit;
+                return moveState;
+            }
+            else
+                return this;
         }
     }
     AttackTarget();
@@ -106,6 +110,12 @@ void CombatState::AttackTarget() {
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
     target->stats.hp -= totalAttackDamage;
+    auto cm = target->getEntity()->getComponent<ColorMask>();
+    if (cm == nullptr){
+        target->getEntity()->addComponent(std::make_unique<ColorMask>());
+        cm = target->getEntity()->getComponent<ColorMask>();
+    }
+    cm->AddMask("DMG_taken", {120, 0, 0, 0.5}, 0.3f);
     spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
 
 

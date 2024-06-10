@@ -18,9 +18,9 @@
 #include "ECS/Render/RenderSystem.h"
 
 const UnitStats Unit::ALLY_BASE = {
-        .max_hp = 100,
-        .hp = 100,
-        .move_spd = 20,
+        .max_hp = 150,
+        .hp = 150,
+        .move_spd = 12,
         .mine_spd = 1,
         .added = {}
 };
@@ -28,10 +28,10 @@ const UnitStats Unit::ALLY_BASE = {
 const UnitStats Unit::ENEMY_BASE = {
         //todo NOTE TO MY FUTURE SELF: when u changed UNIT for SPONGE and added BUG and SHROOM you didnt look for any tileState == UNIT checks,
         // need to add tileState == SPONGE || tileState == BUG || tileState == SHROOM checks
-        .max_hp = 100,
-        .hp = 100,
-        .move_spd = 20,
-        .mine_spd = 1,
+        .max_hp = 90,
+        .hp = 90,
+        .move_spd = 10,
+        .mine_spd = 0,
         .added = {}
 };
 

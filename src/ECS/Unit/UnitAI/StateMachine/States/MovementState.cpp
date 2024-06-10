@@ -16,7 +16,7 @@ State *MovementState::RunCurrentState() {
     MoveOnPath();
 
     // todo calculate from centers
-    if (unit->hasPickupTarget && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1.5) {
+    if (unit->hasPickupTarget && unit->pickupTarget != nullptr && !unit->pickupTarget->isPickedUp && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1.5) {
         std::pair<Item *, Item *> drop = {unit->equipment[1], unit->equipment[2]};
         InventoryManager::instance->assign_item(unit->pickupTarget->item, unit, -1);
         if (drop.first)
@@ -25,8 +25,12 @@ State *MovementState::RunCurrentState() {
             InventoryManager::instance->spawn_item_on_map(drop.second,
                                                           {unit->worldPosition.x + 0.2, unit->worldPosition.z + 0.2});
 
+        unit->pickupTarget->isPickedUp = true;
         unit->pickupTarget->getEntity()->Destroy();
         unit->pickupTarget = nullptr;
+        unit->hasPickupTarget = false;
+    }
+    if(unit->hasPickupTarget && (unit->pickupTarget == nullptr || unit->pickupTarget->isPickedUp)){
         unit->hasPickupTarget = false;
     }
 
