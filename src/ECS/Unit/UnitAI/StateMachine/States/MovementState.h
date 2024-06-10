@@ -23,6 +23,8 @@ public:
     bool isTargetInRange() override;
     bool hasCombatTarget{};
     bool isAttackTargetInRange{};
+    bool canPathToAttackTarget();
+    bool canPathToMiningTarget();
 
 private:
     void MoveOnPath();

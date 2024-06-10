@@ -22,6 +22,7 @@
 #include <iostream>
 #include <cstdlib> // Required for rand()
 #include <ctime>   // Required for time()
+#include <future>
 
 Grid::Grid(Scene *scene, int width, int height, float tileSize, Vector3 Position) {
     this->name = "Grid";
@@ -210,6 +211,9 @@ void Grid::InitializeTileEntities() {
             tileEntity->getComponent<BoxCollider>()->setCenter(
                     tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
             tileEntity->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xz";
+            if(tileEntity->getComponent<BoxCollider>()->getCenter().y == -2){
+                tileEntity->getComponent<BoxCollider>()->boxColliderData.color = glm::vec4(0, 1, 0, 1);
+            }
 
             tile->isInFogOfWar = true;
             switch (tile->state) {
@@ -561,53 +565,90 @@ std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos) {
     return neighbours;
 }
 
-
 void Grid::UpdateFogData(Tile *tile) {
-    Vector2Int neighboursIndexes[4] = {Vector2Int(0, 1), Vector2Int(0, -1), Vector2Int(-1, 0), Vector2Int(1, 0)};
-    vector<Vector2Int> open;
-    vector<Vector2Int> closed;
-    vector<Vector2Int> egde;
-    unordered_map<Vector2Int,int> depth;
+    const Vector2Int neighboursIndexes[4] = {
+            Vector2Int(0, 1),
+            Vector2Int(0, -1),
+            Vector2Int(-1, 0),
+            Vector2Int(1, 0)
+    };
+
+    std::vector<Vector2Int> open;
+    std::unordered_set<Vector2Int, Vector2IntHasher> closedSet;
+    std::unordered_set<Vector2Int, Vector2IntHasher> edgeSet;
+
+    open.reserve(100);
+    closedSet.reserve(100);
+    edgeSet.reserve(100);
 
     open.push_back(tile->index);
+    closedSet.insert(tile->index);
+
     while (!open.empty()) {
         Vector2Int current = open.back();
         open.pop_back();
-        for (int i = 0; i < 4; i++) {
-            Vector2Int neighbourIndex = current + neighboursIndexes[i];
+
+        for (const auto& offset : neighboursIndexes) {
+            Vector2Int neighbourIndex = current + offset;
+            if (closedSet.find(neighbourIndex) != closedSet.end()) continue;
+
             Tile *neighbourTile = getTileAt(neighbourIndex.x, neighbourIndex.z);
-            if (neighbourTile != nullptr && std::find(closed.begin(), closed.end(), neighbourTile->index) == closed.end()) {
-                if(neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE){
+            if (neighbourTile != nullptr) {
+                if (neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE) {
                     open.push_back(neighbourIndex);
-                }else{
-                    egde.push_back(neighbourIndex);
+                } else {
+                    edgeSet.insert(neighbourIndex);
                 }
+                closedSet.insert(neighbourIndex);
             }
         }
-        closed.push_back(current);
     }
 
-    for (int i = 0; i < visibilityRange; ++i) {
-        while (!egde.empty()) {
-            Vector2Int current = egde.back();
-            egde.pop_back();
-            for (int j = 0; j < 4; j++) {
-                Vector2Int neighbourIndex = current + neighboursIndexes[j];
+    // Function to expand edges in parallel
+    auto expandEdges = [neighboursIndexes, this](const std::unordered_set<Vector2Int, Vector2IntHasher>& edgeSet, std::unordered_set<Vector2Int, Vector2IntHasher>& closedSet) {
+        std::unordered_set<Vector2Int, Vector2IntHasher> newEdgeSet;
+
+        for (const auto& current : edgeSet) {
+            for (const auto& offset : neighboursIndexes) {
+                Vector2Int neighbourIndex = current + offset;
+                if (closedSet.find(neighbourIndex) != closedSet.end()) continue;
+
                 Tile *neighbourTile = getTileAt(neighbourIndex.x, neighbourIndex.z);
-                if (neighbourTile != nullptr && std::find(closed.begin(), closed.end(), neighbourTile->index) == closed.end()) {
-                    open.push_back(neighbourIndex);
-                    closed.push_back(neighbourIndex);
+                if (neighbourTile != nullptr) {
+                    newEdgeSet.insert(neighbourIndex);
+                    closedSet.insert(neighbourIndex);
                 }
             }
         }
-        egde.insert(egde.end(), open.begin(), open.end());
+
+        return newEdgeSet;
+    };
+
+    std::vector<std::future<std::unordered_set<Vector2Int, Vector2IntHasher>>> futures;
+
+    // Expand edges with parallel tasks
+    for (int i = 0; i < visibilityRange; ++i) {
+        futures.push_back(std::async(std::launch::async, expandEdges, edgeSet, std::ref(closedSet)));
+        edgeSet.clear();
+        for (auto& future : futures) {
+            std::unordered_set<Vector2Int, Vector2IntHasher> newEdges = future.get();
+            edgeSet.insert(newEdges.begin(), newEdges.end());
+        }
+        futures.clear();
     }
-    
-    for(auto index: closed){
-        getTileAt(index)->isInFogOfWar = false;
-        getTileAt(index)->changeWallsFogOfWarState(false);
+
+    // Update fog of war
+    for (const auto& index : closedSet) {
+        Tile *tile = getTileAt(index.x, index.z);
+        if (tile != nullptr) {
+            tile->isInFogOfWar = false;
+            tile->changeWallsFogOfWarState(false);
+        }
     }
 }
+
+
+
 
 void Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");

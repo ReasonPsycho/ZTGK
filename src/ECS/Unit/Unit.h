@@ -49,7 +49,7 @@ public:
     bool isTargetInRange = false;
 
     //targets
-    Vector2Int movementTarget;
+    Vector2Int movementTarget = Vector2Int(0, 0);
     Unit* combatTarget;
     PickupubleItem * pickupTarget;
 
@@ -74,7 +74,8 @@ public:
     UnitStats stats;
 
     Unit* GetClosestEnemyInWeaponRange();
-    std::vector<Unit*> GetEnemiesInSight();
+    std::vector<Unit*> GetPathableEnemiesInSight();
+    Unit* GetClosestPathableEnemyInSight();
     Unit* GetClosestEnemyInSight();
 
     Vector2Int GetDirtiestTileAround();
@@ -98,13 +99,18 @@ public:
     float waitTimer = 0;
     void Wait(float seconds);
 
-    bool DontLookForEnemyTarget = false;
-
+    bool ForcedMovementState = false;
+    bool ForcedMiningState = false;
+    IMineable* forcedMiningTarget = nullptr;
+    Vector2Int forcedMovementTarget = Vector2Int(0, 0);
     void DIEXD();
+
+    bool canPathToAttackTarget(Unit* target = nullptr);
+    bool canPathToMiningTarget();
 
 private:
     Vector2Int previousGridPosition;
-    float DontLookForEnemyTargetTimer = 0;
+
 };
 
 

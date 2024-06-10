@@ -20,15 +20,17 @@ State *IdleState::RunCurrentState() {
         return moveState;
     }
     //from Idle to Combat
+
     if(unit->hasCombatTarget){
+
         combatState = new CombatState(grid);
         combatState->unit = unit;
 
-        if(combatState->isTargetInRange()) {
+        if(combatState->isTargetInRange() && unit->canPathToAttackTarget()) {
             idleTimer = 0;
             return combatState;
         }
-        else
+        else if(unit->canPathToAttackTarget())
         {
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
