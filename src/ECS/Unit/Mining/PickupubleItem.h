@@ -13,6 +13,7 @@ public:
     explicit PickupubleItem(Item *item);
 
     Item * item;
+    bool isPickedUp = false;
 
 protected:
     void showImGuiDetailsImpl(Camera *camera) override;

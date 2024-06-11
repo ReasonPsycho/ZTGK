@@ -20,7 +20,11 @@ void Render::draw(Shader &regularShader) {
     regularShader.setFloat("saturation", 3.0);
     regularShader.setBool("useNormalMap", false);
     regularShader.setBool("isInFogOfWar", isInFogOfWar);
-    
+    regularShader.setBool("isAnimated", isAnimated);
+    if(isAnimated){
+        for (int i = 0; i < animationTransforms.size(); ++i)
+            regularShader.setMatrix4("finalBonesMatrices[" + std::to_string(i) + "]", false, glm::value_ptr(animationTransforms[i]));
+    }
     pModel->Draw(regularShader);
 }
 
@@ -31,6 +35,12 @@ void Render::draw(Shader &regularShader, Frustum *frustum) {
         regularShader.setVec4("colorMask", colorMask);
         regularShader.setFloat("dirtLevel", dirtLevel);
         regularShader.setBool("isInFogOfWar", isInFogOfWar);
+        regularShader.setBool("isAnimated", isAnimated);
+        if(isAnimated){
+            for (int i = 0; i < animationTransforms.size(); ++i)
+                regularShader.setMatrix4("finalBonesMatrices[" + std::to_string(i) + "]", false, glm::value_ptr(animationTransforms[i]));
+        }
+
         pModel->Draw(regularShader);    
     }
 }

@@ -47,7 +47,7 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
     gScore[start] = 0;
     fScore[start] = VectorUtils::Distance(start, target);
 
-    while(!openSet.empty() && glfwGetTime() - start_time < 0.002){
+    while(!openSet.empty()){
 
         Vector2Int current = GetLowestFScore(openSet, fScore);
         if (current == target){

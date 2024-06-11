@@ -14,9 +14,10 @@ using namespace std;
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
+#include "map"
 #include <string>
 #include <vector>
+#include "AssimpGLMHelpers.h"
 
 #include "Shader.h"
 #include "Texture.h"
@@ -24,6 +25,15 @@ using namespace std;
 #include <direct.h>
 #include <iostream>
 
+struct BoneInfo
+{
+    /*id is index in finalBoneMatrices*/
+    int id;
+
+    /*offset matrix transforms vertex from model space to bone space*/
+    glm::mat4 offset;
+
+};
 
 class Model {
 public:
@@ -32,12 +42,25 @@ public:
     vector<Mesh> meshes;
     string directory;
 
+    std::map<string, BoneInfo> m_BoneInfoMap; //
+    int m_BoneCounter = 0;
+
+    auto& GetBoneInfoMap() { return m_BoneInfoMap; }
+    int& GetBoneCount() { return m_BoneCounter; }
+    void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
+    void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+
+    void SetVertexBoneDataToDefault(Vertex& vertex);
+
+
+    Model(){};
     Model(string const *path) : path(path) {};
     Model(unsigned int VAO, MaterialPhong material, vector<unsigned int> indices);
     
+    
     void Draw(Shader &shader);
     void SimpleDraw(Shader &shader);
-
+    
     void loadModel();
     
     string const *path;

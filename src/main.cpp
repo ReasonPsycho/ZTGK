@@ -76,6 +76,7 @@
 #include "ECS/Unit/Mining/MineableChest.h"
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Audio/AudioManager.h"
+#include "ECS/Render/ModelLoading/ModelLoadingManager.h"
 
 #pragma endregion Includes
 
@@ -84,20 +85,27 @@
 Scene scene;
 string modelPath = "res/models/asteroid/Asteroid.fbx";
 string modelPathGabka = "res/models/gabka/pan_gabka_lower_poly.fbx";
-string modelPathZuczek = "res/models/properZuczek/Zuczek.fbx";
+string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
+string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
+string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
+string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+string modelPathZuczek = "res/models/zuczek/Zuczek.fbx";
+string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack.fbx";
+string modelPathZuczekIddle = "res/models/zuczek/Zuczek_iddle.fbx";
+string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
 
-Model tileModel = Model(&tileModelPath);
-Model model = Model(&modelPath);
-Model gabka = Model(&modelPathGabka);
-Model zuczek = Model(&modelPathZuczek);
-Model wall = Model(&modelPathWall);
-Model washingMachineModel = Model(&washingMachinePath);
-Model chestModel = Model(&modelChestPath);
-
+ModelLoadingManager modelLoadingManager;
+Model *tileModel;
+Model *model;
+Model *gabka;
+Model *zuczek;
+Model *wall;
+Model *washingMachineModel;
+Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
 unsigned bggroup, zmgroup;
@@ -109,6 +117,12 @@ BloomPostProcess bloomSystem;
 
 shared_ptr<spdlog::logger> file_logger;
 #pragma endregion constants
+
+//MY SHIT FOR DEBUGING, IF I FORGOT TO REMOVE FEEL FREE TO DO IT <3
+bool isXpressed = false;
+int radiusToRemove = 5;
+
+
 
 #pragma region Function definitions
 
@@ -264,7 +278,7 @@ int main(int, char **) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
-    
+
     glfwSwapInterval(1);
 
     init_managers();
@@ -406,7 +420,6 @@ void init_systems() {
     spdlog::info("Loaded sounds.");
 
 
-
     primitives.Init();
 
 
@@ -535,22 +548,25 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-    model.loadModel();
-    wall.loadModel();
+
+    tileModel = modelLoadingManager.GetModel(tileModelPath);
+    model = modelLoadingManager.GetModel(modelPath);
+    gabka = modelLoadingManager.GetModel(modelPathGabka);
+    zuczek = modelLoadingManager.GetModel(modelPathZuczek);
+    wall = modelLoadingManager.GetModel(modelPathWall);
+    washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
+    chestModel = modelLoadingManager.GetModel(modelChestPath);
+    modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
-    gabka.loadModel();
-    zuczek.loadModel();
-    tileModel.loadModel();
-    washingMachineModel.loadModel();
-    chestModel.loadModel();
-    ztgk::game::washingMachineModel = &washingMachineModel;
-    ztgk::game::playerModel = &gabka;
-    ztgk::game::bugModel = &zuczek;
-    ztgk::game::chestModel = &chestModel;
 
-    ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(&washingMachineModel);
+    ztgk::game::washingMachineModel = washingMachineModel;
+    ztgk::game::playerModel = gabka;
+    ztgk::game::bugModel = zuczek;
+    ztgk::game::chestModel = chestModel;
+
+    ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
 
     Entity *gameObject;
@@ -559,25 +575,25 @@ void load_enteties() {
     gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
     gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
-    gameObject->addComponent(make_unique<Render>(&wall));;
+    gameObject->addComponent(make_unique<Render>(wall));;
 
     gameObject = scene.addEntity("Wall1");;
     gameObject->transform.setLocalPosition(glm::vec3(100, 50, 200));
     gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
-    gameObject->addComponent(make_unique<Render>(&wall));;
+    gameObject->addComponent(make_unique<Render>(wall));;
 //
     gameObject = scene.addEntity("Wall2");;
     gameObject->transform.setLocalPosition(glm::vec3(0, 50, 100));
     gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
-    gameObject->addComponent(make_unique<Render>(&wall));;
+    gameObject->addComponent(make_unique<Render>(wall));;
 //
     gameObject = scene.addEntity("Wall3");;
     gameObject->transform.setLocalPosition(glm::vec3(200, 50, 100));
     gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
-    gameObject->addComponent(make_unique<Render>(&wall));;
+    gameObject->addComponent(make_unique<Render>(wall));;
 
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
@@ -608,7 +624,7 @@ void load_enteties() {
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-
+    
 //    auto ehud = scene.addEntity("HUD DEMO");
 //
 //    auto drag = scene.systemManager.getSystem<HUD>()->createButton(
@@ -701,57 +717,83 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-   // load_units();
+    load_units();
 
 
 }
 
 void load_units() {
-    playerUnit = scene.addEntity("Player1");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
+
+    playerUnit = scene.addEntity("Gabka");
+    playerUnit->addComponent(make_unique<Render>(gabka));
+    playerUnit->addComponent(make_unique<ColorMask>());
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(modelPathGabkaMove, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager.GetAnimation(modelPathGabkaIdle, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(modelPathGabkaMine, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(modelPathGabkaAttack, gabka);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
+    playerUnit = scene.addEntity("Żuczek");
+    playerUnit->addComponent(make_unique<Render>(zuczek));
+    playerUnit->addComponent(make_unique<ColorMask>());
+ //   playerUnit->addComponent(make_unique<AnimationPlayer>());
+ //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = modelLoadingManager.GetAnimation(modelPathZuczekAttack, zuczek);
+ //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = modelLoadingManager.GetAnimation(modelPathZuczekMove, zuczek);
+ //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = modelLoadingManager.GetAnimation(modelPathZuczekIddle, zuczek);
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
     /*
-    playerUnit = scene.addEntity("Player2");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player2", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+playerUnit = scene.addEntity("Player1");
+playerUnit->addComponent(make_unique<Render>(gabka));
+playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
+playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+playerUnit->updateSelfAndChild();
+playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
+playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+playerUnit->addComponent(make_unique<Unit>("Player1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), Unit::ALLY_BASE, true));
+stateManager = new StateManager(playerUnit->getComponent<Unit>());
+stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
+stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
 
-    playerUnit = scene.addEntity("Player3");
-    playerUnit->addComponent(make_unique<Render>(&gabka));
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-    playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    playerUnit->addComponent(make_unique<Unit>("Player3", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
-    stateManager = new StateManager(playerUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-    playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-*/
+
+playerUnit = scene.addEntity("Player2");
+playerUnit->addComponent(make_unique<Render>(&gabka));
+playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
+playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+playerUnit->updateSelfAndChild();
+playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
+playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+playerUnit->addComponent(make_unique<Unit>("Player2", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
+stateManager = new StateManager(playerUnit->getComponent<Unit>());
+stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
+stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
+playerUnit = scene.addEntity("Player3");
+playerUnit->addComponent(make_unique<Render>(&gabka));
+playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
+playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+playerUnit->updateSelfAndChild();
+playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
+playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
+playerUnit->addComponent(make_unique<Unit>("Player3", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
+stateManager = new StateManager(playerUnit->getComponent<Unit>());
+stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
+stateManager->currentState->unit = playerUnit->getComponent<Unit>();
+playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
+
     Entity *enemyUnit = scene.addEntity("Enemy1");
-    enemyUnit->addComponent(make_unique<Render>(&zuczek));
+    enemyUnit->addComponent(make_unique<Render>(zuczek));
     enemyUnit->transform.setLocalScale(glm::vec3(2, 2, 2));
     enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     enemyUnit->updateSelfAndChild();
@@ -998,6 +1040,7 @@ void load_hud() {
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_loadScreen)->setHidden(true);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true);
 
+     */
 }
 
 void init_imgui() {
@@ -1045,7 +1088,7 @@ void update() {
     ZoneScopedN("Update");
 
     //no need to check every frame, every 5 sec is good enough
-    if((int)glfwGetTime()%5 == 0 && glfwGetTime() - (int)glfwGetTime() < 0.02) {
+    if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
     }
 
@@ -1064,6 +1107,7 @@ void update() {
     scene.systemManager.getSystem<SignalQueue>()->Update();
 
     scene.systemManager.getSystem<UnitSystem>()->Update();
+    scene.systemManager.getSystem<WashingMachine>()->Update();
 
     update_dragged_tiles();
     for (auto tile: selectedTiles) {
@@ -1074,15 +1118,17 @@ void update() {
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
 
-//    auto u = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents[0];
-//    spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
+//    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
+//        if(u->isAlly)
+//            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
+//    }
 }
 
 void render() {
     ZoneScopedN("Render");
 
-    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(& scene.systemManager.getSystem<PhongPipeline>()->phongShader);
-    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&scene.systemManager.getSystem<PhongPipeline>()->phongShader);
+    scene.systemManager.getSystem<LightSystem>()->PushDepthMapsToShader(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader);
 
     glViewport(0, 0, camera.saved_display_w, camera.saved_display_h); // Needed after light generation
 
@@ -1098,9 +1144,9 @@ void render() {
 
     scene.systemManager.getSystem<PhongPipeline>()->PrebindPipeline(&camera);
 
-    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
-    scene.systemManager.getSystem<RenderSystem>()->DrawScene(& scene.systemManager.getSystem<PhongPipeline>()->phongShader, &camera);
-    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(& scene.systemManager.getSystem<PhongPipeline>()->phongInstanceLightShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
+    scene.systemManager.getSystem<RenderSystem>()->DrawScene(&scene.systemManager.getSystem<PhongPipeline>()->phongShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceLightShader, &camera);
 
 
     scene.systemManager.getSystem<PhongPipeline>()->WriteToBackBuffer(&camera);
@@ -1108,7 +1154,7 @@ void render() {
     scene.systemManager.getSystem<WireRenderSystem>()->DrawColliders();
     scene.systemManager.getSystem<WireRenderSystem>()->DrawRays();
     file_logger->info("Rendered AsteroidsSystem.");
-    
+
 
     scene.systemManager.getSystem<HUD>()->draw();
 }
@@ -1272,10 +1318,10 @@ void imgui_end() {
         ImGui::Render();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }else{
+    } else {
         ImGui::EndFrame();
     }
-        
+
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 
         GLFWwindow *backup_current_context = glfwGetCurrentContext();
@@ -1342,6 +1388,16 @@ void processInput(GLFWwindow *window) {
     } else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
         ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_TILE;
         spdlog::info("Drag mode set to DRAG_TILE");
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+        spdlog::debug("clearing tiles in radius");
+        isXpressed = true;
+//        radiusToRemove +=1;
+    }
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+        isXpressed = false;
     }
 
 }
@@ -1526,18 +1582,20 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                 //if hit entity is mineable, set it as mining target
                 if (mineable != nullptr && !mineable->isMined) {
-                    unit->DontLookForEnemyTarget = true;
                     unit->miningTargets.clear();
                     unit->miningTargets.emplace_back(hit->getMineableComponent<IMineable>(hit));
                     Tile *hitTile = hit->getComponent<Tile>();
                     hitTile->setTileSelectionState(SELECTED);
                     unit->hasMiningTarget = true;
+//                    unit->ForcedMiningState = true;
+//                    unit->forcedMiningTarget = mineable;
                     spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
                 }
 
-                //if hit entity is a tile, stop doing anything and set movement target
+                    //if hit entity is a tile, stop doing anything and set movement target
                 else if (hit->getComponent<Tile>() != nullptr) {
-                    unit->DontLookForEnemyTarget = true;
+                    unit->ForcedMovementState = true;
+                    unit->forcedMovementTarget = hit->getComponent<Tile>()->index;
 
                     unit->hasMiningTarget = false;
                     unit->miningTargets.clear();
@@ -1550,7 +1608,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
                 }
 
-                //if hit an item model, set it as the pickup & movement target
+                    //if hit an item model, set it as the pickup & movement target
                 else if (hit->getComponent<PickupubleItem>() != nullptr) {
                     unit->DontLookForEnemyTarget = true;
 
@@ -1625,7 +1683,7 @@ void init_time() {
 }
 
 void gen_and_load_lvl(bool gen_new_lvl) {
-    if(!gen_new_lvl) {
+    if (!gen_new_lvl) {
         std::ifstream file("save.txt");
         if (file.good()) {
             LevelSaving::load();
@@ -1644,9 +1702,9 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
             .keyEnemies = RNG::RandomInt(2, 3),
-            .minEnemies = 0,
-            .maxEnemies = 5,
-            .unitCount = 3,
+            .minEnemies = 5,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 5,  //4        <---
+            .unitCount = 1,   //3        <---
             .chestCount = RNG::RandomInt(8, 15),
     };
 

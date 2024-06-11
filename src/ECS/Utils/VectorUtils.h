@@ -83,6 +83,12 @@ struct Vector2Int {
 
 };
 
+struct Vector2IntHasher {
+    std::size_t operator()(const Vector2Int& v) const {
+        return v.x ^ v.z;
+    }
+};
+
 struct Vector3{
     float x;
     float y;

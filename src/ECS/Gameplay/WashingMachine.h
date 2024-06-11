@@ -28,9 +28,12 @@ public:
     std::unordered_map<unsigned, std::vector<WashingMachineTile*>> WashingMachineTiles;
 
     int praniumNeeded;
-    int radiusToClear = 4;
+    int radiusToClear = 8;
 
-    void clearTilesInRadius(Vector2Int position, int radius);
+    std::vector<Tile*> getTilesToClearInRaiuds(Vector2Int position, int radius);
+    std::vector<Tile*> getAllTilesWithDirtyFloorInRadius(Vector2Int position, int radius);
+    void clearNextTile_walls();
+    void clearNextTile_floors();
     void onPraniumDelivered();
 
 
@@ -41,6 +44,10 @@ private:
     };
 
     int currentPranium = 0;
+    std::vector<Tile*> tilesToClear_walls;
+    std::vector<Tile*> tilesToClear_floors;
+
+    std::vector<Tile*> sortInSpiralPattern(std::vector<Tile*> tiles, Vector2Int position);
 
 };
 

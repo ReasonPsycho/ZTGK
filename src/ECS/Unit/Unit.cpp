@@ -17,11 +17,12 @@
 #include "ECS/Render/Components/ColorMask.h"
 #include "ECS/Render/RenderSystem.h"
 #include "ECS/HUD/HUD.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/MiningState.h"
 
 const UnitStats Unit::ALLY_BASE = {
-        .max_hp = 100,
-        .hp = 100,
-        .move_spd = 20,
+        .max_hp = 150,
+        .hp = 150,
+        .move_spd = 12,
         .mine_spd = 1,
         .added = {}
 };
@@ -29,10 +30,10 @@ const UnitStats Unit::ALLY_BASE = {
 const UnitStats Unit::ENEMY_BASE = {
         //todo NOTE TO MY FUTURE SELF: when u changed UNIT for SPONGE and added BUG and SHROOM you didnt look for any tileState == UNIT checks,
         // need to add tileState == SPONGE || tileState == BUG || tileState == SHROOM checks
-        .max_hp = 100,
-        .hp = 100,
-        .move_spd = 20,
-        .mine_spd = 1,
+        .max_hp = 90,
+        .hp = 90,
+        .move_spd = 10,
+        .mine_spd = 0,
         .added = {}
 };
 
@@ -117,21 +118,24 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Has movement target? %s", hasMovementTarget ? "true" : "false");
     ImGui::Text("Movement Target: (%d, %d)", movementTarget.x, movementTarget.z);
     ImGui::Text("Has combat target? %s", hasCombatTarget ? "true" : "false");
-    ImGui::Text("Combat Target: %s", combatTarget != nullptr ? combatTarget->name.c_str() : "This sponge is pacifist");
+    ImGui::Text("Combat Target: %s (%d, %d)", combatTarget != nullptr ? combatTarget->name.c_str() : "This sponge is pacifist", combatTarget != nullptr ? combatTarget->gridPosition.x : 0, combatTarget != nullptr ? combatTarget->gridPosition.z : 0);
     ImGui::Text("Has mining target? %s", hasMiningTarget ? "true" : "false");
-    ImGui::Text("Mining Target: %s", currentMiningTarget != nullptr ? currentMiningTarget->name.c_str() : "No mining target");
-
+    ImGui::Text("Mining Target: %s (%d, %d)", currentMiningTarget != nullptr ? currentMiningTarget->name.c_str() : "No mining target", currentMiningTarget != nullptr ? currentMiningTarget->gridPosition.x : 0, currentMiningTarget != nullptr ? currentMiningTarget->gridPosition.z : 0);
+    ImGui::Separator();
+    ImGui::Text("Forced movement state? %s", ForcedMovementState ? "true" : "false");
+    ImGui::Text("Forced movement target: (%d, %d)", forcedMovementTarget.x, forcedMovementTarget.z);
+    ImGui::Text("Forced idle state? %s", forcedIdleState ? "true" : "false");
+    ImGui::Text("Wait timer: %f", waitTimer);
+    ImGui::Text("Forced mining state? %s", ForcedMiningState ? "true" : "false");
+    ImGui::Text("Forced mining target: %s (%d, %d)", forcedMiningTarget != nullptr ? forcedMiningTarget->name.c_str() : "No mining target", forcedMiningTarget != nullptr ? forcedMiningTarget->gridPosition.x : 0, forcedMiningTarget != nullptr ? forcedMiningTarget->gridPosition.z : 0);
 
 }
 
 void Unit::UpdateImpl() {
-    if(DontLookForEnemyTarget){
-        DontLookForEnemyTargetTimer += Time::Instance().DeltaTime();
-        if(DontLookForEnemyTargetTimer >= 3){
-            DontLookForEnemyTarget = false;
-            DontLookForEnemyTargetTimer = 0;
-        }
-    }
+
+    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+
+
     if(forcedIdleState){
         currentState = new IdleState(grid);
         currentState->unit = this;
@@ -189,17 +193,69 @@ void Unit::UpdateImpl() {
     if(hasMovementTarget){
         if(!grid->getTileAt(movementTarget)->vacant()){
             movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
-            pathfinding.FindPath(gridPosition, movementTarget);
+            pathfinding.path = pathfinding.FindPath(gridPosition, movementTarget);
+        }
+    }
+    if(!ForcedMovementState && !ForcedMiningState) {
+        combatTarget = GetClosestPathableEnemyInSight();
+        if (combatTarget == nullptr) {
+            combatTarget = GetClosestEnemyInSight();
+            if (combatTarget != nullptr) {
+                movementTarget = combatTarget->gridPosition;
+            }
         }
     }
 
-    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
-
-    if(DontLookForEnemyTarget){
-        combatTarget = nullptr;
-        hasCombatTarget = false;
+    if(ForcedMovementState){
+        if(!hasMovementTarget){
+            ForcedMovementState = false;
+        }
+        else{
+            hasMiningTarget = false;
+            hasCombatTarget = false;
+            hasMovementTarget = true;
+            combatTarget = nullptr;
+            miningTargets.clear();
+            currentMiningTarget = nullptr;
+            movementTarget = forcedMovementTarget;
+            if(!grid->getTileAt(forcedMovementTarget)->vacant()){
+                movementTarget = pathfinding.GetNearestVacantTile(forcedMovementTarget, gridPosition);
+                forcedMovementTarget = movementTarget;
+            }
+        }
     }
-    else{combatTarget = GetClosestEnemyInSight();}
+
+    if(ForcedMiningState && !ForcedMovementState){
+        if(forcedMiningTarget->isMined){
+            ForcedMiningState = false;
+            forcedMiningTarget = nullptr;
+        }
+        else {
+            hasMiningTarget = true;
+            hasCombatTarget = false;
+            hasMovementTarget = true;
+            combatTarget = nullptr;
+            currentMiningTarget = forcedMiningTarget;
+            auto targ = pathfinding.GetNearestVacantTile(forcedMiningTarget->gridPosition, gridPosition);
+            auto miningState = new MiningState(grid);
+            miningState->unit = this;
+            if (!miningState->isTargetInRange()) {
+                spdlog::info("Target not in range, moving to mining target");
+                forcedMovementTarget = targ;
+                ForcedMovementState = true;
+                ForcedMiningState = false;
+            }
+            else{
+                ForcedMovementState = false;
+                ForcedMiningState = false;
+                currentMiningTarget = forcedMiningTarget;
+            }
+            delete miningState;
+        }
+
+    }
+
+
 
     if(combatTarget != nullptr){
         hasCombatTarget = true;
@@ -230,12 +286,13 @@ void Unit::UpdateImpl() {
         std::vector<Tile*> neighTiles = grid->GetNeighbours(gridPosition);
         for(auto &tile : neighTiles){
             if(tile->state == TileState::CORE){
-                ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
                 if(equipment.item1 != nullptr && equipment.item1->name == "Pranium Ore"){
                     equipment.unequipItem(1);
+                    ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
                 }
                 else if(equipment.item2 != nullptr && equipment.item2->name == "Pranium Ore"){
                     equipment.unequipItem(2);
+                    ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
                 }
             }
         }
@@ -256,6 +313,7 @@ void Unit::UpdateImpl() {
     }
 
     getEntity()->getComponent<Render>()->isInFogOfWar = grid->getTileAt(gridPosition)->isInFogOfWar;
+
 
 
     previousGridPosition = gridPosition;
@@ -350,12 +408,19 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable>& MineablesToEx
         }
         float distance = VectorUtils::Distance(Vector2Int(gridPosition.x, gridPosition.z), Vector2Int(tile->gridPosition.x, tile->gridPosition.z));
         if(distance < closestDistance){
-            if(pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition, gridPosition)).empty()){
-                continue;
+            auto neigh = grid->GetNeighbours(gridPosition);
+            bool found = false;
+            for(auto n : neigh){
+                if(n->index == gridPosition){
+                    found = true;
+                    break;
+                }
             }
 
-            closestDistance = distance;
-            closestMineable = tile;
+            if(found || !pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition, gridPosition)).empty()){
+                closestDistance = distance;
+                closestMineable = tile;
+            }
         }
     }
     if(closestMineable == nullptr){
@@ -379,7 +444,7 @@ void Unit::Wait(float seconds) {
 
 }
 
-std::vector<Unit *> Unit::GetEnemiesInSight() {
+std::vector<Unit *> Unit::GetPathableEnemiesInSight() {
     std::vector<Unit*> enemies;
     int sightRange = isAlly ? 6 : 4;
     for (int i = -sightRange; i < sightRange; i++) {
@@ -388,22 +453,24 @@ std::vector<Unit *> Unit::GetEnemiesInSight() {
             if (grid->isInBounds(pos)) {
                 Tile *tile = grid->getTileAt(pos);
                 if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
-                    enemies.push_back(tile->unit);
+                        enemies.push_back(tile->unit);
+
                 }
             }
         }
     }
 
-    //if cannot path to target, remove from list
-    enemies.erase(std::remove_if(enemies.begin(), enemies.end(), [this](Unit * enemy){
-        return !canFindPathToTarget(pathfinding.GetNearestVacantTile(enemy->gridPosition, gridPosition));
-    }), enemies.end());
+    for(auto enemy : enemies){
+        if(!canPathToAttackTarget(enemy)){
+            enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
+        }
+    }
 
     return enemies;
 }
 
-Unit *Unit::GetClosestEnemyInSight() {
-std::vector<Unit*> enemies = GetEnemiesInSight();
+Unit *Unit::GetClosestPathableEnemyInSight() {
+std::vector<Unit*> enemies = GetPathableEnemiesInSight();
     if (enemies.empty())
         return nullptr;
 
@@ -445,5 +512,64 @@ void Unit::DIEXD() {
     ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeColorMaskComponent(getEntity()->getComponent<ColorMask>());
     getEntity()->Destroy();
 
+}
+
+bool Unit::canPathToAttackTarget(Unit *target) {
+    if(target == nullptr){
+        target = combatTarget;
+    }
+    if(combatTarget == nullptr && target != nullptr){
+        combatTarget = target;
+    }
+    if(target == nullptr){
+        return false;
+    }
+    auto neigh = grid->GetNeighbours(target->gridPosition);
+    for(auto n : neigh){
+        if(n->index == gridPosition){
+            return true;
+        }
+    }
+
+    auto pathToTarget = pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(target->gridPosition, gridPosition));
+    return !pathToTarget.empty();
+}
+
+bool Unit::canPathToMiningTarget() {
+    if(currentMiningTarget == nullptr){
+        return false;
+    }
+    auto neigh = grid->GetNeighbours(currentMiningTarget->gridPosition);
+    for(auto n : neigh){
+        if(n->index == gridPosition){
+            return true;
+        }
+    }
+    auto pathToTarget = pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(currentMiningTarget->gridPosition, gridPosition));
+    return !pathToTarget.empty();
+}
+
+Unit *Unit::GetClosestEnemyInSight() {
+    std::vector<Unit*> enemies;
+    int sightRange = isAlly ? 6 : 4;
+    for (int i = -sightRange; i < sightRange; i++) {
+        for (int j = -sightRange; j < sightRange; j++) {
+            Vector2Int pos = Vector2Int(gridPosition.x + i, gridPosition.z + j);
+            if (grid->isInBounds(pos)) {
+                Tile *tile = grid->getTileAt(pos);
+                if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
+                    enemies.push_back(tile->unit);
+                }
+            }
+        }
+    }
+
+    if (enemies.empty())
+        return nullptr;
+
+    std::sort(enemies.begin(), enemies.end(), [this](Unit * enemy, Unit * enemy1){
+        return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) < VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
+    });
+    return enemies.at(0);
 }
 
