@@ -236,5 +236,6 @@ void LevelSaving::loadImpl(const string &path) {
     game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(game::washingMachineModel);
     // todo chests and stuff, once relevant
 
+    ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(false);
     spdlog::info("Finished loading");
 }

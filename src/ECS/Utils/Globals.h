@@ -24,6 +24,19 @@ namespace ztgk::game {
         };
 
         ui_phase phase = ui_phase::MAIN_MENU;
+        unsigned tracked_unit_id;
+        unsigned gr_game;
+        unsigned gr_map;
+        unsigned gr_middle;
+        unsigned gr_actions;
+        unsigned gr_top;
+        unsigned gr_item;
+        unsigned gr_pause;
+        unsigned gr_settings;
+        unsigned gr_menu;
+        unsigned gr_credits;
+        unsigned gr_loadScreen;
+        unsigned gr_mainMenu;
     };
     extern s_ui_data ui_data;
 

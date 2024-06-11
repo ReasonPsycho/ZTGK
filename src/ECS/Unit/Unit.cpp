@@ -16,6 +16,7 @@
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Render/Components/ColorMask.h"
 #include "ECS/Render/RenderSystem.h"
+#include "ECS/HUD/HUD.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 100,
@@ -433,6 +434,10 @@ Vector2Int Unit::GetDirtiestTileAround() {
 }
 
 void Unit::DIEXD() {
+    if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
+        ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
+    }
+
     grid->getTileAt(gridPosition)->unit = nullptr;
     grid->getTileAt(gridPosition)->state = FLOOR;
     ztgk::game::scene->systemManager.getSystem<UnitSystem>()->removeComponent(this);
