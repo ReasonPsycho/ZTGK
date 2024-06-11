@@ -10,6 +10,8 @@
 #include "MiningState.h"
 #include "IdleState.h"
 #include "ECS/Utils/Globals.h"
+#include "ECS/HUD/Interactables/HUDSlider.h"
+#include "ECS/Render/Components/ColorMask.h"
 
 State *CombatState::RunCurrentState() {
 
@@ -46,12 +48,15 @@ State *CombatState::RunCurrentState() {
         else
         {
             unit->hasMovementTarget = true;
-            unit->movementTarget = unit->findClosestMineable()->gridPosition;
-
-            moveState = new MovementState(grid);
-            moveState->unit = unit;
-
-            return moveState;
+            auto closestMineable = unit->findClosestMineable();
+            if (closestMineable != nullptr) {
+                unit->movementTarget = closestMineable->gridPosition;
+                moveState = new MovementState(grid);
+                moveState->unit = unit;
+                return moveState;
+            }
+            else
+                return this;
         }
     }
     AttackTarget();
@@ -71,8 +76,8 @@ bool CombatState::isTargetInRange() {
 //    return inRange;
      Unit* targ = unit->GetClosestEnemyInWeaponRange();
     if (targ == nullptr) {
-        unit->hasCombatTarget = false;
-        unit->isTargetInRange = false;
+//        unit->hasCombatTarget = false;
+//        unit->isTargetInRange = false;
         return false;
     }
     unit->combatTarget = targ;
@@ -94,7 +99,7 @@ void CombatState::AttackTarget() {
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;
     }
-    float angle = atan2(unit->combatTarget->gridPosition.z - unit->gridPosition.z, unit->combatTarget->gridPosition.x - unit->gridPosition.x);
+    float angle = atan2(unit->combatTarget->worldPosition.x - unit->worldPosition.x, unit->combatTarget->worldPosition.z - unit->worldPosition.z);
     unit->rotation = angle;
 
     auto target = unit->combatTarget;
@@ -106,7 +111,17 @@ void CombatState::AttackTarget() {
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
     target->stats.hp -= totalAttackDamage;
+    auto cm = target->getEntity()->getComponent<ColorMask>();
+    if (cm == nullptr){
+        target->getEntity()->addComponent(std::make_unique<ColorMask>());
+        cm = target->getEntity()->getComponent<ColorMask>();
+    }
+    cm->AddMask("DMG_taken", {120, 0, 0, 0.5}, 0.3f);
     spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
+    if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
+        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;
+        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->stats.hp);
+    }
 
 
     ztgk::game::audioManager->playRandomSoundFromGroup("punch");

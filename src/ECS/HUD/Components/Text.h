@@ -37,7 +37,7 @@ public:
     unsigned style;
 
     // editor
-    static const unsigned editor_buffer_size = 100;
+    static const unsigned editor_buffer_size = 50000;
     char editor_content_buffer[editor_buffer_size];
     char editor_font_buffer[editor_buffer_size];
     void showImGuiDetailsImpl(Camera *camera) override;

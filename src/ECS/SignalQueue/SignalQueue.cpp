@@ -159,6 +159,10 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
                 data = std::make_shared<HUDRemapGroupsSignalData>(cfg.all, cfg.componentID, (hudcType)cfg.componentType, cfg.oldGroupID, cfg.newGroupID, cfg.message);
             } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
                 data = std::make_shared<HUDRemoveGroupSignalData>(cfg.groupId, cfg.message);
+            } else if (choicemask == Signal::signal_types.level_load) {
+                data = std::make_shared<SignalData>(cfg.message);
+            } else if (choicemask == Signal::signal_types.level_save) {
+                data = std::make_shared<SignalData>(cfg.message);
             } else {
                 data = std::make_shared<SignalData>(cfg.message);
             }
@@ -188,8 +192,8 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
                     "\nThat is the first event in order of subscription that matches the typemask or id."
                     "\nThis also means any log will only print this signal if no other receiver caught it.");
         }
-        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud UpdateImpl mappings", "Hud sort z depth", "Hud remove groupID"};
-        ImGui::Combo("Type", &cfg.choice, types, 9);
+        static const char *types[] = {"Test", "Keyboard", "Audio", "Mouse Button", "Mouse Move", "Mouse Scroll", "Hud UpdateImpl mappings", "Hud sort z depth", "Hud remove groupID", "Level Load", "Level Save"};
+        ImGui::Combo("Type", &cfg.choice, types, 11);
         // assumes types are ordered the same way type id masks are initialized!!
         unsigned choicemask = 1 << cfg.choice;
 
@@ -226,10 +230,12 @@ void SignalQueue::showImGuiDetailsImpl(Camera *camera) {
                 ImGui::InputInt("Old Group ID", &cfg.oldGroupID);
                 ImGui::InputInt("New Group ID", &cfg.newGroupID);
             }
-        } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal) {
-            ImGui::Text("No unique fields.");
         } else if (choicemask == Signal::signal_types.hud_remove_group_signal) {
             ImGui::InputInt("Group ID", &cfg.groupId);
+        } else if (choicemask == Signal::signal_types.hud_sort_z_depth_signal
+                   || choicemask == Signal::signal_types.level_load
+                   || choicemask == Signal::signal_types.level_save) {
+            ImGui::Text("No unique fields.");
         } else {
             ImGui::Text("Unimplemented - see SignalQueue::editor_control_window");
         }

@@ -9,6 +9,7 @@
 
 namespace ztgk::game {
     // defaults
+    s_ui_data game::ui_data = {};
     GLFWwindow * game::window = nullptr;
     Scene * game::scene = nullptr;
     Model * game::cube_model = nullptr;
