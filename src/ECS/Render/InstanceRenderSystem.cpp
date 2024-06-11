@@ -26,7 +26,7 @@ void InstanceRenderSystem::removeComponent(void *component) {
 }
 
 void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
-
+    ImGui::Text("My integer value is: %zu", wallData.size());
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {

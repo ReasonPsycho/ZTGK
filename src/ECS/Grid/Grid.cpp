@@ -577,7 +577,7 @@ void Grid::UpdateFogData(Tile *tile) {
             Vector2Int neighbourIndex = current + neighboursIndexes[i];
             Tile *neighbourTile = getTileAt(neighbourIndex.x, neighbourIndex.z);
             if (neighbourTile != nullptr && std::find(closed.begin(), closed.end(), neighbourTile->index) == closed.end()) {
-                if(neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE){
+                if(neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE || !neighbourTile->isInFogOfWar){
                     open.push_back(neighbourIndex);
                 }else{
                     egde.push_back(neighbourIndex);

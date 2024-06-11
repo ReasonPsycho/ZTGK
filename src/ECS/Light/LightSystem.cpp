@@ -254,7 +254,7 @@ void LightSystem::addComponent(void *component) {
 }
 
 void LightSystem::showImGuiDetailsImpl(Camera *camera) {
-
+    
 }
 
 void LightSystem::removeComponent(void *component) {
