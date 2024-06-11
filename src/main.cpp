@@ -624,7 +624,7 @@ void load_enteties() {
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-    
+
 //    auto ehud = scene.addEntity("HUD DEMO");
 //
 //    auto drag = scene.systemManager.getSystem<HUD>()->createButton(
@@ -1040,7 +1040,6 @@ void load_hud() {
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_loadScreen)->setHidden(true);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true);
 
-     */
 }
 
 void init_imgui() {
@@ -1610,7 +1609,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                     //if hit an item model, set it as the pickup & movement target
                 else if (hit->getComponent<PickupubleItem>() != nullptr) {
-                    unit->DontLookForEnemyTarget = true;
+                    unit->ForcedMovementState = true;
 
                     unit->hasMiningTarget = false;
                     unit->miningTargets.clear();
