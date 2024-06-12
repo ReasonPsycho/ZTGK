@@ -32,29 +32,33 @@ void ColorMask::RemoveMask(std::string name) {
 
 void ColorMask::UpdateImpl() {
     glm::vec4 currentColorMask = glm::vec4(0);
-    for (auto &pair: maskDataMap) {
-        for (int i = 0; i < 3; ++i) {
-            currentColorMask[i] = (currentColorMask[i] * currentColorMask[3] + pair.second.color[i] * pair.second.color[3]) / 2;
+    if (!maskDataMap.empty()) {
+        auto it = maskDataMap.begin();
+        currentColorMask = it->second.color;
+        it++;
+        
+        while (it != maskDataMap.end()) {
+            for (int i = 0; i < 3; ++i) {
+                currentColorMask[i] = currentColorMask[i] * currentColorMask[3] + it->second.color[i] * it->second.color[3];
+            }
+            currentColorMask[3] = (currentColorMask[3] + it->second.color[3])/2;
+            it++;
         }
-        currentColorMask[3] = (currentColorMask[3] + pair.second.color[3]) / 2;
-    }
-
-
-    auto it = maskDataMap.begin();
-
-    while(it != maskDataMap.end()) {
-        if(!it->second.constant){
-            it->second.timer = it->second.timer - (float )Time::Instance().DeltaTime();
-            if(it->second.timer <= 0){
-                maskDataMap.erase(it++);       
-            }else{
+        it = maskDataMap.begin();
+        
+        while (it != maskDataMap.end()) {
+            if (!it->second.constant) {
+                it->second.timer = it->second.timer - (float) Time::Instance().DeltaTime();
+                if (it->second.timer <= 0) {
+                    maskDataMap.erase(it);
+                } else {
+                    ++it;
+                }
+            } else {
                 ++it;
             }
-        } else {
-            ++it;
         }
     }
-    
     Render *render = getEntity()->getComponent<Render>();
     if (render != nullptr) {
         render->colorMask = currentColorMask;
@@ -70,9 +74,9 @@ void ColorMask::showImGuiDetailsImpl(Camera *camera) {
 
     if (ImGui::Button("Add timer")) {
         if (isConstant) {
-            AddMask(input_buf, glm::vec4(color[0],color[1],color[2],color[3]));
+            AddMask(input_buf, glm::vec4(color[0], color[1], color[2], color[3]));
         } else {
-            AddMask(input_buf, glm::vec4(color[0],color[1],color[2],color[3]),timer);
+            AddMask(input_buf, glm::vec4(color[0], color[1], color[2], color[3]), timer);
         }
     }
 }

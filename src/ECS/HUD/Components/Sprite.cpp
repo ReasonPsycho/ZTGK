@@ -63,6 +63,7 @@ void Sprite::load(const std::string &path) {
 
         stbi_image_free(data);
     }
+    stbi_set_flip_vertically_on_load(true);
 }
 
 void Sprite::showImGuiDetailsImpl(Camera *camera) {

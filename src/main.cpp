@@ -598,9 +598,13 @@ void load_enteties() {
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
-    gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
+    gameObject->transform.setLocalPosition(glm::vec3(100, 16, 105));
+    gameObject->addComponent(make_unique<PointLight>(
+            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
+                           0.05f)));
 
-
+    gameObject = scene.addEntity("Point Light");;
+    gameObject->transform.setLocalPosition(glm::vec3(105, 16, 100));
     gameObject->addComponent(make_unique<PointLight>(
             PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
                            0.05f)));
@@ -733,17 +737,17 @@ void load_units() {
     playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(modelPathGabkaMine, gabka);
     playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(modelPathGabkaAttack, gabka);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
 
     playerUnit = scene.addEntity("Żuczek");
     playerUnit->addComponent(make_unique<Render>(zuczek));
     playerUnit->addComponent(make_unique<ColorMask>());
- //   playerUnit->addComponent(make_unique<AnimationPlayer>());
- //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = modelLoadingManager.GetAnimation(modelPathZuczekAttack, zuczek);
- //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = modelLoadingManager.GetAnimation(modelPathZuczekMove, zuczek);
- //   playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = modelLoadingManager.GetAnimation(modelPathZuczekIddle, zuczek);
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = modelLoadingManager.GetAnimation(modelPathZuczekAttack, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = modelLoadingManager.GetAnimation(modelPathZuczekMove, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = modelLoadingManager.GetAnimation(modelPathZuczekIddle, zuczek);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
@@ -1438,8 +1442,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 void update_dragged_tiles() {
 
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
-                                                                 display_h);
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
+                                                                 camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
     if (isLeftMouseButtonHeld && ray != nullptr && ray->getHitEntity() != nullptr) {
@@ -1464,8 +1468,8 @@ void update_dragged_tiles() {
 void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //calculate ray every mouse press
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
-                                                                 display_h);
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
+                                                                 camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
     if (ray->getHitEntity() != nullptr) {
         spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);

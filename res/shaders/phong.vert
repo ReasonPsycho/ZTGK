@@ -14,8 +14,8 @@ uniform mat4 view;
 uniform mat4 model;
 uniform vec3 camPos;
 
-const int MAX_BONES = 20;
-const int MAX_BONE_INFLUENCE = 4;
+const int MAX_BONES = 100;
+const int MAX_BONE_INFLUENCE = 5;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform bool isAnimated;
 

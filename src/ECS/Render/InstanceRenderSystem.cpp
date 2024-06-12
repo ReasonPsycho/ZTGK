@@ -3,6 +3,7 @@
 //
 
 #include "ECS/SystemManager.h"
+#include "ECS/Render/Pipelines/Phong/PhongPipeline.h"
 #include "InstanceRenderSystem.h"
 #include <filesystem>
 
@@ -26,7 +27,7 @@ void InstanceRenderSystem::removeComponent(void *component) {
 }
 
 void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
-
+    ImGui::Text("My integer value is: %zu", wallData.size());
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader,Camera * camera) {
@@ -171,6 +172,9 @@ void InstanceRenderSystem::PushToSSBO(Camera* camera) {
 void InstanceRenderSystem::DrawLights(Shader *regularShader, Camera *camera) {
     ZoneScopedN("Simple draw tiles");
     LightSystem* lightSystem = systemManager->getSystem<LightSystem>();
+    PhongPipeline* phongPipline = systemManager->getSystem<PhongPipeline>();\
+    glEnable(GL_BLEND);
+    glDisablei(GL_BLEND, phongPipline->colorAttachments[2]);
     regularShader->use();
     lightMaterial.loadMaterial(regularShader);
     regularShader->setInt("spotLightAmount", lightSystem->spotLights.size());
