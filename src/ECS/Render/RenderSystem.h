@@ -24,7 +24,7 @@ public:
     void removeComponent(void* component) override;
     void showImGuiDetailsImpl(Camera *camera) override;
     void DrawScene(Shader *regularShader, Camera *camera);
-    void SimpleDrawScene(Shader* regularShader);
+    void SimpleDrawScene(Shader *regularShader, glm::vec3 viewPos, float farPlane);
     void registerComponents() override{};
     void UpdateImpl() override;
     void removeColorMaskComponent(void* colorMask);

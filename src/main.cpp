@@ -1104,11 +1104,8 @@ void update() {
 
     scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
-    scene.systemManager.getSystem<InstanceRenderSystem>()->PushToSSBO(&camera);
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
-
     scene.systemManager.getSystem<SignalQueue>()->Update();
-
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
 
@@ -1441,6 +1438,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 }
 
 void update_dragged_tiles() {
+    ZoneScopedN("Update dragged tiles");
 
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
                                                                  camera.saved_display_h);

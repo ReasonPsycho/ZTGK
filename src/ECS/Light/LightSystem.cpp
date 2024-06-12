@@ -177,9 +177,9 @@ void LightSystem::UpdateImpl() {
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++, 0);
         planeDepthShader.use();
-        renderSystem->SimpleDrawScene(&planeDepthShader);
+        renderSystem->SimpleDrawScene(&planeDepthShader, light->data.position, 100);
         instancePlaneDepthShader.use();
-        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera);
+        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera, light->data.position, 100);
         offset += sizeof(light->data);
     }
 
@@ -195,9 +195,9 @@ void LightSystem::UpdateImpl() {
         light->SetUpShadowBuffer(&planeDepthShader, &instancePlaneDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                  planeShadowMaps, index++, 0);
         planeDepthShader.use();
-        renderSystem->SimpleDrawScene(&planeDepthShader);
+        renderSystem->SimpleDrawScene(&planeDepthShader,  light->data.position, light->data.position[3]);
         instancePlaneDepthShader.use();
-        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera);
+        instanceRenderSystem->SimpleDrawTiles(&instancePlaneDepthShader, camera, light->data.position, light->data.position[3]);
 
         offset += sizeof(light->data);
     }
@@ -217,9 +217,9 @@ void LightSystem::UpdateImpl() {
             light->SetUpShadowBuffer(&cubeDepthShader, &instanceCubeDepthShader, SHADOW_WIDTH, SHADOW_HEIGHT,
                                      cubeShadowMaps, index, i);
             cubeDepthShader.use();
-            renderSystem->SimpleDrawScene(&cubeDepthShader);
+            renderSystem->SimpleDrawScene(&cubeDepthShader,  light->data.position, light->data.position[3]);
             instanceCubeDepthShader.use();
-            instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader, camera);
+            instanceRenderSystem->SimpleDrawTiles(&instanceCubeDepthShader, camera, light->data.position, light->data.position[3]);
         }
         index++;
         offset += sizeof(light->data);

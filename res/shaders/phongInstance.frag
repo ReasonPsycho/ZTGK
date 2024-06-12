@@ -279,7 +279,7 @@ void main()
     }
 
     if (currentWallData[2] != 0){
-        result = mix(result, selectionColor[currentWallData[2]] * color_mask_color(), 0.2);
+        result = mix(result, selectionColor[currentWallData[2]] * color_mask_color(), 0.3);
         fogOfWarData = vec4(selectionColor[currentWallData[2]], fogOfWarData.a);
     }
 
