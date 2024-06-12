@@ -16,10 +16,10 @@ struct SignalReceiver : Component {
     unsigned receiver_uid;
 
     unsigned receive_type_mask = 0;
-    std::function<void(const Signal&)> receive{};
+    std::function<void(Signal&)> receive{};
 
     SignalReceiver();
-    explicit SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal &)> onSignal = [](const Signal &) {});
+    explicit SignalReceiver(unsigned int receiveTypeMask, std::function<void(Signal &)> onSignal = [](Signal &) {});
     virtual ~SignalReceiver() = default;
 
     // editor

@@ -27,7 +27,7 @@ void HUD::init() {
     textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
     signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud | Signal::signal_types.mouse_move_signal | Signal::signal_types.mouse_button_signal);
-    signalReceiver->receive = [this](const Signal & signal) {
+    signalReceiver->receive = [this](Signal & signal) {
         if ( signal.stype == Signal::signal_types.hud_sort_z_depth_signal ) {
             sort_z();
             return;
@@ -79,6 +79,7 @@ void HUD::init() {
                 if (pressed->allow_release_outside || spriteRenderer->bounds(pressed->collisionSprite).contains(data->pos)) {
                     pressed->onRelease(pressed);
                     pressed = nullptr;
+                    signal.consume = true;
                 }
                 return;
             }
@@ -96,6 +97,7 @@ void HUD::init() {
                         if (data->action == GLFW_PRESS) {
                             button->onPress(button);
                             pressed = button;
+                            signal.consume = true;
                         }
                         return;
                     }

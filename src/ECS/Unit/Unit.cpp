@@ -503,6 +503,7 @@ Vector2Int Unit::GetDirtiestTileAround() {
 void Unit::DIEXD() {
     if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
         ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
+        ztgk::game::ui_data.tracked_unit_id = -1;
     }
 
     grid->getTileAt(gridPosition)->unit = nullptr;

@@ -335,6 +335,8 @@ void cleanup() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    *ztgk::game::signalQueue -= ztgk::game::selectionHandler;
+    delete ztgk::game::selectionHandler;
     ztgk::game::audioManager->close();
 
     glfwDestroyWindow(window);
@@ -454,6 +456,15 @@ void init_systems() {
     scene.systemManager.getSystem<HUD>()->init();
 
     scene.systemManager.getSystem<UnitSystem>()->init();
+
+    ztgk::game::selectionHandler = new SignalReceiver(
+        Signal::signal_types.mouse_button_signal,
+        [](const Signal &signal) {
+            auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+            handle_picking(window, data->button, data->action, data->mods);
+        }
+    );
+    *ztgk::game::signalQueue += ztgk::game::selectionHandler;
 }
 
 void init_managers() {
@@ -1429,10 +1440,9 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
-
     ztgk::game::cursor.click(button, action, mods);
-    if (ztgk::game::cursor.config.capture_click)
-        handle_picking(window, button, action, mods);
+//    if (ztgk::game::cursor.config.capture_click)
+//        handle_picking(window, button, action, mods);
 
 }
 
