@@ -43,7 +43,7 @@ struct Cursor {
     glm::vec2 raw_prev_pos = ztgk::game::window_size / 2;
     glm::vec2 ui_pos = ztgk::game::window_size / 2;
     glm::vec2 ui_prev_pos = ztgk::game::window_size / 2;
-    ImGuiIO * mouseio;
+//    ImGuiIO * mouseio;
     SignalReceiver toggleHandler;
     dragSelectionMode dragMode = DRAG_TILE;
 

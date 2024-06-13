@@ -14,7 +14,7 @@
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 
 void Cursor::init() {
-    mouseio = &ImGui::GetIO();
+//    mouseio = &ImGui::GetIO();
     double tx, ty;
     glfwGetCursorPos(ztgk::game::window, &tx, &ty);
     glfw_prev_pos = {tx, ty};
@@ -33,6 +33,8 @@ void Cursor::init() {
             if (data->key == GLFW_KEY_R && data->mods == GLFW_MOD_CONTROL && data->action == GLFW_PRESS) {
                 raw_pos = ztgk::game::window_size / 2;
                 raw_prev_pos = ztgk::game::window_size / 2;
+                glfwSetCursorPos(ztgk::game::window, raw_pos.x, raw_pos.y);
+                update_ui_pos();
             }
         }
     };
@@ -44,7 +46,7 @@ void Cursor::move(glm::vec2 newpos) {
     if (config.capture_move) {
         raw_prev_pos = raw_pos;
         raw_pos -= glfw_offset;
-        mouseio->MousePos = {raw_pos.x, raw_pos.y};
+//        mouseio->MousePos = {raw_pos.x, raw_pos.y};
         update_ui_pos();
         if (config.forward_move) {
             *ztgk::game::signalQueue += MouseMoveSignalData::signal(ui_pos,ui_prev_pos,"Cursor forwarding MOVE");

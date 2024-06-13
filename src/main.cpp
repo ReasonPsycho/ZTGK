@@ -226,13 +226,6 @@ Entity *playerUnit;
 
 std::vector<Vector2Int> selectedTiles;
 
-bool captureMouse = false;
-bool captureMouseButtonPressed = false;
-
-ImGuiIO mouseio;
-double mouseX;
-double mouseY;
-
 bool isLeftMouseButtonHeld = false;
 glm::vec3 mouseHeldStartPos;
 glm::vec3 mouseHeldEndPos;
@@ -389,6 +382,7 @@ bool init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
     // Create window with graphics context
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
@@ -1192,7 +1186,7 @@ void input() {
     ZoneScopedN("Input");
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glfwSetScrollCallback(window, scroll_callback);
@@ -1210,10 +1204,6 @@ void update() {
     if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
     }
-
-    //UpdateImpl mouse position
-    mouseX = mouseio.MousePos.x;
-    mouseY = mouseio.MousePos.y;
 
     ztgk::game::cursor.update();
     scene.systemManager.Update();
@@ -1277,15 +1267,6 @@ void render() {
 
 void imgui_begin() {
     ZoneScopedN("Imgui begin");
-
-    ImGuiIO &io = ImGui::GetIO();
-    mouseio = io;
-    // Start the Dear ImGui frame
-    if (!captureMouse) {
-        io.MouseDrawCursor = true;
-    } else {
-        io.MouseDrawCursor = false;
-    }
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -1456,17 +1437,6 @@ void processInput(GLFWwindow *window) {
     
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    
-    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
-        if (!captureMouseButtonPressed) {
-            captureMouse = !captureMouse;
-        }
-        captureMouseButtonPressed = true;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_RELEASE) {
-        captureMouseButtonPressed = false;
-    }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
@@ -1537,15 +1507,12 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     ztgk::game::cursor.click(button, action, mods);
-//    if (ztgk::game::cursor.config.capture_click)
-//        handle_picking(window, button, action, mods);
-
 }
 
 void update_dragged_tiles() {
     ZoneScopedN("Update dragged tiles");
 
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(ztgk::game::cursor.raw_pos.x, ztgk::game::cursor.raw_pos.y, camera.saved_display_w,
                                                                  camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
@@ -1571,7 +1538,7 @@ void update_dragged_tiles() {
 void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //calculate ray every mouse press
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(ztgk::game::cursor.raw_pos.x, ztgk::game::cursor.raw_pos.y, camera.saved_display_w,
                                                                  camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
     if (ray->getHitEntity() != nullptr) {
