@@ -1089,7 +1089,8 @@ void input() {
 
 void update() {
     ZoneScopedN("Update");
-
+    scene.systemManager.getSystem<SignalQueue>()->Update();
+    
     //no need to check every frame, every 5 sec is good enough
     if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
@@ -1106,7 +1107,6 @@ void update() {
     scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
-    scene.systemManager.getSystem<SignalQueue>()->Update();
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
 
