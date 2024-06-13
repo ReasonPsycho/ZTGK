@@ -31,6 +31,7 @@ public:
     // glm::vec2 worldPos{};
 
     std::string name;
+    std::string icon_path = "res/textures/question_mark.png";
     std::string description;
     ItemStats stats{};
     bool takesTwoSlots;

@@ -19,8 +19,6 @@ namespace ztgk::game {
     struct s_ui_data {
         enum class ui_phase {
             MAIN_MENU,
-            SETTINGS,
-            CREDITS,
             GAME
         };
 
@@ -38,6 +36,10 @@ namespace ztgk::game {
         unsigned gr_credits;
         unsigned gr_loadScreen;
         unsigned gr_mainMenu;
+        unsigned gr_w1_offensive;
+        unsigned gr_w1_passive;
+        unsigned gr_w2_offensive;
+        unsigned gr_w2_passive;
     };
     extern s_ui_data ui_data;
 
