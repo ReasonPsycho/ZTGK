@@ -129,7 +129,7 @@ private:
             std::type_index(typeid(Tile))
     };
 
-    void SpawnUnit(Vector2Int gridPos, bool isAlly);
+    Entity * SpawnUnit(Vector2Int gridPos, bool isAlly);
 };
 
 

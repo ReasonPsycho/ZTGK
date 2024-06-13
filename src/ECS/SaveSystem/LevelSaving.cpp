@@ -220,19 +220,23 @@ void LevelSaving::loadImpl(const string &path) {
     grid->SetUpWalls();
     grid->UpdateFogData(grid->centerTile);
 
-    spdlog::trace("Reading node");
-    auto units = game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
-    if (!units.empty()) {
-        spdlog::warn("Units already existing! Aborting!");
-    } else {
-        spdlog::trace("Loading unit entities");
-        for (auto unode: node["allies"]) {
-            auto name = unode[nameof(quote(Entity::name))].as<string>();
-
-            auto entity = Unit::serializer_newUnitEntity(game::scene, name);
-            YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
-        }
-    }
+    //todo FIX LOAD EQUIPMENT
+//    spdlog::trace("Reading node");
+//    auto units = game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
+//    if (!node["allies"]) {
+//        spdlog::trace("No ally details - loading from generated level rather than save file.");
+//    } else {
+//        spdlog::trace("Loading unit equipment");
+//        for (auto unode: node["allies"]) {
+//            auto unit = std::find_if(units.begin(), units.end(), [unode](Unit * unit){ return unit->gridPosition == unode["gridPosition"].as<Vector2Int>(); });
+//            if (unit == units.end()) {
+//                spdlog::warn("Unit not found in generated units!");
+//                continue;
+//            }
+//
+//            (*unit)->equipment = unode["equipment"].as<UnitEquipment>();
+//        }
+//    }
     game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(game::washingMachineModel);
     // todo chests and stuff, once relevant
 
