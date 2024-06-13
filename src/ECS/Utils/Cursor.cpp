@@ -77,3 +77,7 @@ void Cursor::click(int button, int action, int mods) {
         }
     }
 }
+
+void Cursor::update() {
+    ztgk::game::camera->MoveCamera(raw_pos.x,raw_pos.y);
+}
