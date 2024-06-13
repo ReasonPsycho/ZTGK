@@ -1742,7 +1742,14 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
                 scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(false);
                 
-                // todo stat highlight
+                auto ent = eitem1->getChild("Passive Stats");
+                int i = 1;
+                for (auto stats : unit->equipment.item1->highlight_passive_stats) {
+                    std::string ent_name = "STAT" + std::to_string(i);
+                    ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                    ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                    i++;
+                }
             }
         } else {
             auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");

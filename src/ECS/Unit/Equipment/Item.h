@@ -37,6 +37,8 @@ public:
     bool takesTwoSlots;
     Model * model;
 
+    std::unordered_map<std::string, std::string> highlight_passive_stats = {};
+
     Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false, Model * model = ztgk::game::cube_model);
 
     void imgui_preview() const;
