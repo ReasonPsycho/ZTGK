@@ -9,7 +9,9 @@
 
 class Mop : public Item{
 public:
-    Mop() : Item("Mop", "A mop to clean the floor", true, ItemStats(10, 1, GridRange(1, 0)), false) {}
+    Mop() : Item("Mop", "A mop to clean the floor", true, ItemStats(10, 1, GridRange(1, 0)), false) {
+        icon_path = "res/textures/icons/item_mop.png";
+    }
 };
 
 

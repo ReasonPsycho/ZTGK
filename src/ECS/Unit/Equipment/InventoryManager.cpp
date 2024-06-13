@@ -144,7 +144,7 @@ bool InventoryManager::unassign_and_delete_item(Unit *unit, Item *item) {
 
 void InventoryManager::spawn_item_on_map(Item *item, glm::vec2 world_pos) {
     auto entity = ztgk::game::scene->addEntity(std::format("On-map Item {} - id {}", item->name, item->uniqueID));
-    entity->transform.setLocalPosition(glm::vec3(world_pos.x * 2, entity->transform.getLocalPosition().y, world_pos.y * 2));
+    entity->transform.setLocalPosition(glm::vec3(world_pos.x, entity->transform.getLocalPosition().y, world_pos.y));
     entity->addComponent(std::make_unique<Render>(item->model));
     entity->addComponent(std::make_unique<PickupubleItem>(item));
     entity->addComponent(std::make_unique<BoxCollider>(entity, glm::vec3(1, 1, 1)));

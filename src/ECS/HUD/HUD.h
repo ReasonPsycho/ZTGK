@@ -13,21 +13,19 @@
 #include "ECS/HUD/Interactables/HUDHoverable.h"
 #include "ECS/HUD/Interactables/HUDButton.h"
 #include "ECS/HUD/Interactables/HUDSlider.h"
+#include "ECS/HUD/Components/Minimap.h"
+#include "MinimapRenderer.h"
 
 struct HUDRemapGroupsSignalData;
 
 class HUD : public System {
 public:
-//    struct btn_callback_ctx {
-//        HUD * hud = nullptr;
-//        Entity * entity = nullptr;
-//    };
-//    using btn_callback = std::function<void(btn_callback_ctx context)>;
 
     std::unordered_map<unsigned, Group> groups;
     std::vector<Group *> z_sorted_groups;
     std::unique_ptr<TextRenderer> textRenderer;
     std::unique_ptr<SpriteRenderer> spriteRenderer;
+    std::unique_ptr<MinimapRenderer> minimapRenderer;
     std::unique_ptr<SignalReceiver> signalReceiver;
 
     void draw();
@@ -76,7 +74,7 @@ public:
     void addComponent(void *component) override;
     void removeComponent(void *component) override;
     const std::type_index *getComponentTypes() override { return reinterpret_cast<const std::type_index *>(&componentTypes); }
-    int getNumComponentTypes() override { return 5; }
+    int getNumComponentTypes() override { return 6; }
     void showImGuiDetailsImpl(Camera *camera) override;
     void registerComponents() override{};
 
@@ -85,17 +83,19 @@ public:
     std::unordered_map<unsigned, std::vector<HUDHoverable*>> hoverables;
     std::unordered_map<unsigned, std::vector<HUDButton*>> buttons;
     std::unordered_map<unsigned, std::vector<HUDSlider*>> sliders;
+    Minimap * minimap = nullptr;
 
     void sort_z();
     void remap_groups(HUDRemapGroupsSignalData data);
 
 private:
-    std::array<std::type_index, 5> componentTypes = {
+    std::array<std::type_index, 6> componentTypes = {
         std::type_index(typeid(Sprite)),
         std::type_index(typeid(Text)),
         std::type_index(typeid(HUDHoverable)),
         std::type_index(typeid(HUDButton)),
-        std::type_index(typeid(HUDSlider))
+        std::type_index(typeid(HUDSlider)),
+        std::type_index(typeid(Minimap))
     };
 
     Entity *bar_base(glm::vec2 midLeftPos, glm::vec2 size,

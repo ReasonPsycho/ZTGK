@@ -119,8 +119,8 @@ void CombatState::AttackTarget() {
     cm->AddMask("DMG_taken", {120.0f/250.0f, 0, 0, 0.5f}, 0.6f);
     spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
     if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
-        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;
-        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->stats.hp);
+        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = target->stats.max_hp + target->stats.added.max_hp;
+        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(target->stats.hp);
     }
 
 
@@ -156,8 +156,8 @@ bool CombatState::isAttackOnCooldown() {
         return true;
     }
 
-    Item * it;
-    Item * sec_it;
+    Item * it = nullptr;
+    Item * sec_it = nullptr;
     glm::ivec2 pos = {unit->gridPosition.x, unit->gridPosition.z};
     glm::ivec2 tpos = {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z};
 
