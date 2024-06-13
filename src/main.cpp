@@ -188,6 +188,8 @@ void update_dragged_tiles();
 
 void gen_and_load_lvl(bool gen_new_lvl = false);
 
+void update_weapon_hud(Unit *unit);
+
 #pragma endregion Function definitions
 
 #pragma region Orginal set up
@@ -335,6 +337,8 @@ void cleanup() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    *ztgk::game::signalQueue -= ztgk::game::selectionHandler;
+    delete ztgk::game::selectionHandler;
     ztgk::game::audioManager->close();
 
     glfwDestroyWindow(window);
@@ -454,6 +458,15 @@ void init_systems() {
     scene.systemManager.getSystem<HUD>()->init();
 
     scene.systemManager.getSystem<UnitSystem>()->init();
+
+    ztgk::game::selectionHandler = new SignalReceiver(
+        Signal::signal_types.mouse_button_signal,
+        [](const Signal &signal) {
+            auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+            handle_picking(window, data->button, data->action, data->mods);
+        }
+    );
+    *ztgk::game::signalQueue += ztgk::game::selectionHandler;
 }
 
 void init_managers() {
@@ -822,6 +835,10 @@ void load_hud() {
     ztgk::game::ui_data.gr_actions = hud->addGroup(ztgk::game::ui_data.gr_game, "Action Panel");
     ztgk::game::ui_data.gr_top = hud->addGroup(ztgk::game::ui_data.gr_game, "Top Panel");
     ztgk::game::ui_data.gr_item = hud->addGroup(ztgk::game::ui_data.gr_game, "Item Details");
+    ztgk::game::ui_data.gr_w1_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 1 Offensive");
+    ztgk::game::ui_data.gr_w1_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 1 Passive");
+    ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
+    ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
 
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
 
@@ -885,6 +902,8 @@ void load_hud() {
     emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
+    emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
+
 
     auto emiddle = scene.addEntity(egame, "Unit Details");
     emiddle->addComponent(make_unique<Sprite>(glm::vec2{400,0}, glm::vec2{1120,250}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_middle));
@@ -932,46 +951,140 @@ void load_hud() {
     ent->addComponent(make_unique<Text>("5", glm::vec2{710, 12}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
+// WEAPON 1
     auto eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #1");
     eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/item_mop.png"));
+    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1200, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
+    eweapPortrait->getComponent<Text>()->mode = TOP_LEFT;
 
+    auto eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
+    ent = scene.addEntity(eoffstat, "ATK");
+    hud->createButton("ATK", glm::vec2{1170, 200}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 200}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(eoffstat, "RNG");
+    hud->createButton("RNG", glm::vec2{1170, 175}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 175}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(eoffstat, "CD");
+    hud->createButton("CD", glm::vec2{1170, 150}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
+    auto eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 150}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w1_offensive, true, 100);
+    eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
+
+    auto epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
+    ent = scene.addEntity(epassstat, "STAT1");
+    hud->createButton("STAT1", glm::vec2{1170, 200}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_passive);
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 200}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_passive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(epassstat, "STAT2");
+    hud->createButton("STAT2", glm::vec2{1170, 175}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_passive);
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 175}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_passive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(epassstat, "STAT3");
+    hud->createButton("STAT3", glm::vec2{1170, 150}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_passive);
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1200, 150}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_passive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+// WEAPON 2
     eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #2");
     eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/item_superMop.png"));
-    //todo weapon stats
+    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1200, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
+    eweapPortrait->getComponent<Text>()->mode = TOP_LEFT;
 
+    eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
+    ent = scene.addEntity(eoffstat, "ATK");
+    hud->createButton("ATK", glm::vec2{1170, 80}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 80}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(eoffstat, "RNG");
+    hud->createButton("RNG", glm::vec2{1170, 55}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 55}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(eoffstat, "CD");
+    hud->createButton("CD", glm::vec2{1170, 30}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
+    eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 30}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w2_offensive, true, 100);
+    eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
+
+    epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
+    ent = scene.addEntity(epassstat, "STAT1");
+    hud->createButton("STAT1", glm::vec2{1170, 80}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_passive);
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 80}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_passive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(epassstat, "STAT2");
+    hud->createButton("STAT2", glm::vec2{1170, 55}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_passive);
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 55}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_passive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(epassstat, "STAT3");
+    hud->createButton("STAT3", glm::vec2{1170, 30}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_passive);
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1200, 30}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_passive));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+// ACTIONS
     auto eactions = scene.addEntity(egame, "Action Panel");
     eactions->addComponent(make_unique<Sprite>(glm::vec2{1520,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
     hud->createButton(
         glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/icons/pick-me.png", "res/textures/transparent.png",
         [eactions](){
-            static std::string spr_on = "res/textures/icons/pick-me.png";
-            static std::string spr_off = "res/textures/icons/gabka_shy.png";
+            static std::string spr_gabka = "res/textures/icons/pick-me.png";
+            static std::string spr_mine = "res/textures/icons/pickAXE.png";
 
-            ztgk::game::cursor.dragMode = DRAG_UNIT;
-            eactions->children[0]->getComponent<Sprite>()->load(spr_on);
-            eactions->children[1]->getComponent<Sprite>()->load(spr_off);
+            if (ztgk::game::cursor.dragMode == DRAG_UNIT) {
+                ztgk::game::cursor.dragMode = DRAG_TILE;
+                eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
+            }
+            else if (ztgk::game::cursor.dragMode == DRAG_TILE) {
+                ztgk::game::cursor.dragMode = DRAG_UNIT;
+                eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
+            }
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
     hud->createButton(
-        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/icons/gabka_shy.png", "res/textures/transparent.png",
-        [eactions](){
-            static std::string spr_on = "res/textures/icons/pickAXE.png";
-            static std::string spr_off = "res/textures/icons/gabka_shy.png";
+        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png",
+        [](){
+            if (ztgk::game::ui_data.tracked_unit_id == -1) return;
+            auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                  scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+            if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
 
-            ztgk::game::cursor.dragMode = DRAG_TILE;
-            eactions->children[1]->getComponent<Sprite>()->load(spr_on);
-            eactions->children[0]->getComponent<Sprite>()->load(spr_off);
+            auto item = (*unit)->equipment[1];
+            if (item == nullptr) return;
+            InventoryManager::instance->unassign_item(*unit, item);
+            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
+            update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png",
+        [](){
+            if (ztgk::game::ui_data.tracked_unit_id == -1) return;
+            auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                  scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+            if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
+
+            auto item = (*unit)->equipment[2];
+            if (item == nullptr) return;
+            InventoryManager::instance->unassign_item(*unit, item);
+            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
+            update_weapon_hud(*unit);
+        },
+        eactions, ztgk::game::ui_data.gr_actions
+    );
     hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");
@@ -1044,6 +1157,8 @@ void load_hud() {
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_loadScreen)->setHidden(true);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true);
 
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
+//    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
 }
 
 void init_imgui() {
@@ -1421,10 +1536,9 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
-
     ztgk::game::cursor.click(button, action, mods);
-    if (ztgk::game::cursor.config.capture_click)
-        handle_picking(window, button, action, mods);
+//    if (ztgk::game::cursor.config.capture_click)
+//        handle_picking(window, button, action, mods);
 
 }
 
@@ -1635,10 +1749,96 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
         //hud/game/unit details/mods/mod
+
+        update_weapon_hud(unit);
+
     } else {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }
 
+}
+
+void update_weapon_hud(Unit *unit) {
+    if (unit->equipment.item1) {
+        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+        eitem1->getComponent<Text>()->content = unit->equipment.item1->name;
+        eitem1->getComponent<Sprite>()->load(unit->equipment.item1->icon_path);
+        if (unit->equipment.item1->offensive) {
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
+
+            eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.dmg);
+            eitem1->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.range.add);
+            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item1->stats.cd_max_sec;
+            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item1->cd_sec);
+        } else {
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(false);
+
+            auto ent = eitem1->getChild("Passive Stats");
+            int i = 1;
+            for (auto stats : unit->equipment.item1->highlight_passive_stats) {
+                string ent_name = "STAT" + to_string(i);
+                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                i++;
+            }
+        }
+    } else {
+        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+        eitem1->getComponent<Text>()->content = "*No Item*";
+        eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
+        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
+        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
+    }
+
+    if (unit->equipment.item2) {
+        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
+        eitem2->getComponent<Text>()->content = unit->equipment.item2->name;
+        eitem2->getComponent<Sprite>()->load(unit->equipment.item2->icon_path);
+        if (unit->equipment.item2->offensive) {
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(false);
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
+
+            eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.dmg);
+            eitem2->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.range.add);
+            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item2->stats.cd_max_sec;
+            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item2->cd_sec);
+        } else {
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(false);
+
+            auto ent = eitem2->getChild("Passive Stats");
+            int i = 1;
+            for (auto stats : unit->equipment.item2->highlight_passive_stats) {
+                string ent_name = "STAT" + to_string(i);
+                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                i++;
+            }
+        }
+    } else {
+        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
+        eitem2->getComponent<Text>()->content = "*No Item*";
+        eitem2->getComponent<Sprite>()->load("res/textures/question_mark.png");
+        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
+        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
+    }
+
+    if (!unit->equipment.item1 && !unit->equipment.item2) {
+        auto eitem0 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+        eitem0->getComponent<Text>()->content = unit->equipment.item0->name + " - No Item";
+        eitem0->getComponent<Sprite>()->load(unit->equipment.item0->icon_path);
+        if (unit->equipment.item0->offensive) {
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
+            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
+
+            eitem0->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.dmg);
+            eitem0->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.range.add);
+            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item0->stats.cd_max_sec;
+            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item0->cd_sec);
+        }
+    }
 }
 
 

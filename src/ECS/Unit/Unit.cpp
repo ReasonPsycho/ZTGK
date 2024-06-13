@@ -305,7 +305,7 @@ void Unit::UpdateImpl() {
             cm = getEntity()->getComponent<ColorMask>();
         }
         if(!cm->HasMask("selected")) {
-            cm->AddMask("selected", glm::vec4(0, 150, 20, 0.1));
+            cm->AddMask("selected", glm::vec4(0, 150.0f/250.0f, 20.0f/250.0f, 0.3f));
         }
     }
     else if (!isSelected && cm != nullptr &&cm->HasMask("selected")){
@@ -326,6 +326,25 @@ void Unit::UpdateImpl() {
         equipment.item2->cd_sec -= Time::Instance().DeltaTime();
     if (equipment.cd_between_sec > 0)
         equipment.cd_between_sec -= Time::Instance().DeltaTime();
+
+    if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
+        if (equipment.item1 && equipment.item1->offensive) {
+            auto eitem = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = equipment.item1->stats.cd_max_sec;
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(equipment.item1->cd_sec);
+        }
+        if (equipment.item2 && equipment.item2->offensive) {
+            auto eitem = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = equipment.item2->stats.cd_max_sec;
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(equipment.item2->cd_sec);
+        }
+
+        if (!equipment.item1 && !equipment.item2) {
+            auto eitem = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = equipment.item0->stats.cd_max_sec;
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(equipment.item0->cd_sec);
+        }
+    }
 }
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {
@@ -503,6 +522,7 @@ Vector2Int Unit::GetDirtiestTileAround() {
 void Unit::DIEXD() {
     if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
         ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
+        ztgk::game::ui_data.tracked_unit_id = -1;
     }
 
     grid->getTileAt(gridPosition)->unit = nullptr;

@@ -31,12 +31,15 @@ public:
     // glm::vec2 worldPos{};
 
     std::string name;
+    std::string icon_path = "res/textures/question_mark.png";
     std::string description;
     ItemStats stats{};
     bool takesTwoSlots;
     Model * model;
 
-    Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false, Model * model = ztgk::game::cube_model);
+    std::unordered_map<std::string, std::string> highlight_passive_stats = {};
+
+    Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false, Model * model = ztgk::game::bugModel);
 
     void imgui_preview() const;
 };

@@ -44,7 +44,7 @@ void HUDSlider::set(float value) {
 }
 
 void HUDSlider::set_in_display_range(float value) {
-    set((value - displayMin) / (displayMax - displayMin));
+    set(clamp((value - displayMin) / (displayMax - displayMin), displayMin, displayMax));
 }
 
 void HUDSlider::set_direction(SliderDirection direction) {

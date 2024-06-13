@@ -12,6 +12,7 @@ public:
         std::string path = "res/models/pranium/pranium.fbx";
         model = new Model(&path);
         model->loadModel();
+        icon_path = "res/textures/puni.png";
     }
 
 };
