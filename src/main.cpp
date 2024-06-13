@@ -214,7 +214,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
+Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
@@ -1204,7 +1204,8 @@ void input() {
 
 void update() {
     ZoneScopedN("Update");
-
+    scene.systemManager.getSystem<SignalQueue>()->Update();
+    
     //no need to check every frame, every 5 sec is good enough
     if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
@@ -1214,13 +1215,13 @@ void update() {
     mouseX = mouseio.MousePos.x;
     mouseY = mouseio.MousePos.y;
 
+    ztgk::game::cursor.update();
     scene.systemManager.Update();
     scene.updateScene();
 
     scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
-    scene.systemManager.getSystem<SignalQueue>()->Update();
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
 
@@ -1450,22 +1451,12 @@ void imgui_end() {
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
+    
+    camera.MoveCamera(window);
+    
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboard(UPWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWNWARD, deltaTime);
-
-
+    
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
         if (!captureMouseButtonPressed) {
             captureMouse = !captureMouse;
