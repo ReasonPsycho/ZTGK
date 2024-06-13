@@ -156,8 +156,8 @@ bool CombatState::isAttackOnCooldown() {
         return true;
     }
 
-    Item * it;
-    Item * sec_it;
+    Item * it = nullptr;
+    Item * sec_it = nullptr;
     glm::ivec2 pos = {unit->gridPosition.x, unit->gridPosition.z};
     glm::ivec2 tpos = {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z};
 
