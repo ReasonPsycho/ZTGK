@@ -1031,28 +1031,49 @@ void load_hud() {
     hud->createButton(
         glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/icons/pick-me.png", "res/textures/transparent.png",
         [eactions](){
-            static std::string spr_on = "res/textures/icons/pick-me.png";
-            static std::string spr_off = "res/textures/icons/gabka_shy.png";
+            static std::string spr_gabka = "res/textures/icons/pick-me.png";
+            static std::string spr_mine = "res/textures/icons/pickAXE.png";
 
-            ztgk::game::cursor.dragMode = DRAG_UNIT;
-            eactions->children[0]->getComponent<Sprite>()->load(spr_on);
-            eactions->children[1]->getComponent<Sprite>()->load(spr_off);
+            if (ztgk::game::cursor.dragMode == DRAG_UNIT) {
+                ztgk::game::cursor.dragMode = DRAG_TILE;
+                eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
+            }
+            else if (ztgk::game::cursor.dragMode == DRAG_TILE) {
+                ztgk::game::cursor.dragMode = DRAG_UNIT;
+                eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
+            }
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
     hud->createButton(
-        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/icons/gabka_shy.png", "res/textures/transparent.png",
-        [eactions](){
-            static std::string spr_on = "res/textures/icons/pickAXE.png";
-            static std::string spr_off = "res/textures/icons/gabka_shy.png";
+        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png",
+        [](){
+            if (ztgk::game::ui_data.tracked_unit_id == -1) return;
+            auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                  scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+            if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
 
-            ztgk::game::cursor.dragMode = DRAG_TILE;
-            eactions->children[1]->getComponent<Sprite>()->load(spr_on);
-            eactions->children[0]->getComponent<Sprite>()->load(spr_off);
+            auto item = (*unit)->equipment[1];
+            if (item == nullptr) return;
+            InventoryManager::instance->unassign_item(*unit, item);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->worldPosition);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png",
+        [](){
+            if (ztgk::game::ui_data.tracked_unit_id == -1) return;
+            auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                  scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+            if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
+
+            auto item = (*unit)->equipment[2];
+            if (item == nullptr) return;
+            InventoryManager::instance->unassign_item(*unit, item);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->worldPosition);
+        },
+        eactions, ztgk::game::ui_data.gr_actions
+    );
     hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
