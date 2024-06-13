@@ -305,7 +305,7 @@ void Unit::UpdateImpl() {
             cm = getEntity()->getComponent<ColorMask>();
         }
         if(!cm->HasMask("selected")) {
-            cm->AddMask("selected", glm::vec4(0, 150, 20, 0.1));
+            cm->AddMask("selected", glm::vec4(0, 150.0f/250.0f, 20.0f/250.0f, 0.3f));
         }
     }
     else if (!isSelected && cm != nullptr &&cm->HasMask("selected")){

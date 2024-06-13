@@ -83,10 +83,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceShader.setFloat("light_shade_cutoff", light_shade_cutoff);
     phongInstanceShader.setFloat("dark_shade_cutoff", dark_shade_cutoff);
     phongInstanceShader.setInt("toon_color_levels", toon_color_levels);
-
-
-    phongInstanceShader.setFloat("rim_threshold", rim_threshold);
-    phongInstanceShader.setFloat("rim_amount", rim_amount);
+    
     phongInstanceShader.setFloat("outlineMapping", instanceShaderOutlineMapping);
 
     phongShader.use();
@@ -110,6 +107,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
 
     phongShader.setFloat("rim_threshold", rim_threshold);
     phongShader.setFloat("rim_amount", rim_amount);
+    phongShader.setFloat("rim_multiplier", rim_multiplier);
     phongShader.setFloat("outlineMapping", normalShaderOutlineMapping);
 
 
@@ -397,8 +395,9 @@ void PhongPipeline::showImGuiDetailsImpl(Camera *camera) {
     if (ImGui::CollapsingHeader("Rim Light Settings"))
     {
         ImGui::Indent();
-        ImGui::DragFloat("Rim Threshold", &rim_threshold, 0.1f);
-        ImGui::DragFloat("Rim Amount", &rim_amount, 0.1f);
+        ImGui::DragFloat("Rim Threshold", &rim_threshold, 0.05f);
+        ImGui::DragFloat("Rim Amount", &rim_amount, 0.05f);
+        ImGui::DragFloat("Rim multiplier", &rim_multiplier, 0.05f);
         ImGui::Unindent();
     }
 
