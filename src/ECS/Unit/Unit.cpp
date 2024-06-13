@@ -326,6 +326,25 @@ void Unit::UpdateImpl() {
         equipment.item2->cd_sec -= Time::Instance().DeltaTime();
     if (equipment.cd_between_sec > 0)
         equipment.cd_between_sec -= Time::Instance().DeltaTime();
+
+    if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
+        if (equipment.item1 && equipment.item1->offensive) {
+            auto eitem = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = equipment.item2->stats.cd_max_sec;
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(equipment.item2->cd_sec);
+        }
+        if (equipment.item2 && equipment.item2->offensive) {
+            auto eitem = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = equipment.item2->stats.cd_max_sec;
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(equipment.item2->cd_sec);
+        }
+
+        if (!equipment.item1 && !equipment.item2) {
+            auto eitem = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = equipment.item0->stats.cd_max_sec;
+            eitem->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(equipment.item0->cd_sec);
+        }
+    }
 }
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {

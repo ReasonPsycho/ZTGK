@@ -962,7 +962,8 @@ void load_hud() {
 
     ent = scene.addEntity(eoffstat, "CD");
     hud->createButton("CD", glm::vec2{1170, 150}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
-    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 150}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w1_offensive, true, 100);
+    auto eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 150}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w1_offensive, true, 100);
+    eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
 
     auto epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
     ent = scene.addEntity(epassstat, "STAT1");
@@ -999,7 +1000,8 @@ void load_hud() {
 
     ent = scene.addEntity(eoffstat, "CD");
     hud->createButton("CD", glm::vec2{1170, 30}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
-    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 30}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w2_offensive, true, 100);
+    eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 30}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w2_offensive, true, 100);
+    eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
 
     epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
     ent = scene.addEntity(epassstat, "STAT1");
@@ -1774,8 +1776,15 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             } else {
                 scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
                 scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(false);
-                
-                // todo stat highlight
+
+                auto ent = eitem2->getChild("Passive Stats");
+                int i = 1;
+                for (auto stats : unit->equipment.item2->highlight_passive_stats) {
+                    std::string ent_name = "STAT" + std::to_string(i);
+                    ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                    ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                    i++;
+                }
             }
         } else {
             auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
@@ -1786,7 +1795,18 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         }
         
         if (!unit->equipment.item1 && !unit->equipment.item2) {
-            // show hands
+            auto eitem0 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
+            eitem0->getComponent<Text>()->content = unit->equipment.item0->name + " - No Item";
+            eitem0->getComponent<Sprite>()->load(unit->equipment.item0->icon_path);
+            if (unit->equipment.item0->offensive) {
+                scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
+                scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
+                
+                eitem0->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.dmg);
+                eitem0->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.range.add);
+                eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item0->stats.cd_max_sec;
+                eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item0->cd_sec);
+            }
         }
         
     } else {
