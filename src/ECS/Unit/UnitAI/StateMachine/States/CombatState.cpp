@@ -116,7 +116,7 @@ void CombatState::AttackTarget() {
         target->getEntity()->addComponent(std::make_unique<ColorMask>());
         cm = target->getEntity()->getComponent<ColorMask>();
     }
-    cm->AddMask("DMG_taken", {120, 0, 0, 0.5}, 0.3f);
+    cm->AddMask("DMG_taken", {120.0f/250.0f, 0, 0, 0.5f}, 0.6f);
     spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
     if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
         ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;

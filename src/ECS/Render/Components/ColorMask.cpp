@@ -50,7 +50,7 @@ void ColorMask::UpdateImpl() {
             if (!it->second.constant) {
                 it->second.timer = it->second.timer - (float) Time::Instance().DeltaTime();
                 if (it->second.timer <= 0) {
-                    maskDataMap.erase(it);
+                    maskDataMap.erase(it++);
                 } else {
                     ++it;
                 }

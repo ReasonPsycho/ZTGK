@@ -594,7 +594,7 @@ void Grid::UpdateFogData(Tile *tile) {
 
             Tile *neighbourTile = getTileAt(neighbourIndex.x, neighbourIndex.z);
             if (neighbourTile != nullptr) {
-                if (neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE || !neighbourTile->isInFogOfWar) {
+                if (neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE) {
                     open.push_back(neighbourIndex);
                 } else {
                     edgeSet.insert(neighbourIndex);
