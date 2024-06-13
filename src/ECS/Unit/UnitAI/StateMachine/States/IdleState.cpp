@@ -21,7 +21,7 @@ State *IdleState::RunCurrentState() {
     }
     //from Idle to Combat
 
-    if(unit->hasCombatTarget){
+    if(unit->hasCombatTarget && unit->combatTarget != nullptr){
 
         combatState = new CombatState(grid);
         combatState->unit = unit;

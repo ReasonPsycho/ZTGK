@@ -58,22 +58,22 @@ State *MiningState::RunCurrentState() {
         return moveState;
     }
 
-    //from Mining to Combat
-    if(unit->hasCombatTarget){
-        combatState = new CombatState(grid);
-        combatState->unit = unit;
-
-        if(combatState->isTargetInRange())
-            return combatState;
-        else
-        {
-            unit->hasMovementTarget = true;
-            unit->movementTarget = unit->combatTarget->gridPosition;
-            moveState = new MovementState(grid);
-            moveState->unit = unit;
-            return moveState;
-        }
-    }
+//    //from Mining to Combat
+//    if(unit->hasCombatTarget){
+//        combatState = new CombatState(grid);
+//        combatState->unit = unit;
+//
+//        if(combatState->isTargetInRange())
+//            return combatState;
+//        else
+//        {
+//            unit->hasMovementTarget = true;
+//            unit->movementTarget = unit->combatTarget->gridPosition;
+//            moveState = new MovementState(grid);
+//            moveState->unit = unit;
+//            return moveState;
+//        }
+//    }
     return this;
 }
 

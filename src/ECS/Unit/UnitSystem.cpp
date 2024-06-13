@@ -69,12 +69,8 @@ void UnitSystem::UpdateImpl() {
         //those find statements are needed because unit can be deleted in the UpdateImpl() function, which does not update unitComponents vector
     }
 
-    float xd = glfwGetTime();
-    int xdd = (int)xd;
-    int xddd = xdd % 2;
-    if((int)glfwGetTime() % 2 == 0){
-        fixOverlappingUnits();
-    }
+    fixOverlappingUnits();
+
 
 
 }
@@ -100,7 +96,7 @@ void UnitSystem::deselectAllUnits() {
     selectedUnits.clear();
 }
 
-void UnitSystem::init() {
+void UnitSystem::init() {/*
     raycastSelectionHandler = std::make_unique<SignalReceiver>(
         Signal::signal_types.mouse_move_signal | Signal::signal_types.mouse_button_signal,
         [this](const Signal & signal) {
@@ -178,29 +174,49 @@ void UnitSystem::init() {
         }
     );
     *ztgk::game::signalQueue += raycastSelectionHandler.get();
+    */
 }
 
 void UnitSystem::fixOverlappingUnits() {
     for (Unit* unit: unitComponents) {
         for (Unit* otherUnit: unitComponents) {
             if (unit != otherUnit && unit->gridPosition == otherUnit->gridPosition) {
-                Vector2Int random_dir;
-                switch((int)glfwGetTime()%4){
-                    case 0:
-                        random_dir = Vector2Int{1, 0};
-                        break;
-                    case 1:
-                        random_dir = Vector2Int{-1, 0};
-                        break;
-                    case 2:
-                        random_dir = Vector2Int{0, 1};
-                        break;
-                    case 3:
-                        random_dir = Vector2Int{0, -1};
-                        break;
+                spdlog::error("UNITS OVERLAPPING ON TILE {} {}", unit->gridPosition.x, unit->gridPosition.z);
+                Vector2Int random_dir = Vector2Int{0, 0};
+                vector<Vector2Int> directions = {Vector2Int{1, 0}, Vector2Int{0, 1}, Vector2Int{-1, 0}, Vector2Int{0, -1}, Vector2Int{1, 1}, Vector2Int{-1, -1}, Vector2Int{1, -1}, Vector2Int{-1, 1}};
+                auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(unit->gridPosition + random_dir);
+                if(tile!= nullptr) {
+                    //sort by distance of world position to unit
+                    std::sort(directions.begin(), directions.end(), [unit](Vector2Int a, Vector2Int b) {
+                        return glm::distance(ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(unit->gridPosition + a), unit->worldPosition) <
+                               glm::distance(ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(unit->gridPosition + b), unit->worldPosition);
+                    });
+                    for (auto dir: directions) {
+                        if (ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(unit->gridPosition + dir) != nullptr && ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(unit->gridPosition + dir)->vacant()){
+                            random_dir = dir;
+                            break;
+                        }
+                    }
                 }
-                unit->gridPosition = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, otherUnit->gridPosition + random_dir);
+                if(random_dir == Vector2Int{0, 0})
+                    spdlog::error("NO VACANT TILE FOUND FOR UNIT {}", unit->name);
+                unit->gridPosition = unit->gridPosition + random_dir;
+                unit->getEntity()->transform.setLocalPosition(ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(unit->gridPosition));
+
+                unit->worldPosition = ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(unit->gridPosition);
+
             }
         }
     }
+}
+
+
+std::vector<Vector2Int> UnitSystem::getAllUnitsPositionsExceptMe(Unit* unit) {
+    std::vector<Vector2Int> positions;
+    for (Unit* otherUnit: unitComponents) {
+        if (unit != otherUnit) {
+            positions.push_back(otherUnit->gridPosition);
+        }
+    }
+    return positions;
 }

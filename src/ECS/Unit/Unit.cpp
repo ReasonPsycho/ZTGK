@@ -196,15 +196,6 @@ void Unit::UpdateImpl() {
             pathfinding.path = pathfinding.FindPath(gridPosition, movementTarget);
         }
     }
-    if(!ForcedMovementState && !ForcedMiningState) {
-        combatTarget = GetClosestPathableEnemyInSight();
-        if (combatTarget == nullptr) {
-            combatTarget = GetClosestEnemyInSight();
-            if (combatTarget != nullptr) {
-                movementTarget = combatTarget->gridPosition;
-            }
-        }
-    }
 
     if(ForcedMovementState){
         if(!hasMovementTarget){
@@ -359,7 +350,7 @@ Unit *Unit::GetClosestEnemyInWeaponRange() {
 }
 
 bool Unit::canFindPathToTarget(Vector2Int target) {
-    pathfinding.FindPath(gridPosition, target);
+    pathfinding.FindPath(gridPosition, target, ztgk::game::scene->systemManager.getSystem<UnitSystem>()->getAllUnitsPositionsExceptMe(this));
     return !pathfinding.path.empty();
 }
 
@@ -506,6 +497,18 @@ void Unit::DIEXD() {
     ztgk::game::scene->systemManager.getSystem<UnitSystem>()->removeComponent(this);
     ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeComponent(getEntity()->getComponent<Render>());
     ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeColorMaskComponent(getEntity()->getComponent<ColorMask>());
+
+    //look for every unit that has opposite isAlly and remove this unit from their combatTargets
+    for(auto &unit : ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents){
+        if(unit->IsAlly() != isAlly){
+            if(unit->combatTarget == this){
+                unit->combatTarget = nullptr;
+                unit->hasCombatTarget = false;
+            }
+        }
+    }
+
+
     getEntity()->Destroy();
 
 }
@@ -513,9 +516,6 @@ void Unit::DIEXD() {
 bool Unit::canPathToAttackTarget(Unit *target) {
     if(target == nullptr){
         target = combatTarget;
-    }
-    if(combatTarget == nullptr && target != nullptr){
-        combatTarget = target;
     }
     if(target == nullptr){
         return false;
@@ -526,8 +526,11 @@ bool Unit::canPathToAttackTarget(Unit *target) {
             return true;
         }
     }
-
-    auto pathToTarget = pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(target->gridPosition, gridPosition));
+    auto nearestVacant = pathfinding.GetNearestVacantTile(target->gridPosition, gridPosition);
+    if(nearestVacant == gridPosition){
+        return false;
+    }
+    auto pathToTarget = pathfinding.FindPath(gridPosition, nearestVacant);
     return !pathToTarget.empty();
 }
 
