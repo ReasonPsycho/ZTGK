@@ -1045,12 +1045,10 @@ void load_hud() {
             static std::string spr_gabka = "res/textures/icons/pick-me.png";
             static std::string spr_mine = "res/textures/icons/pickAXE.png";
 
-            if (ztgk::game::cursor.dragMode == DRAG_UNIT) {
-                ztgk::game::cursor.dragMode = DRAG_TILE;
+            if (isLeftMouseButtonHeld) {
                 eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
             }
-            else if (ztgk::game::cursor.dragMode == DRAG_TILE) {
-                ztgk::game::cursor.dragMode = DRAG_UNIT;
+            else if (isRightMouseButtonHeld) {
                 eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
             }
         },
@@ -1498,15 +1496,15 @@ void processInput(GLFWwindow *window) {
         ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
-        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
-        spdlog::debug("clearing tiles in radius");
-        isXpressed = true;
-//        radiusToRemove +=1;
-    }
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
-        isXpressed = false;
-    }
+//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+//        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+//        spdlog::debug("clearing tiles in radius");
+//        isXpressed = true;
+////        radiusToRemove +=1;
+//    }
+//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+//        isXpressed = false;
+//    }
 
 }
 
