@@ -11,9 +11,37 @@
 
 struct Cursor;
 class SignalQueue;
+class SignalReceiver;
 struct GLFWwindow;
 
 namespace ztgk::game {
+
+    struct s_ui_data {
+        enum class ui_phase {
+            MAIN_MENU,
+            GAME
+        };
+
+        ui_phase phase = ui_phase::MAIN_MENU;
+        unsigned tracked_unit_id;
+        unsigned gr_game;
+        unsigned gr_map;
+        unsigned gr_middle;
+        unsigned gr_actions;
+        unsigned gr_top;
+        unsigned gr_item;
+        unsigned gr_pause;
+        unsigned gr_settings;
+        unsigned gr_menu;
+        unsigned gr_credits;
+        unsigned gr_loadScreen;
+        unsigned gr_mainMenu;
+        unsigned gr_w1_offensive;
+        unsigned gr_w1_passive;
+        unsigned gr_w2_offensive;
+        unsigned gr_w2_passive;
+    };
+    extern s_ui_data ui_data;
 
     extern GLFWwindow * window;
     extern Scene * scene;
@@ -22,6 +50,7 @@ namespace ztgk::game {
     extern SignalQueue * signalQueue;
     extern Model * washingMachineModel;
     extern AudioManager * audioManager;
+    extern SignalReceiver * selectionHandler;
 
     extern Cursor cursor;
 

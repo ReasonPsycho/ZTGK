@@ -15,7 +15,7 @@ std::unordered_map<unsigned, std::pair<SignalReceiver *, std::vector<std::string
 
 SignalReceiver::SignalReceiver() : SignalReceiver(0) {}
 
-SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(const Signal & signal)> onSignal)
+SignalReceiver::SignalReceiver(unsigned int receiveTypeMask, std::function<void(Signal & signal)> onSignal)
         : receiver_uid(id<ID_POOL_SIGNAL_RECEIVER>()), receive_type_mask(receiveTypeMask), receive(onSignal) {
     name = "Signal Receiver";
 }
@@ -36,6 +36,8 @@ void SignalReceiver::showImGuiDetailsImpl(Camera *camera) {
         ImGui::CheckboxFlags("Hud mapping UpdateImpl", &receive_type_mask, Signal::signal_types.hud_update_group_mappings_signal);
         ImGui::CheckboxFlags("Hud trigger z sort", &receive_type_mask, Signal::signal_types.hud_sort_z_depth_signal);
         ImGui::CheckboxFlags("Hud remove groupID", &receive_type_mask, Signal::signal_types.hud_remove_group_signal);
+        ImGui::CheckboxFlags("Level load", &receive_type_mask, Signal::signal_types.level_load);
+        ImGui::CheckboxFlags("Level save", &receive_type_mask, Signal::signal_types.level_save);
         ImGui::CheckboxFlags("All", &receive_type_mask, Signal::signal_types.all);
     }
 

@@ -12,6 +12,7 @@
 
 struct Cursor {
     void init();
+    void update();
     void move(glm::vec2 newpos);
     void scroll(glm::vec2 offset);
     void click(int button, int action, int mods);

@@ -22,5 +22,12 @@ public:
                 .atk_speed = 0.3,
                 .knockback = 1
         }
-    }) {}
+    }) {
+        icon_path = "res/textures/perwoll.jpg";
+        highlight_passive_stats = {
+                {"DMG", "100"},
+                {"DMG%", "0.5"},
+                {"ASPD", "0.3"}
+        };
+    }
 };

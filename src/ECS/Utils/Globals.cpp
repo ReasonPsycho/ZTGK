@@ -9,6 +9,7 @@
 
 namespace ztgk::game {
     // defaults
+    s_ui_data game::ui_data = {};
     GLFWwindow * game::window = nullptr;
     Scene * game::scene = nullptr;
     Model * game::cube_model = nullptr;
@@ -24,6 +25,7 @@ namespace ztgk::game {
     int game::toon_color_levels = 15;
     Model * game::washingMachineModel = nullptr;
     AudioManager * game::audioManager = nullptr;
+    SignalReceiver * game::selectionHandler = nullptr;
     Model * game::playerModel = nullptr;
     Model * game::bugModel = nullptr;
     Model * game::shroomModel = nullptr;

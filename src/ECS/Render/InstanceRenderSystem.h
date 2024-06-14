@@ -24,7 +24,7 @@ public:
     void Innit();
     void DrawTiles(Shader* regularShader,Camera * camera);
     void DrawLights(Shader* regularShader,Camera * camera);
-    void SimpleDrawTiles(Shader* regularShader,Camera * camera);
+    void SimpleDrawTiles(Shader *regularShader, Camera *camera, glm::vec3 viewPos, float renderDistance);
     void PushToSSBO(Camera* camera);
 
     //ECS
@@ -57,11 +57,13 @@ private:
     
     string tilePath =  "res/textures/tiles/Tile";
     
-    std::vector<WallData> wallData;
+
+    std::vector<Chunk* > loadedChunks;
     MaterialPhong wallMaterial;
     MaterialPhong lightMaterial;
-    
-    
+    std::vector<WallData> wallData;
+
+
     //ECS
     std::array<std::type_index, 0> componentTypes = {};
 };

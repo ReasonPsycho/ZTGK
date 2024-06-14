@@ -73,6 +73,11 @@ void Cursor::click(int button, int action, int mods) {
             *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods,
                                           {raw_pos.x, ztgk::game::window_size.y - raw_pos.y},
                                           "Cursor forwarding CLICK");
+
         }
     }
+}
+
+void Cursor::update() {
+    ztgk::game::camera->MoveCamera(raw_pos.x,raw_pos.y);
 }

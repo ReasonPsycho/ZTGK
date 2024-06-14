@@ -11,17 +11,22 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
 
 
     Frustum frustum = createFrustumFromCamera(*camera);
+
     for (auto &renderComponent: renderComponents) {
-        renderComponent->draw(*regularShader, &frustum);
+        if(!renderComponent->isInFogOfWar){
+            renderComponent->draw(*regularShader, &frustum);
+        }
     }
     
     
 }
 
-void RenderSystem::SimpleDrawScene(Shader *regularShader) {
+void RenderSystem::SimpleDrawScene(Shader *regularShader, glm::vec3 viewPos, float farPlane) {
     for (auto &renderComponent: renderComponents) {
-        auto rc = renderComponent;
-        renderComponent->simpleDraw(*regularShader);
+        if (!renderComponent->isInFogOfWar && glm::distance(renderComponent->getEntity()->transform.getGlobalPosition(), viewPos) < farPlane){
+            auto rc = renderComponent;
+            renderComponent->simpleDraw(*regularShader);
+        }
     }
 }
 
@@ -48,11 +53,21 @@ void RenderSystem::addComponent(void *component) {
     {
         colorMaskComponents.push_back(colorMaskPtr);
     }
+
+    AnimationPlayer* animationPlayerPtr = dynamic_cast<AnimationPlayer*>(basePtr);
+    if(animationPlayerPtr != nullptr)
+    {
+        animationPlayerComponents.push_back(animationPlayerPtr);
+    }
 }
 
 void RenderSystem::UpdateImpl() {
     for (auto colorMask: colorMaskComponents) {
             colorMask->Update();
+    }
+
+    for (auto animationPlayer: animationPlayerComponents) {
+        animationPlayer->Update();
     }
 }
 

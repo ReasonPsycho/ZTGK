@@ -48,10 +48,11 @@ public:
 
     Texture *bloomDirtTexture;
     MaterialPhong *foamMaterial;
+    GLuint colorAttachments[4];
+    
 private:
     Primitives *_primitives;
     GLuint frameBuffer;
-    GLuint colorAttachments[4];
     GLuint rbo;
     bool toonTencilEnabled;
     bool isInnit = false;
@@ -82,8 +83,9 @@ private:
     float lightMultiplayer = 0.5f;
     
     //rimlight
-    float rim_threshold = 10;
-    float rim_amount = 0.5f;
+    float rim_threshold = 12;
+    float rim_amount = 1.0f;
+    float rim_multiplier = 0.2f;
     
     //outlines
     bool normalShaderOutlineMapping = true;

@@ -23,7 +23,10 @@ s_signal_types::s_signal_types() {
     hud_remove_group_signal = mask_id<MASK_ID_POOL_SIGNAL_TYPE>();
         all_hud = hud_sort_z_depth_signal | hud_update_group_mappings_signal | hud_remove_group_signal;
 
-    all = test | keyboard | audio_signal | all_mouse | all_hud;
+    level_load = mask_id<MASK_ID_POOL_SIGNAL_TYPE>();
+    level_save = mask_id<MASK_ID_POOL_SIGNAL_TYPE>();
+
+    all = test | keyboard | audio_signal | all_mouse | all_hud | level_load | level_save;
 }
 
 s_signal_types Signal::signal_types{};
