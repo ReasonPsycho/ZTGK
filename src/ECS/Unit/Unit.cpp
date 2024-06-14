@@ -17,6 +17,7 @@
 #include "ECS/Render/Components/ColorMask.h"
 #include "ECS/Render/RenderSystem.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/MiningState.h"
+#include "ECS/Unit/UnitAI/StateMachine/States/CombatState.h"
 
 
 const UnitStats Unit::ALLY_BASE = {
@@ -246,10 +247,41 @@ void Unit::UpdateImpl() {
 
     }
 
+    if(!isAlly && !ForcedMovementState && !ForcedMiningState) {
+        combatTarget = GetClosestPathableEnemyInSight();
+        if (combatTarget == nullptr) {
+            combatTarget = GetClosestEnemyInSight();
+            if (combatTarget != nullptr) {
+                movementTarget = combatTarget->gridPosition;
+            }
+        }
+    }
+
+    std::vector<Tile*> neiTiles = grid->GetNeighbours(gridPosition, false);
+    for(auto &tile : neiTiles){
+        if(tile->unit != nullptr && tile->unit->IsAlly() != isAlly){
+            combatTarget = tile->unit;
+            break;
+        }
+    }
+
+
 
 
     if(combatTarget != nullptr){
         hasCombatTarget = true;
+        auto combatState = new CombatState(grid);
+        combatState->unit = this;
+        if(combatState->isTargetInRange() && canPathToAttackTarget()){}
+        else if(!combatState->isTargetInRange() && canPathToAttackTarget()){
+            hasMovementTarget = true;
+            movementTarget = pathfinding.GetNearestVacantTile(combatTarget->gridPosition, gridPosition);
+            delete combatState;
+        }
+        else{
+            hasCombatTarget = false;
+            delete combatState;
+        }
     }
     else{
         hasCombatTarget = false;

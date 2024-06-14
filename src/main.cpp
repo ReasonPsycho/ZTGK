@@ -1165,7 +1165,7 @@ void update_dragged_tiles() {
                                                                  display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
-    if (isLeftMouseButtonHeld && ray != nullptr && ray->getHitEntity() != nullptr) {
+    if ((isLeftMouseButtonHeld || isRightMouseButtonHeld) && ray != nullptr && ray->getHitEntity() != nullptr) {
         Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
         mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
@@ -1304,8 +1304,23 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             lastRightClickTime = glfwGetTime();
 
 
+
             std::vector<Unit*> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
             if(!selectedSponges.empty()){
+
+                auto pickupableItem = hit->getComponent<PickupubleItem>();
+                if(pickupableItem != nullptr){
+                    //sort sponges by distance to pickupable item ascending using pickupableItem->getEntity()->transform.getLocalPosition()
+                    std::sort(selectedSponges.begin(), selectedSponges.end(), [pickupableItem](Unit* a, Unit* b){
+                        return VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(a->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition())) < VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(b->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition()));
+                    });
+
+                    selectedSponges[0]->pickupTarget = pickupableItem;
+                    selectedSponges[0]->hasPickupTarget = true;
+
+                    return;
+
+                }
 
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
                 auto hitTile = hit->getComponent<Tile>();
