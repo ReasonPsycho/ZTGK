@@ -64,25 +64,18 @@ State *CombatState::RunCurrentState() {
 }
 
 bool CombatState::isTargetInRange() {
-    if(unit->combatTarget == nullptr){
+    if (unit->combatTarget == nullptr) {
         unit->hasCombatTarget = false;
         return false;
     }
-//    bool inRange = unit->equipment.in_range_of(
-//        {unit->gridPosition.x, unit->gridPosition.z},
-//        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
-//    ) != nullptr;
-//    unit->isTargetInRange = inRange;
-//    return inRange;
-     Unit* targ = unit->GetClosestEnemyInWeaponRange();
-    if (targ == nullptr) {
-//        unit->hasCombatTarget = false;
-//        unit->isTargetInRange = false;
-        return false;
-    }
-    unit->combatTarget = targ;
-    unit->isTargetInRange = true;
-    return true;
+        Unit *targ = unit->GetClosestEnemyInWeaponRange();
+        if (targ == nullptr) {
+            return false;
+        }
+        unit->combatTarget = targ;
+        unit->isTargetInRange = true;
+        return true;
+
 
 }
 
@@ -103,6 +96,7 @@ void CombatState::AttackTarget() {
     unit->rotation = angle;
 
     auto target = unit->combatTarget;
+    if(target == nullptr) return; //todo expand on this
 
     float totalAttackDamage =
             (useItem->stats.dmg + useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
@@ -111,7 +105,14 @@ void CombatState::AttackTarget() {
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
     target->stats.hp -= totalAttackDamage;
-    auto cm = target->getEntity()->getComponent<ColorMask>();
+    ColorMask* cm;
+    if(target!= nullptr && target->getEntity() != nullptr)
+        cm = target->getEntity()->getComponent<ColorMask>();
+    else{
+        unit->hasCombatTarget = false;
+        unit->combatTarget = nullptr;
+        return;
+    }
     if (cm == nullptr){
         target->getEntity()->addComponent(std::make_unique<ColorMask>());
         cm = target->getEntity()->getComponent<ColorMask>();

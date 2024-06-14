@@ -10,13 +10,6 @@
 #include "ECS/SignalQueue/SignalReceiver.h"
 #include "Globals.h"
 
-enum dragSelectionMode{
-    DRAG_UNIT,
-    DRAG_TILE
-};
-
-
-
 struct Cursor {
     void init();
     void update();
@@ -45,7 +38,6 @@ struct Cursor {
     glm::vec2 ui_prev_pos = ztgk::game::window_size / 2;
     ImGuiIO * mouseio;
     SignalReceiver toggleHandler;
-    dragSelectionMode dragMode = DRAG_TILE;
 
     inline void update_ui_pos() {
         //todo once cursor icons are real, verify if the position is correctly aligned with the icon's pivot (it seems there's a slight offset?)

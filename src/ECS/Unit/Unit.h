@@ -50,10 +50,10 @@ public:
 
     //targets
     Vector2Int movementTarget = Vector2Int(0, 0);
-    Unit* combatTarget;
-    PickupubleItem * pickupTarget;
+    Unit* combatTarget = nullptr;
+    PickupubleItem * pickupTarget = nullptr;
 
-    std::vector<IMineable*> miningTargets;
+    std::vector<IMineable*> miningTargets = {};
     IMineable* currentMiningTarget = nullptr;
 
     Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);

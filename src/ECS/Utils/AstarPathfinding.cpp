@@ -22,7 +22,7 @@ AstarPathfinding::AstarPathfinding(Grid *grid, Unit* unit) {
  * @param start
  * @param target
  */
-std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target, bool debug) {
+std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target, std::vector<Vector2Int> forbiddenTiles, bool debug) {
     ZoneScopedN("Astar::FindPath");
     double start_time = glfwGetTime();
 
@@ -59,6 +59,11 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
         closedSet.insert(current);
 
         for(auto neigh : GetNeighbours(current)){
+            // Skip if the neighbor is a forbidden tile
+            if(std::find(forbiddenTiles.begin(), forbiddenTiles.end(), neigh) != forbiddenTiles.end()){
+                continue;
+            }
+
             if(closedSet.contains(neigh) || !grid->getTileAt(neigh)->vacant()){
                 continue;
             }
