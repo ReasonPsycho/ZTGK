@@ -83,6 +83,7 @@ public:
     bool canFindPathToTarget(Vector2Int target);
     std::vector<IMineable> miningPath;
 
+    void Pickup(PickupubleItem* item);
 
     // serializer
     // only use this with serializer!

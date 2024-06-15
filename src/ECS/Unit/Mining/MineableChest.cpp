@@ -18,9 +18,11 @@ void MineableChest::showImGuiDetailsImpl(Camera *camera) {
 
 void MineableChest::onMined(Unit *unit) {
     IMineable::onMined(unit);
+    parentEntity->getComponent<Render>()->Remove();
     auto item = InventoryManager::instance->create_item(item_type_id);
     auto pos = grid->GridToWorldPosition(gridPosition);
-    InventoryManager::instance->spawn_item_on_map(item, {pos.x, pos.z});
+    InventoryManager::instance->spawn_item_on_map(item, gridPosition);
+    spdlog::debug("Mined chest");
 }
 
 void MineableChest::UpdateImpl() {

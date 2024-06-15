@@ -25,8 +25,10 @@ std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
     // any free, otherwise slot 1
     if (slot == -1) {
         if (item->takesTwoSlots) {
+            // handle further down
         } else if (item1 != nullptr && item2 != nullptr) {
             slot = 1;
+            // handle further down with selected slot changed to 1
         } else if (item1 == nullptr) {
             item1 = item;
             return ret;

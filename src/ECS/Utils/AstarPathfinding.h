@@ -35,6 +35,9 @@ public:
 
     Vector2Int GetNearestVacantTile(Vector2Int target, Vector2Int origin);
 
+    // Potrzebowalem bez sprawdzania == origin XOXO
+    Vector2Int GetNearestVacantTileAround(Vector2Int origin);
+
 private:
     Grid* grid;
     Unit* unit;

@@ -188,8 +188,6 @@ void update_dragged_tiles();
 
 void gen_and_load_lvl(bool gen_new_lvl = false);
 
-void update_weapon_hud(Unit *unit);
-
 #pragma endregion Function definitions
 
 #pragma region Orginal set up
@@ -1066,8 +1064,8 @@ void load_hud() {
             auto item = (*unit)->equipment[1];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
-            update_weapon_hud(*unit);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition));
+            ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
@@ -1081,8 +1079,8 @@ void load_hud() {
             auto item = (*unit)->equipment[2];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
-            update_weapon_hud(*unit);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition));
+            ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
@@ -1703,6 +1701,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                     selectedSponges[0]->pickupTarget = pickupableItem;
                     selectedSponges[0]->hasPickupTarget = true;
+                    selectedSponges[0]->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                            VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    selectedSponges[0]->hasMovementTarget = true;
 
                     return;
 
@@ -1869,95 +1870,12 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
         //hud/game/unit details/mods/mod
 
-        update_weapon_hud(unit);
+        ztgk::update_weapon_hud(unit);
 
     } else {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }
 
-}
-
-void update_weapon_hud(Unit *unit) {
-    if (unit->equipment.item1) {
-        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem1->getComponent<Text>()->content = unit->equipment.item1->name;
-        eitem1->getComponent<Sprite>()->load(unit->equipment.item1->icon_path);
-        if (unit->equipment.item1->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-
-            eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.dmg);
-            eitem1->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.range.add);
-            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item1->stats.cd_max_sec;
-            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item1->cd_sec);
-        } else {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(false);
-
-            auto ent = eitem1->getChild("Passive Stats");
-            int i = 1;
-            for (auto stats : unit->equipment.item1->highlight_passive_stats) {
-                string ent_name = "STAT" + to_string(i);
-                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
-                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                i++;
-            }
-        }
-    } else {
-        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem1->getComponent<Text>()->content = "*No Item*";
-        eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-    }
-
-    if (unit->equipment.item2) {
-        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
-        eitem2->getComponent<Text>()->content = unit->equipment.item2->name;
-        eitem2->getComponent<Sprite>()->load(unit->equipment.item2->icon_path);
-        if (unit->equipment.item2->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
-
-            eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.dmg);
-            eitem2->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.range.add);
-            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item2->stats.cd_max_sec;
-            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item2->cd_sec);
-        } else {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(false);
-
-            auto ent = eitem2->getChild("Passive Stats");
-            int i = 1;
-            for (auto stats : unit->equipment.item2->highlight_passive_stats) {
-                string ent_name = "STAT" + to_string(i);
-                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
-                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                i++;
-            }
-        }
-    } else {
-        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
-        eitem2->getComponent<Text>()->content = "*No Item*";
-        eitem2->getComponent<Sprite>()->load("res/textures/question_mark.png");
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
-    }
-
-    if (!unit->equipment.item1 && !unit->equipment.item2) {
-        auto eitem0 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem0->getComponent<Text>()->content = unit->equipment.item0->name + " - No Item";
-        eitem0->getComponent<Sprite>()->load(unit->equipment.item0->icon_path);
-        if (unit->equipment.item0->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-
-            eitem0->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.dmg);
-            eitem0->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.range.add);
-            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item0->stats.cd_max_sec;
-            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item0->cd_sec);
-        }
-    }
 }
 
 

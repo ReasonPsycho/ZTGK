@@ -11,6 +11,8 @@
 #include "glm/vec4.hpp"
 #include "spdlog/spdlog.h"
 
+class Unit;
+
 namespace ztgk {
     static constexpr short ID_POOL_SYSTEM = 0;
     static constexpr short ID_POOL_ENTITY = 1;
@@ -42,6 +44,8 @@ namespace ztgk {
 
     // in millis
     long long time();
+
+    void update_weapon_hud(Unit * unit);
 
     extern Console console;
 

@@ -11,6 +11,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/TestBuffItem.h"
 #include "ECS/Unit/Equipment/ConcreteItems/PraniumOre.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
+#include "ECS/Utils/Util.h"
 
 InventoryManager * InventoryManager::instance = nullptr;
 
@@ -75,10 +76,10 @@ std::pair<Item *, bool> InventoryManager::get_item(unsigned int item_uid) {
     return {nullptr, false};
 }
 
-bool InventoryManager::assign_item(Item *item, Unit *unit, short slot) {
+std::pair<Item *, Item *> InventoryManager::assign_item(Item *item, Unit *unit, short slot) {
     if (!mv_to_asgn(item)) {
         spdlog::error("Item not found or not freed before! Cannot assign!");
-        return false;
+        return {};
     }
 
     auto un_eq = unit->equipment.equipItem(item, slot);
@@ -90,7 +91,7 @@ bool InventoryManager::assign_item(Item *item, Unit *unit, short slot) {
         mv_to_free(un_eq.second);
 
     unit->UpdateStats();
-    return true;
+    return un_eq;
 }
 
 bool InventoryManager::unassign_item(Unit *unit, Item *item) {
@@ -119,7 +120,7 @@ bool InventoryManager::unassign_item(Unit *unit, short slot) {
 
 bool InventoryManager::create_and_assign_item(unsigned int type_id, Unit *unit, short slot) {
     auto item = create_item(type_id);
-    return assign_item(item, unit, slot);
+    return assign_item(item, unit, slot) == std::pair<Item *, Item *>{};
 }
 
 bool InventoryManager::unassign_and_delete_item(Unit *unit, short slot) {
@@ -142,13 +143,21 @@ bool InventoryManager::unassign_and_delete_item(Unit *unit, Item *item) {
     return false;
 }
 
-void InventoryManager::spawn_item_on_map(Item *item, glm::vec2 world_pos) {
-    auto entity = ztgk::game::scene->addEntity(std::format("On-map Item {} - id {}", item->name, item->uniqueID));
-    entity->transform.setLocalPosition(glm::vec3(world_pos.x, entity->transform.getLocalPosition().y, world_pos.y));
-    entity->addComponent(std::make_unique<Render>(item->model));
-    entity->addComponent(std::make_unique<PickupubleItem>(item));
-    entity->addComponent(std::make_unique<BoxCollider>(entity, glm::vec3(1, 1, 1)));
-    entity->getComponent<BoxCollider>()->Update();
+//void InventoryManager::spawn_item_on_map(Item *item, glm::vec2 world_pos) {
+//    auto entity = ztgk::game::scene->addEntity(std::format("On-map Item {} - id {}", item->name, item->uniqueID));
+//    entity->transform.setLocalPosition(glm::vec3(world_pos.x, entity->transform.getLocalPosition().y, world_pos.y));
+//    entity->addComponent(std::make_unique<Render>(item->model));
+//    entity->addComponent(std::make_unique<PickupubleItem>(item));
+//    entity->addComponent(std::make_unique<BoxCollider>(entity, glm::vec3(1, 1, 1)));
+//    entity->getComponent<BoxCollider>()->boxColliderData.color = ztgk::color.YELLOW;
+//    entity->getComponent<BoxCollider>()->Update();
+//}
+
+void InventoryManager::spawn_item_on_map(Item *item, Vector2Int grid_pos) {
+    auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(grid_pos);
+    tile->state = FLOOR;
+    tile->parentEntity->addComponent(std::make_unique<Render>(item->model));
+    tile->parentEntity->addComponent(std::make_unique<PickupubleItem>(item, grid_pos));
 }
 
 void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
@@ -163,7 +172,7 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
         static Item * found = nullptr;
         static Unit * found_unit = nullptr;
         static bool found_assigned = false;
-        static glm::vec2 world_pos = {};
+        static glm::ivec2 world_pos = {};
 
         if (ImGui::TreeNode("Create Item")) {
             ImGui::InputInt("Type ID", &item_type_id);
@@ -298,7 +307,7 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
             else {
                 ImGui::InputInt("Item ID", &item_id);
             }
-            ImGui::DragFloat2("World Pos", glm::value_ptr(world_pos));
+            ImGui::DragInt2("Grid Pos", glm::value_ptr(world_pos));
 
             if (ImGui::Button("Spawn")) {
                 Item * item = nullptr;
@@ -308,7 +317,7 @@ void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
                 if (!item) {
                     spdlog::error("Failed to find/create item!");
                 } else {
-                    spawn_item_on_map(item, world_pos);
+                    spawn_item_on_map(item, Vector2Int{world_pos.x, world_pos.y});
                 }
             }
             ImGui::TreePop();
