@@ -26,6 +26,7 @@ void InstanceRenderSystem::removeComponent(void *component) {
 
 void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
 
+    ImGui::Text("Variable value: %zu", loadedChunks.size());
 }
 
 void InstanceRenderSystem::DrawTiles(Shader *regularShader, Camera *camera) {
@@ -107,9 +108,15 @@ void InstanceRenderSystem::UpdateImpl() {
             Chunk *chunk = grid->chunkArray[x][z];
             if (chunk->getBoundingVolume().BoundingVolume::isOnFrustum(frustum)) {
                 chunk->isVisible = true;
+                if(chunk->localLight != nullptr){
+                    chunk->localLight->isActive = true;
+                }
                 loadedChunks.push_back(chunk);
             } else {
                 chunk->isVisible = false;
+                if(chunk->localLight != nullptr){
+                    chunk->localLight->isActive = false;
+                }
             }
         }
     }

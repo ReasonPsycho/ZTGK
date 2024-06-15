@@ -34,6 +34,12 @@ public:
     void PushToSSBO();
     void UpdateImpl() override;
 
+    void RenderPlaneDepthMapInstanced();
+    void RenderPlaneDepthMap();
+
+    void RenderCubeDepthMapInstanced();
+    void RenderCubeDepthMap();
+    
     void GenerateShadowBuffers();
 
 
@@ -94,7 +100,7 @@ private:
     GLuint cubeShadowMaps;
 
     int maxDirLight = 1;
-    int maxPointLight = 20;
+    int maxPointLight = 120;
     int maxSpotLight = 20;
 
 
