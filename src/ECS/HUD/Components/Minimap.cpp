@@ -42,6 +42,7 @@ void Minimap::UpdateImpl() {
         }
     };
 
+    // krzychu nie patrz na to zrobie na sygnałach to jest temporary xdd
     for (int y = 0; y < 100; ++y) {
         for (int x = 0; x < 100; ++x) {
             Tile *tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(x, y);
