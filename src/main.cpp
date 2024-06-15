@@ -1093,21 +1093,39 @@ void load_hud() {
 
 // TOP PANEL
     auto etop = scene.addEntity(egame, "Top Panel");
-    glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 100};
+    glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 50};
     ent = hud->createButton(
-        "||", top_anchor, glm::vec2{35, 35},
+        "||", top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
         ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
         [hud](){
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
         },
         etop, ztgk::game::ui_data.gr_top
     );
-    ent->getComponent<Text>()->pos.y += 4;
+    ent->getComponent<Text>()->pos.x -= 1;
+    ent->getComponent<Text>()->pos.y += 5;
+
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{300, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->getComponent<Sprite>()->mode = CENTER;
 
     auto etime = scene.addEntity(etop, "Time");
-    etime->addComponent(make_unique<Text>("00:00", top_anchor + glm::vec2{0, 50}, glm::vec2(0.7), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    etime->addComponent(make_unique<Text>("00:00", top_anchor, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     etime->getComponent<Text>()->mode = CENTER;
     ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
+
+    auto epraniumCounter = scene.addEntity(etop, "Pranium Counter");
+    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
+    epraniumCounter->getComponent<Sprite>()->mode = CENTER;
+    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    epraniumCounter->getComponent<Text>()->mode = MIDDLE_LEFT;
+    ztgk::game::ui_data.txt_pranium_counter = epraniumCounter->getComponent<Text>();
+
+    auto eunitCounter = scene.addEntity(etop, "Unit Counter");
+    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
+    eunitCounter->getComponent<Sprite>()->mode = CENTER;
+    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");

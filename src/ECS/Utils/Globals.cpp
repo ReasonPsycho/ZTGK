@@ -16,6 +16,7 @@ namespace ztgk::game {
     Camera * game::camera = nullptr;
     SignalQueue * game::signalQueue = nullptr;
     Cursor game::cursor = {};
+    int game::pranium_needed_to_win = 10;
     std::atomic<bool> game::pause = false;
     std::atomic<bool> game::pause_render = false;
     glm::ivec2 game::window_size = { 1920, 1080 };

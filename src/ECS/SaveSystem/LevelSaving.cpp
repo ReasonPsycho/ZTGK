@@ -216,6 +216,7 @@ void LevelSaving::loadImpl(const string &path) {
     }
 
     spdlog::trace("Initializing tiles with loaded state");
+    ztgk::game::pranium_needed_to_win = 0;
     grid->InitializeTileEntities();
     grid->SetUpWalls();
     grid->UpdateFogData(grid->centerTile);

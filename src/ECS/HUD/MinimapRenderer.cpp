@@ -15,7 +15,7 @@ MinimapRenderer::MinimapRenderer(HUD *hud) : hud(hud), shader("res/shaders/hud_m
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 100 * 100, NULL, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
@@ -64,7 +64,7 @@ void MinimapRenderer::render(Minimap *minimap) {
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 100 * 100, vertices, GL_STATIC_DRAW);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
