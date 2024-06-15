@@ -9,8 +9,10 @@
 #include "imgui.h"
 #include <ImGuizmo.h>
 #include "glad/glad.h"
+
 #include <vector>
 #include <memory>
+#include <algorithm>
 #include "glm/vec4.hpp"
 #include "Components/ILight.h"
 #include "Components/DirLight.h"
@@ -19,7 +21,6 @@
 #include "../System.h"
 #include "../Component.h"
 #include "ECS/Scene.h"
-#include <algorithm>
 
 
 class LightSystem : public System {
