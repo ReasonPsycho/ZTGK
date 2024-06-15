@@ -199,6 +199,10 @@ void WashingMachine::clearNextTile_walls() {
         }
     }
 
+    auto mineable = grid->getTileAt(tile->index)->getEntity()->getComponent<IMineable>();
+    if(mineable != nullptr){
+        mineable->isMined = true;
+    }
     tile->isInFogOfWar = false;
     grid->UpdateFogData(tile);
     tile->changeDirtinessLevel(0);

@@ -9,6 +9,7 @@
 #include "MiningState.h"
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
+#include "ECS/Unit/UnitSystem.h"
 
 
 State *MovementState::RunCurrentState() {
@@ -67,8 +68,6 @@ State *MovementState::RunCurrentState() {
             return miningState;
         else if (unit->canPathToMiningTarget()) {
             auto closestMineable = unit->findClosestMineable();
-            spdlog::debug("Closest mineable: {}, {}", closestMineable->gridPosition.x, closestMineable->gridPosition.z);
-            spdlog::debug("My position: {}, {}", unit->gridPosition.x, unit->gridPosition.z);
             if (closestMineable != nullptr) {
                 unit->hasMovementTarget = true;
                 unit->movementTarget = closestMineable->gridPosition;
@@ -101,6 +100,12 @@ State *MovementState::RunCurrentState() {
             unit->movementTarget = unit->combatTarget->gridPosition;
             return this;
         }
+        else{
+            spdlog::info("Target not in range, cannot path to attack target");
+            delete combatState;
+            unit->hasCombatTarget = false;
+            unit->combatTarget = nullptr;
+        }
     }
 
 
@@ -108,16 +113,34 @@ State *MovementState::RunCurrentState() {
 }
 
 void MovementState::MoveOnPath() {
+    //if any tile in path is not vacant, recalculate path
+//    for (auto tile : unit->pathfinding.path) {
+//        if (!unit->grid->getTileAt(tile.x, tile.z)->vacant()) {
+//            spdlog::error("Non vacant tile in path, recalculating path");
+//            unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget, ztgk::game::scene->systemManager.getSystem<UnitSystem>()->getAllUnitsPositionsExceptMe(unit));
+//            break;
+//        }
+//    }
+
+    //if path is not empty and next tile is not vacant, recalculate path
+    if (unit->pathfinding.path.size() > 0 && (!unit->grid->getTileAt(unit->pathfinding.path[0].x, unit->pathfinding.path[0].z)->vacant() && unit->pathfinding.path[0] != unit->gridPosition)) {
+        spdlog::error("Non vacant tile in path, recalculating path");
+        unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget, ztgk::game::scene->systemManager.getSystem<UnitSystem>()->getAllUnitsPositionsExceptMe(unit));
+    }
+
+
     if (unit->pathfinding.path.size() == 0 && !unit->hasMovementTarget) {
         return;
     }
     if(unit->pathfinding.path.size() == 0 && unit->hasMovementTarget){
-        unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget);
+        unit->pathfinding.FindPath(unit->gridPosition, unit->movementTarget, ztgk::game::scene->systemManager.getSystem<UnitSystem>()->getAllUnitsPositionsExceptMe(unit));
     }
     if(unit->pathfinding.path.size() > 1 &&  unit->pathfinding.path[0] == unit->gridPosition){
         unit->pathfinding.path.erase(unit->pathfinding.path.begin());
     }
     if (!unit->pathfinding.path.empty()) {
+
+
 
         Vector2Int nextTile = unit->pathfinding.path[0];
 

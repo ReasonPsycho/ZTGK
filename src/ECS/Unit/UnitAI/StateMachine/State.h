@@ -17,7 +17,7 @@ public:
     virtual ~State() = default;
 
      string name;
-     Unit* unit;
+     Unit* unit = nullptr;
      Grid* grid;
      virtual State* RunCurrentState() = 0;
      virtual bool isTargetInRange() = 0;

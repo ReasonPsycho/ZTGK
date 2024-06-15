@@ -197,6 +197,12 @@ void Grid::GenerateTileEntities(float scale) {
 
                 }
             }
+            Entity* localLight = scene->addEntity(chunkEntity,"LocalLight");
+            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,0.05f)));
+            localLight->transform.setLocalPosition(glm::vec3(0, 7,0));
+            chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
+            localLight->forceUpdateSelfAndChild();
+            localLight->getComponent<PointLight>()->setIsDirty(true);
         }
     }
     gridEntity->forceUpdateSelfAndChild();
@@ -534,7 +540,7 @@ void Grid::SetUpChunks() {
         }
     }
 }
-std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos) {
+std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos, bool includeDiagonals) {
     std::vector<Tile *> neighbours;
     if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z))) {
         neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z));
@@ -548,20 +554,20 @@ std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos) {
     if (isInBounds(Vector2Int(gridpos.x, gridpos.z - 1))) {
         neighbours.push_back(getTileAt(gridpos.x, gridpos.z - 1));
     }
-    //diagonals
-    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z + 1))) {
-        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z + 1));
+    if(includeDiagonals) {
+        if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z + 1))) {
+            neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z + 1));
+        }
+        if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z - 1))) {
+            neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z - 1));
+        }
+        if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z - 1))) {
+            neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z - 1));
+        }
+        if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z + 1))) {
+            neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z + 1));
+        }
     }
-    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z - 1))) {
-        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z - 1));
-    }
-    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z - 1))) {
-        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z - 1));
-    }
-    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z + 1))) {
-        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z + 1));
-    }
-
     return neighbours;
 }
 

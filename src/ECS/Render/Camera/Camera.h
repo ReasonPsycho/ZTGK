@@ -12,6 +12,7 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "ECS/Render/ModelLoading/Shader.h"
+#include "GLFW/glfw3.h"
 
 enum Camera_Movement {
     FORWARD,
@@ -31,6 +32,12 @@ const float ZOOM = 45.0f;
 const float NEARCLIP = 0.1f;
 const float FARCLIP = 1000.0f;
 
+const float MAX_X_POS = 180;
+const float MIN_X_POS = 20;
+const float MAX_Y_POS = 30;
+const float MIN_Y_POS = 5;
+const float MAX_Z_POS = 180;
+const float MIN_Z_POS = 20;
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera {
@@ -49,9 +56,12 @@ public:
     float Pitch;
     // camera options
     float MovementSpeed;
+    int PanZoneSize = 80;
     float MouseSensitivity;
     float Zoom;
 
+    bool debugMovement = false;
+    
     //Constructors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
            float yaw = YAW, float pitch = PITCH, float nearClip = NEARCLIP, float farClip = FARCLIP);
@@ -65,7 +75,9 @@ public:
     float GetAspectRatio();
 
     //InputProcessing added update_delta time with predefintion of one (for cases where it takes to long to implement it)
-    void ProcessKeyboard(Camera_Movement direction, double deltaTime = 1);
+    void MoveCamera(GLFWwindow *window);
+    void MoveCamera(float xPos, float yPos);
+    void MoveCamera(float scroll);
 
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true, double deltaTime = 1);
 

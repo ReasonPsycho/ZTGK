@@ -29,7 +29,7 @@ public:
     ~AstarPathfinding() = default;
 
     // Most important method
-    std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target, bool debug = false);
+    std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target,  std::vector<Vector2Int> forbiddenTiles = {}, bool debug = false);
 
     std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target, int max_iterations);
 

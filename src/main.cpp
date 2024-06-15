@@ -214,7 +214,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(200.0f, 40.0f, 0.0f));
+Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
 PBRPrimitives pbrprimitives;
@@ -225,6 +225,7 @@ float lastX;
 Entity *playerUnit;
 
 std::vector<Vector2Int> selectedTiles;
+std::vector<Tile*> tilesSelectedToMine;
 
 bool captureMouse = false;
 bool captureMouseButtonPressed = false;
@@ -234,11 +235,18 @@ double mouseX;
 double mouseY;
 
 bool isLeftMouseButtonHeld = false;
+float LmouseHeldStartTime = 0.0f;
+float LmouseHeldReleaseTime = 0.0f;
+
+bool isRightMouseButtonHeld = false;
+float RmouseHeldStartTime = 0.0f;
+float RmouseHeldReleaseTime = 0.0f;
+
 glm::vec3 mouseHeldStartPos;
 glm::vec3 mouseHeldEndPos;
-float mouseHeldStartTime = 0.0f;
-float mouseHeldReleaseTime = 0.0f;
 
+float lastLeftClickTime = 0.0f;
+float lastRightClickTime = 0.0f;
 
 // timing
 double deltaTime = Time::Instance().DeltaTime();
@@ -608,6 +616,7 @@ void load_enteties() {
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(wall));;
 
+    /*
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
@@ -628,9 +637,9 @@ void load_enteties() {
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
+*/
+    
     scene.systemManager.getSystem<LightSystem>()->Init();
-
-
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
 
@@ -734,7 +743,8 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-    load_units();
+    //load_units();
+
 
 
 }
@@ -1036,12 +1046,10 @@ void load_hud() {
             static std::string spr_gabka = "res/textures/icons/pick-me.png";
             static std::string spr_mine = "res/textures/icons/pickAXE.png";
 
-            if (ztgk::game::cursor.dragMode == DRAG_UNIT) {
-                ztgk::game::cursor.dragMode = DRAG_TILE;
+            if (isLeftMouseButtonHeld) {
                 eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
             }
-            else if (ztgk::game::cursor.dragMode == DRAG_TILE) {
-                ztgk::game::cursor.dragMode = DRAG_UNIT;
+            else if (isRightMouseButtonHeld) {
                 eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
             }
         },
@@ -1221,7 +1229,8 @@ void input() {
 
 void update() {
     ZoneScopedN("Update");
-
+    scene.systemManager.getSystem<SignalQueue>()->Update();
+    
     //no need to check every frame, every 5 sec is good enough
     if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
@@ -1231,13 +1240,13 @@ void update() {
     mouseX = mouseio.MousePos.x;
     mouseY = mouseio.MousePos.y;
 
+    ztgk::game::cursor.update();
     scene.systemManager.Update();
     scene.updateScene();
 
-    scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
+    scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
-    scene.systemManager.getSystem<SignalQueue>()->Update();
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
 
@@ -1255,6 +1264,8 @@ void update() {
 //        if(u->isAlly)
 //            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
 //    }
+
+
 }
 
 void render() {
@@ -1468,22 +1479,12 @@ void imgui_end() {
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
+    
+    camera.MoveCamera(window);
+    
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboard(UPWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWNWARD, deltaTime);
-
-
+    
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
         if (!captureMouseButtonPressed) {
             captureMouse = !captureMouse;
@@ -1514,24 +1515,15 @@ void processInput(GLFWwindow *window) {
         ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
-        ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_UNIT;
-        spdlog::info("Drag mode set to DRAG_UNIT");
-
-    } else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
-        ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_TILE;
-        spdlog::info("Drag mode set to DRAG_TILE");
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
-        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
-        spdlog::debug("clearing tiles in radius");
-        isXpressed = true;
-//        radiusToRemove +=1;
-    }
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
-        isXpressed = false;
-    }
+//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+//        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+//        spdlog::debug("clearing tiles in radius");
+//        isXpressed = true;
+////        radiusToRemove +=1;
+//    }
+//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+//        isXpressed = false;
+//    }
 
 }
 
@@ -1560,6 +1552,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ztgk::game::cursor.scroll({xoffset, yoffset});
+    camera.MoveCamera(yoffset);
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
@@ -1576,7 +1569,7 @@ void update_dragged_tiles() {
                                                                  camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
-    if (isLeftMouseButtonHeld && ray != nullptr && ray->getHitEntity() != nullptr) {
+    if ((isLeftMouseButtonHeld || isRightMouseButtonHeld) && ray != nullptr && ray->getHitEntity() != nullptr) {
         Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
         mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
@@ -1587,9 +1580,9 @@ void update_dragged_tiles() {
             }
         }
         selectedTiles = tilesInArea;
-//        for(auto tile : tilesInArea){
-//            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
-//        }
+        for(auto tile : tilesInArea){
+            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
+        }
 
     }
 
@@ -1597,22 +1590,18 @@ void update_dragged_tiles() {
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
-    //calculate ray every mouse press
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
-                                                                 camera.saved_display_h);
+    //calculate ray every mouse press and release
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
+                                                                 display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
-    if (ray->getHitEntity() != nullptr) {
-        spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);
-    } else {
-        spdlog::info("Ray hit nothing");
-    }
 
-    if (isLeftMouseButtonHeld && ray->getHitEntity() != nullptr) {
-        spdlog::info("Mouse held");
+    std::vector<Vector2Int> tilesInArea;
+    if ((isLeftMouseButtonHeld || isRightMouseButtonHeld) && ray->getHitEntity() != nullptr) {
+//        spdlog::info("Mouse held");
         Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
         mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
-        std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+        tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
         for (auto tile: tilesInArea) {
             scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
         }
@@ -1620,8 +1609,16 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //if left mouse button is pressed, start timer and save position of the mouse press
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        mouseHeldStartTime = glfwGetTime();
+        LmouseHeldStartTime = glfwGetTime();
         isLeftMouseButtonHeld = true;
+        if (ray->getHitEntity() != nullptr) {
+            mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
+        }
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        RmouseHeldStartTime = glfwGetTime();
+        isRightMouseButtonHeld = true;
         if (ray->getHitEntity() != nullptr) {
             mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
         }
@@ -1629,37 +1626,34 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //if left mouse button is released, check if it was a click or a drag
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-        mouseHeldReleaseTime = glfwGetTime();
+        LmouseHeldReleaseTime = glfwGetTime();
         isLeftMouseButtonHeld = false;
 
-        //if mouse was held for less than 0.2 seconds, consider it a click
-        if (mouseHeldReleaseTime - mouseHeldStartTime < 0.2f) {
+        //if mouse was held for less than 0.1 seconds, consider it a click
+        if (LmouseHeldReleaseTime - LmouseHeldStartTime < 0.2f) {
 
+            //check for double click
+            if(glfwGetTime() - lastLeftClickTime < 0.2f){
+                spdlog::debug("Left double click detected");
+                //deselect all units
+                scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+            }
+            lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
-            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr &&
-                ray->getHitEntity()->getComponent<Unit>()->isAlly) {
-
+            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly) {
                 //if it is already selected, deselect it
                 if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
                     scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ray->getHitEntity()->getComponent<Unit>());
                 }
-
                     //if it is not selected, select it
                 else {
                     scene.systemManager.getSystem<UnitSystem>()->selectUnit(ray->getHitEntity()->getComponent<Unit>());
                 }
             }
-
-                // if ray hits anyting else than a unit, deselect all units
-            else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr) {
-                scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
-            }
         }
-
-            //if mouse was held for more than 0.2 seconds, consider it a drag
+            //if mouse was held for more than 0.1 seconds, consider it a drag
         else {
             if (ray->getHitEntity() != nullptr) {
-                dragSelectionMode dsm = ztgk::game::cursor.dragMode;
                 mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
                 Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
                 Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
@@ -1668,98 +1662,214 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
                 }
 
-                std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
+                std::vector<Tile*> tiles;
 
-                if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty() && dsm == dragSelectionMode::DRAG_TILE) {
-                    for (auto unit: scene.systemManager.getSystem<UnitSystem>()->selectedUnits) {
-                        unit->miningTargets.clear();
-                        for (auto tile: tilesInArea) {
-                            auto mineable = scene.systemManager.getSystem<Grid>()->getTileAt(tile)->getEntity()->getComponent<IMineable>();
-                            if (mineable != nullptr && !mineable->isMined) {
-                                unit->miningTargets.push_back(mineable);
-                            }
-                        }
-                    }
-
-                } else if (dsm == dragSelectionMode::DRAG_UNIT) {
-                    scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
-                    for (auto tile: tilesInArea) {
-                        Unit *unitptr = scene.systemManager.getSystem<Grid>()->getTileAt(tile)->unit;
-                        if (unitptr != nullptr) {
-                            if (unitptr->isAlly && !unitptr->isSelected) {
-                                scene.systemManager.getSystem<UnitSystem>()->selectUnit(unitptr);
-                            }
+                //get all tiles in the area
+                for (auto tile: tilesInArea) {
+                    tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
+                }
+                std::vector<Unit*> Sponges;
+                //get all units and mineables in the area
+                for (auto tile: tiles) {
+                    if (tile->unit != nullptr) {
+                        if (tile->unit->isAlly) {
+                            Sponges.push_back(tile->unit);
                         }
                     }
                 }
-            } else {
-                isLeftMouseButtonHeld = false;
-                return;
+
+                //select all Sponges in the area
+                if (!Sponges.empty()) {
+                    for (auto sponge: Sponges) {
+                        scene.systemManager.getSystem<UnitSystem>()->selectUnit(sponge);
+                    }
+                }
+
             }
         }
 
-        scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
 
-
-    //if there are selected units and right mouse button is pressed, set target for selected units
-    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        RmouseHeldReleaseTime = glfwGetTime();
+        isRightMouseButtonHeld = false;
 
         Entity *hit = ray->getHitEntity();
 
-        //if something was hit
-        if (hit != nullptr) {
-            for (auto unit: scene.systemManager.getSystem<UnitSystem>()->selectedUnits) {
-                IMineable *mineable = hit->getMineableComponent<IMineable>(hit);
 
-                //if hit entity is mineable, set it as mining target
-                if (mineable != nullptr && !mineable->isMined) {
-                    unit->miningTargets.clear();
-                    unit->miningTargets.emplace_back(hit->getMineableComponent<IMineable>(hit));
-                    Tile *hitTile = hit->getComponent<Tile>();
-                    hitTile->setTileSelectionState(SELECTED);
-                    unit->hasMiningTarget = true;
-//                    unit->ForcedMiningState = true;
-//                    unit->forcedMiningTarget = mineable;
-                    spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
+
+        //if mouse was held for less than 0.2 seconds, consider it a click
+        if(RmouseHeldReleaseTime - RmouseHeldStartTime < 0.2f){
+            if(glfwGetTime() - lastRightClickTime < 0.2f){
+                spdlog::debug("Right double click detected");
+            }
+            lastRightClickTime = glfwGetTime();
+
+
+
+            std::vector<Unit*> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
+            if(!selectedSponges.empty()){
+
+                auto pickupableItem = hit->getComponent<PickupubleItem>();
+                if(pickupableItem != nullptr){
+                    //sort sponges by distance to pickupable item ascending using pickupableItem->getEntity()->transform.getLocalPosition()
+                    std::sort(selectedSponges.begin(), selectedSponges.end(), [pickupableItem](Unit* a, Unit* b){
+                        return VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(a->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition())) < VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(b->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition()));
+                    });
+
+                    selectedSponges[0]->pickupTarget = pickupableItem;
+                    selectedSponges[0]->hasPickupTarget = true;
+
+                    return;
+
                 }
 
-                    //if hit entity is a tile, stop doing anything and set movement target
-                else if (hit->getComponent<Tile>() != nullptr) {
-                    unit->ForcedMovementState = true;
-                    unit->forcedMovementTarget = hit->getComponent<Tile>()->index;
+                auto hitMineable = hit->getMineableComponent<IMineable>(hit);
+                auto hitTile = hit->getComponent<Tile>();
+                auto hitUnit = hit->getComponent<Unit>();
+                auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
-                    unit->hasMiningTarget = false;
-                    unit->miningTargets.clear();
-                    unit->hasCombatTarget = false;
-                    unit->combatTarget = nullptr;
-                    unit->hasMovementTarget = true;
-                    unit->pathfinding.path.clear();
-                    unit->hasPickupTarget = false;
-                    unit->pickupTarget = nullptr;
-                    unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                for(auto sponge : selectedSponges){
+                    sponge->hasMovementTarget = false;
+                    sponge->miningTargets.clear();
+                    sponge->currentMiningTarget = nullptr;
+                    sponge->hasMiningTarget = false;
+                    sponge->combatTarget = nullptr;
+                    sponge->hasCombatTarget = false;
+                    sponge->pathfinding.path.clear();
+
+                    if(hitUnit!= nullptr){
+                        if(hitUnit->isAlly){} //do nothing
+                        else{
+                            sponge->hasCombatTarget = true;
+                            sponge->combatTarget = hitUnit;
+                            continue;
+                        }
+                    }
+
+                    if(hitMineable != nullptr){
+                        if(!hitMineable->isMined){
+                            sponge->miningTargets.clear();
+                            sponge->miningTargets.emplace_back(hitMineable);
+                            sponge->hasMiningTarget = true;
+                            hitTile->setTileSelectionState(SELECTED);
+                            tilesSelectedToMine.push_back(hitTile);
+                            continue;
+                        }
+                    }
+
+                    if(hitTile != nullptr) {
+                        sponge->ForcedMovementState = true;
+                        sponge->forcedMovementTarget = hitTile->index;
+
+                        sponge->hasMiningTarget = false;
+                        sponge->miningTargets.clear();
+                        sponge->hasCombatTarget = false;
+                        sponge->combatTarget = nullptr;
+
+                        sponge->hasMovementTarget = true;
+                        sponge->pathfinding.path.clear();
+                        sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                                VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+
+                    }
+
+                    if(hitWashingMachine != nullptr){
+                        sponge->ForcedMovementState = true;
+                        sponge->forcedMovementTarget = hitTile->index;
+
+                        sponge->hasMiningTarget = false;
+                        sponge->miningTargets.clear();
+                        sponge->hasCombatTarget = false;
+                        sponge->combatTarget = nullptr;
+
+                        sponge->hasMovementTarget = true;
+                        sponge->pathfinding.path.clear();
+                        sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                                VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    }
                 }
 
-                    //if hit an item model, set it as the pickup & movement target
-                else if (hit->getComponent<PickupubleItem>() != nullptr) {
-                    unit->ForcedMovementState = true;
 
-                    unit->hasMiningTarget = false;
-                    unit->miningTargets.clear();
-                    unit->hasCombatTarget = false;
-                    unit->combatTarget = nullptr;
-                    unit->hasMovementTarget = true;
-                    unit->pathfinding.path.clear();
-                    unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
-                    unit->hasPickupTarget = true;
-                    unit->pickupTarget = hit->getComponent<PickupubleItem>();
+            }
+        }
+        //if mouse was held for more, consider it a drag
+        else{
+            if (ray->getHitEntity() != nullptr) {
+                mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
+                Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                        VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+                Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                        VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+
+                for (auto tile: selectedTiles) {
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
+                }
+
+                tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                selectedTiles = tilesInArea;
+                update_dragged_tiles();
+                std::vector<Tile *> tiles;
+
+                std::vector<IMineable*> Mineables = {};
+                std::vector<Unit*> Enemies = {};
+
+                for(auto tile : tilesInArea){
+                    tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
+                }
+
+                for(auto tile: tiles){
+                    auto possibleMineable = tile->getEntity()->getMineableComponent<IMineable>(tile->getEntity());
+                    if(possibleMineable != nullptr) {
+                        Mineables.push_back(possibleMineable);
+                    }
+
+                    if(tile->unit != nullptr){
+                        if(!tile->unit->isAlly){
+                            Enemies.push_back(tile->unit);
+                        }
+                    }
+                }
+                if(!Enemies.empty()){
+                    if(!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
+                        for(auto Sponge : scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                            //sort enemies by distance to sponge ascending
+                            std::sort(Enemies.begin(), Enemies.end(), [Sponge](Unit* a, Unit* b){
+                                return VectorUtils::Distance(Sponge->gridPosition, a->gridPosition) < VectorUtils::Distance(Sponge->gridPosition, b->gridPosition);
+                            });
+
+                            for(auto enemy : Enemies){
+                                if(Sponge->canPathToAttackTarget(enemy)){
+                                    Sponge->hasCombatTarget = true;
+                                    Sponge->combatTarget = enemy;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                else if(!Mineables.empty()){
+                    if(!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
+                        for(auto Sponge : scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                            Sponge->miningTargets.clear();
+                            for(auto mineable : Mineables){
+                                if(!mineable->isMined){
+                                    Sponge->miningTargets.emplace_back(mineable);
+                                    Sponge->hasMiningTarget = true;
+                                    tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
+                                    mineable->getEntity()->getComponent<Tile>()->setTileSelectionState(SELECTED);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
-
+    scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
         auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];

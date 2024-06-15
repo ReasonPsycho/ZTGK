@@ -73,8 +73,7 @@ public:
     
     void Innit(int width, int height, int index) override;
 
-    void SetUpShadowBuffer(Shader *shadowMapShader, Shader *instanceShadowMapShader, int width, int height,
-                           GLuint ShadowMapArrayId, int index, int layer) override; // Pure virtual function
+    void SetUpShadowBuffer(Shader *shadowMapShader, GLuint ShadowMapArrayId, int index, int layer) override; // Pure virtual function
     void UpdateData(int height, int width) override;
 
 };

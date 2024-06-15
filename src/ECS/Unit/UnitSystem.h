@@ -33,6 +33,8 @@ public:
     std::vector<Unit* > selectedUnits;
 
     std::vector<Unit *> unitComponents;
+
+    std::vector<Vector2Int> getAllUnitsPositionsExceptMe(Unit* unit);
 private:
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(Unit))
