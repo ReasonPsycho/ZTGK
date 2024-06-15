@@ -110,6 +110,8 @@ void HUD::init() {
     *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += signalReceiver.get();
 }
 
+
+
 void HUD::draw() {
     // no reverse
     //  same layer -> draw older elements first (in bg)
@@ -210,6 +212,10 @@ void HUD::addComponent(void *component) {
         case hudcType::SLIDER: {
             HUDSlider *slider = reinterpret_cast<HUDSlider *>(component);
             sliders[slider->groupID].push_back(slider);
+            break;
+        }
+        case hudcType::MINIMAP: {
+            minimap = reinterpret_cast<Minimap *>(component);
             break;
         }
     }
@@ -767,6 +773,11 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
     entity->getComponent<HUDSlider>()->displayFormat = displayFormat;
 
     return entity;
+}
+
+void HUD::UpdateImpl() {
+//    if (minimap)
+//        minimap->Update();
 }
 
 #pragma endregion

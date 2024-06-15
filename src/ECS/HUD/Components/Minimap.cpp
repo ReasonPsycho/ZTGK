@@ -21,6 +21,8 @@ Minimap::Minimap(const glm::vec2 &pos, const glm::vec2 &size, unsigned int hudGr
 
 void Minimap::UpdateImpl() {
     auto get_color = [](Tile * tile) -> glm::vec4 {
+        if (tile->isInFogOfWar)
+            return ztgk::color.WHITE;
         switch (tile->state) {
             default:
             case FLOOR:

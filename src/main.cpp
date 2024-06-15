@@ -899,7 +899,7 @@ void load_hud() {
 // game
     auto egame = scene.addEntity(ehud, "Game");
     auto emap = scene.addEntity(egame, "Map");
-    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
+//    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
     emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
@@ -1232,6 +1232,7 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
+    scene.systemManager.getSystem<HUD>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
