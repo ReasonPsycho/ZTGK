@@ -616,6 +616,7 @@ void load_enteties() {
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(wall));;
 
+    /*
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
@@ -636,9 +637,9 @@ void load_enteties() {
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
+*/
+    
     scene.systemManager.getSystem<LightSystem>()->Init();
-
-
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
 
@@ -1226,8 +1227,8 @@ void update() {
     scene.systemManager.Update();
     scene.updateScene();
 
-    scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
+    scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
@@ -1533,6 +1534,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ztgk::game::cursor.scroll({xoffset, yoffset});
+    camera.MoveCamera(yoffset);
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {

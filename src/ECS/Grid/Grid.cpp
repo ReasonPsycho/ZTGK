@@ -197,6 +197,12 @@ void Grid::GenerateTileEntities(float scale) {
 
                 }
             }
+            Entity* localLight = scene->addEntity(chunkEntity,"LocalLight");
+            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,0.05f)));
+            localLight->transform.setLocalPosition(glm::vec3(0, 7,0));
+            chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
+            localLight->forceUpdateSelfAndChild();
+            localLight->getComponent<PointLight>()->setIsDirty(true);
         }
     }
     gridEntity->forceUpdateSelfAndChild();

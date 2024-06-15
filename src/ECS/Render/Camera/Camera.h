@@ -34,6 +34,8 @@ const float FARCLIP = 1000.0f;
 
 const float MAX_X_POS = 180;
 const float MIN_X_POS = 20;
+const float MAX_Y_POS = 30;
+const float MIN_Y_POS = 5;
 const float MAX_Z_POS = 180;
 const float MIN_Z_POS = 20;
 
@@ -75,6 +77,7 @@ public:
     //InputProcessing added update_delta time with predefintion of one (for cases where it takes to long to implement it)
     void MoveCamera(GLFWwindow *window);
     void MoveCamera(float xPos, float yPos);
+    void MoveCamera(float scroll);
 
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true, double deltaTime = 1);
 

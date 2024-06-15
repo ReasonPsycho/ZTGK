@@ -64,15 +64,18 @@ void Camera::MoveCamera(GLFWwindow *window) {
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
             Position -= right * velocity;
 
-
         if (Position.x > MAX_X_POS)
-            Position.x = MAX_X_POS;
+            Position = glm::vec3(MAX_X_POS,Position.y,Position.z) ;
         if (Position.z > MAX_Z_POS)
-            Position.z = MAX_Z_POS;
+            Position = glm::vec3(Position.x,Position.y,MAX_Z_POS);
+        if (Position.y > MAX_Y_POS)
+            Position = glm::vec3(Position.x,MAX_Y_POS,Position.z) ;
+        if (Position.y < MIN_Y_POS)
+            Position = glm::vec3(Position.x,MIN_Y_POS,Position.z) ;
         if (Position.x < MIN_X_POS)
-            Position.x = MIN_X_POS;
+            Position = glm::vec3(MIN_X_POS,Position.y,Position.z) ;
         if (Position.z < MIN_Z_POS)
-            Position.z = MIN_Z_POS;
+            Position = glm::vec3(Position.x,Position.y,MIN_Z_POS);
     }
 }
 
@@ -96,13 +99,17 @@ void Camera::MoveCamera(float xPos, float yPos) {
             Position += front * velocity;
 
         if (Position.x > MAX_X_POS)
-            Position.x = MAX_X_POS;
+            Position = glm::vec3(MAX_X_POS,Position.y,Position.z) ;
         if (Position.z > MAX_Z_POS)
-            Position.z = MAX_Z_POS;
+            Position = glm::vec3(Position.x,Position.y,MAX_Z_POS);
+        if (Position.y > MAX_Y_POS)
+            Position = glm::vec3(Position.x,MAX_Y_POS,Position.z) ;
+        if (Position.y < MIN_Y_POS)
+            Position = glm::vec3(Position.x,MIN_Y_POS,Position.z) ;
         if (Position.x < MIN_X_POS)
-            Position.x = MIN_X_POS;
+            Position = glm::vec3(MIN_X_POS,Position.y,Position.z) ;
         if (Position.z < MIN_Z_POS)
-            Position.z = MIN_Z_POS;
+            Position = glm::vec3(Position.x,Position.y,MIN_Z_POS);
         
     }
 }
@@ -209,6 +216,42 @@ glm::vec3 Camera::getDirFromCameraToCursor(float mouseX, float mouseY, int scree
 
 float Camera::GetAspectRatio() {
     return (float ) saved_display_w/(float )saved_display_h;
+}
+
+void Camera::MoveCamera(float scroll) {
+    if(!debugMovement){
+        float velocity = MovementSpeed * scroll *(float) Time::Instance().DeltaTime();
+
+        glm::vec3 front;
+        front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+        front.y = sin(glm::radians(Pitch));
+        front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+        front = glm::normalize(front);
+        glm::vec3 right = glm::normalize(glm::cross(front, Up));
+        
+        auto tmpPosition =    Position + front * velocity;
+
+        if (tmpPosition.y > MAX_Y_POS)
+            return;
+        if (tmpPosition.y < MIN_Y_POS)
+            return;
+
+        Position = tmpPosition;
+
+        if (Position.x > MAX_X_POS)
+            Position = glm::vec3(MAX_X_POS,Position.y,Position.z) ;
+        if (Position.z > MAX_Z_POS)
+            Position = glm::vec3(Position.x,Position.y,MAX_Z_POS);
+        if (Position.y > MAX_Y_POS)
+            Position = glm::vec3(Position.x,MAX_Y_POS,Position.z) ;
+        if (Position.y < MIN_Y_POS)
+            Position = glm::vec3(Position.x,MIN_Y_POS,Position.z) ;
+        if (Position.x < MIN_X_POS)
+            Position = glm::vec3(MIN_X_POS,Position.y,Position.z) ;
+        if (Position.z < MIN_Z_POS)
+            Position = glm::vec3(Position.x,Position.y,MIN_Z_POS);
+
+    }
 }
 
 
