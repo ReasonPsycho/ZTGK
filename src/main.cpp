@@ -1085,6 +1085,23 @@ void load_hud() {
     hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
 
+// TOP PANEL
+    auto etop = scene.addEntity(egame, "Top Panel");
+    glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 100};
+    ent = hud->createButton(
+        "||", top_anchor, glm::vec2{35, 35},
+        ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
+        [hud](){
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+        },
+        etop, ztgk::game::ui_data.gr_top
+    );
+    ent->getComponent<Text>()->pos.y += 4;
+
+    auto etime = scene.addEntity(etop, "Time");
+    etime->addComponent(make_unique<Text>("00:00", top_anchor + glm::vec2{0, 50}, glm::vec2(0.7), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    etime->getComponent<Text>()->mode = CENTER;
+    ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");

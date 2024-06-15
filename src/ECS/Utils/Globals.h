@@ -13,6 +13,7 @@ struct Cursor;
 class SignalQueue;
 class SignalReceiver;
 struct GLFWwindow;
+struct Text;
 
 namespace ztgk::game {
 
@@ -40,6 +41,8 @@ namespace ztgk::game {
         unsigned gr_w1_passive;
         unsigned gr_w2_offensive;
         unsigned gr_w2_passive;
+
+        Text * txt_time_display = nullptr;
     };
     extern s_ui_data ui_data;
 

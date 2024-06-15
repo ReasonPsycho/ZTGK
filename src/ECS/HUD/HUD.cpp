@@ -15,6 +15,7 @@
 #include <ranges>
 #include <algorithm>
 #include "ECS/Utils/Util.h"
+#include "ECS/Utils/Time.h"
 
 using namespace std;
 
@@ -776,6 +777,12 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
 }
 
 void HUD::UpdateImpl() {
+    if (ztgk::game::ui_data.txt_time_display) {
+        auto time = Time::Instance().LastFrame();
+        int mins = time / 60.0f;
+        int secs = (int)time % 60;
+        ztgk::game::ui_data.txt_time_display->content = std::format("{:02d}:{:02d}", mins, secs);
+    }
 //    if (minimap)
 //        minimap->Update();
 }
