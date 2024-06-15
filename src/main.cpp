@@ -1856,22 +1856,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
     if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
         auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
-        auto emods = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Mods");
-        emods->getChild("ATK")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.dmg_perc, unit->stats.added.dmg_flat);
-        emods->getChild("DEF")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.def_perc, unit->stats.added.def_flat);
-        emods->getChild("CD")->getComponent<Text>()->content = std::format("{}", unit->stats.added.atk_speed);
-        emods->getChild("RNG")->getComponent<Text>()->content = std::format("{}", unit->stats.added.rng_add);
-        emods->getChild("MNSP")->getComponent<Text>()->content = std::format("{}", unit->stats.mine_spd + unit->stats.added.mine_speed);
-        emods->getChild("MVSP")->getComponent<Text>()->content = std::format("{}", unit->stats.move_spd + unit->stats.added.move_speed);
-
-        scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;
-        scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->stats.hp);
-
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-        //hud/game/unit details/mods/mod
-
-        ztgk::update_weapon_hud(unit);
-
+        ztgk::update_unit_hud(unit);
     } else {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }

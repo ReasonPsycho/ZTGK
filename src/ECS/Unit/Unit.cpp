@@ -51,6 +51,8 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->previousGridPosition = gridPosition;
     grid->getTileAt(gridPosition)->state = SPONGE;
     grid->getTileAt(gridPosition)->unit = this;
+    // todo switch on isAlly & randomize gabka portraits
+    icon_path = "res/textures/icons/gabka_cool.png";
     UpdateStats();
 }
 
@@ -75,6 +77,7 @@ void Unit::UnequipItem(short slot) {
 
 void Unit::UpdateStats() {
     glm::ivec2 old_range = {stats.added.rng_add, stats.added.rng_rem};
+    float old_max_hp = stats.max_hp + stats.added.max_hp;
 
     stats.added = {};
     if(equipment.item1 != nullptr){
@@ -93,6 +96,7 @@ void Unit::UpdateStats() {
             equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
     }
 
+    stats.hp += (stats.max_hp + stats.added.max_hp) - old_max_hp;
     if (stats.hp > stats.max_hp + stats.added.max_hp) {
         stats.hp = stats.max_hp + stats.added.max_hp;
     }
@@ -645,7 +649,7 @@ void Unit::Pickup(PickupubleItem *item) {
     grid->getTileAt(target->gridPosition)->state = FLOOR;
     target->getEntity()->getComponent<Render>()->Remove();
     target->Remove();
-    ztgk::update_weapon_hud(this);
+    ztgk::update_unit_hud(this);
 
     Vector2Int first_pos = pathfinding.GetNearestVacantTileAround(spawn_origin, {spawn_origin});
     if (drop.first)

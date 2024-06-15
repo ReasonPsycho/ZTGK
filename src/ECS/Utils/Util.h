@@ -45,6 +45,7 @@ namespace ztgk {
     // in millis
     long long time();
 
+    void update_unit_hud(Unit * unit);
     void update_weapon_hud(Unit * unit);
 
     extern Console console;

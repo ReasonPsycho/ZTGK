@@ -40,6 +40,7 @@ public:
     Grid* grid;
 
     UnitEquipment equipment;
+    std::string icon_path;
 
     //target flags
     bool hasMovementTarget = false;

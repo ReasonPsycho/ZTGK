@@ -17,6 +17,29 @@ namespace ztgk {
 
     Console ztgk::console = Console();
 
+    void update_unit_hud(Unit *unit) {
+        auto eunit = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details");
+
+        auto ent = eunit->getChild("Portrait");
+        eunit->getComponent<Sprite>()->load(unit->icon_path);
+
+        ent = eunit->getChild("Name");
+        ent->getComponent<Text>()->content = unit->name;
+
+        auto emods = eunit->getChild("Mods");
+        emods->getChild("ATK")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.dmg_perc, unit->stats.added.dmg_flat);
+        emods->getChild("DEF")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.def_perc, unit->stats.added.def_flat);
+        emods->getChild("CD")->getComponent<Text>()->content = std::format("{}", unit->stats.added.atk_speed);
+        emods->getChild("RNG")->getComponent<Text>()->content = std::format("{}", unit->stats.added.rng_add);
+        emods->getChild("MNSP")->getComponent<Text>()->content = std::format("{}", unit->stats.mine_spd + unit->stats.added.mine_speed);
+        emods->getChild("MVSP")->getComponent<Text>()->content = std::format("{}", unit->stats.move_spd + unit->stats.added.move_speed);
+
+        eunit->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;
+        eunit->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->stats.hp);
+
+        update_weapon_hud(unit);
+    }
+
     void update_weapon_hud(Unit *unit) {
         if (unit->equipment.item1) {
             auto eitem1 = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
