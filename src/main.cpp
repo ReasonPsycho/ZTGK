@@ -1064,7 +1064,7 @@ void load_hud() {
             auto item = (*unit)->equipment[1];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition));
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
@@ -1079,7 +1079,7 @@ void load_hud() {
             auto item = (*unit)->equipment[2];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition));
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions

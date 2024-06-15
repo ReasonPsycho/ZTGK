@@ -236,7 +236,7 @@ Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int 
 
 }
 
-Vector2Int AstarPathfinding::GetNearestVacantTileAround(Vector2Int origin) {
+Vector2Int AstarPathfinding::GetNearestVacantTileAround(Vector2Int origin, std::vector<Vector2Int> forbiddenTiles) {
     ZoneScopedN("GetNearestVacantTileAround");
     Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
     std::vector<Vector2Int> list;
@@ -247,7 +247,7 @@ Vector2Int AstarPathfinding::GetNearestVacantTileAround(Vector2Int origin) {
     while(list.size() > 0){
         Vector2Int current = list[0];
         list.erase(list.begin());
-        if(grid->getTileAt(current)->vacant()){
+        if(grid->getTileAt(current)->vacant() && std::find(forbiddenTiles.begin(), forbiddenTiles.end(), current) == forbiddenTiles.end()){
             return current;
         }
 

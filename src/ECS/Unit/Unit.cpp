@@ -633,13 +633,9 @@ Unit *Unit::GetClosestEnemyInSight() {
 
 void Unit::Pickup(PickupubleItem *item) {
     std::pair<Item *, Item *> drop = InventoryManager::instance->assign_item(pickupTarget->item, this, -1);
-    if (drop.first)
-        InventoryManager::instance->spawn_item_on_map(drop.first, pathfinding.GetNearestVacantTileAround(pickupTarget->gridPosition));
-    if (drop.second)
-        InventoryManager::instance->spawn_item_on_map(drop.second,
-                                                      pathfinding.GetNearestVacantTileAround(pickupTarget->gridPosition));
 
     auto target = pickupTarget;
+    auto spawn_origin = target->gridPosition;
     for (auto unit : ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](Unit *unit) { return unit->IsAlly(); })) {
         if (unit->hasPickupTarget && unit->pickupTarget == target) {
             unit->hasPickupTarget = false;
@@ -650,5 +646,11 @@ void Unit::Pickup(PickupubleItem *item) {
     target->getEntity()->getComponent<Render>()->Remove();
     target->Remove();
     ztgk::update_weapon_hud(this);
+
+    Vector2Int first_pos = pathfinding.GetNearestVacantTileAround(spawn_origin, {spawn_origin});
+    if (drop.first)
+        InventoryManager::instance->spawn_item_on_map(drop.first, first_pos);
+    if (drop.second)
+        InventoryManager::instance->spawn_item_on_map(drop.second, pathfinding.GetNearestVacantTileAround(spawn_origin,  drop.first ? std::vector{spawn_origin, first_pos} : std::vector{spawn_origin}));
 }
 

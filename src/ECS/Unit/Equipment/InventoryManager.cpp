@@ -79,7 +79,7 @@ std::pair<Item *, bool> InventoryManager::get_item(unsigned int item_uid) {
 std::pair<Item *, Item *> InventoryManager::assign_item(Item *item, Unit *unit, short slot) {
     if (!mv_to_asgn(item)) {
         spdlog::error("Item not found or not freed before! Cannot assign!");
-        return {};
+        return {nullptr, nullptr};
     }
 
     auto un_eq = unit->equipment.equipItem(item, slot);
