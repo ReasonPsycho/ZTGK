@@ -21,11 +21,9 @@ void Pranium::onMine(Unit *unit) {
 
 void Pranium::onMined(Unit *unit) {
     auto item = InventoryManager::instance->create_item(Item::item_types.pranium_ore);
-    InventoryManager::instance->spawn_item_on_map(item, VectorUtils::Vector2IntToGlmVec2(gridPosition));
+    InventoryManager::instance->spawn_item_on_map(item, gridPosition);
 
-    auto tile = getEntity()->getComponent<Tile>();
-    tile->state = TileState::FLOOR;
-    tile->getEntity()->removeComponentFromMap(tile->getEntity()->getComponent<Render>());
+    parentEntity->getComponent<Render>()->Remove();
 //    tile->getEntity()->removeComponentFromMap(this);
 
 }

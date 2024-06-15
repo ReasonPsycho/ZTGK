@@ -19,6 +19,7 @@
 #include "ECS/HUD/HUD.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/MiningState.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/CombatState.h"
+#include "ECS/Unit/Equipment/InventoryManager.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 150,
@@ -50,6 +51,8 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->previousGridPosition = gridPosition;
     grid->getTileAt(gridPosition)->state = SPONGE;
     grid->getTileAt(gridPosition)->unit = this;
+    // todo switch on isAlly & randomize gabka portraits
+    icon_path = "res/textures/icons/gabka_cool.png";
     UpdateStats();
 }
 
@@ -74,6 +77,7 @@ void Unit::UnequipItem(short slot) {
 
 void Unit::UpdateStats() {
     glm::ivec2 old_range = {stats.added.rng_add, stats.added.rng_rem};
+    float old_max_hp = stats.max_hp + stats.added.max_hp;
 
     stats.added = {};
     if(equipment.item1 != nullptr){
@@ -92,6 +96,7 @@ void Unit::UpdateStats() {
             equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
     }
 
+    stats.hp += (stats.max_hp + stats.added.max_hp) - old_max_hp;
     if (stats.hp > stats.max_hp + stats.added.max_hp) {
         stats.hp = stats.max_hp + stats.added.max_hp;
     }
@@ -122,6 +127,8 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Text("Combat Target: %s (%d, %d)", combatTarget != nullptr ? combatTarget->name.c_str() : "This sponge is pacifist", combatTarget != nullptr ? combatTarget->gridPosition.x : 0, combatTarget != nullptr ? combatTarget->gridPosition.z : 0);
     ImGui::Text("Has mining target? %s", hasMiningTarget ? "true" : "false");
     ImGui::Text("Mining Target: %s (%d, %d)", currentMiningTarget != nullptr ? currentMiningTarget->name.c_str() : "No mining target", currentMiningTarget != nullptr ? currentMiningTarget->gridPosition.x : 0, currentMiningTarget != nullptr ? currentMiningTarget->gridPosition.z : 0);
+    ImGui::Text("Has pickup target? %s", hasPickupTarget ? "true" : "false");
+    ImGui::Text("Pickup Target: %s (%f, %f, %f)", pickupTarget != nullptr ? pickupTarget->name.c_str() : "No pickup target", pickupTarget != nullptr ? pickupTarget->getEntity()->transform.getGlobalPosition().x : 0, pickupTarget != nullptr ? pickupTarget->getEntity()->transform.getGlobalPosition().y : 0, pickupTarget != nullptr ? pickupTarget->getEntity()->transform.getGlobalPosition().z : 0);
     ImGui::Separator();
     ImGui::Text("Forced movement state? %s", ForcedMovementState ? "true" : "false");
     ImGui::Text("Forced movement target: (%d, %d)", forcedMovementTarget.x, forcedMovementTarget.z);
@@ -626,5 +633,28 @@ Unit *Unit::GetClosestEnemyInSight() {
         return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) < VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
     });
     return enemies.at(0);
+}
+
+void Unit::Pickup(PickupubleItem *item) {
+    std::pair<Item *, Item *> drop = InventoryManager::instance->assign_item(pickupTarget->item, this, -1);
+
+    auto target = pickupTarget;
+    auto spawn_origin = target->gridPosition;
+    for (auto unit : ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](Unit *unit) { return unit->IsAlly(); })) {
+        if (unit->hasPickupTarget && unit->pickupTarget == target) {
+            unit->hasPickupTarget = false;
+            unit->pickupTarget = nullptr;
+        }
+    }
+    grid->getTileAt(target->gridPosition)->state = FLOOR;
+    target->getEntity()->getComponent<Render>()->Remove();
+    target->Remove();
+    ztgk::update_unit_hud(this);
+
+    Vector2Int first_pos = pathfinding.GetNearestVacantTileAround(spawn_origin, {spawn_origin});
+    if (drop.first)
+        InventoryManager::instance->spawn_item_on_map(drop.first, first_pos);
+    if (drop.second)
+        InventoryManager::instance->spawn_item_on_map(drop.second, pathfinding.GetNearestVacantTileAround(spawn_origin,  drop.first ? std::vector{spawn_origin, first_pos} : std::vector{spawn_origin}));
 }
 

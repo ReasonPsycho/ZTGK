@@ -17,21 +17,11 @@ State *MovementState::RunCurrentState() {
     MoveOnPath();
 
     // todo calculate from centers
-    if (unit->hasPickupTarget && unit->pickupTarget != nullptr && !unit->pickupTarget->isPickedUp && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1.5) {
-        std::pair<Item *, Item *> drop = {unit->equipment[1], unit->equipment[2]};
-        InventoryManager::instance->assign_item(unit->pickupTarget->item, unit, -1);
-        if (drop.first)
-            InventoryManager::instance->spawn_item_on_map(drop.first, {unit->worldPosition.x, unit->worldPosition.z});
-        if (drop.second)
-            InventoryManager::instance->spawn_item_on_map(drop.second,
-                                                          {unit->worldPosition.x + 0.2, unit->worldPosition.z + 0.2});
-
-        unit->pickupTarget->isPickedUp = true;
-        unit->pickupTarget->getEntity()->Destroy();
-        unit->pickupTarget = nullptr;
-        unit->hasPickupTarget = false;
+    if (unit->hasPickupTarget && unit->pickupTarget != nullptr && glm::distance(unit->worldPosition, unit->pickupTarget->getEntity()->transform.getGlobalPosition()) <= 1.5) {
+        unit->Pickup(unit->pickupTarget);
     }
-    if(unit->hasPickupTarget && (unit->pickupTarget == nullptr || unit->pickupTarget->isPickedUp)){
+    // todo idk if this is necessary
+    if(unit->hasPickupTarget && unit->pickupTarget == nullptr){
         unit->hasPickupTarget = false;
     }
 
