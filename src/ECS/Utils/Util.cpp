@@ -21,7 +21,7 @@ namespace ztgk {
         auto eunit = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details");
 
         auto ent = eunit->getChild("Portrait");
-        eunit->getComponent<Sprite>()->load(unit->icon_path);
+        ent->getComponent<Sprite>()->load(unit->icon_path);
 
         ent = eunit->getChild("Name");
         ent->getComponent<Text>()->content = unit->name;
