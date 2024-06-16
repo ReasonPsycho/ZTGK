@@ -22,8 +22,8 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 
 const UnitStats Unit::ALLY_BASE = {
-        .max_hp = 150,
-        .hp = 150,
+        .max_hp = 5,
+        .hp = 5,
         .move_spd = 12,
         .mine_spd = 1,
         .added = {}

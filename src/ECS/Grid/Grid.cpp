@@ -18,6 +18,8 @@
 #include "ECS/Unit/Unit.h"
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
+#include "ECS/Render/ModelLoading/ModelLoadingManager.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -658,6 +660,16 @@ void Grid::UpdateFogData(Tile *tile) {
 
 
 Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
+    auto modelLoadingManager = ModelLoadingManager();
+    modelLoadingManager.Innit();
+    auto gabka = ztgk::game::playerModel;
+
+    string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
+    string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
+    string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
+    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+
+
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
     UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : ztgk::game::bugModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -667,9 +679,21 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));
     UnitEntity->getComponent<BoxCollider>()->setCenter(UnitEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
     UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : "Enemy", this, gridPos, isAlly ? Unit::ALLY_BASE : Unit::ENEMY_BASE, isAlly));
+
     auto stateManager = new StateManager(UnitEntity->getComponent<Unit>());
     stateManager->currentState = new IdleState(this);
     stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
+    if(isAlly) {
+        UnitEntity->addComponent(make_unique<AnimationPlayer>());
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(
+                modelPathGabkaMove, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager.GetAnimation(
+                modelPathGabkaIdle, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(
+                modelPathGabkaMine, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(
+                modelPathGabkaAttack, gabka);
+    }
     return UnitEntity;
 }

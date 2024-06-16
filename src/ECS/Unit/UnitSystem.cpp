@@ -14,6 +14,7 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
 #include "ECS/Unit/Mining/MineableChest.h"
+#include "ECS/HUD/HUD.h"
 
 UnitSystem::UnitSystem() {
     name = "UnitSystem";
@@ -62,6 +63,7 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void UnitSystem::UpdateImpl() {
+    std::vector<Unit*> Spongies;
     for (Unit* unit: unitComponents) {
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
         unit->UpdateImpl();
@@ -70,6 +72,17 @@ void UnitSystem::UpdateImpl() {
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
 
         //those find statements are needed because unit can be deleted in the UpdateImpl() function, which does not update unitComponents vector
+        if(unit->isAlly && unit->isAlive){
+            Spongies.push_back(unit);
+        }
+
+    }
+    if(Spongies.empty() && ztgk::game::gameStarted && !ztgk::game::gameLost){
+        auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(false);
+        ztgk::game::gameLost = true;
+
     }
 
     fixOverlappingUnits();

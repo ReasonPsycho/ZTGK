@@ -152,6 +152,14 @@ void CombatState::AttackTarget() {
 
         if(!target->isAlly)
             target->DIEXD();
+        else{
+            target->hasCombatTarget = false;
+            target->combatTarget = nullptr;
+            target->currentMiningTarget = nullptr;
+            target->hasMiningTarget = false;
+            target->miningTargets.clear();
+            target->hasMovementTarget = false;
+        }
     }
 }
 

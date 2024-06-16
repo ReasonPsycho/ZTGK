@@ -8,6 +8,7 @@
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Entity.h"
+#include "ECS/HUD/HUD.h"
 
 WashingMachine::WashingMachine(int praniumNeeded, int radiusToClearEveryMilestone) {
     name = "WashingMachine";
@@ -115,10 +116,14 @@ void WashingMachine::onPraniumDelivered() {
     currentPranium++;
     spdlog::debug("\n Pranium delivered, current: {}/{} \n", currentPranium, praniumNeeded);
 
-//    if(currentPranium >= praniumNeeded){
-//        //todo finisz gejm
-//        ztgk::game::audioManager->playSound("win");
-//    }
+    if(currentPranium >= praniumNeeded){
+        auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(false);
+
+        ztgk::game::audioManager->playSound("win");
+        ztgk::game::gameWon = true;
+    }
 
 
     auto newTilesToClear_walls = getTilesToClearInRaiuds(Vector2Int(50, 50), radiusToClear);

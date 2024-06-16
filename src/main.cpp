@@ -860,6 +860,7 @@ void load_hud() {
     ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
     ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
 
+
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
 
     ztgk::game::ui_data.gr_settings = hud->addGroup(0, "Settings");
@@ -868,6 +869,10 @@ void load_hud() {
 
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
+
+    ztgk::game::ui_data.gr_game_won = hud->addGroup(0, "Game Won");
+    ztgk::game::ui_data.gr_game_lost = hud->addGroup(0, "Game Lost");
+
 
 // menu
     auto emenu = scene.addEntity(ehud, "Menu");
@@ -1199,6 +1204,24 @@ void load_hud() {
         ecredits, ztgk::game::ui_data.gr_credits
     );
 
+    // Game Won -> 4 pranium delivered to Washing Machine
+    auto egamewon = scene.addEntity(ehud, "Menu");
+    egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
+    egamewon->addComponent(make_unique<Text>("CONGRATULATIONS!!! YOU HAVE DEFEATED THE DIRT!!!", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamewon, ztgk::game::ui_data.gr_game_won
+    );
+
+    // Game Lost -> All Gompkas are dead
+    auto egamelost = scene.addEntity(ehud, "Menu");
+    egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
+    egamelost->addComponent(make_unique<Text>("YOU HAVE BEEN DEFEATED BY THE DIRT!!!", top_anchor, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamelost, ztgk::game::ui_data.gr_game_lost
+    );
+
     // groups
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
@@ -1212,6 +1235,8 @@ void load_hud() {
 
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
 //    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true);
 }
 
 void init_imgui() {
@@ -2038,6 +2063,7 @@ void gen_and_load_lvl(bool gen_new_lvl) {
 
 
     LevelSaving::load();
+
 }
 
 #pragma endregion Functions
