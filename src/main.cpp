@@ -2010,6 +2010,11 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .maxEnemies = 4,  //4        <---
             .unitCount = 3,   //3        <---
             .chestCount = RNG::RandomInt(10, 15),
+            .lootTable = {
+                {1, 1.f, 0.f},
+                {3, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
     };
 
     static char seedString[64] = "";

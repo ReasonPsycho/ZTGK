@@ -249,7 +249,7 @@ void Grid::InitializeTileEntities() {
                     break;
                 case CHEST:
                     // todo item type id
-                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
+                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, tile->stateData.chestItemTypeId));
                     tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));

@@ -25,6 +25,7 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
             return TOKEN_WALL;
         case CHEST:
             // todo item type id
+            return TOKEN_TREASURE_CHEST_0 + data.chestItemTypeId;
             return TOKEN_TREASURE_CHEST;
         case ORE:
             return TOKEN_ORE;
@@ -51,6 +52,12 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
 }
 
 void ztgk::tile_state_from_token(char token, Tile * tile) {
+    if (token >= TOKEN_TREASURE_CHEST_0 && token <= TOKEN_TREASURE_CHEST_9) {
+        tile->state = CHEST;
+        tile->stateData.chestItemTypeId = token - TOKEN_TREASURE_CHEST_0;
+        return;
+    }
+
     switch (token) {
         default:
         case TOKEN_ERROR:
