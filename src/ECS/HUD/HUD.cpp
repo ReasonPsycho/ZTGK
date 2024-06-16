@@ -129,8 +129,8 @@ void HUD::drawGroup(unsigned int groupID) {
         spdlog::warn(std::format("HUD Group {} not found! Defaulting to groupID 0.", groupID));
         groupID = 0;
     }
-    if ( minimap && minimap->groupID == groupID )
-        minimapRenderer->render(minimap);
+//    if ( minimap && minimap->groupID == groupID )
+//        minimapRenderer->render(minimap);
     for ( auto sprite : sprites[groupID] ) {
         spriteRenderer->render(sprite);
     }
