@@ -6,12 +6,21 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <ostream>
 #include <random>
 #include <utility>
 #include <vector>
 #include <glm/glm.hpp>
 #include "ECS/Utils/Random.h"
+
+struct ItemTemplate {
+	static constexpr int unlimited = std::numeric_limits<int>::max();
+	int id = -1;
+	float chanceEarlyGame = 1.f;
+	float chanceLateGame = 1.f;
+	int maxCount = unlimited;
+};
 
 struct LevelLayout {
 	struct Tile {
@@ -27,6 +36,7 @@ struct LevelLayout {
 		};
 
 		Type type = Type::wall;
+		int itemId = -1;
 		int pocketIndex = -1;
 		bool dfsVisited = false;
 	};
@@ -55,6 +65,7 @@ public:
 		int maxEnemies {};
 		int unitCount {};
 		int chestCount {};
+		std::vector<ItemTemplate> lootTable {};
 	};
 
 	inline LevelGenerator(LevelLayout& level) noexcept : level(level) {}
@@ -102,12 +113,14 @@ private:
 	void addEnemiesToPocket(int index, int count, PcgEngine& rand) noexcept;
 	bool addChestToPocket(int index, PcgEngine& rand) noexcept;
 
+	void assignChestItems(glm::vec2 center, const std::vector<ItemTemplate>& lootTable, PcgEngine& rand);
+
 	static constexpr glm::ivec2 directions[4] {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
 	LevelLayout& level;
 	std::vector<Pocket> pockets;
 	std::vector<glm::vec2> perlinNoiseGrid;
-	glm::ivec2 perlinNoiseGridSize;
+	glm::ivec2 perlinNoiseGridSize {};
 };
 
 LevelLayout generateLevel(const LevelGenerator::Config& config);
