@@ -24,7 +24,10 @@ Sprite::Sprite(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec4 &col
     name = std::format("Sprite: {}", texture);
 }
 
-void Sprite::load(const std::string &path) {
+void Sprite::load(const std::string &path, bool force) {
+    if (path == loaded_path && !force)
+        return;
+    loaded_path = path;
     glDeleteTextures(1, &texture);
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);

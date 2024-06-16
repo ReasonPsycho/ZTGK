@@ -236,6 +236,32 @@ Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int 
 
 }
 
+Vector2Int AstarPathfinding::GetNearestVacantTileAround(Vector2Int origin, std::vector<Vector2Int> forbiddenTiles) {
+    ZoneScopedN("GetNearestVacantTileAround");
+    Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
+    std::vector<Vector2Int> list;
+    list.push_back(origin);
+    std::unordered_set<Vector2Int> visited;
+    visited.insert(origin);
+
+    while(list.size() > 0){
+        Vector2Int current = list[0];
+        list.erase(list.begin());
+        if(grid->getTileAt(current)->vacant() && std::find(forbiddenTiles.begin(), forbiddenTiles.end(), current) == forbiddenTiles.end()){
+            return current;
+        }
+
+        for(Vector2Int dir : directions){
+            Vector2Int next = current + dir;
+            if(grid->getTileAt(next)!= nullptr && !visited.contains(next)){
+                list.push_back(next);
+                visited.insert(next);
+            }
+        }
+    }
+    return origin;
+}
+
 std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int target, int max_iterations) {
     if (grid->getTileAt(target) == nullptr) {
         spdlog::error("PATHFINDING: Target tile is nullptr");

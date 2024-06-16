@@ -23,12 +23,13 @@ struct Sprite : public AHUDComponent {
            unsigned int hudGroupId = 0,
            const std::string & path = "");
 
+    std::string loaded_path = "";
     glm::vec2 size;
-    GLuint texture;
+    GLuint texture = -1;
     glm::vec4 color;
     bool hasTexture = false;
 
-    void load(const std::string & path = "");
+    void load(const std::string & path = "", bool force = false);
 
     // editor
     static const unsigned editor_path_len = 100;

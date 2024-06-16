@@ -31,7 +31,7 @@ public:
     std::pair<Item *, bool> get_item(unsigned item_uid);
 
     // item cannot be assigned if it's not free!
-    bool assign_item(Item * item, Unit * unit, short slot);
+    std::pair<Item *, Item *> assign_item(Item * item, Unit * unit, short slot);
     bool unassign_item(Unit * unit, Item * item);
     bool unassign_item(Unit * unit, short slot);
 
@@ -40,7 +40,8 @@ public:
     bool unassign_and_delete_item(Unit * unit, Item * item);
 
     // todo
-    void spawn_item_on_map(Item * item, glm::vec2 world_pos);
+//    void spawn_item_on_map(Item * item, glm::vec2 world_pos);
+    void spawn_item_on_map(Item * item, Vector2Int grid_pos);
 
     void showImGuiDetailsImpl(Camera *camera) override;
 
