@@ -13,6 +13,7 @@ struct Cursor;
 class SignalQueue;
 class SignalReceiver;
 struct GLFWwindow;
+struct Text;
 
 namespace ztgk::game {
 
@@ -40,6 +41,10 @@ namespace ztgk::game {
         unsigned gr_w1_passive;
         unsigned gr_w2_offensive;
         unsigned gr_w2_passive;
+
+        Text * txt_time_display = nullptr;
+        Text * txt_pranium_counter = nullptr;
+        Text * txt_unit_counter = nullptr;
     };
     extern s_ui_data ui_data;
 
@@ -54,6 +59,7 @@ namespace ztgk::game {
 
     extern Cursor cursor;
 
+    extern int pranium_needed_to_win;
     extern std::atomic<bool> pause;
     extern std::atomic<bool> pause_render;
 

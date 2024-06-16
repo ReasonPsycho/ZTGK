@@ -907,7 +907,7 @@ void load_hud() {
 // game
     auto egame = scene.addEntity(ehud, "Game");
     auto emap = scene.addEntity(egame, "Map");
-    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
+//    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
     emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
@@ -1091,6 +1091,41 @@ void load_hud() {
     hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
 
+// TOP PANEL
+    auto etop = scene.addEntity(egame, "Top Panel");
+    glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 50};
+    ent = hud->createButton(
+        "||", top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
+        ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
+        [hud](){
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+        },
+        etop, ztgk::game::ui_data.gr_top
+    );
+    ent->getComponent<Text>()->pos.x -= 1;
+    ent->getComponent<Text>()->pos.y += 5;
+
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{300, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->getComponent<Sprite>()->mode = CENTER;
+
+    auto etime = scene.addEntity(etop, "Time");
+    etime->addComponent(make_unique<Text>("00:00", top_anchor, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    etime->getComponent<Text>()->mode = CENTER;
+    ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
+
+    auto epraniumCounter = scene.addEntity(etop, "Pranium Counter");
+    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
+    epraniumCounter->getComponent<Sprite>()->mode = CENTER;
+    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    epraniumCounter->getComponent<Text>()->mode = MIDDLE_LEFT;
+    ztgk::game::ui_data.txt_pranium_counter = epraniumCounter->getComponent<Text>();
+
+    auto eunitCounter = scene.addEntity(etop, "Unit Counter");
+    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
+    eunitCounter->getComponent<Sprite>()->mode = CENTER;
+    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");
@@ -1239,6 +1274,7 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
+    scene.systemManager.getSystem<HUD>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
@@ -1910,17 +1946,17 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .seed {},
             .size {100, 100},
             .wallThickness = 1.f,
-            .baseRadius = RNG::RandomFloat(6.f, 10.f),
+            .baseRadius = RNG::RandomFloat(8.f, 12.f),
             .keyRadius = RNG::RandomFloat(3.f, 5.f),
-            .pocketRadius = RNG::RandomFloat(6.f, 10.f),
+            .pocketRadius = RNG::RandomFloat(4.f, 8.f),
             .noiseImpact = RNG::RandomFloat(0.1f, 0.3f),
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
-            .keyEnemies = RNG::RandomInt(2, 3),
-            .minEnemies = 5,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 5,  //4        <---
-            .unitCount = 1,   //3        <---
-            .chestCount = RNG::RandomInt(8, 15),
+            .keyEnemies = RNG::RandomInt(1, 3),
+            .minEnemies = 0,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 4,  //4        <---
+            .unitCount = 3,   //3        <---
+            .chestCount = RNG::RandomInt(10, 15),
     };
 
     static char seedString[64] = "";

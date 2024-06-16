@@ -15,6 +15,8 @@
 #include <ranges>
 #include <algorithm>
 #include "ECS/Utils/Util.h"
+#include "ECS/Utils/Time.h"
+#include "ECS/Unit/UnitSystem.h"
 
 using namespace std;
 
@@ -109,6 +111,8 @@ void HUD::init() {
 
     *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += signalReceiver.get();
 }
+
+
 
 void HUD::draw() {
     // no reverse
@@ -210,6 +214,10 @@ void HUD::addComponent(void *component) {
         case hudcType::SLIDER: {
             HUDSlider *slider = reinterpret_cast<HUDSlider *>(component);
             sliders[slider->groupID].push_back(slider);
+            break;
+        }
+        case hudcType::MINIMAP: {
+            minimap = reinterpret_cast<Minimap *>(component);
             break;
         }
     }
@@ -767,6 +775,26 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
     entity->getComponent<HUDSlider>()->displayFormat = displayFormat;
 
     return entity;
+}
+
+void HUD::UpdateImpl() {
+    if (ztgk::game::ui_data.txt_time_display) {
+        auto time = Time::Instance().LastFrame();
+        int mins = time / 60.0f;
+        int secs = (int)time % 60;
+        ztgk::game::ui_data.txt_time_display->content = std::format("{:02d}:{:02d}", mins, secs);
+    }
+    if (ztgk::game::ui_data.txt_pranium_counter) {
+        ztgk::game::ui_data.txt_pranium_counter->content = std::format("{}", ztgk::game::pranium_needed_to_win);
+    }
+    if (ztgk::game::ui_data.txt_unit_counter) {
+        auto spongs = std::count_if(ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->isAlly; });
+        ztgk::game::ui_data.txt_unit_counter->content = std::format("{}", spongs);
+    }
+    // todo listen to win / lose signal
+//    if (minimap)
+//        minimap->Update();
 }
 
 #pragma endregion

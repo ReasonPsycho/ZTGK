@@ -234,6 +234,7 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
+                    ++ztgk::game::pranium_needed_to_win;
                     break;
                 case CORE:
                     tile->isInFogOfWar = false;
@@ -656,7 +657,7 @@ void Grid::UpdateFogData(Tile *tile) {
 
 
 
-void Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
+Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
     UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : ztgk::game::bugModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
@@ -670,4 +671,5 @@ void Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
     stateManager->currentState = new IdleState(this);
     stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
+    return UnitEntity;
 }
