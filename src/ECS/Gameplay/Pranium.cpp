@@ -20,10 +20,13 @@ void Pranium::onMine(Unit *unit) {
 }
 
 void Pranium::onMined(Unit *unit) {
+    IMineable::onMined(unit);
+    if (parentEntity->getComponent<Render>())
+        parentEntity->getComponent<Render>()->Remove();
     auto item = InventoryManager::instance->create_item(Item::item_types.pranium_ore);
+    auto pos = grid->GridToWorldPosition(gridPosition);
     InventoryManager::instance->spawn_item_on_map(item, gridPosition);
-
-    parentEntity->getComponent<Render>()->Remove();
+    spdlog::debug("Mined chest");
 //    tile->getEntity()->removeComponentFromMap(this);
 
 }

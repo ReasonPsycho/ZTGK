@@ -25,6 +25,7 @@ namespace ztgk::game {
     float game::lightMultiplayer = 1.2;
     int game::toon_color_levels = 15;
     Model * game::washingMachineModel = nullptr;
+    Model * game::praniumModel = nullptr;
     AudioManager * game::audioManager = nullptr;
     SignalReceiver * game::selectionHandler = nullptr;
     Model * game::playerModel = nullptr;

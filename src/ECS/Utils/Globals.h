@@ -54,6 +54,7 @@ namespace ztgk::game {
     extern Camera * camera;
     extern SignalQueue * signalQueue;
     extern Model * washingMachineModel;
+    extern Model * praniumModel;
     extern AudioManager * audioManager;
     extern SignalReceiver * selectionHandler;
 

@@ -584,6 +584,7 @@ void load_enteties() {
     ztgk::game::playerModel = gabka;
     ztgk::game::bugModel = zuczek;
     ztgk::game::chestModel = chestModel;
+    ztgk::game::praniumModel = modelLoadingManager.GetModel("res/models/pranium/pranium.fbx");
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
