@@ -565,6 +565,10 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
 
 
+    //healing
+    ztgk::game::audioManager->loadSound("res/sounds/heal1.mp3", "heal1");
+    ztgk::game::audioManager->loadSound("res/sounds/heal2.mp3", "heal2");
+
 }
 
 void load_enteties() {

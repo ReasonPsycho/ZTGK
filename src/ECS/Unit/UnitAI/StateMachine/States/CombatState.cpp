@@ -12,9 +12,24 @@
 #include "ECS/Utils/Globals.h"
 #include "ECS/HUD/Interactables/HUDSlider.h"
 #include "ECS/Render/Components/ColorMask.h"
+#include "HealingState.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
 
 State *CombatState::RunCurrentState() {
 
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        auto moveState = new MovementState(grid);
+        moveState->unit = unit;
+        moveState->unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        return moveState;
+    }
 
     //from Combat to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
@@ -132,8 +147,11 @@ void CombatState::AttackTarget() {
         ztgk::game::audioManager->playRandomSoundFromGroup(unit->combatTarget->isAlly ? "deathSponge" : "deathEnemy");
 
         unit->hasCombatTarget = false;
+        target->isAlive = false;
+        unit->combatTarget = nullptr;
 
-        target->DIEXD();
+        if(!target->isAlly)
+            target->DIEXD();
     }
 }
 

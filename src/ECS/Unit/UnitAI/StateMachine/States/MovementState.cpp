@@ -10,9 +10,25 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "HealingState.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
 
 
 State *MovementState::RunCurrentState() {
+
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                spdlog::info("Unit is dead, moving to healing state");
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        MoveOnPath();
+        return this;
+    }
 
     MoveOnPath();
 
