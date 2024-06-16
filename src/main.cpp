@@ -1392,6 +1392,11 @@ void imgui_render() {
             .maxEnemies = 2,
             .unitCount = 3,
             .chestCount = 10,
+            .lootTable = {
+                {0, 1.f, 0.f},
+                {1, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -2010,6 +2015,11 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .maxEnemies = 4,  //4        <---
             .unitCount = 3,   //3        <---
             .chestCount = RNG::RandomInt(10, 15),
+            .lootTable = {
+                {0, 1.f, 0.f},
+                {1, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
     };
 
     static char seedString[64] = "";

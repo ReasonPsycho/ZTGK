@@ -3,9 +3,9 @@
 //
 
 #include "LevelGenerator.h"
+#include <algorithm>
 #include <format>
 #include <map>
-#include "ECS/Utils/RNG.h"
 
 std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 	using TileType = LevelLayout::Tile::Type;
@@ -23,7 +23,12 @@ std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 	for (std::size_t i = 0; i < level.grid.size(); i++) {
 		if (i % level.size.x == 0)
 			os << '\n' << '#';
-		os << chars.at(level.grid[i].type);
+		const auto& tile = level.grid[i];
+		if (tile.type == TileType::chest && tile.itemId >= 0 && tile.itemId < 10) {
+			os << tile.itemId;
+		} else {
+			os << chars.at(tile.type);
+		}
 	}
 	os << '\n';
 	os << "# ---LAYOUT END---" << '\n';
@@ -62,7 +67,6 @@ void LevelGenerator::operator()(const Config& config) {
                 getTile(glm::ivec2(pockets[basePocketIndex].center) + glm::ivec2(i, j))->type = Tile::Type::core;
             }
         }
-//        getTile(glm::ivec2(pockets[basePocketIndex].center))->type = Tile::Type::core;
 		addAtRandomToPocket(basePocketIndex, config.unitCount, Tile::Type::unit, rand, [this](glm::ivec2 pos) {
 			return !isTileAdjacentTo(pos, [this](glm::ivec2 otherPos) {
 				auto other = getTile(otherPos);
@@ -109,6 +113,7 @@ void LevelGenerator::operator()(const Config& config) {
 			}
 		};
 	}
+	assignChestItems(center, config.lootTable, rand);
 }
 
 inline void LevelGenerator::generatePerlinNoiseGrid(glm::ivec2 size, PcgEngine& rand) noexcept {
@@ -219,7 +224,8 @@ void LevelGenerator::hollowOutPocket(int index, float padding, float noiseImpact
 }
 
 void LevelGenerator::addEnemiesToPocket(int index, int count, PcgEngine& rand) noexcept {
-	addAtRandomToPocket(index, count, RNG::RandomBool() ? Tile::Type::bug : Tile::Type::shroom, rand, [](glm::ivec2) {
+	std::bernoulli_distribution dist(0.5);
+	addAtRandomToPocket(index, count, dist(rand) ? Tile::Type::bug : Tile::Type::shroom, rand, [](glm::ivec2) {
 		return true;
 	});
 }
@@ -235,4 +241,39 @@ bool LevelGenerator::addChestToPocket(int index, PcgEngine& rand) noexcept {
 		return false;
 	pockets[index].hasChest = true;
 	return true;
+}
+
+void LevelGenerator::assignChestItems(glm::vec2 center, const std::vector<ItemTemplate>& lootTable, PcgEngine& rand) {
+	std::vector<Tile*> chests;
+	for (auto&& tile : level.grid) {
+		if (tile.type == Tile::Type::chest)
+			chests.push_back(&tile);
+	}
+	auto chestCount = chests.size();
+	auto tableSize = lootTable.size();
+	if (chestCount == 0 || tableSize == 0)
+		return;
+	std::ranges::sort(chests, {}, [&](const Tile* chest) {
+		return glm::distance(center, pockets[chest->pocketIndex].center);
+	});
+	float slope = chestCount < 2 ? 0.f : 1.f / (chestCount - 1);
+	std::vector<int> alreadyGenerated(tableSize);
+	for (std::size_t i = 0; i < chestCount; i++) {
+		float lateGame = i * slope;
+		float total = 0.f;
+		std::vector<float> partialSums(tableSize);
+		for (std::size_t j = 0; j < tableSize; j++) {
+			const auto& item = lootTable[j];
+			if (alreadyGenerated[j] < item.maxCount)
+				total += std::max(0.f, glm::mix(item.chanceEarlyGame, item.chanceLateGame, lateGame));
+			partialSums[j] = total;
+		}
+		if (total == 0.f)
+			continue;
+		std::uniform_real_distribution<float> dist(0.f, total);
+		float value = dist(rand);
+		auto index = std::ranges::upper_bound(partialSums, value) - partialSums.begin();
+		chests[i]->itemId = lootTable[index].id;
+		alreadyGenerated[index]++;
+	}
 }
