@@ -30,8 +30,6 @@ const UnitStats Unit::ALLY_BASE = {
 };
 
 const UnitStats Unit::ENEMY_BASE = {
-        //todo NOTE TO MY FUTURE SELF: when u changed UNIT for SPONGE and added BUG and SHROOM you didnt look for any tileState == UNIT checks,
-        // need to add tileState == SPONGE || tileState == BUG || tileState == SHROOM checks
         .max_hp = 90,
         .hp = 90,
         .move_spd = 10,
@@ -88,13 +86,13 @@ void Unit::UpdateStats() {
     }
 
     glm::ivec2 new_range = {stats.added.rng_add, stats.added.rng_rem};
-    if (new_range != old_range) {
+
         equipment.rangeEff0 = equipment.item0->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
         if (equipment.item1 != nullptr)
             equipment.rangeEff1 = equipment.item1->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
         if (equipment.item2 != nullptr)
             equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
-    }
+
 
     stats.hp += (stats.max_hp + stats.added.max_hp) - old_max_hp;
     if (stats.hp > stats.max_hp + stats.added.max_hp) {
@@ -140,159 +138,184 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
+    if(stats.hp <= 0){
+        isAlive = false;
+    }
+
+    if(isBeingHealedByWashingMachine && stats.hp >= stats.max_hp){
+        isBeingHealedByWashingMachine = false;
+    }
+    if(!isAlive && isAlly){
+        ztgk::game::scene->systemManager.getSystem<UnitSystem>()->deselectUnit(this);
+        //if unit stands next to washing machine it will be healed by it
+        auto neighTiles = grid->GetNeighbours(gridPosition, true);
+        for(auto &tile : neighTiles){
+            if(tile != nullptr && tile->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                isBeingHealedByWashingMachine = true;
+            }
+        }
+
+        //if unit has 0 hp but is not next to washing machine it will path to washing machine with 50% speed
+        if(!isBeingHealedByWashingMachine){
+            movementTarget = pathfinding.GetNearestVacantTile(getClosestWashingMachineTile(), gridPosition);
+            hasMovementTarget = true;
+        }
+    }
+    if(!isAlive && !isAlly){
+        DIEXD();
+    }
+
 
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+    if(isAlive){
 
-
-    if(forcedIdleState){
-        currentState = new IdleState(grid);
-        currentState->unit = this;
-        waitTimer -= Time::Instance().DeltaTime();
-
-        if(waitTimer <= 0){
-            forcedIdleState = false;
-            waitTimer = 0;
-        }
-        else{
-            return;
-        }
-    }
-
-    auto currentTile = grid->getTileAt(gridPosition);
-    if(isAlly && currentTile->dirtinessLevel > 0){
-        auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
-        if(newDirtLvl < 0){
-            newDirtLvl = 0;
-        }
-        currentTile->changeDirtinessLevel(newDirtLvl);
-        if(newDirtLvl == 0){
-            ztgk::game::audioManager->playRandomSoundFromGroup("idle");
-        }
-    }
-
-    else if(!isAlly && currentTile->dirtinessLevel < 100){
-        auto newDirtLvl = currentTile->dirtinessLevel + 10 * Time::Instance().DeltaTime();
-        if(newDirtLvl > 100){
-            newDirtLvl = 100;
-        }
-        currentTile->changeDirtinessLevel(newDirtLvl);
-    }
-
-    if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
-        currentMiningTarget = nullptr;
-    }
-
-    for(auto &mineable : miningTargets){
-        if(mineable->isMined){
-            miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), mineable), miningTargets.end());
-        }
-    }
-
-    if(!miningTargets.empty() && currentMiningTarget == nullptr){
-        currentMiningTarget = findClosestMineable();
-        if(currentMiningTarget != nullptr){
-            hasMiningTarget = true;
-        }
-        else{
-            hasMiningTarget = false;
-        }
-    }
-
-    if(hasMovementTarget){
-        if(!grid->getTileAt(movementTarget)->vacant()){
-            movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
-            pathfinding.path = pathfinding.FindPath(gridPosition, movementTarget);
-        }
-    }
-
-    if(ForcedMovementState){
-        if(!hasMovementTarget){
-            ForcedMovementState = false;
-        }
-        else{
-            hasMiningTarget = false;
-            hasCombatTarget = false;
-            hasMovementTarget = true;
+        if(combatTarget != nullptr && !combatTarget->isAlive){
             combatTarget = nullptr;
-            miningTargets.clear();
-            currentMiningTarget = nullptr;
-            movementTarget = forcedMovementTarget;
-            if(!grid->getTileAt(forcedMovementTarget)->vacant()){
-                movementTarget = pathfinding.GetNearestVacantTile(forcedMovementTarget, gridPosition);
-                forcedMovementTarget = movementTarget;
+            hasCombatTarget = false;
+        }
+
+        auto currentTile = grid->getTileAt(gridPosition);
+        if(isAlly && currentTile->dirtinessLevel > 0){
+            auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
+            if(newDirtLvl < 0){
+                newDirtLvl = 0;
+            }
+            currentTile->changeDirtinessLevel(newDirtLvl);
+            if(newDirtLvl == 0){
+                ztgk::game::audioManager->playRandomSoundFromGroup("idle");
             }
         }
-    }
 
-    if(ForcedMiningState && !ForcedMovementState){
-        if(forcedMiningTarget->isMined){
-            ForcedMiningState = false;
-            forcedMiningTarget = nullptr;
+        else if(!isAlly && currentTile->dirtinessLevel < 100){
+            auto newDirtLvl = currentTile->dirtinessLevel + 10 * Time::Instance().DeltaTime();
+            if(newDirtLvl > 100){
+                newDirtLvl = 100;
+            }
+            currentTile->changeDirtinessLevel(newDirtLvl);
         }
-        else {
-            hasMiningTarget = true;
-            hasCombatTarget = false;
-            hasMovementTarget = true;
-            combatTarget = nullptr;
-            currentMiningTarget = forcedMiningTarget;
-            auto targ = pathfinding.GetNearestVacantTile(forcedMiningTarget->gridPosition, gridPosition);
-            auto miningState = new MiningState(grid);
-            miningState->unit = this;
-            if (!miningState->isTargetInRange()) {
-                spdlog::info("Target not in range, moving to mining target");
-                forcedMovementTarget = targ;
-                ForcedMovementState = true;
-                ForcedMiningState = false;
+
+        if(currentMiningTarget!=nullptr && currentMiningTarget->isMined){
+            currentMiningTarget = nullptr;
+        }
+
+        for(auto &mineable : miningTargets){
+            if(mineable->isMined){
+                miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), mineable), miningTargets.end());
+            }
+        }
+
+        if(!miningTargets.empty() && currentMiningTarget == nullptr){
+            currentMiningTarget = findClosestMineable();
+            if(currentMiningTarget != nullptr){
+                hasMiningTarget = true;
             }
             else{
+                hasMiningTarget = false;
+            }
+        }
+
+        if(hasMovementTarget){
+            if(!grid->getTileAt(movementTarget)->vacant()){
+                movementTarget = pathfinding.GetNearestVacantTile(movementTarget, gridPosition);
+                pathfinding.path = pathfinding.FindPath(gridPosition, movementTarget);
+            }
+        }
+
+        if(ForcedMovementState){
+            if(!hasMovementTarget){
                 ForcedMovementState = false;
+            }
+            else{
+                hasMiningTarget = false;
+                hasCombatTarget = false;
+                hasMovementTarget = true;
+                combatTarget = nullptr;
+                miningTargets.clear();
+                currentMiningTarget = nullptr;
+                movementTarget = forcedMovementTarget;
+                if(!grid->getTileAt(forcedMovementTarget)->vacant()){
+                    movementTarget = pathfinding.GetNearestVacantTile(forcedMovementTarget, gridPosition);
+                    forcedMovementTarget = movementTarget;
+                }
+            }
+        }
+
+        if(ForcedMiningState && !ForcedMovementState){
+            if(forcedMiningTarget->isMined){
                 ForcedMiningState = false;
+                forcedMiningTarget = nullptr;
+            }
+            else {
+                hasMiningTarget = true;
+                hasCombatTarget = false;
+                hasMovementTarget = true;
+                combatTarget = nullptr;
                 currentMiningTarget = forcedMiningTarget;
+                auto targ = pathfinding.GetNearestVacantTile(forcedMiningTarget->gridPosition, gridPosition);
+                auto miningState = new MiningState(grid);
+                miningState->unit = this;
+                if (!miningState->isTargetInRange()) {
+                    spdlog::info("Target not in range, moving to mining target");
+                    forcedMovementTarget = targ;
+                    ForcedMovementState = true;
+                    ForcedMiningState = false;
+                }
+                else{
+                    ForcedMovementState = false;
+                    ForcedMiningState = false;
+                    currentMiningTarget = forcedMiningTarget;
+                }
+                delete miningState;
             }
-            delete miningState;
+
         }
 
-    }
-
-    if(!isAlly && !ForcedMovementState && !ForcedMiningState) {
-        combatTarget = GetClosestPathableEnemyInSight();
-        if (combatTarget == nullptr) {
-            combatTarget = GetClosestEnemyInSight();
-            if (combatTarget != nullptr) {
-                movementTarget = combatTarget->gridPosition;
+        if(!isAlly && !ForcedMovementState && !ForcedMiningState) {
+            combatTarget = GetClosestPathableEnemyInSight();
+            if (combatTarget == nullptr) {
+                combatTarget = GetClosestEnemyInSight();
+                if (combatTarget != nullptr) {
+                    movementTarget = combatTarget->gridPosition;
+                }
             }
         }
-    }
 
-    std::vector<Tile*> neiTiles = grid->GetNeighbours(gridPosition, false);
-    for(auto &tile : neiTiles){
-        if(tile->unit != nullptr && tile->unit->IsAlly() != isAlly){
-            combatTarget = tile->unit;
-            break;
+        std::vector<Tile*> neiTiles = grid->GetNeighbours(gridPosition, false);
+        for(auto &tile : neiTiles){
+            if(tile->unit != nullptr && tile->unit->IsAlly() != isAlly){
+                combatTarget = tile->unit;
+                break;
+            }
         }
-    }
 
 
 
 
-    if(combatTarget != nullptr){
-        hasCombatTarget = true;
-        auto combatState = new CombatState(grid);
-        combatState->unit = this;
-        if(combatState->isTargetInRange() && canPathToAttackTarget()){}
-        else if(!combatState->isTargetInRange() && canPathToAttackTarget()){
-            hasMovementTarget = true;
-            movementTarget = pathfinding.GetNearestVacantTile(combatTarget->gridPosition, gridPosition);
-            delete combatState;
+        if(combatTarget != nullptr){
+            hasCombatTarget = true;
+            auto combatState = new CombatState(grid);
+            combatState->unit = this;
+            if(combatState->isTargetInRange() && canPathToAttackTarget()){delete combatState;}
+            else if(!combatState->isTargetInRange() && canPathToAttackTarget()){
+                hasMovementTarget = true;
+                movementTarget = pathfinding.GetNearestVacantTile(combatTarget->gridPosition, gridPosition);
+                delete combatState;
+            }
+            else{
+                hasCombatTarget = false;
+                delete combatState;
+            }
         }
         else{
             hasCombatTarget = false;
-            delete combatState;
         }
     }
-    else{
+
+    if(combatTarget!= nullptr && !combatTarget->isAlive){
+        combatTarget = nullptr;
         hasCombatTarget = false;
     }
+
 
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->state = FLOOR;
@@ -375,6 +398,12 @@ Unit *Unit::GetClosestEnemyInWeaponRange() {
             enemies.insert(enemies.end(), found.begin(), found.end());
         }
     }
+
+    //remove enemies that are not alive
+    enemies.erase(std::remove_if(enemies.begin(), enemies.end(), [](Unit* enemy){
+        return !enemy->isAlive;
+    }), enemies.end());
+
 
     if (enemies.empty())
         return nullptr;
@@ -496,6 +525,11 @@ std::vector<Unit *> Unit::GetPathableEnemiesInSight() {
         }
     }
 
+    //remove enemies that are not alive
+    enemies.erase(std::remove_if(enemies.begin(), enemies.end(), [](Unit* enemy){
+        return !enemy->isAlive;
+    }), enemies.end());
+
     return enemies;
 }
 
@@ -507,6 +541,11 @@ std::vector<Unit*> enemies = GetPathableEnemiesInSight();
     std::sort(enemies.begin(), enemies.end(), [this](Unit * enemy, Unit * enemy1){
         return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) < VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
     });
+    //remove enemies that are not alive
+    enemies.erase(std::remove_if(enemies.begin(), enemies.end(), [](Unit* enemy){
+        return !enemy->isAlive;
+    }), enemies.end());
+
     return enemies.at(0);
 }
 
@@ -636,5 +675,20 @@ void Unit::Pickup(PickupubleItem *item) {
         InventoryManager::instance->spawn_item_on_map(drop.first, first_pos);
     if (drop.second)
         InventoryManager::instance->spawn_item_on_map(drop.second, pathfinding.GetNearestVacantTileAround(spawn_origin,  drop.first ? std::vector{spawn_origin, first_pos} : std::vector{spawn_origin}));
+}
+
+Vector2Int Unit::getClosestWashingMachineTile() {
+    std::vector<Vector2Int> washingMachineTilesGridPos;
+    auto washingMachineTileMap = ztgk::game::scene->systemManager.getSystem<WashingMachine>()->WashingMachineTiles;
+    for(auto &tile : washingMachineTileMap){
+        washingMachineTilesGridPos.push_back(tile.second[0]->gridPosition);
+    }
+
+    //sort by distance to unit
+    std::sort(washingMachineTilesGridPos.begin(), washingMachineTilesGridPos.end(), [this](Vector2Int pos1, Vector2Int pos2){
+        return VectorUtils::Distance(this->gridPosition, pos1) < VectorUtils::Distance(this->gridPosition, pos2);
+    });
+
+    return washingMachineTilesGridPos[0];
 }
 
