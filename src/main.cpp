@@ -1428,6 +1428,11 @@ void imgui_render() {
             .maxEnemies = 2,
             .unitCount = 3,
             .chestCount = 10,
+            .lootTable = {
+                {0, 1.f, 0.f},
+                {1, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -2042,10 +2047,16 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
             .keyEnemies = RNG::RandomInt(1, 3),
-            .minEnemies = 0,                                    //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 4,                                    //4        <---
-            .unitCount = 3,                                     //3        <---
-            .chestCount = RNG::RandomInt(100, 150),   //10, 15    <---
+            .minEnemies = 0,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 4,                       //4        <---
+            .unitCount = 3,                        //3        <---
+            .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
+            .lootTable = {
+                {0, 1.f, 0.f},
+                {1, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
+
     };
 
     static char seedString[64] = "";
