@@ -1899,6 +1899,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
     } else {
+        ztgk::game::ui_data.tracked_unit_id = -1;
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }
 
