@@ -32,6 +32,9 @@ void UnitSystem::removeComponent(void *component) {
     } else {
         spdlog::warn("Attempted to remove a component that does not exist in the map: {}.", typeid(*((Unit *)component)).name());
     }
+    if (std::find(selectedUnits.begin(), selectedUnits.end(), (Unit *)component) != selectedUnits.end()) {
+        selectedUnits.erase(std::find(selectedUnits.begin(), selectedUnits.end(), (Unit *)component));
+    }
 }
 
 const std::type_index *UnitSystem::getComponentTypes() {
@@ -76,7 +79,8 @@ void UnitSystem::UpdateImpl() {
 }
 
 void UnitSystem::selectUnit(Unit *unit) {
-    selectedUnits.push_back(unit);
+    if (std::find(selectedUnits.begin(), selectedUnits.end(), unit) == selectedUnits.end())
+        selectedUnits.push_back(unit);
     unit->isSelected = true;
 }
 

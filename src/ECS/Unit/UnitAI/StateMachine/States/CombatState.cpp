@@ -197,11 +197,11 @@ bool CombatState::isAttackOnCooldown() {
         }
     }
 
-    if (it != nullptr && it->cd_sec < 0) {
+    if (it != nullptr && it->cd_sec <= 0) {
         useItem = it;
         return false;
     }
-    if (sec_it != nullptr && sec_it->cd_sec < 0) {
+    if (sec_it != nullptr && sec_it->cd_sec <= 0) {
         useItem = sec_it;
         return false;
     }

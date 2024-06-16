@@ -10,7 +10,7 @@ void PickupubleItem::showImGuiDetailsImpl(Camera *camera) {
     Component::showImGuiDetailsImpl(camera);
 }
 
-PickupubleItem::PickupubleItem(Item *item) : item(item) {
+PickupubleItem::PickupubleItem(Item *item, Vector2Int gridPosition) : item(item), gridPosition(gridPosition) {
     name = "Pickupuble item - " + item->name + " id " + std::to_string(item->uniqueID);
 }
 

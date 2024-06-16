@@ -40,6 +40,7 @@ public:
     Grid* grid;
 
     UnitEquipment equipment;
+    std::string icon_path;
 
     //target flags
     bool hasMovementTarget = false;
@@ -83,6 +84,7 @@ public:
     bool canFindPathToTarget(Vector2Int target);
     std::vector<IMineable> miningPath;
 
+    void Pickup(PickupubleItem* item);
 
     // serializer
     // only use this with serializer!

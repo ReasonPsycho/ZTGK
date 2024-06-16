@@ -6,14 +6,16 @@
 
 
 #include "ECS/Component.h"
+#include "ECS/Utils/VectorUtils.h"
+
 class Item;
 
 class PickupubleItem : public Component {
 public:
-    explicit PickupubleItem(Item *item);
+    explicit PickupubleItem(Item *item, Vector2Int gridPosition);
+    Vector2Int gridPosition;
 
     Item * item;
-    bool isPickedUp = false;
 
 protected:
     void showImGuiDetailsImpl(Camera *camera) override;
