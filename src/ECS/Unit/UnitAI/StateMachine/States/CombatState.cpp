@@ -14,6 +14,7 @@
 #include "ECS/Render/Components/ColorMask.h"
 #include "HealingState.h"
 #include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Unit/Equipment/Projectile/Projectile.h"
 
 State *CombatState::RunCurrentState() {
 
@@ -119,7 +120,22 @@ void CombatState::AttackTarget() {
 
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
-    target->stats.hp -= totalAttackDamage;
+    if(useItem->stats.range.add > 1){
+        auto projectileEntity = ztgk::game::scene->addEntity("Projectile");
+        projectileEntity->transform.setLocalPosition(unit->worldPosition);
+        projectileEntity->addComponent(std::make_unique<Render>(ztgk::game::projectileModel));
+        projectileEntity->addComponent(std::make_unique<Projectile>(unit->worldPosition,  target->worldPosition,unit, target, totalAttackDamage));
+        projectileEntity->transform.setLocalScale({0.1f, 0.1f, 0.1f});
+        projectileEntity->updateSelfAndChild();
+    }
+    else{
+        applyDamage(unit, target, totalAttackDamage);
+    }
+
+}
+
+ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
+    target->stats.hp -= damage;
     ColorMask* cm;
     if(target!= nullptr && target->getEntity() != nullptr)
         cm = target->getEntity()->getComponent<ColorMask>();
@@ -133,7 +149,6 @@ void CombatState::AttackTarget() {
         cm = target->getEntity()->getComponent<ColorMask>();
     }
     cm->AddMask("DMG_taken", {120.0f/250.0f, 0, 0, 0.5f}, 0.6f);
-    spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
     if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
         ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = target->stats.max_hp + target->stats.added.max_hp;
         ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(target->stats.hp);
@@ -144,7 +159,7 @@ void CombatState::AttackTarget() {
 
 
     if(target->stats.hp <= 0){
-        ztgk::game::audioManager->playRandomSoundFromGroup(unit->combatTarget->isAlly ? "deathSponge" : "deathEnemy");
+        ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
 
         unit->hasCombatTarget = false;
         target->isAlive = false;
@@ -162,8 +177,6 @@ void CombatState::AttackTarget() {
         }
     }
 }
-
-
 
 
 CombatState::CombatState(Grid *grid) {

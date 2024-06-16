@@ -33,6 +33,7 @@ namespace ztgk::game {
     Model * game::shroomModel = nullptr;
     Model * game::oreModel = nullptr;
     Model * game::chestModel = nullptr;
+    Model * game::projectileModel = nullptr;
 
     bool game::gameStarted = false;
     bool game::gameWon = false;

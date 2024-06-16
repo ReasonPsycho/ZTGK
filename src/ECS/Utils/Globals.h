@@ -76,6 +76,7 @@ namespace ztgk::game {
     extern Model* shroomModel;
     extern Model* oreModel;
     extern Model* chestModel;
+    extern Model* projectileModel;
 
 
     extern bool gameStarted;

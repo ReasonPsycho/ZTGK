@@ -22,16 +22,14 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 
 const UnitStats Unit::ALLY_BASE = {
-        .max_hp = 5,
-        .hp = 5,
+        .max_hp = 150,
+        .hp = 150,
         .move_spd = 12,
         .mine_spd = 1,
         .added = {}
 };
 
 const UnitStats Unit::ENEMY_BASE = {
-        //todo NOTE TO MY FUTURE SELF: when u changed UNIT for SPONGE and added BUG and SHROOM you didnt look for any tileState == UNIT checks,
-        // need to add tileState == SPONGE || tileState == BUG || tileState == SHROOM checks
         .max_hp = 90,
         .hp = 90,
         .move_spd = 10,
@@ -88,13 +86,13 @@ void Unit::UpdateStats() {
     }
 
     glm::ivec2 new_range = {stats.added.rng_add, stats.added.rng_rem};
-    if (new_range != old_range) {
+
         equipment.rangeEff0 = equipment.item0->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
         if (equipment.item1 != nullptr)
             equipment.rangeEff1 = equipment.item1->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
         if (equipment.item2 != nullptr)
             equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
-    }
+
 
     stats.hp += (stats.max_hp + stats.added.max_hp) - old_max_hp;
     if (stats.hp > stats.max_hp + stats.added.max_hp) {
@@ -297,7 +295,7 @@ void Unit::UpdateImpl() {
             hasCombatTarget = true;
             auto combatState = new CombatState(grid);
             combatState->unit = this;
-            if(combatState->isTargetInRange() && canPathToAttackTarget()){}
+            if(combatState->isTargetInRange() && canPathToAttackTarget()){delete combatState;}
             else if(!combatState->isTargetInRange() && canPathToAttackTarget()){
                 hasMovementTarget = true;
                 movementTarget = pathfinding.GetNearestVacantTile(combatTarget->gridPosition, gridPosition);

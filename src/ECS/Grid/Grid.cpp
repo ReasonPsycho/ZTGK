@@ -20,6 +20,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
 #include "ECS/Render/Components/AnimationPlayer.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
+#include "ECS/Unit/Equipment/ConcreteItems/ItemTypes.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -251,7 +252,8 @@ void Grid::InitializeTileEntities() {
                     break;
                 case CHEST:
                     // todo item type id
-                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
+                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 2));
+
                     tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));

@@ -77,6 +77,7 @@
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Audio/AudioManager.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
+#include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 #pragma endregion Includes
 
@@ -96,6 +97,7 @@ string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
+string modelProjectilePath = "res/models/projectile/projectile.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
 
 ModelLoadingManager modelLoadingManager;
@@ -108,6 +110,7 @@ Model *washingMachineModel;
 Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
+Model *projectileModel;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -450,6 +453,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
     scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
     scene.systemManager.addSystem(std::make_unique<MiningSystem>());
+    scene.systemManager.addSystem(std::make_unique<ProjectileSystem>());
 
     scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -586,6 +590,7 @@ void load_enteties() {
     wall = modelLoadingManager.GetModel(modelPathWall);
     washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
     chestModel = modelLoadingManager.GetModel(modelChestPath);
+    projectileModel = modelLoadingManager.GetModel(modelProjectilePath);
     modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
@@ -596,6 +601,7 @@ void load_enteties() {
     ztgk::game::bugModel = zuczek;
     ztgk::game::chestModel = chestModel;
     ztgk::game::praniumModel = modelLoadingManager.GetModel("res/models/pranium/pranium.fbx");
+    ztgk::game::projectileModel = projectileModel;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -1312,6 +1318,7 @@ void update() {
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
     scene.systemManager.getSystem<HUD>()->Update();
+    scene.systemManager.getSystem<ProjectileSystem>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
@@ -2035,10 +2042,10 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
             .keyEnemies = RNG::RandomInt(1, 3),
-            .minEnemies = 0,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 4,  //4        <---
-            .unitCount = 3,   //3        <---
-            .chestCount = RNG::RandomInt(10, 15),
+            .minEnemies = 0,                                    //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 4,                                    //4        <---
+            .unitCount = 3,                                     //3        <---
+            .chestCount = RNG::RandomInt(100, 150),   //10, 15    <---
     };
 
     static char seedString[64] = "";
