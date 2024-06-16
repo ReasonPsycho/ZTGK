@@ -182,6 +182,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods);
 
+void handleControls(int key, int scancode, int action, int mods);
+
 void processInput(GLFWwindow *window);
 
 void update_dragged_tiles();
@@ -466,10 +468,15 @@ void init_systems() {
     scene.systemManager.getSystem<UnitSystem>()->init();
 
     ztgk::game::selectionHandler = new SignalReceiver(
-        Signal::signal_types.mouse_button_signal,
+        Signal::signal_types.mouse_button_signal | Signal::signal_types.keyboard,
         [](const Signal &signal) {
-            auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
-            handle_picking(window, data->button, data->action, data->mods);
+            if (signal.stype == Signal::signal_types.mouse_button_signal) {
+                auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+                handle_picking(window, data->button, data->action, data->mods);
+            } else if (signal.stype == Signal::signal_types.keyboard) {
+                auto data = std::dynamic_pointer_cast<KeySignalData>(signal.data);
+                handleControls(data->key, data->scancode, data->action, data->mods);
+            }
         }
     );
     *ztgk::game::signalQueue += ztgk::game::selectionHandler;
@@ -1498,10 +1505,7 @@ void imgui_end() {
 void processInput(GLFWwindow *window) {
     
     camera.MoveCamera(window);
-    
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    
+
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
         if (!captureMouseButtonPressed) {
             captureMouse = !captureMouse;
@@ -1894,11 +1898,58 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
         auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-        ztgk::update_unit_hud(unit);
     } else {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }
 
+}
+
+void handleControls(int key, int scancode, int action, int mods) {
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
+                if (ztgk::game::ui_data.tracked_unit_id == -1)
+                    ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
+                break;
+            }
+            --idx;
+        }
+    }
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ally);
+                if (ztgk::game::ui_data.tracked_unit_id == ally->uniqueID)
+                    ztgk::game::ui_data.tracked_unit_id = -1;
+                break;
+            }
+            --idx;
+        }
+    }
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        auto pause = scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_pause);
+        if (!pause->isHidden()) {
+            auto settings = scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_settings);
+        }
+        pause->setHidden(!pause->isHidden());
+    }
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (key == GLFW_KEY_A && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
+        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+            scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
+        }
+    }
+    if (key == GLFW_KEY_A && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
+        scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+        ztgk::game::ui_data.tracked_unit_id = -1;
+    }
 }
 
 

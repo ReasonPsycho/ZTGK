@@ -795,6 +795,7 @@ void HUD::UpdateImpl() {
     // todo listen to win / lose signal
 //    if (minimap)
 //        minimap->Update();
+    ztgk::update_unit_hud();
 }
 
 #pragma endregion

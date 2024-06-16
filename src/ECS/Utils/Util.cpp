@@ -8,6 +8,7 @@
 #include "ECS/HUD/Components/Sprite.h"
 #include "ECS/HUD/Interactables/HUDSlider.h"
 #include "ECS/HUD/HUD.h"
+#include "ECS/Unit/UnitSystem.h"
 
 namespace ztgk {
 
@@ -17,7 +18,32 @@ namespace ztgk {
 
     Console ztgk::console = Console();
 
-    void update_unit_hud(Unit *unit) {
+    void update_unit_hud() {
+
+        // todo determine group hud
+        Unit * unit;
+        auto unitsys = ztgk::game::scene->systemManager.getSystem<UnitSystem>();
+        auto fnd = std::find_if(unitsys->unitComponents.begin(),
+                                 unitsys->unitComponents.end(),
+                                 [](auto &unit) { return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+        // if not found
+        if (fnd == unitsys->unitComponents.end()) {
+            // and there are no selected units
+            if (unitsys->selectedUnits.empty()) {
+                // hide the layer
+                ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
+                return;
+            } else {
+                // otherwise use the first selected unit
+                unit = unitsys->selectedUnits[0];
+                ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
+            }
+        } else {
+            // or just the found one
+            unit = *fnd;
+        }
+        ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
+
         auto eunit = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details");
 
         auto ent = eunit->getChild("Portrait");

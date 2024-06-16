@@ -356,10 +356,6 @@ void Unit::UpdateImpl() {
         equipment.item2->cd_sec -= Time::Instance().DeltaTime();
     if (equipment.cd_between_sec > 0)
         equipment.cd_between_sec -= Time::Instance().DeltaTime();
-
-    if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
-        ztgk::update_unit_hud(this);
-    }
 }
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {
@@ -634,7 +630,6 @@ void Unit::Pickup(PickupubleItem *item) {
     grid->getTileAt(target->gridPosition)->state = FLOOR;
     target->getEntity()->getComponent<Render>()->Remove();
     target->Remove();
-    ztgk::update_unit_hud(this);
 
     Vector2Int first_pos = pathfinding.GetNearestVacantTileAround(spawn_origin, {spawn_origin});
     if (drop.first)
