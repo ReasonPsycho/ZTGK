@@ -1821,8 +1821,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
                 if(hitUnit == nullptr && hitTile != nullptr){
-                if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
-                    hitUnit = hitTile->unit;
+                    if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
+                         hitUnit = hitTile->unit;
+                    }
                 }
                 auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
