@@ -117,6 +117,7 @@ void CombatState::AttackTarget() {
     float totalAttackDamage =
             (useItem->stats.dmg + useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
             * (1 - target->stats.added.def_perc) - target->stats.added.def_flat;
+    totalAttackDamage = std::max(totalAttackDamage, 0.0f);
 
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;

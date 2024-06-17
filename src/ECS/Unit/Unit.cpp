@@ -74,7 +74,6 @@ void Unit::UnequipItem(short slot) {
 }
 
 void Unit::UpdateStats() {
-    glm::ivec2 old_range = {stats.added.rng_add, stats.added.rng_rem};
     float old_max_hp = stats.max_hp + stats.added.max_hp;
 
     stats.added = {};
@@ -84,14 +83,12 @@ void Unit::UpdateStats() {
     if(equipment.item2 != nullptr){
         stats.added += equipment.item2->stats.add_to_unit;
     }
-
-    glm::ivec2 new_range = {stats.added.rng_add, stats.added.rng_rem};
-
-        equipment.rangeEff0 = equipment.item0->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
-        if (equipment.item1 != nullptr)
-            equipment.rangeEff1 = equipment.item1->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
-        if (equipment.item2 != nullptr)
-            equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
+    
+    equipment.rangeEff0 = equipment.item0->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
+    if (equipment.item1 != nullptr)
+        equipment.rangeEff1 = equipment.item1->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
+    if (equipment.item2 != nullptr)
+        equipment.rangeEff2 = equipment.item2->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
 
 
     stats.hp += (stats.max_hp + stats.added.max_hp) - old_max_hp;
