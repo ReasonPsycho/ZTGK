@@ -88,6 +88,7 @@ void Unit::UpdateStats() {
     }
 
     glm::ivec2 new_range = {stats.added.rng_add, stats.added.rng_rem};
+
     if (new_range != old_range) {
         equipment.rangeEff0 = equipment.item0->stats.range.merge(stats.added.rng_add, stats.added.rng_rem);
         if (equipment.item1 != nullptr)

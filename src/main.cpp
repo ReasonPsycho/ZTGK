@@ -1666,14 +1666,23 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             }
             lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
+            Unit * hitAlly = nullptr;
             if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+                hitAlly = ray->getHitEntity()->getComponent<Unit>();
+            } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
+            }
+
+            if (hitAlly) {
                 //if it is already selected, deselect it
-                if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
-                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                if (hitAlly->isSelected) {
+                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
                 }
                     //if it is not selected, select it
                 else {
-                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(ray->getHitEntity()->getComponent<Unit>());
+                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(hitAlly);
                 }
             }
         }
