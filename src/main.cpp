@@ -105,7 +105,6 @@ string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLaunc
 string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
 string modelPathShroom = "res/models/shroom/shroom.fbx";
 
-ModelLoadingManager modelLoadingManager;
 Model *tileModel;
 Model *model;
 Model *gabka;
@@ -230,6 +229,7 @@ int display_w, display_h;
 Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
+
 PBRPrimitives pbrprimitives;
 
 float lastY;
@@ -592,24 +592,23 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-
-    tileModel = modelLoadingManager.GetModel(tileModelPath);
-    model = modelLoadingManager.GetModel(modelPath);
-    gabka = modelLoadingManager.GetModel(modelPathGabka);
-    zuczek = modelLoadingManager.GetModel(modelPathZuczek);
-    wall = modelLoadingManager.GetModel(modelPathWall);
-    washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
-    chestModel = modelLoadingManager.GetModel(modelChestPath);
-    projectileModel = modelLoadingManager.GetModel(modelProjectilePath);
-    mopModel = modelLoadingManager.GetModel(modelMopPath);
-    mopObrotowyModel = modelLoadingManager.GetModel(modelMopObrotowyPath);
-    tidyPodLauncherModel = modelLoadingManager.GetModel(modelTidyPodLauncherPath);
-    praniumModel = modelLoadingManager.GetModel(modelPraniumPath);
-    //shroomModel = modelLoadingManager.GetModel(modelPathShroom);
-    modelLoadingManager.Innit();
+    ztgk::game::modelLoadingManager =  new ModelLoadingManager;
+    ztgk::game::modelLoadingManager ->Innit();
+    tileModel =   ztgk::game::modelLoadingManager ->GetModel(tileModelPath);
+    model =   ztgk::game::modelLoadingManager ->GetModel(modelPath);
+    gabka =   ztgk::game::modelLoadingManager ->GetModel(modelPathGabka);
+    zuczek =   ztgk::game::modelLoadingManager ->GetModel(modelPathZuczek);
+    wall =   ztgk::game::modelLoadingManager ->GetModel(modelPathWall);
+    washingMachineModel =   ztgk::game::modelLoadingManager ->GetModel(washingMachinePath);
+    chestModel =   ztgk::game::modelLoadingManager ->GetModel(modelChestPath);
+    projectileModel =   ztgk::game::modelLoadingManager->GetModel(modelProjectilePath);
+    mopModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopPath);
+    mopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopObrotowyPath);
+    tidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelTidyPodLauncherPath);
+    praniumModel =   ztgk::game::modelLoadingManager ->GetModel(modelPraniumPath);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
+    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
 
     ztgk::game::washingMachineModel = washingMachineModel;
     ztgk::game::playerModel = gabka;
@@ -676,6 +675,7 @@ void load_enteties() {
     
     scene.systemManager.getSystem<LightSystem>()->Init();
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
+    scene.systemManager.getSystem<RenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
 
     //level gen and load___________________________________________________________________________________________________________________________________________________
@@ -778,7 +778,7 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-    //load_units();
+   // load_units();
 
 
 
@@ -790,22 +790,28 @@ void load_units() {
     playerUnit->addComponent(make_unique<Render>(gabka));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(modelPathGabkaMove, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager.GetAnimation(modelPathGabkaIdle, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(modelPathGabkaMine, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(modelPathGabkaAttack, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttack, gabka);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
+    playerUnit = scene.addEntity(playerUnit,"Emote");
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(0, 1, 0));
+    playerUnit->addComponent(make_unique<BetterSpriteRender>(  ztgk::game::modelLoadingManager ->GetTexture("res/textures/icons/pick-me.png")));
+
+
 
     playerUnit = scene.addEntity("Żuczek");
     playerUnit->addComponent(make_unique<Render>(zuczek));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = modelLoadingManager.GetAnimation(modelPathZuczekAttack, zuczek);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = modelLoadingManager.GetAnimation(modelPathZuczekMove, zuczek);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = modelLoadingManager.GetAnimation(modelPathZuczekIddle, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczek);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));

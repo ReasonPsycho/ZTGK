@@ -3,7 +3,6 @@
 //
 
 #include "RenderSystem.h"
-#include "ECS/Utils/Globals.h"
 
 
 void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
@@ -18,6 +17,13 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
         }
     }
     
+    for (auto & betterRender: betterRenderPlayerComponents) {
+        if(betterRender->draw(ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->spriteRenderShader, &frustum)) {
+            glBindVertexArray(tileModel->meshes[0].VAO);
+            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[0].indices.size()), GL_UNSIGNED_INT, (void*)0);
+            glBindVertexArray(0);  
+        }
+    }
     
 }
 
@@ -48,6 +54,12 @@ void RenderSystem::addComponent(void *component) {
         renderComponents.push_back(renderPtr);
     }
 
+    BetterSpriteRender* BetterRenderPtr = dynamic_cast<BetterSpriteRender*>(basePtr);
+    if(BetterRenderPtr != nullptr)
+    {
+        betterRenderPlayerComponents.push_back(BetterRenderPtr);
+    }
+
     ColorMask* colorMaskPtr = dynamic_cast<ColorMask*>(basePtr);
     if(colorMaskPtr != nullptr)
     {
@@ -69,6 +81,10 @@ void RenderSystem::UpdateImpl() {
     for (auto animationPlayer: animationPlayerComponents) {
         animationPlayer->Update();
     }
+
+    for (auto betterSprite: betterRenderPlayerComponents) {
+        betterSprite->Update();
+    }
 }
 
 
@@ -77,6 +93,24 @@ void RenderSystem::removeComponent(void *component) {
 
     if (component_iter != renderComponents.end()) {
         renderComponents.erase(component_iter);
+    }
+
+    auto BetterSpriteRender_iter = std::find(betterRenderPlayerComponents.begin(), betterRenderPlayerComponents.end(), reinterpret_cast<BetterSpriteRender *const>(component));
+
+    if (BetterSpriteRender_iter != betterRenderPlayerComponents.end()) {
+        betterRenderPlayerComponents.erase(BetterSpriteRender_iter);
+    }
+
+    auto ColorMask_iter = std::find(colorMaskComponents.begin(), colorMaskComponents.end(), reinterpret_cast<ColorMask *const>(component));
+
+    if (ColorMask_iter != colorMaskComponents.end()) {
+        colorMaskComponents.erase(ColorMask_iter);
+    }
+
+    auto AnimationPlayer_iter = std::find(animationPlayerComponents.begin(), animationPlayerComponents.end(), reinterpret_cast<AnimationPlayer *const>(component));
+
+    if (AnimationPlayer_iter != animationPlayerComponents.end()) {
+        animationPlayerComponents.erase(AnimationPlayer_iter);
     }
 }
 

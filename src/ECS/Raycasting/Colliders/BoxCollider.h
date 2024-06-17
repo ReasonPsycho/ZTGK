@@ -7,7 +7,6 @@
 #include "ECS/Raycasting/Collider.h"
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Render/ModelLoading/Model.h"
-#include "ECS/Render/Primitives/Primitives.h"
 
 class CollisionSystem;
 
