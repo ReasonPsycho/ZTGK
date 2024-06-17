@@ -96,9 +96,13 @@ string modelPathZuczekIddle = "res/models/zuczek/Zuczek_iddle.fbx";
 string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
-string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
+string washingMachinePath = "res/models/washingmachine/pralka.fbx";
 string modelProjectilePath = "res/models/projectile/projectile.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
+string modelMopPath = "res/models/items/mop/mop.fbx";
+string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
+string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
+string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
 
 ModelLoadingManager modelLoadingManager;
 Model *tileModel;
@@ -111,6 +115,10 @@ Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
 Model *projectileModel;
+Model *mopModel;
+Model *mopObrotowyModel;
+Model *tidyPodLauncherModel;
+Model *praniumModel;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -591,6 +599,10 @@ void load_enteties() {
     washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
     chestModel = modelLoadingManager.GetModel(modelChestPath);
     projectileModel = modelLoadingManager.GetModel(modelProjectilePath);
+    mopModel = modelLoadingManager.GetModel(modelMopPath);
+    mopObrotowyModel = modelLoadingManager.GetModel(modelMopObrotowyPath);
+    tidyPodLauncherModel = modelLoadingManager.GetModel(modelTidyPodLauncherPath);
+    praniumModel = modelLoadingManager.GetModel(modelPraniumPath);
     modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
@@ -600,8 +612,11 @@ void load_enteties() {
     ztgk::game::playerModel = gabka;
     ztgk::game::bugModel = zuczek;
     ztgk::game::chestModel = chestModel;
-    ztgk::game::praniumModel = modelLoadingManager.GetModel("res/models/pranium/pranium.fbx");
+    ztgk::game::praniumModel = praniumModel;
     ztgk::game::projectileModel = projectileModel;
+    ztgk::game::mopModel = mopModel;
+    ztgk::game::mopObrotowyModel = mopObrotowyModel;
+    ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
