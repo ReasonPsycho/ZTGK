@@ -659,8 +659,7 @@ void Grid::UpdateFogData(Tile *tile) {
 
 
 Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
-    auto modelLoadingManager = ModelLoadingManager();
-    modelLoadingManager.Innit();
+    auto modelLoadingManager = ztgk::game::modelLoadingManager;
     auto gabka = ztgk::game::playerModel;
 
     string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
@@ -685,13 +684,13 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
     if(isAlly) {
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
                 modelPathGabkaMove, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager.GetAnimation(
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
                 modelPathGabkaIdle, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
                 modelPathGabkaMine, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager->GetAnimation(
                 modelPathGabkaAttack, gabka);
     }
     return UnitEntity;

@@ -13,7 +13,7 @@ struct Cursor;
 class SignalQueue;
 class SignalReceiver;
 struct GLFWwindow;
-struct ModelLoadingManager;
+class ModelLoadingManager;
 struct Text;
 
 namespace ztgk::game {
