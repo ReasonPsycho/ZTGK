@@ -13,6 +13,7 @@ struct Cursor;
 class SignalQueue;
 class SignalReceiver;
 struct GLFWwindow;
+struct ModelLoadingManager;
 struct Text;
 
 namespace ztgk::game {
@@ -58,6 +59,7 @@ namespace ztgk::game {
     extern Model * washingMachineModel;
     extern Model * praniumModel;
     extern AudioManager * audioManager;
+    extern ModelLoadingManager * modelLoadingManager;
     extern SignalReceiver * selectionHandler;
 
     extern Cursor cursor;
