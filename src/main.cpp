@@ -103,6 +103,7 @@ string modelMopPath = "res/models/items/mop/mop.fbx";
 string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
 string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
 string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
+string modelPathShroom = "res/models/shroom/shroom.fbx";
 
 ModelLoadingManager modelLoadingManager;
 Model *tileModel;
@@ -119,6 +120,7 @@ Model *mopModel;
 Model *mopObrotowyModel;
 Model *tidyPodLauncherModel;
 Model *praniumModel;
+Model *shroomModel;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -603,6 +605,7 @@ void load_enteties() {
     mopObrotowyModel = modelLoadingManager.GetModel(modelMopObrotowyPath);
     tidyPodLauncherModel = modelLoadingManager.GetModel(modelTidyPodLauncherPath);
     praniumModel = modelLoadingManager.GetModel(modelPraniumPath);
+    //shroomModel = modelLoadingManager.GetModel(modelPathShroom);
     modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
@@ -617,6 +620,7 @@ void load_enteties() {
     ztgk::game::mopModel = mopModel;
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
+    //ztgk::game::shroomModel = shroomModel;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -857,7 +861,7 @@ playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), s
     enemyUnit->updateSelfAndChild();
     enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(1, 1, 1)));
     enemyUnit->getComponent<BoxCollider>()->setCenter(enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    enemyUnit->addComponent(make_unique<Unit>("Enemy1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 60), Unit::ENEMY_BASE, false));
+    enemyUnit->addComponent(make_unique<Unit>("Enemy1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 60), Unit::ENEMY_BASE_BUG, false));
     stateManager = new StateManager(enemyUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
