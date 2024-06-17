@@ -15,11 +15,13 @@ class ModelLoadingManager  {
 public:
     Animation *GetAnimation(std::string path, Model *model);
     Model * GetModel (std::string path);
+    Texture * GetTexture (std::string path);
     void Innit();
 private:
     bool isInnit = false;
     std::map<std::string, std::shared_ptr<Animation>> animationMap;
     std::map<std::string, std::shared_ptr<Model>> modelMap;
+    std::map<std::string, std::shared_ptr<Texture>> textureMap;
 };
 
 

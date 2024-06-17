@@ -5,7 +5,6 @@
 #include "Grid.h"
 #include "ECS/Entity.h"
 #include "ECS/Render/Components/Render.h"
-#include "ECS/Render/Primitives/Primitives.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Unit/Mining/IMineable.h"
 #include "ECS/Utils/Globals.h"

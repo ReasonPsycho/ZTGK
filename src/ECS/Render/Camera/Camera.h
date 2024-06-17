@@ -30,7 +30,7 @@ const float SPEED = 100.0f;
 const float SENSITIVITY = 5.0f;
 const float ZOOM = 45.0f;
 const float NEARCLIP = 0.1f;
-const float FARCLIP = 1000.0f;
+const float FARCLIP = 400.0f;
 
 const float MAX_X_POS = 180;
 const float MIN_X_POS = 20;

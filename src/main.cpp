@@ -217,6 +217,7 @@ int display_w, display_h;
 Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
+
 PBRPrimitives pbrprimitives;
 
 float lastY;
@@ -580,7 +581,7 @@ void load_enteties() {
     modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
+    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
 
     ztgk::game::washingMachineModel = washingMachineModel;
     ztgk::game::playerModel = gabka;
@@ -641,6 +642,7 @@ void load_enteties() {
     
     scene.systemManager.getSystem<LightSystem>()->Init();
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
+    scene.systemManager.getSystem<RenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
 
     //level gen and load___________________________________________________________________________________________________________________________________________________
@@ -743,7 +745,7 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-    //load_units();
+    load_units();
 
 
 
@@ -763,6 +765,12 @@ void load_units() {
     playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
+    playerUnit = scene.addEntity(playerUnit,"Emote");
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(0, 1, 0));
+    playerUnit->addComponent(make_unique<BetterSpriteRender>(modelLoadingManager.GetTexture("res/textures/icons/pick-me.png")));
+
+
 
     playerUnit = scene.addEntity("Żuczek");
     playerUnit->addComponent(make_unique<Render>(zuczek));
