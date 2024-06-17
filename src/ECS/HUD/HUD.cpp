@@ -17,6 +17,7 @@
 #include "ECS/Utils/Util.h"
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/UnitSystem.h"
+#include "ECS/Gameplay/WashingMachine.h"
 
 using namespace std;
 
@@ -785,11 +786,11 @@ void HUD::UpdateImpl() {
         ztgk::game::ui_data.txt_time_display->content = std::format("{:02d}:{:02d}", mins, secs);
     }
     if (ztgk::game::ui_data.txt_pranium_counter) {
-        ztgk::game::ui_data.txt_pranium_counter->content = std::format("{}", ztgk::game::pranium_needed_to_win);
+        ztgk::game::ui_data.txt_pranium_counter->content = std::format("{}%", 100.0f * ztgk::game::scene->systemManager.getSystem<WashingMachine>()->praniumNeeded / ztgk::game::scene->systemManager.getSystem<WashingMachine>()->currentPranium);
     }
     if (ztgk::game::ui_data.txt_unit_counter) {
         auto spongs = std::count_if(ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
-                                    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->isAlly; });
+                                    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->isAlly && unit->isAlive; });
         ztgk::game::ui_data.txt_unit_counter->content = std::format("{}", spongs);
     }
     // todo listen to win / lose signal
