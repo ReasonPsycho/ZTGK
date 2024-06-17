@@ -25,7 +25,7 @@ void ProjectileSystem::UpdateImpl() {
 
     for (auto &projectile : projectiles) {
         if(find(projectiles.begin(), projectiles.end(), projectile) != projectiles.end())
-            projectile->UpdateImpl();
+            projectile->Update();
     }
 }
 

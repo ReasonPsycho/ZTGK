@@ -45,7 +45,7 @@ void Projectile::UpdateImpl() {
     }
 
     // Check if the projectile has reached the target using the margin of error
-    if (glm::length(worldPosition - targetPosition) < epsilon) {
+    if (glm::length(worldPosition - targetPosition) < epsilon || curvePoints.empty()) {
         // Apply damage and remove the projectile
         CombatState::applyDamage(unit, target, damage);
         ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->removeComponent(this);

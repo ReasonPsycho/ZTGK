@@ -327,3 +327,45 @@ std::vector<Vector2Int> AstarPathfinding::FindPath(Vector2Int start, Vector2Int 
 }
 
 
+Vector2Int AstarPathfinding::GetNearestVacantTileInRange(Vector2Int target, Vector2Int origin, int range) {
+    // Base case: If range is 1, call GetNearestVacantTile
+    if (range <= 1) {
+        return GetNearestVacantTile(target, origin);
+    }
+
+    std::vector<Vector2Int> candidateTiles;
+    // Generate all candidate positions in a circle around the target within the specified range
+    for (int dx = -range; dx <= range; ++dx) {
+        for (int dz = -range; dz <= range; ++dz) {
+            if (std::sqrt(dx * dx + dz * dz) <= range) {
+                Vector2Int candidateTile = target + Vector2Int(dx, dz);
+                candidateTiles.push_back(candidateTile);
+            }
+        }
+    }
+
+    // Sort candidate tiles by distance to the origin
+    std::sort(candidateTiles.begin(), candidateTiles.end(), [origin](Vector2Int a, Vector2Int b) {
+        return VectorUtils::Distance(a, origin) < VectorUtils::Distance(b, origin);
+    });
+
+    // Check each candidate position
+    for (const auto& candidateTile : candidateTiles) {
+        // Check if the candidate tile is within grid bounds
+        if (grid->getTileAt(candidateTile) != nullptr) {
+            // Check if the candidate tile is vacant
+            if (grid->getTileAt(candidateTile)->vacant()) {
+                // Check if a path can be found to this tile
+                std::vector<Vector2Int> path = FindPath(origin, candidateTile);
+                if (!path.empty()) {
+                    return candidateTile;
+                }
+            }
+        }
+    }
+
+    // If no suitable tile is found, decrease the range and try again
+    return GetNearestVacantTileInRange(target, origin, range - 1);
+}
+
+

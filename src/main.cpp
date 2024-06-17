@@ -1774,7 +1774,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         isRightMouseButtonHeld = false;
 
         Entity *hit = ray->getHitEntity();
-
+        if(hit == nullptr){
+            return;
+        }
 
 
         //if mouse was held for less than 0.2 seconds, consider it a click
@@ -1809,6 +1811,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
+                if(hitUnit == nullptr && hitTile != nullptr){
+                    hitUnit = hitTile->unit;
+                }
                 auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
                 for(auto sponge : selectedSponges){
@@ -1819,6 +1824,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     sponge->combatTarget = nullptr;
                     sponge->hasCombatTarget = false;
                     sponge->pathfinding.path.clear();
+
 
                     if(hitUnit!= nullptr){
                         if(hitUnit->isAlly){} //do nothing

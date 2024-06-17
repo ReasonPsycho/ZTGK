@@ -22,16 +22,16 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 
 const UnitStats Unit::ALLY_BASE = {
-        .max_hp = 150,
-        .hp = 150,
+        .max_hp = 11150,
+        .hp = 11150,
         .move_spd = 12,
         .mine_spd = 1,
         .added = {}
 };
 
 const UnitStats Unit::ENEMY_BASE = {
-        .max_hp = 90,
-        .hp = 90,
+        .max_hp = 2000,
+        .hp = 2000,
         .move_spd = 10,
         .mine_spd = 0,
         .added = {}
@@ -269,14 +269,13 @@ void Unit::UpdateImpl() {
             }
 
         }
-
         if(!isAlly && !ForcedMovementState && !ForcedMiningState) {
             combatTarget = GetClosestPathableEnemyInSight();
-            if (combatTarget == nullptr) {
-                combatTarget = GetClosestEnemyInSight();
+//            if (combatTarget == nullptr) {
+//                combatTarget = GetClosestEnemyInSight();
                 if (combatTarget != nullptr) {
                     movementTarget = combatTarget->gridPosition;
-                }
+//                }
             }
         }
 
@@ -288,17 +287,15 @@ void Unit::UpdateImpl() {
             }
         }
 
-
-
-
-        if(combatTarget != nullptr){
+        if(combatTarget != nullptr && !ForcedMovementState){
             hasCombatTarget = true;
             auto combatState = new CombatState(grid);
             combatState->unit = this;
             if(combatState->isTargetInRange() && canPathToAttackTarget()){delete combatState;}
             else if(!combatState->isTargetInRange() && canPathToAttackTarget()){
                 hasMovementTarget = true;
-                movementTarget = pathfinding.GetNearestVacantTile(combatTarget->gridPosition, gridPosition);
+
+                movementTarget = pathfinding.GetNearestVacantTileInRange(combatTarget->gridPosition, gridPosition, stats.added.rng_add + stats.added.rng_rem);
                 delete combatState;
             }
             else{
