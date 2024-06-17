@@ -20,6 +20,8 @@
 #include "ECS/Render/Components/AnimationPlayer.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
 #include "ECS/Unit/Equipment/ConcreteItems/ItemTypes.h"
+#include "ECS/Unit/Equipment/InventoryManager.h"
+#include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -670,7 +672,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
 
 
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
-    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::bugModel));
+    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::shroomModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
     UnitEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
     UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
@@ -678,6 +680,10 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));
     UnitEntity->getComponent<BoxCollider>()->setCenter(UnitEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
     UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : bug ? "Bug" : "Shroom", this, gridPos, isAlly ? Unit::ALLY_BASE : bug ? Unit::ENEMY_BASE_BUG : Unit::ENEMY_BASE_SHROOM, isAlly));
+    if(bug){
+        auto unit = UnitEntity->getComponent<Unit>();
+        InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
+    }
 
     auto stateManager = new StateManager(UnitEntity->getComponent<Unit>());
     stateManager->currentState = new IdleState(this);
