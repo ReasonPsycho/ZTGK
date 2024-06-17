@@ -15,6 +15,9 @@
 #include <ranges>
 #include <algorithm>
 #include "ECS/Utils/Util.h"
+#include "ECS/Utils/Time.h"
+#include "ECS/Unit/UnitSystem.h"
+#include "ECS/Gameplay/WashingMachine.h"
 
 using namespace std;
 
@@ -110,6 +113,8 @@ void HUD::init() {
     *ztgk::game::scene->systemManager.getSystem<SignalQueue>() += signalReceiver.get();
 }
 
+
+
 void HUD::draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glEnable(GL_BLEND);
@@ -131,8 +136,8 @@ void HUD::drawGroup(unsigned int groupID) {
         spdlog::warn(std::format("HUD Group {} not found! Defaulting to groupID 0.", groupID));
         groupID = 0;
     }
-    if ( minimap && minimap->groupID == groupID )
-        minimapRenderer->render(minimap);
+//    if ( minimap && minimap->groupID == groupID )
+//        minimapRenderer->render(minimap);
     for ( auto sprite : sprites[groupID] ) {
         spriteRenderer->render(sprite);
     }
@@ -216,6 +221,10 @@ void HUD::addComponent(void *component) {
         case hudcType::SLIDER: {
             HUDSlider *slider = reinterpret_cast<HUDSlider *>(component);
             sliders[slider->groupID].push_back(slider);
+            break;
+        }
+        case hudcType::MINIMAP: {
+            minimap = reinterpret_cast<Minimap *>(component);
             break;
         }
     }
@@ -773,6 +782,27 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
     entity->getComponent<HUDSlider>()->displayFormat = displayFormat;
 
     return entity;
+}
+
+void HUD::UpdateImpl() {
+    if (ztgk::game::ui_data.txt_time_display) {
+        auto time = Time::Instance().LastFrame();
+        int mins = time / 60.0f;
+        int secs = (int)time % 60;
+        ztgk::game::ui_data.txt_time_display->content = std::format("{:02d}:{:02d}", mins, secs);
+    }
+    if (ztgk::game::ui_data.txt_pranium_counter) {
+        ztgk::game::ui_data.txt_pranium_counter->content = std::format("{}%", 100.0f * ztgk::game::scene->systemManager.getSystem<WashingMachine>()->praniumNeeded / ztgk::game::scene->systemManager.getSystem<WashingMachine>()->currentPranium);
+    }
+    if (ztgk::game::ui_data.txt_unit_counter) {
+        auto spongs = std::count_if(ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->isAlly && unit->isAlive; });
+        ztgk::game::ui_data.txt_unit_counter->content = std::format("{}", spongs);
+    }
+    // todo listen to win / lose signal
+//    if (minimap)
+//        minimap->Update();
+    ztgk::update_unit_hud();
 }
 
 #pragma endregion

@@ -9,9 +9,25 @@
 #include "MovementState.h"
 #include "CombatState.h"
 #include "IdleState.h"
+#include "HealingState.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
 
 
 State *MiningState::RunCurrentState() {
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        auto moveState = new MovementState(grid);
+        moveState->unit = unit;
+        moveState->unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        return moveState;
+    }
+
     isTargetInRange();
 
     //from Mining to Idle

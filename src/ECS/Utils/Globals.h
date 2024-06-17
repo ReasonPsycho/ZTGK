@@ -13,6 +13,7 @@ struct Cursor;
 class SignalQueue;
 class SignalReceiver;
 struct GLFWwindow;
+struct Text;
 
 namespace ztgk::game {
 
@@ -23,7 +24,7 @@ namespace ztgk::game {
         };
 
         ui_phase phase = ui_phase::MAIN_MENU;
-        unsigned tracked_unit_id;
+        unsigned tracked_unit_id = -1;
         unsigned gr_game;
         unsigned gr_map;
         unsigned gr_middle;
@@ -40,6 +41,12 @@ namespace ztgk::game {
         unsigned gr_w1_passive;
         unsigned gr_w2_offensive;
         unsigned gr_w2_passive;
+        unsigned gr_game_won;
+        unsigned gr_game_lost;
+
+        Text * txt_time_display = nullptr;
+        Text * txt_pranium_counter = nullptr;
+        Text * txt_unit_counter = nullptr;
     };
     extern s_ui_data ui_data;
 
@@ -49,11 +56,13 @@ namespace ztgk::game {
     extern Camera * camera;
     extern SignalQueue * signalQueue;
     extern Model * washingMachineModel;
+    extern Model * praniumModel;
     extern AudioManager * audioManager;
     extern SignalReceiver * selectionHandler;
 
     extern Cursor cursor;
 
+    extern int pranium_needed_to_win;
     extern std::atomic<bool> pause;
     extern std::atomic<bool> pause_render;
 
@@ -67,5 +76,13 @@ namespace ztgk::game {
     extern Model* shroomModel;
     extern Model* oreModel;
     extern Model* chestModel;
-    
+    extern Model* projectileModel;
+    extern Model* mopModel;
+    extern Model* mopObrotowyModel;
+    extern Model* tidyPodLauncherModel;
+
+
+    extern bool gameStarted;
+    extern bool gameWon;
+    extern bool gameLost;
 }

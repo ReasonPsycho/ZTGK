@@ -17,6 +17,7 @@ struct UnitStats {
     float hp{};
 
     float move_spd{20};
+    float move_spd_when_beaten{move_spd/2.0f};
     float mine_spd{};
     // todo atk speed
 
@@ -40,6 +41,7 @@ public:
     Grid* grid;
 
     UnitEquipment equipment;
+    std::string icon_path;
 
     //target flags
     bool hasMovementTarget = false;
@@ -83,6 +85,7 @@ public:
     bool canFindPathToTarget(Vector2Int target);
     std::vector<IMineable> miningPath;
 
+    void Pickup(PickupubleItem* item);
 
     // serializer
     // only use this with serializer!
@@ -107,6 +110,12 @@ public:
 
     bool canPathToAttackTarget(Unit* target = nullptr);
     bool canPathToMiningTarget();
+
+
+    bool isAlive = true;
+    bool isBeingHealedByWashingMachine = false;
+
+    Vector2Int getClosestWashingMachineTile();
 
 private:
     Vector2Int previousGridPosition;

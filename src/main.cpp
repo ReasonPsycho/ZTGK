@@ -77,6 +77,7 @@
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Audio/AudioManager.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
+#include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 #pragma endregion Includes
 
@@ -95,8 +96,13 @@ string modelPathZuczekIddle = "res/models/zuczek/Zuczek_iddle.fbx";
 string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
-string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
+string washingMachinePath = "res/models/washingmachine/pralka.fbx";
+string modelProjectilePath = "res/models/projectile/projectile.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
+string modelMopPath = "res/models/items/mop/mop.fbx";
+string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
+string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
+string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
 
 ModelLoadingManager modelLoadingManager;
 Model *tileModel;
@@ -108,6 +114,11 @@ Model *washingMachineModel;
 Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
+Model *projectileModel;
+Model *mopModel;
+Model *mopObrotowyModel;
+Model *tidyPodLauncherModel;
+Model *praniumModel;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -182,13 +193,13 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods);
 
+void handleControls(int key, int scancode, int action, int mods);
+
 void processInput(GLFWwindow *window);
 
 void update_dragged_tiles();
 
 void gen_and_load_lvl(bool gen_new_lvl = false);
-
-void update_weapon_hud(Unit *unit);
 
 #pragma endregion Function definitions
 
@@ -451,6 +462,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
     scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
     scene.systemManager.addSystem(std::make_unique<MiningSystem>());
+    scene.systemManager.addSystem(std::make_unique<ProjectileSystem>());
 
     scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -469,10 +481,15 @@ void init_systems() {
     scene.systemManager.getSystem<UnitSystem>()->init();
 
     ztgk::game::selectionHandler = new SignalReceiver(
-        Signal::signal_types.mouse_button_signal,
+        Signal::signal_types.mouse_button_signal | Signal::signal_types.keyboard,
         [](const Signal &signal) {
-            auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
-            handle_picking(window, data->button, data->action, data->mods);
+            if (signal.stype == Signal::signal_types.mouse_button_signal) {
+                auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+                handle_picking(window, data->button, data->action, data->mods);
+            } else if (signal.stype == Signal::signal_types.keyboard) {
+                auto data = std::dynamic_pointer_cast<KeySignalData>(signal.data);
+                handleControls(data->key, data->scancode, data->action, data->mods);
+            }
         }
     );
     *ztgk::game::signalQueue += ztgk::game::selectionHandler;
@@ -561,6 +578,10 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
 
 
+    //healing
+    ztgk::game::audioManager->loadSound("res/sounds/heal1.mp3", "heal1");
+    ztgk::game::audioManager->loadSound("res/sounds/heal2.mp3", "heal2");
+
 }
 
 void load_enteties() {
@@ -578,6 +599,11 @@ void load_enteties() {
     wall = modelLoadingManager.GetModel(modelPathWall);
     washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
     chestModel = modelLoadingManager.GetModel(modelChestPath);
+    projectileModel = modelLoadingManager.GetModel(modelProjectilePath);
+    mopModel = modelLoadingManager.GetModel(modelMopPath);
+    mopObrotowyModel = modelLoadingManager.GetModel(modelMopObrotowyPath);
+    tidyPodLauncherModel = modelLoadingManager.GetModel(modelTidyPodLauncherPath);
+    praniumModel = modelLoadingManager.GetModel(modelPraniumPath);
     modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
@@ -587,6 +613,11 @@ void load_enteties() {
     ztgk::game::playerModel = gabka;
     ztgk::game::bugModel = zuczek;
     ztgk::game::chestModel = chestModel;
+    ztgk::game::praniumModel = praniumModel;
+    ztgk::game::projectileModel = projectileModel;
+    ztgk::game::mopModel = mopModel;
+    ztgk::game::mopObrotowyModel = mopObrotowyModel;
+    ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -858,6 +889,7 @@ void load_hud() {
     ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
     ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
 
+
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
 
     ztgk::game::ui_data.gr_settings = hud->addGroup(0, "Settings");
@@ -866,6 +898,10 @@ void load_hud() {
 
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
+
+    ztgk::game::ui_data.gr_game_won = hud->addGroup(0, "Game Won");
+    ztgk::game::ui_data.gr_game_lost = hud->addGroup(0, "Game Lost");
+
 
 // menu
     auto emenu = scene.addEntity(ehud, "Menu");
@@ -917,7 +953,7 @@ void load_hud() {
 // game
     auto egame = scene.addEntity(ehud, "Game");
     auto emap = scene.addEntity(egame, "Map");
-    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
+//    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
     emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
@@ -1074,8 +1110,8 @@ void load_hud() {
             auto item = (*unit)->equipment[1];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
-            update_weapon_hud(*unit);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
+            ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
@@ -1089,8 +1125,8 @@ void load_hud() {
             auto item = (*unit)->equipment[2];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
-            update_weapon_hud(*unit);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
+            ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
@@ -1101,6 +1137,41 @@ void load_hud() {
     hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
 
+// TOP PANEL
+    auto etop = scene.addEntity(egame, "Top Panel");
+    glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 50};
+    ent = hud->createButton(
+        "||", top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
+        ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
+        [hud](){
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+        },
+        etop, ztgk::game::ui_data.gr_top
+    );
+    ent->getComponent<Text>()->pos.x -= 1;
+    ent->getComponent<Text>()->pos.y += 5;
+
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{300, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->getComponent<Sprite>()->mode = CENTER;
+
+    auto etime = scene.addEntity(etop, "Time");
+    etime->addComponent(make_unique<Text>("00:00", top_anchor, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    etime->getComponent<Text>()->mode = CENTER;
+    ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
+
+    auto epraniumCounter = scene.addEntity(etop, "Pranium Counter");
+    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
+    epraniumCounter->getComponent<Sprite>()->mode = CENTER;
+    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    epraniumCounter->getComponent<Text>()->mode = MIDDLE_LEFT;
+    ztgk::game::ui_data.txt_pranium_counter = epraniumCounter->getComponent<Text>();
+
+    auto eunitCounter = scene.addEntity(etop, "Unit Counter");
+    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
+    eunitCounter->getComponent<Sprite>()->mode = CENTER;
+    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");
@@ -1162,6 +1233,24 @@ void load_hud() {
         ecredits, ztgk::game::ui_data.gr_credits
     );
 
+    // Game Won -> 4 pranium delivered to Washing Machine
+    auto egamewon = scene.addEntity(ehud, "Menu");
+    egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
+    egamewon->addComponent(make_unique<Text>("CONGRATULATIONS!!! YOU HAVE DEFEATED THE DIRT!!!", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamewon, ztgk::game::ui_data.gr_game_won
+    );
+
+    // Game Lost -> All Gompkas are dead
+    auto egamelost = scene.addEntity(ehud, "Menu");
+    egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
+    egamelost->addComponent(make_unique<Text>("YOU HAVE BEEN DEFEATED BY THE DIRT!!!", top_anchor, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamelost, ztgk::game::ui_data.gr_game_lost
+    );
+
     // groups
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
@@ -1175,6 +1264,8 @@ void load_hud() {
 
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
 //    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true);
 }
 
 void init_imgui() {
@@ -1249,6 +1340,8 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
+    scene.systemManager.getSystem<HUD>()->Update();
+    scene.systemManager.getSystem<ProjectileSystem>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
@@ -1358,6 +1451,11 @@ void imgui_render() {
             .maxEnemies = 2,
             .unitCount = 3,
             .chestCount = 10,
+            .lootTable = {
+                {0, 1.f, 0.f},
+                {1, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -1471,10 +1569,7 @@ void imgui_end() {
 void processInput(GLFWwindow *window) {
     
     camera.MoveCamera(window);
-    
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    
+
     if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
         if (!captureMouseButtonPressed) {
             captureMouse = !captureMouse;
@@ -1630,14 +1725,23 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             }
             lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
+            Unit * hitAlly = nullptr;
             if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+                hitAlly = ray->getHitEntity()->getComponent<Unit>();
+            } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
+            }
+
+            if (hitAlly) {
                 //if it is already selected, deselect it
-                if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
-                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                if (hitAlly->isSelected) {
+                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
                 }
                     //if it is not selected, select it
                 else {
-                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(ray->getHitEntity()->getComponent<Unit>());
+                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(hitAlly);
                 }
             }
         }
@@ -1687,7 +1791,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         isRightMouseButtonHeld = false;
 
         Entity *hit = ray->getHitEntity();
-
+        if(hit == nullptr){
+            return;
+        }
 
 
         //if mouse was held for less than 0.2 seconds, consider it a click
@@ -1711,6 +1817,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                     selectedSponges[0]->pickupTarget = pickupableItem;
                     selectedSponges[0]->hasPickupTarget = true;
+                    selectedSponges[0]->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                            VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    selectedSponges[0]->hasMovementTarget = true;
 
                     return;
 
@@ -1719,6 +1828,11 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
+                if(hitUnit == nullptr && hitTile != nullptr){
+                    if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
+                         hitUnit = hitTile->unit;
+                    }
+                }
                 auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
                 for(auto sponge : selectedSponges){
@@ -1729,6 +1843,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     sponge->combatTarget = nullptr;
                     sponge->hasCombatTarget = false;
                     sponge->pathfinding.path.clear();
+
 
                     if(hitUnit!= nullptr){
                         if(hitUnit->isAlly){} //do nothing
@@ -1863,108 +1978,59 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
     if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
         auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
-        auto emods = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Mods");
-        emods->getChild("ATK")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.dmg_perc, unit->stats.added.dmg_flat);
-        emods->getChild("DEF")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.def_perc, unit->stats.added.def_flat);
-        emods->getChild("CD")->getComponent<Text>()->content = std::format("{}", unit->stats.added.atk_speed);
-        emods->getChild("RNG")->getComponent<Text>()->content = std::format("{}", unit->stats.added.rng_add);
-        emods->getChild("MNSP")->getComponent<Text>()->content = std::format("{}", unit->stats.mine_spd + unit->stats.added.mine_speed);
-        emods->getChild("MVSP")->getComponent<Text>()->content = std::format("{}", unit->stats.move_spd + unit->stats.added.move_speed);
-
-        scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;
-        scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->stats.hp);
-
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-        //hud/game/unit details/mods/mod
-
-        update_weapon_hud(unit);
-
     } else {
+        ztgk::game::ui_data.tracked_unit_id = -1;
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }
 
 }
 
-void update_weapon_hud(Unit *unit) {
-    if (unit->equipment.item1) {
-        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem1->getComponent<Text>()->content = unit->equipment.item1->name;
-        eitem1->getComponent<Sprite>()->load(unit->equipment.item1->icon_path);
-        if (unit->equipment.item1->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-
-            eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.dmg);
-            eitem1->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.range.add);
-            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item1->stats.cd_max_sec;
-            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item1->cd_sec);
-        } else {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(false);
-
-            auto ent = eitem1->getChild("Passive Stats");
-            int i = 1;
-            for (auto stats : unit->equipment.item1->highlight_passive_stats) {
-                string ent_name = "STAT" + to_string(i);
-                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
-                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                i++;
+void handleControls(int key, int scancode, int action, int mods) {
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
+                if (ztgk::game::ui_data.tracked_unit_id == -1)
+                    ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
+                break;
             }
+            --idx;
         }
-    } else {
-        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem1->getComponent<Text>()->content = "*No Item*";
-        eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
     }
-
-    if (unit->equipment.item2) {
-        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
-        eitem2->getComponent<Text>()->content = unit->equipment.item2->name;
-        eitem2->getComponent<Sprite>()->load(unit->equipment.item2->icon_path);
-        if (unit->equipment.item2->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
-
-            eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.dmg);
-            eitem2->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.range.add);
-            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item2->stats.cd_max_sec;
-            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item2->cd_sec);
-        } else {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(false);
-
-            auto ent = eitem2->getChild("Passive Stats");
-            int i = 1;
-            for (auto stats : unit->equipment.item2->highlight_passive_stats) {
-                string ent_name = "STAT" + to_string(i);
-                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
-                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                i++;
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ally);
+                if (ztgk::game::ui_data.tracked_unit_id == ally->uniqueID)
+                    ztgk::game::ui_data.tracked_unit_id = -1;
+                break;
             }
+            --idx;
         }
-    } else {
-        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
-        eitem2->getComponent<Text>()->content = "*No Item*";
-        eitem2->getComponent<Sprite>()->load("res/textures/question_mark.png");
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
     }
-
-    if (!unit->equipment.item1 && !unit->equipment.item2) {
-        auto eitem0 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem0->getComponent<Text>()->content = unit->equipment.item0->name + " - No Item";
-        eitem0->getComponent<Sprite>()->load(unit->equipment.item0->icon_path);
-        if (unit->equipment.item0->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-
-            eitem0->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.dmg);
-            eitem0->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.range.add);
-            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item0->stats.cd_max_sec;
-            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item0->cd_sec);
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        auto pause = scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_pause);
+        if (!pause->isHidden()) {
+            auto settings = scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_settings);
         }
+        pause->setHidden(!pause->isHidden());
+    }
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (key == GLFW_KEY_A && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
+        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+            scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
+        }
+    }
+    if (key == GLFW_KEY_A && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
+        scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+        ztgk::game::ui_data.tracked_unit_id = -1;
     }
 }
 
@@ -2014,17 +2080,23 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .seed {},
             .size {100, 100},
             .wallThickness = 1.f,
-            .baseRadius = RNG::RandomFloat(6.f, 10.f),
+            .baseRadius = RNG::RandomFloat(8.f, 12.f),
             .keyRadius = RNG::RandomFloat(3.f, 5.f),
-            .pocketRadius = RNG::RandomFloat(6.f, 10.f),
+            .pocketRadius = RNG::RandomFloat(4.f, 8.f),
             .noiseImpact = RNG::RandomFloat(0.1f, 0.3f),
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
-            .keyEnemies = RNG::RandomInt(2, 3),
-            .minEnemies = 5,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 5,  //4        <---
-            .unitCount = 1,   //3        <---
-            .chestCount = RNG::RandomInt(8, 15),
+            .keyEnemies = RNG::RandomInt(1, 3),
+            .minEnemies = 0,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 4,                       //4        <---
+            .unitCount = 3,                        //3        <---
+            .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
+            .lootTable = {
+                {1, 1.f, 0.f},
+                {3, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
+
     };
 
     static char seedString[64] = "";
@@ -2049,6 +2121,7 @@ void gen_and_load_lvl(bool gen_new_lvl) {
 
 
     LevelSaving::load();
+
 }
 
 #pragma endregion Functions

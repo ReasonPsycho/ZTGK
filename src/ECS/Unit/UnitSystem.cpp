@@ -14,6 +14,7 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
 #include "ECS/Unit/Mining/MineableChest.h"
+#include "ECS/HUD/HUD.h"
 
 UnitSystem::UnitSystem() {
     name = "UnitSystem";
@@ -31,6 +32,9 @@ void UnitSystem::removeComponent(void *component) {
         spdlog::info("Component successfully removed {}.", typeid(*((Unit *)component)).name());
     } else {
         spdlog::warn("Attempted to remove a component that does not exist in the map: {}.", typeid(*((Unit *)component)).name());
+    }
+    if (std::find(selectedUnits.begin(), selectedUnits.end(), (Unit *)component) != selectedUnits.end()) {
+        selectedUnits.erase(std::find(selectedUnits.begin(), selectedUnits.end(), (Unit *)component));
     }
 }
 
@@ -59,14 +63,26 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void UnitSystem::UpdateImpl() {
+    std::vector<Unit*> Spongies;
     for (Unit* unit: unitComponents) {
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
-        unit->UpdateImpl();
+        unit->Update();
         unit->getEntity()->getComponent<UnitAI>()->Update();
         unit->getEntity()->getComponent<BoxCollider>()->Update();
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
 
         //those find statements are needed because unit can be deleted in the UpdateImpl() function, which does not update unitComponents vector
+        if(unit->isAlly && unit->isAlive){
+            Spongies.push_back(unit);
+        }
+
+    }
+    if(Spongies.empty() && ztgk::game::gameStarted && !ztgk::game::gameLost){
+        auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(false);
+        ztgk::game::gameLost = true;
+
     }
 
     fixOverlappingUnits();
@@ -76,7 +92,8 @@ void UnitSystem::UpdateImpl() {
 }
 
 void UnitSystem::selectUnit(Unit *unit) {
-    selectedUnits.push_back(unit);
+    if (std::find(selectedUnits.begin(), selectedUnits.end(), unit) == selectedUnits.end())
+        selectedUnits.push_back(unit);
     unit->isSelected = true;
 }
 

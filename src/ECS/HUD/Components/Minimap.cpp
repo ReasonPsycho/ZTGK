@@ -21,6 +21,8 @@ Minimap::Minimap(const glm::vec2 &pos, const glm::vec2 &size, unsigned int hudGr
 
 void Minimap::UpdateImpl() {
     auto get_color = [](Tile * tile) -> glm::vec4 {
+        if (tile->isInFogOfWar)
+            return ztgk::color.WHITE;
         switch (tile->state) {
             default:
             case FLOOR:
@@ -40,6 +42,7 @@ void Minimap::UpdateImpl() {
         }
     };
 
+    // krzychu nie patrz na to zrobie na sygnałach to jest temporary xdd
     for (int y = 0; y < 100; ++y) {
         for (int x = 0; x < 100; ++x) {
             Tile *tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(x, y);

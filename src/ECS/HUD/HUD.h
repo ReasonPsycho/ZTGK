@@ -28,6 +28,8 @@ public:
     std::unique_ptr<MinimapRenderer> minimapRenderer;
     std::unique_ptr<SignalReceiver> signalReceiver;
 
+    void UpdateImpl() override;
+
     void draw();
     void drawGroup(unsigned groupID);
     Group * getDefaultGroup() const;

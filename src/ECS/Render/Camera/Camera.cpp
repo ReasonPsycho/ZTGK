@@ -47,6 +47,15 @@ void Camera::MoveCamera(GLFWwindow *window) {
         if (glfwGetKey(window, GLFW_KEY_C) ==GLFW_PRESS)
             Position -= Up * velocity;  
     }else{
+        bool no_mods = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS
+                && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) != GLFW_PRESS
+                && glfwGetKey(window, GLFW_KEY_LEFT_ALT) != GLFW_PRESS
+                && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) != GLFW_PRESS
+                && glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) != GLFW_PRESS
+                && glfwGetKey(window, GLFW_KEY_RIGHT_ALT) != GLFW_PRESS;
+
+        if (!no_mods) return;
+
         glm::vec3 front;
         front.x = cos(glm::radians(Yaw));
         front.y = 0;   // ignore pitch
