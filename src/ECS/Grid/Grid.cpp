@@ -245,7 +245,7 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 5, 1);
                     break;
                 case SPONGE:
-                    SpawnUnit(tile->index, true);
+                    SpawnUnit(tile->index, true, false);
                     break;
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
@@ -260,9 +260,10 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
                     break;
                 case SHROOM:
-                    //todo add shroom spawning with model etc
+                    SpawnUnit(tile->index, false, false);
+                    break;
                 case BUG:
-                    SpawnUnit(tile->index, false);
+                    SpawnUnit(tile->index, false, true);
                     break;
             }
         }
@@ -658,7 +659,7 @@ void Grid::UpdateFogData(Tile *tile) {
 
 
 
-Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
+Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     auto modelLoadingManager = ztgk::game::modelLoadingManager;
     auto gabka = ztgk::game::playerModel;
 
@@ -669,14 +670,14 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
 
 
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
-    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : ztgk::game::bugModel));
+    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::bugModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
     UnitEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
     UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
     UnitEntity->updateSelfAndChild();
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));
     UnitEntity->getComponent<BoxCollider>()->setCenter(UnitEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : "Enemy", this, gridPos, isAlly ? Unit::ALLY_BASE : Unit::ENEMY_BASE, isAlly));
+    UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : bug ? "Bug" : "Shroom", this, gridPos, isAlly ? Unit::ALLY_BASE : bug ? Unit::ENEMY_BASE_BUG : Unit::ENEMY_BASE_SHROOM, isAlly));
 
     auto stateManager = new StateManager(UnitEntity->getComponent<Unit>());
     stateManager->currentState = new IdleState(this);

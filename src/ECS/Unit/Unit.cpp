@@ -29,13 +29,23 @@ const UnitStats Unit::ALLY_BASE = {
         .added = {}
 };
 
-const UnitStats Unit::ENEMY_BASE = {
+const UnitStats Unit::ENEMY_BASE_BUG = {
         .max_hp = 60,
         .hp = 60,
         .move_spd = 9,
         .mine_spd = 0,
         .added = {}
 };
+
+const UnitStats Unit::ENEMY_BASE_SHROOM = {
+        .max_hp = 40,
+        .hp = 40,
+        .move_spd = 15,
+        .mine_spd = 0,
+        .added = { .rng_add = 3 }
+};
+
+
 
 Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats baseStats, bool isAlly)
 : equipment(this) {

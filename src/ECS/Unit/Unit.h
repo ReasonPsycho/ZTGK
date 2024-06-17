@@ -27,7 +27,8 @@ struct UnitStats {
 class Unit : public Component {
 public:
     static const UnitStats ALLY_BASE;
-    static const UnitStats ENEMY_BASE;
+    static const UnitStats ENEMY_BASE_BUG;
+    static const UnitStats ENEMY_BASE_SHROOM;
 
     bool isSelected = false;
 
