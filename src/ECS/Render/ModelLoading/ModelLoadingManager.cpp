@@ -49,3 +49,23 @@ Model * ModelLoadingManager::GetModel(std::string path) {
 void ModelLoadingManager::Innit() {
 
 }
+
+Texture *ModelLoadingManager::GetTexture(std::string path) {
+    auto it = textureMap.find(path);
+
+    if (it != textureMap.end())
+    {
+        // Found the key in the map, check if it has non-null pointer
+        if(it->second != nullptr)
+        {
+            // The map contains the pointer
+            return it->second.get();
+        }
+    }
+    else
+    {
+        textureMap[path] = std::make_shared<Texture>(path,"");
+        return textureMap[path].get();
+        // The map does not contain the pointer
+    }
+    return nullptr;}

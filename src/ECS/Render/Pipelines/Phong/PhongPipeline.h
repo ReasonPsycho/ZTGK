@@ -38,6 +38,7 @@ public:
     
     
     Shader phongShader = Shader("res/shaders/phong.vert", "res/shaders/phong.frag");
+    Shader spriteRenderShader = Shader("res/shaders/spriteRender.vert", "res/shaders/spriteRender.frag");
     Shader phongInstanceShader = Shader("res/shaders/phongInstance.vert", "res/shaders/phongInstance.frag");
     Shader phongInstanceLightShader = Shader("res/shaders/emmisonInstance.vert", "res/shaders/emmisonInstance.frag");
     Shader textureSampler = Shader("res/shaders/textureSampler.vert", "res/shaders/textureSampler.frag");
@@ -49,9 +50,9 @@ public:
     Texture *bloomDirtTexture;
     MaterialPhong *foamMaterial;
     GLuint colorAttachments[4];
+    Primitives *_primitives;
     
 private:
-    Primitives *_primitives;
     GLuint frameBuffer;
     GLuint rbo;
     bool toonTencilEnabled;

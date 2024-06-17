@@ -11,6 +11,7 @@
 #include "IdleState.h"
 #include "HealingState.h"
 #include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
 
 
 State *MiningState::RunCurrentState() {
@@ -129,10 +130,34 @@ void MiningState::Mine() {
     if(isTargetInRange()){
         if(unit->currentMiningTarget->getTimeToMineRemaining() == unit->currentMiningTarget->timeToMine){
             ztgk::game::audioManager->playRandomSoundFromGroup("mining");
+            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+            if(anim == nullptr)
+            {
+                spdlog::error("No animation player component found");
+            }
+            else
+            {
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_mine.fbx";
+                anim->PlayAnimation(modelPathGabkaMove, true, 4.0f);
+            }
         }
         unit->currentMiningTarget->Mine(unit);
+        //rotate unit towards the mining target
+        float angle = atan2(unit->currentMiningTarget->gridPosition.x - unit->gridPosition.x, unit->currentMiningTarget->gridPosition.z - unit->gridPosition.z);
+        unit->rotation = angle;
+
 
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
+            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+            if(anim == nullptr)
+            {
+                spdlog::error("No animation player component found");
+            }
+            else
+            {
+                anim->StopAnimation();
+            }
+
             miningTargets.erase(miningTargets.begin());
             if(miningTargets.empty()){
                 unit->hasMiningTarget = false;
