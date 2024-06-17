@@ -15,6 +15,7 @@
 #include "HealingState.h"
 #include "ECS/Gameplay/WashingMachineTile.h"
 #include "ECS/Unit/Equipment/Projectile/Projectile.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
 
 State *CombatState::RunCurrentState() {
 
@@ -130,6 +131,16 @@ void CombatState::AttackTarget() {
         projectileEntity->updateSelfAndChild();
     }
     else{
+        auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+        if(anim == nullptr)
+        {
+            spdlog::error("No animation player component found");
+        }
+        else
+        {
+            string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
+            anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+        }
         applyDamage(unit, target, totalAttackDamage);
     }
 
