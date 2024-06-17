@@ -21,6 +21,11 @@ void AnimationPlayer::UpdateImpl() {
             looping = false;
             animationSpeed = 1.0f;
         }
+    } else{
+        Render *render = getEntity()->getComponent<Render>();
+        if (render != nullptr) {
+            render->isAnimated = false;
+        }
     }
 }
 
@@ -52,6 +57,7 @@ void AnimationPlayer::PlayAnimation(std::string path, bool looping, float animat
 }
 
 void AnimationPlayer::StopAnimation() {
+    animator.m_CurrentTime = 0;
     isPlaying = false;
     looping = false;
     animationSpeed = 1.0f;
