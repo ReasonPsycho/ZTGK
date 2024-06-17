@@ -103,7 +103,7 @@ void CombatState::AttackTarget() {
         unit->hasCombatTarget = false;
         return;
     }
-    if(!unit->isTargetInRange){
+    if(!isTargetInRange()){
         unit->hasMovementTarget = true;
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;

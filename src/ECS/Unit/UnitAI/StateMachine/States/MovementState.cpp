@@ -41,13 +41,28 @@ State *MovementState::RunCurrentState() {
         unit->hasPickupTarget = false;
     }
 
-//    if(unit-> hasCombatTarget && unit->combatTarget != nullptr){
-//        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, unit->combatTarget->gridPosition);
-//    }
+    if(unit-> hasCombatTarget && unit->combatTarget != nullptr){
+        auto combat = new CombatState(grid);
+        combat->unit = unit;
+        if(combat->isTargetInRange()){
+            unit->hasMovementTarget = false;
+            return combat;
+        }
+        else {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->pathfinding.GetNearestVacantTileInRange(unit->gridPosition,
+                                                                                 unit->combatTarget->gridPosition,
+                                                                                 unit->stats.added.rng_add +
+                                                                                 unit->stats.added.rng_rem);
+            return  this;
+        }
 
-    if(unit->hasMovementTarget && unit->hasCombatTarget && unit->combatTarget != nullptr && (unit->movementTarget != unit->combatTarget->gridPosition && unit->hasMiningTarget && unit->currentMiningTarget != nullptr)){
+    }
+
+    if(unit->hasMovementTarget && (unit->hasMiningTarget && unit->currentMiningTarget != nullptr)){
         return this;
     }
+
 
     //from Movement to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
