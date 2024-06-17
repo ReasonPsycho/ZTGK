@@ -1702,14 +1702,23 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             }
             lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
+            Unit * hitAlly = nullptr;
             if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+                hitAlly = ray->getHitEntity()->getComponent<Unit>();
+            } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
+            }
+
+            if (hitAlly) {
                 //if it is already selected, deselect it
-                if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
-                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ray->getHitEntity()->getComponent<Unit>());
+                if (hitAlly->isSelected) {
+                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
                 }
                     //if it is not selected, select it
                 else {
-                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(ray->getHitEntity()->getComponent<Unit>());
+                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(hitAlly);
                 }
             }
         }
@@ -1794,6 +1803,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
+                if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
+                    hitUnit = hitTile->unit;
+                }
                 auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
                 for(auto sponge : selectedSponges){
@@ -2052,8 +2064,8 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .unitCount = 3,                        //3        <---
             .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
             .lootTable = {
-                {0, 1.f, 0.f},
-                {1, 0.5f, 0.5f},
+                {1, 1.f, 0.f},
+                {3, 0.5f, 0.5f},
                 {2, 0.f, 1.f},
             },
 

@@ -28,6 +28,7 @@ public:
     std::unordered_map<unsigned, std::vector<WashingMachineTile*>> WashingMachineTiles;
 
     int praniumNeeded;
+    int currentPranium = 0;
     int radiusToClear = 8;
 
     std::vector<Tile*> getTilesToClearInRaiuds(Vector2Int position, int radius);
@@ -43,7 +44,6 @@ private:
         std::type_index(typeid(WashingMachineTile))
     };
 
-    int currentPranium = 0;
     std::vector<Tile*> tilesToClear_walls;
     std::vector<Tile*> tilesToClear_floors;
 
