@@ -142,6 +142,10 @@ void MiningState::Mine() {
             }
         }
         unit->currentMiningTarget->Mine(unit);
+        //rotate unit towards the mining target
+        float angle = atan2(unit->currentMiningTarget->gridPosition.x - unit->gridPosition.x, unit->currentMiningTarget->gridPosition.z - unit->gridPosition.z);
+        unit->rotation = angle;
+
 
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
             auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
