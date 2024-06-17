@@ -1767,6 +1767,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
+                if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
+                    hitUnit = hitTile->unit;
+                }
                 auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
                 for(auto sponge : selectedSponges){
