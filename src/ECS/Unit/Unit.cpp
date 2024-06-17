@@ -22,17 +22,17 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 
 const UnitStats Unit::ALLY_BASE = {
-        .max_hp = 11150,
-        .hp = 11150,
+        .max_hp = 15,
+        .hp = 15,
         .move_spd = 12,
         .mine_spd = 1,
         .added = {}
 };
 
 const UnitStats Unit::ENEMY_BASE = {
-        .max_hp = 2000,
-        .hp = 2000,
-        .move_spd = 10,
+        .max_hp = 60,
+        .hp = 60,
+        .move_spd = 9,
         .mine_spd = 0,
         .added = {}
 };
