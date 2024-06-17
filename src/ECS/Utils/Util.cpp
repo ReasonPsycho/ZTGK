@@ -90,9 +90,16 @@ namespace ztgk {
                 auto ent = eitem1->getChild("Passive Stats");
                 int i = 1;
                 for (auto stats : item->highlight_passive_stats) {
+                    if (i > 4) break;
                     string ent_name = "STAT" + to_string(i);
-                    ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                    ent->getChild(ent_name)->getComponent<Sprite>()->load(stats.first);
                     ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                    i++;
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(false);
+                }
+                i++;
+                while (i <= 4) {
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(true);
                     i++;
                 }
             }
@@ -127,9 +134,16 @@ namespace ztgk {
                 auto ent = eitem2->getChild("Passive Stats");
                 int i = 1;
                 for (auto stats : item->highlight_passive_stats) {
+                    if (i > 4) break;
                     string ent_name = "STAT" + to_string(i);
-                    ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                    ent->getChild(ent_name)->getComponent<Sprite>()->load(stats.first);
                     ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                    i++;
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(false);
+                }
+                i++;
+                while (i <= 4) {
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(true);
                     i++;
                 }
             }
