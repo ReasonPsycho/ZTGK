@@ -47,6 +47,9 @@ namespace ztgk::game {
         Text * txt_time_display = nullptr;
         Text * txt_pranium_counter = nullptr;
         Text * txt_unit_counter = nullptr;
+
+        float game_start_time = 0;
+        float game_save_time = 0;
     };
     extern s_ui_data ui_data;
 

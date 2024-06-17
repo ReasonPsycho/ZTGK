@@ -257,6 +257,7 @@ void HUD::showImGuiDetailsImpl(Camera *camera) {
     if (ImGui::Button("Remap groups")) {
         remap_groups( HUDRemapGroupsSignalData() );
     }
+    ImGui::InputInt("Tracked unit ID", reinterpret_cast<int *>(&ztgk::game::ui_data.tracked_unit_id));
 
     if (ImGui::CollapsingHeader("Groups", true)) {
         if (ImGui::Button("New Group"))
@@ -780,18 +781,33 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
 
 void HUD::UpdateImpl() {
     if (ztgk::game::ui_data.txt_time_display) {
-        auto time = Time::Instance().LastFrame();
+        auto time = Time::Instance().LastFrame() - ztgk::game::ui_data.game_start_time + ztgk::game::ui_data.game_save_time;
         int mins = time / 60.0f;
         int secs = (int)time % 60;
         ztgk::game::ui_data.txt_time_display->content = std::format("{:02d}:{:02d}", mins, secs);
     }
     if (ztgk::game::ui_data.txt_pranium_counter) {
-        ztgk::game::ui_data.txt_pranium_counter->content = std::format("{}%", 100.0f * ztgk::game::scene->systemManager.getSystem<WashingMachine>()->praniumNeeded / ztgk::game::scene->systemManager.getSystem<WashingMachine>()->currentPranium);
+        auto ratio = 100.0f * ztgk::game::scene->systemManager.getSystem<WashingMachine>()->currentPranium / ztgk::game::scene->systemManager.getSystem<WashingMachine>()->praniumNeeded;
+        ztgk::game::ui_data.txt_pranium_counter->content = std::format("{}%", ratio);
+        if (ratio >= 80)
+            ztgk::game::ui_data.txt_pranium_counter->color = ztgk::color.TEAL;
+        else ztgk::game::ui_data.txt_pranium_counter->color = ztgk::color.NAVY;
     }
     if (ztgk::game::ui_data.txt_unit_counter) {
-        auto spongs = std::count_if(ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
-                                    ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->isAlly && unit->isAlive; });
-        ztgk::game::ui_data.txt_unit_counter->content = std::format("{}", spongs);
+        // filter view on units that are allies
+        int allies = 0;
+        int alive = 0;
+        for (auto unit : ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents) {
+            if (unit->isAlly) {
+                ++allies;
+                if (unit->isAlive)
+                    ++alive;
+            }
+        }
+        ztgk::game::ui_data.txt_unit_counter->content = std::format("{}/{}", alive, allies);
+        if (alive <= 1)
+            ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.RED;
+        else ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.YELLOW;
     }
     // todo listen to win / lose signal
 //    if (minimap)

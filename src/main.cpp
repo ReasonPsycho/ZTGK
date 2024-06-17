@@ -891,8 +891,8 @@ void load_hud() {
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
 
-    ztgk::game::ui_data.gr_game_won = hud->addGroup(0, "Game Won");
-    ztgk::game::ui_data.gr_game_lost = hud->addGroup(0, "Game Lost");
+    ztgk::game::ui_data.gr_game_won = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Won");
+    ztgk::game::ui_data.gr_game_lost = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Lost");
 
 
 // menu
@@ -1143,7 +1143,7 @@ void load_hud() {
     ent->getComponent<Text>()->pos.x -= 1;
     ent->getComponent<Text>()->pos.y += 5;
 
-    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{300, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{450, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
     etop->getComponent<Sprite>()->mode = CENTER;
 
     auto etime = scene.addEntity(etop, "Time");
@@ -1152,16 +1152,16 @@ void load_hud() {
     ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
 
     auto epraniumCounter = scene.addEntity(etop, "Pranium Counter");
-    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
+    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{190, 0}, glm::vec2{60, 80}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
     epraniumCounter->getComponent<Sprite>()->mode = CENTER;
-    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{150, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     epraniumCounter->getComponent<Text>()->mode = MIDDLE_LEFT;
     ztgk::game::ui_data.txt_pranium_counter = epraniumCounter->getComponent<Text>();
 
     auto eunitCounter = scene.addEntity(etop, "Unit Counter");
-    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
+    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{190, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
     eunitCounter->getComponent<Sprite>()->mode = CENTER;
-    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{155, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
     ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 
@@ -1226,19 +1226,27 @@ void load_hud() {
     );
 
     // Game Won -> 4 pranium delivered to Washing Machine
-    auto egamewon = scene.addEntity(ehud, "Menu");
+    auto egamewon = scene.addEntity(emenu, "Win Screen");
     egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
-    egamewon->addComponent(make_unique<Text>("CONGRATULATIONS!!! YOU HAVE DEFEATED THE DIRT!!!", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
-    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+    egamewon->addComponent(make_unique<Text>("VICTORY", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 200}, glm::vec2(2), ztgk::color.GOLD, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    egamewon->getComponent<Text>()->mode = CENTER;
+    auto egamewon_desc = scene.addEntity(egamewon, "Win Screen Flavor");
+    egamewon_desc->addComponent(make_unique<Text>("The world is now a cleaner place.", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    egamewon_desc->getComponent<Text>()->mode = CENTER;
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         egamewon, ztgk::game::ui_data.gr_game_won
     );
 
     // Game Lost -> All Gompkas are dead
-    auto egamelost = scene.addEntity(ehud, "Menu");
+    auto egamelost = scene.addEntity(emenu, "Lose Screen");
     egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
-    egamelost->addComponent(make_unique<Text>("YOU HAVE BEEN DEFEATED BY THE DIRT!!!", top_anchor, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
-    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+    egamelost->addComponent(make_unique<Text>("DEFEAT", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 200}, glm::vec2(1.5), ztgk::color.RED, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    egamelost->getComponent<Text>()->mode = CENTER;
+    auto egamelost_desc = scene.addEntity(egamelost, "Lose Screen Flavor");
+    egamelost_desc->addComponent(make_unique<Text>("As The Flith emerges, entropy increases...", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    egamelost_desc->getComponent<Text>()->mode = CENTER;
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         egamelost, ztgk::game::ui_data.gr_game_lost
     );
@@ -1979,18 +1987,30 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 }
 
 void handleControls(int key, int scancode, int action, int mods) {
-    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS) {
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == 0 && action == GLFW_PRESS) {
+        scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
         auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
         auto idx = key - GLFW_KEY_1;
         for (auto ally : allies) {
             if (idx == 0) {
                 scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
-                if (ztgk::game::ui_data.tracked_unit_id == -1)
-                    ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
+                ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
                 break;
             }
             --idx;
         }
+    }
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
+                break;
+            }
+            --idx;
+        }
+        ztgk::game::ui_data.tracked_unit_id = -1;
     }
     if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
         auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
@@ -2022,6 +2042,16 @@ void handleControls(int key, int scancode, int action, int mods) {
     }
     if (key == GLFW_KEY_A && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
         scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+        ztgk::game::ui_data.tracked_unit_id = -1;
+    }
+    if (key == GLFW_KEY_A && mods == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT) && action == GLFW_PRESS) {
+        auto old_selection = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
+        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+            scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
+        }
+        for (auto unit : old_selection) {
+            scene.systemManager.getSystem<UnitSystem>()->deselectUnit(unit);
+        }
         ztgk::game::ui_data.tracked_unit_id = -1;
     }
 }
