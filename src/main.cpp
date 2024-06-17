@@ -619,7 +619,7 @@ void load_enteties() {
     ztgk::game::mopModel = mopModel;
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
-    //ztgk::game::shroomModel = shroomModel;
+    ztgk::game::shroomModel = ztgk::game::modelLoadingManager ->GetModel("res/models/Mushroom/shroom.fbx");
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -778,7 +778,7 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-   // load_units();
+  //  load_units();
 
 
 
@@ -816,6 +816,16 @@ void load_units() {
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
+
+    playerUnit = scene.addEntity("Shroom");
+    playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
+    playerUnit->addComponent(make_unique<ColorMask>());
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+  playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    
     /*
 playerUnit = scene.addEntity("Player1");
 playerUnit->addComponent(make_unique<Render>(gabka));
