@@ -116,13 +116,19 @@ void HUD::init() {
 
 
 void HUD::draw() {
-    // no reverse
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
     //  same layer -> draw older elements first (in bg)
     //  diff layer -> as per sort_z
     for (auto pair : z_sorted_groups
     | std::views::filter([this](Group * g){ return !isGroupTreeHidden(g->id); })) {
         drawGroup(pair->id);
     }
+
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HUD::drawGroup(unsigned int groupID) {

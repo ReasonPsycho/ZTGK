@@ -22,6 +22,7 @@ uniform int pointLightAmount;
 
 flat out vec4 specularData;
 flat out vec4 diffuseData;
+uniform vec3 cameraUp;
 
 struct DirLight {
     vec4 diffuse;
@@ -109,12 +110,11 @@ void main()
     }
 
     vec3 look = normalize(camPos - billboard_position);
-    vec3 up = vec3(0.0, 1.0, 0.0);
-    vec3 right = cross(up, look);
+    vec3 right = cross(cameraUp, look);
 
     // Build the billboard's model matrix
     model[0] = vec4(right, 0.0);
-    model[1] = vec4(up, 0.0);
+    model[1] = vec4(cameraUp, 0.0);
     model[2] = vec4(look, 0.0);
     model[3] = vec4(billboard_position, 1.0);
 
