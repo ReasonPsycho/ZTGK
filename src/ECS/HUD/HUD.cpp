@@ -794,7 +794,6 @@ void HUD::UpdateImpl() {
         else ztgk::game::ui_data.txt_pranium_counter->color = ztgk::color.NAVY;
     }
     if (ztgk::game::ui_data.txt_unit_counter) {
-        // filter view on units that are allies
         int allies = 0;
         int alive = 0;
         for (auto unit : ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents) {
@@ -809,7 +808,9 @@ void HUD::UpdateImpl() {
             ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.RED;
         else ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.YELLOW;
     }
-    // todo listen to win / lose signal
+    // lose in UnitSystem
+    // win in WashingMachine
+
 //    if (minimap)
 //        minimap->Update();
     ztgk::update_unit_hud();
