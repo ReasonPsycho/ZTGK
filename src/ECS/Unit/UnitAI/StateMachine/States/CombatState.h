@@ -25,6 +25,7 @@ public:
     Item * useItem;
 
     bool isAttackOnCooldown();
+    static void applyDamage(Unit* unit, Unit* target, float dmg);
 
 private:
     void AttackTarget();

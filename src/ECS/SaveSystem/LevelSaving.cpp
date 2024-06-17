@@ -250,4 +250,6 @@ void LevelSaving::loadImpl(const string &path) {
 
     ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(false);
     spdlog::info("Finished loading");
+
+    ztgk::game::gameStarted = true;
 }

@@ -41,6 +41,8 @@ namespace ztgk::game {
         unsigned gr_w1_passive;
         unsigned gr_w2_offensive;
         unsigned gr_w2_passive;
+        unsigned gr_game_won;
+        unsigned gr_game_lost;
 
         Text * txt_time_display = nullptr;
         Text * txt_pranium_counter = nullptr;
@@ -74,5 +76,10 @@ namespace ztgk::game {
     extern Model* shroomModel;
     extern Model* oreModel;
     extern Model* chestModel;
-    
+    extern Model* projectileModel;
+
+
+    extern bool gameStarted;
+    extern bool gameWon;
+    extern bool gameLost;
 }

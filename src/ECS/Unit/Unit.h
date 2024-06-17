@@ -110,6 +110,12 @@ public:
     bool canPathToAttackTarget(Unit* target = nullptr);
     bool canPathToMiningTarget();
 
+
+    bool isAlive = true;
+    bool isBeingHealedByWashingMachine = false;
+
+    Vector2Int getClosestWashingMachineTile();
+
 private:
     Vector2Int previousGridPosition;
 

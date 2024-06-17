@@ -10,9 +10,25 @@
 #include "ECS/Utils/Time.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/UnitSystem.h"
-
+#include "HealingState.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
 
 State *MovementState::RunCurrentState() {
+
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                spdlog::info("Unit is dead, moving to healing state");
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        MoveOnPath();
+        return this;
+    }
 
     MoveOnPath();
 
@@ -151,6 +167,17 @@ void MovementState::MoveOnPath() {
             Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, (unit->stats.move_spd + unit->stats.added.move_speed) * Time::Instance().DeltaTime());
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
             unit->rotation = rotationAngle;
+//            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+//            if(anim == nullptr)
+//            {
+//                spdlog::error("No animation player component found");
+//            }
+//            else
+//            {
+//                string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
+                    //todo Krzysiu tu się wykurwia wszystko aaaaaa
+//                anim->PlayAnimation(modelPathGabkaMove);
+//            }
         }
     }
 }

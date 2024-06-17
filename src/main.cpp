@@ -77,6 +77,7 @@
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Audio/AudioManager.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
+#include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 #pragma endregion Includes
 
@@ -96,6 +97,7 @@ string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
+string modelProjectilePath = "res/models/projectile/projectile.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
 
 ModelLoadingManager modelLoadingManager;
@@ -108,6 +110,7 @@ Model *washingMachineModel;
 Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
+Model *projectileModel;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -450,6 +453,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
     scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
     scene.systemManager.addSystem(std::make_unique<MiningSystem>());
+    scene.systemManager.addSystem(std::make_unique<ProjectileSystem>());
 
     scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -565,6 +569,10 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
 
 
+    //healing
+    ztgk::game::audioManager->loadSound("res/sounds/heal1.mp3", "heal1");
+    ztgk::game::audioManager->loadSound("res/sounds/heal2.mp3", "heal2");
+
 }
 
 void load_enteties() {
@@ -582,6 +590,7 @@ void load_enteties() {
     wall = modelLoadingManager.GetModel(modelPathWall);
     washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
     chestModel = modelLoadingManager.GetModel(modelChestPath);
+    projectileModel = modelLoadingManager.GetModel(modelProjectilePath);
     modelLoadingManager.Innit();
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
@@ -592,6 +601,7 @@ void load_enteties() {
     ztgk::game::bugModel = zuczek;
     ztgk::game::chestModel = chestModel;
     ztgk::game::praniumModel = modelLoadingManager.GetModel("res/models/pranium/pranium.fbx");
+    ztgk::game::projectileModel = projectileModel;
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -856,6 +866,7 @@ void load_hud() {
     ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
     ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
 
+
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
 
     ztgk::game::ui_data.gr_settings = hud->addGroup(0, "Settings");
@@ -864,6 +875,10 @@ void load_hud() {
 
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
+
+    ztgk::game::ui_data.gr_game_won = hud->addGroup(0, "Game Won");
+    ztgk::game::ui_data.gr_game_lost = hud->addGroup(0, "Game Lost");
+
 
 // menu
     auto emenu = scene.addEntity(ehud, "Menu");
@@ -1195,6 +1210,24 @@ void load_hud() {
         ecredits, ztgk::game::ui_data.gr_credits
     );
 
+    // Game Won -> 4 pranium delivered to Washing Machine
+    auto egamewon = scene.addEntity(ehud, "Menu");
+    egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
+    egamewon->addComponent(make_unique<Text>("CONGRATULATIONS!!! YOU HAVE DEFEATED THE DIRT!!!", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamewon, ztgk::game::ui_data.gr_game_won
+    );
+
+    // Game Lost -> All Gompkas are dead
+    auto egamelost = scene.addEntity(ehud, "Menu");
+    egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
+    egamelost->addComponent(make_unique<Text>("YOU HAVE BEEN DEFEATED BY THE DIRT!!!", top_anchor, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamelost, ztgk::game::ui_data.gr_game_lost
+    );
+
     // groups
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
@@ -1208,6 +1241,8 @@ void load_hud() {
 
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
 //    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true);
 }
 
 void init_imgui() {
@@ -1283,6 +1318,7 @@ void update() {
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
     scene.systemManager.getSystem<HUD>()->Update();
+    scene.systemManager.getSystem<ProjectileSystem>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
@@ -2023,15 +2059,16 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
             .keyEnemies = RNG::RandomInt(1, 3),
-            .minEnemies = 0,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 4,  //4        <---
-            .unitCount = 3,   //3        <---
-            .chestCount = RNG::RandomInt(10, 15),
+            .minEnemies = 0,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 4,                       //4        <---
+            .unitCount = 3,                        //3        <---
+            .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
             .lootTable = {
                 {1, 1.f, 0.f},
                 {3, 0.5f, 0.5f},
                 {2, 0.f, 1.f},
             },
+
     };
 
     static char seedString[64] = "";
@@ -2056,6 +2093,7 @@ void gen_and_load_lvl(bool gen_new_lvl) {
 
 
     LevelSaving::load();
+
 }
 
 #pragma endregion Functions

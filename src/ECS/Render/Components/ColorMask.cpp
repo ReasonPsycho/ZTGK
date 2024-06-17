@@ -88,3 +88,20 @@ ColorMask::ColorMask() {
 bool ColorMask::HasMask(std::string name) {
     return maskDataMap.find(name) != maskDataMap.end();
 }
+
+void ColorMask::ChangeMaskColor(std::string name, glm::vec4 color) {
+    if (maskDataMap.find(name) != maskDataMap.end()) {  //If value doesn't already exist
+        maskDataMap[name].color = color;
+    } else {
+        spdlog::info("This doesn't have this color mask!: " + name);
+    }
+}
+
+glm::vec4 ColorMask::GetMaskColor(std::string name) {
+    if (maskDataMap.find(name) != maskDataMap.end()) {  //If value doesn't already exist
+        return maskDataMap[name].color;
+    } else {
+        spdlog::info("This doesn't have this color mask!: " + name);
+        return glm::vec4(0);
+    }
+}
