@@ -77,6 +77,9 @@ namespace ztgk::game {
     extern Model* oreModel;
     extern Model* chestModel;
     extern Model* projectileModel;
+    extern Model* mopModel;
+    extern Model* mopObrotowyModel;
+    extern Model* tidyPodLauncherModel;
 
 
     extern bool gameStarted;

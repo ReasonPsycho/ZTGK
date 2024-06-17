@@ -66,7 +66,7 @@ void UnitSystem::UpdateImpl() {
     std::vector<Unit*> Spongies;
     for (Unit* unit: unitComponents) {
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
-        unit->UpdateImpl();
+        unit->Update();
         unit->getEntity()->getComponent<UnitAI>()->Update();
         unit->getEntity()->getComponent<BoxCollider>()->Update();
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;

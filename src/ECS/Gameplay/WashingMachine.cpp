@@ -178,8 +178,9 @@ void WashingMachine::createWashingMachine(Model* model) {
 
     machineEntity->addComponent(std::make_unique<Render>(model));
 
-    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x,4,centerTileWorldPos.z));
-    machineEntity->transform.setLocalScale(glm::vec3(5, 5, 5));
+    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x - 4.5f,4,centerTileWorldPos.z));
+    machineEntity->transform.setLocalScale(glm::vec3(3, 3, 3));
+    machineEntity->transform.setLocalRotation(glm::vec3(glm::radians(0.0f), glm::radians(-90.0f), glm::radians(0.f)));
     machineEntity->updateSelfAndChild();
 
     machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));

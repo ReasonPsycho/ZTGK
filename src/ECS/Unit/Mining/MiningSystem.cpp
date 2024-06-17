@@ -79,10 +79,10 @@ void MiningSystem::showImGuiDetailsImpl(Camera *camera) {
 
 void MiningSystem::UpdateImpl() {
     for (auto pranium : praniumComponents) {
-        pranium->UpdateImpl();
+        pranium->Update();
     }
     for (auto mineableChest : mineableChestComponents) {
-        mineableChest->UpdateImpl();
+        mineableChest->Update();
     }
 //    for (auto mineable : mineableComponents) {
 //        mineable->UpdateImpl();

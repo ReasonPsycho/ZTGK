@@ -38,6 +38,7 @@ public:
     // Potrzebowalem bez sprawdzania == origin XOXO
     Vector2Int GetNearestVacantTileAround(Vector2Int origin, std::vector<Vector2Int> forbiddenTiles);
 
+    Vector2Int GetNearestVacantTileInRange(Vector2Int target, Vector2Int origin, int range);
 private:
     Grid* grid;
     Unit* unit;

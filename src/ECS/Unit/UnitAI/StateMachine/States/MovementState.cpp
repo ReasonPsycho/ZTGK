@@ -41,13 +41,28 @@ State *MovementState::RunCurrentState() {
         unit->hasPickupTarget = false;
     }
 
-//    if(unit-> hasCombatTarget && unit->combatTarget != nullptr){
-//        unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->gridPosition, unit->combatTarget->gridPosition);
-//    }
+    if(unit-> hasCombatTarget && unit->combatTarget != nullptr){
+        auto combat = new CombatState(grid);
+        combat->unit = unit;
+        if(combat->isTargetInRange()){
+            unit->hasMovementTarget = false;
+            return combat;
+        }
+        else {
+            unit->hasMovementTarget = true;
+            unit->movementTarget = unit->pathfinding.GetNearestVacantTileInRange(unit->gridPosition,
+                                                                                 unit->combatTarget->gridPosition,
+                                                                                 unit->stats.added.rng_add +
+                                                                                 unit->stats.added.rng_rem);
+            return  this;
+        }
 
-    if(unit->hasMovementTarget && unit->hasCombatTarget && unit->combatTarget != nullptr && (unit->movementTarget != unit->combatTarget->gridPosition && unit->hasMiningTarget && unit->currentMiningTarget != nullptr)){
+    }
+
+    if(unit->hasMovementTarget && (unit->hasMiningTarget && unit->currentMiningTarget != nullptr)){
         return this;
     }
+
 
     //from Movement to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
@@ -164,7 +179,7 @@ void MovementState::MoveOnPath() {
 
             Vector3 worldPos = Vector3(unit->worldPosition.x, unit->worldPosition.y, unit->worldPosition.z);
             Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, nextTileWorldPosition.y, nextTileWorldPosition.z);
-            Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, (unit->stats.move_spd + unit->stats.added.move_speed) * Time::Instance().DeltaTime());
+            Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, (unit->isAlive ? unit->stats.move_spd + unit->stats.added.move_speed : unit->stats.move_spd_when_beaten + unit->stats.added.move_speed/2.0f) * Time::Instance().DeltaTime());
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
             unit->rotation = rotationAngle;
 //            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
