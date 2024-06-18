@@ -334,9 +334,11 @@ int main(int, char **) {
             render();
 
         // Draw ImGui
-//        imgui_begin();
-//        imgui_render(); // edit this function to add your own ImGui controls
-//        imgui_end(); // this call effectively renders ImGui
+#ifdef DEBUG_BUILD
+        imgui_begin();
+        imgui_render(); // edit this function to add your own ImGui controls
+        imgui_end(); // this call effectively renders ImGui
+#endif
 
         // End frame and swap buffers (double buffering)
         end_frame();
@@ -410,7 +412,9 @@ bool init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#ifdef RELEASE_BUILD
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+#endif
 
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Scrub Squad", NULL, NULL);
 
@@ -1392,8 +1396,11 @@ void input() {
     ZoneScopedN("Input");
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#ifdef DEBUG_BUILD
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#elif defined(RELEASE_BUILD)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+#endif
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glfwSetScrollCallback(window, scroll_callback);
@@ -1482,15 +1489,6 @@ void render() {
 
 void imgui_begin() {
     ZoneScopedN("Imgui begin");
-
-//    ImGuiIO &io = ImGui::GetIO();
-//    mouseio = io;
-//    // Start the Dear ImGui frame
-//    if (!captureMouse) {
-//        io.MouseDrawCursor = true;
-//    } else {
-//        io.MouseDrawCursor = false;
-//    }
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -1664,17 +1662,6 @@ void processInput(GLFWwindow *window) {
 
     camera.MoveCamera(window);
 
-//    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
-//        if (!captureMouseButtonPressed) {
-//            captureMouse = !captureMouse;
-//        }
-//        captureMouseButtonPressed = true;
-//    }
-//
-//    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_RELEASE) {
-//        captureMouseButtonPressed = false;
-//    }
-
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
             if (timeStep == 0) {
@@ -1688,10 +1675,6 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         timeStepKeyPressed = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 
 //    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
@@ -2175,7 +2158,9 @@ void handleControls(int key, int scancode, int action, int mods) {
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     *ztgk::game::signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
+#ifdef DEBUG_BUILD
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+#endif
 }
 
 void end_frame() {
