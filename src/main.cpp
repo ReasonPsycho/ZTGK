@@ -922,6 +922,9 @@ void load_hud() {
     auto emenu = scene.addEntity(ehud, "Menu");
 
     emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title_screen.png"));
+    auto etitle = scene.addEntity(emenu, "Title");
+    etitle->addComponent(make_unique<Sprite>(glm::vec2{ztgk::game::window_size.x / 2,ztgk::game::window_size.y - 200}, glm::vec2{600, 150}, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title.png"));
+    etitle->getComponent<Sprite>()->mode = CENTER;
     float ystep = (ztgk::game::window_size.y - 2*200) / 4.0f;
     glm::vec2 btn_pos = {ztgk::game::window_size.x*4/5, ztgk::game::window_size.y - 200};
     hud->createButton(
