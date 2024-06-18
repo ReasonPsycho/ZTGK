@@ -639,6 +639,12 @@ void load_enteties() {
 
     Entity *gameObject;
 
+    gameObject = scene.addEntity("Gzibi");
+    gameObject->transform.setLocalPosition(glm::vec3(100, 0, 100));
+    gameObject->transform.setLocalScale(glm::vec3(1, 1, 1));
+    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
+    gameObject->addComponent(make_unique<Render>(ztgk::game::shroomModel));
+
     gameObject = scene.addEntity("Wall");;
     gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
     gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));

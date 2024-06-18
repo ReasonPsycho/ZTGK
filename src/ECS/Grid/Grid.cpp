@@ -693,7 +693,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     }
 
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
-    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::shroomModel));
+    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::bugModel : bug ? ztgk::game::bugModel : ztgk::game::shroomModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
     UnitEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
     UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
@@ -706,26 +706,26 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     stateManager->currentState = new IdleState(this);
     stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
-    if(isAlly) {
-        UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMove, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
-                modelPathGabkaIdle, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMine, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttack, gabka);
-
-        int ic = RNG::RandomInt(0, 1);
-        UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
-    }
-    else if (bug) {
-        UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
-    } else if(!isAlly && !bug){
-        auto unit = UnitEntity->getComponent<Unit>();
-        InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
-        UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
-    }
+//    if(isAlly) {
+//        UnitEntity->addComponent(make_unique<AnimationPlayer>());
+//        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
+//                modelPathGabkaMove, gabka);
+//        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
+//                modelPathGabkaIdle, gabka);
+//        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
+//                modelPathGabkaMine, gabka);
+//        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager->GetAnimation(
+//                modelPathGabkaAttack, gabka);
+//
+//        int ic = RNG::RandomInt(0, 1);
+//        UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
+//    }
+//    else if (bug) {
+//        UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
+//    } else if(!isAlly && !bug){
+//        auto unit = UnitEntity->getComponent<Unit>();
+//        InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
+//        UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
+//    }
     return UnitEntity;
 }

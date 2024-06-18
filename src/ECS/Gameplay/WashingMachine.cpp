@@ -143,48 +143,48 @@ void WashingMachine::onPraniumDelivered() {
 }
 
 void WashingMachine::createWashingMachine(Model* model) {
-    std::vector<Vector2Int> tilePositions;
-    if(WashingMachineTiles[uniqueID].empty()){
-        spdlog::error("No tiles for washing machine");
-        return;
-    }
-
-    for(auto tile : WashingMachineTiles[uniqueID]){
-        tilePositions.push_back(tile->gridPosition);
-    }
-
-    //get position of center tile
-    Vector2Int cornerTile = tilePositions[0];
-    for(auto tile : tilePositions){
-        if(tile.x < cornerTile.x){
-            cornerTile.x = tile.x;
-        }
-        if(tile.z < cornerTile.z){
-            cornerTile.z = tile.z;
-        }
-    }
-    Vector2Int centerTileGridPos = cornerTile + Vector2Int(2, 2);
-
-    auto centerTileWorldPos = ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(centerTileGridPos);
-
-
-    auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
-    if(machineEntity != nullptr){
-        machineEntity->Destroy();
-        delete machineEntity;
-    }
-    if(machineEntity == nullptr){
-        machineEntity = ztgk::game::scene->addEntity("WashingMachine");
-    }
-
-    machineEntity->addComponent(std::make_unique<Render>(model));
-
-    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x - 4.5f,4,centerTileWorldPos.z));
-    machineEntity->transform.setLocalScale(glm::vec3(3, 3, 3));
-    machineEntity->transform.setLocalRotation(glm::vec3(glm::radians(0.0f), glm::radians(-90.0f), glm::radians(0.f)));
-    machineEntity->updateSelfAndChild();
-
-    machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));
+//    std::vector<Vector2Int> tilePositions;
+//    if(WashingMachineTiles[uniqueID].empty()){
+//        spdlog::error("No tiles for washing machine");
+//        return;
+//    }
+//
+//    for(auto tile : WashingMachineTiles[uniqueID]){
+//        tilePositions.push_back(tile->gridPosition);
+//    }
+//
+//    //get position of center tile
+//    Vector2Int cornerTile = tilePositions[0];
+//    for(auto tile : tilePositions){
+//        if(tile.x < cornerTile.x){
+//            cornerTile.x = tile.x;
+//        }
+//        if(tile.z < cornerTile.z){
+//            cornerTile.z = tile.z;
+//        }
+//    }
+//    Vector2Int centerTileGridPos = cornerTile + Vector2Int(2, 2);
+//
+//    auto centerTileWorldPos = ztgk::game::scene->systemManager.getSystem<Grid>()->GridToWorldPosition(centerTileGridPos);
+//
+//
+//    auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
+//    if(machineEntity != nullptr){
+//        machineEntity->Destroy();
+//        delete machineEntity;
+//    }
+//    if(machineEntity == nullptr){
+//        machineEntity = ztgk::game::scene->addEntity("WashingMachine");
+//    }
+//
+//    machineEntity->addComponent(std::make_unique<Render>(model));
+//
+//    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x - 4.5f,4,centerTileWorldPos.z));
+//    machineEntity->transform.setLocalScale(glm::vec3(3, 3, 3));
+//    machineEntity->transform.setLocalRotation(glm::vec3(glm::radians(0.0f), glm::radians(-90.0f), glm::radians(0.f)));
+//    machineEntity->updateSelfAndChild();
+//
+//    machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));
 
 }
 
