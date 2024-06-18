@@ -25,9 +25,9 @@ public:
     }) {
         icon_path = "res/textures/perwoll.jpg";
         highlight_passive_stats = {
-                {"DMG", "100"},
-                {"DMG%", "0.5"},
-                {"ASPD", "0.3"}
+                {"res/textures/icons/stat/atk.png", "100"},
+                {"res/textures/icons/stat/atk.png", "0.5"},
+                {"res/textures/icons/stat/aspd.png", "0.3"}
         };
     }
 };
