@@ -524,7 +524,7 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 255);
 
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
@@ -936,10 +936,8 @@ void load_hud() {
 
     emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title_screen.png"));
     auto etitle = scene.addEntity(emenu, "Title");
-    etitle->addComponent(make_unique<Sprite>(glm::vec2{ztgk::game::window_size.x / 2,ztgk::game::window_size.y - 200}, glm::vec2{600, 150}, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title.png"));
-    etitle->getComponent<Sprite>()->mode = CENTER;
-    float ystep = (ztgk::game::window_size.y - 2*200) / 4.0f;
-    glm::vec2 btn_pos = {ztgk::game::window_size.x*4/5, ztgk::game::window_size.y - 200};
+    float ystep = (ztgk::game::window_size.y - 3*200) / 4.0f;
+    glm::vec2 btn_pos = {ztgk::game::window_size.x*4/5, ztgk::game::window_size.y - 400};
     hud->createButton(
         "START", btn_pos, glm::vec2{200, 80},
         ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
@@ -1270,8 +1268,8 @@ void load_hud() {
     eslider_master->getComponent<Text>()->mode = MIDDLE_RIGHT;
     hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, {1000, 80}, eslider_master, ztgk::game::ui_data.gr_settings, 128, 0, "{:.0f}/{:.0f}");
 
-    auto eslider_ambient = scene.addEntity(esettings, "Ambient Volume ");
-    eslider_ambient->addComponent(make_unique<Text>("Ambient Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_settings));
+    auto eslider_ambient = scene.addEntity(esettings, "Music Volume ");
+    eslider_ambient->addComponent(make_unique<Text>("Music Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_settings));
     eslider_ambient->getComponent<Text>()->mode = MIDDLE_RIGHT;
     hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, {1000, 80}, eslider_ambient, ztgk::game::ui_data.gr_settings, 128, 0, "{:.0f}/{:.0f}");
 
@@ -1304,7 +1302,7 @@ void load_hud() {
         glm::vec2{100, ztgk::game::window_size.y - 100}, glm::vec2(1), glm::vec4{36, 54, 110, 255}/255.0f, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_credits
     ));
     eteam->getComponent<Text>()->mode = TOP_LEFT;
-    eteam->addComponent(make_unique<Sprite>(glm::vec2{100,400}, glm::vec2{400, 225}, ztgk::color.WHITE, ztgk::game::ui_data.gr_credits, "res/textures/credits.jpg"));
+    eteam->addComponent(make_unique<Sprite>(glm::vec2{100,400}, glm::vec2{400, 225}, ztgk::color.WHITE, ztgk::game::ui_data.gr_credits, "res/textures/credits.png"));
     eteam->getComponent<Sprite>()->mode = MIDDLE_LEFT;
 
     auto elicenses = scene.addEntity(ecredits, "Licenses");
@@ -1917,8 +1915,14 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
             std::vector<Unit*> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
             if(!selectedSponges.empty()){
-
-                auto pickupableItem = hit->getComponent<PickupubleItem>();
+                auto kiddo = hit->getChild("OnMapItem");
+                PickupubleItem* pickupableItem = nullptr;
+                if(kiddo != nullptr) {
+                    pickupableItem = hit->getChild("OnMapItem")->getComponent<PickupubleItem>();
+                }
+                else{
+                    pickupableItem = hit->getComponent<PickupubleItem>();
+                }
                 if(pickupableItem != nullptr){
                     //sort sponges by distance to pickupable item ascending using pickupableItem->getEntity()->transform.getLocalPosition()
                     std::sort(selectedSponges.begin(), selectedSponges.end(), [pickupableItem](Unit* a, Unit* b){

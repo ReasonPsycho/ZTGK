@@ -20,7 +20,6 @@ State *MovementState::RunCurrentState() {
         auto neighs = grid->GetNeighbours(unit->gridPosition);
         for(auto n : neighs){
             if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
-                spdlog::info("Unit is dead, moving to healing state");
                 auto healingState = new HealingState(grid, unit);
                 return healingState;
             }
@@ -115,14 +114,12 @@ State *MovementState::RunCurrentState() {
             return combatState;
         else if(unit->canPathToAttackTarget())
         {
-            spdlog::info("Target not in range, moving to attack target -> can path to attack target");
             delete combatState;
             unit->hasMovementTarget = true;
             unit->movementTarget = unit->combatTarget->gridPosition;
             return this;
         }
         else{
-            spdlog::info("Target not in range, cannot path to attack target");
             delete combatState;
             unit->hasCombatTarget = false;
             unit->combatTarget = nullptr;
