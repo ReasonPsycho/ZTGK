@@ -1787,6 +1787,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 spdlog::debug("Left double click detected");
                 //deselect all units
                 scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+                ztgk::game::ui_data.tracked_unit_id = -1;
             }
             lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
@@ -1799,16 +1800,31 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
             }
 
-            if (hitAlly) {
+            if (hitAlly && hitAlly->isAlive) {
                 //if it is already selected, deselect it
                 if (hitAlly->isSelected) {
                     scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
+                    if (ztgk::game::ui_data.tracked_unit_id == hitAlly->uniqueID)
+                        ztgk::game::ui_data.tracked_unit_id = -1;
                 }
                     //if it is not selected, select it
                 else {
                     scene.systemManager.getSystem<UnitSystem>()->selectUnit(hitAlly);
+                    ztgk::game::ui_data.tracked_unit_id = hitAlly->uniqueID;
                 }
             }
+
+            Unit * hitEnemy = nullptr;
+            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && !ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+                hitEnemy = ray->getHitEntity()->getComponent<Unit>();
+            } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
+                       && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                       && !ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                hitEnemy = ray->getHitEntity()->getComponent<Tile>()->unit;
+            }
+
+            if (hitEnemy)
+                ztgk::game::ui_data.tracked_unit_id = hitEnemy->uniqueID;
         }
             //if mouse was held for more than 0.1 seconds, consider it a drag
         else {
@@ -2040,14 +2056,14 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         }
     }
     scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
-    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
-        auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
-        ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-    } else {
-        ztgk::game::ui_data.tracked_unit_id = -1;
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
-    }
+//    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
+//        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
+//        auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
+//        ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
+//    } else {
+//        ztgk::game::ui_data.tracked_unit_id = -1;
+//        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
+//    }
 
 }
 
