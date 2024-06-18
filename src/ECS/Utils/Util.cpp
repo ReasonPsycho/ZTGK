@@ -29,8 +29,16 @@ namespace ztgk {
             eactions->children[i]->getComponent<Sprite>()->load(allies[i]->icon_path);
             eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(allies[i]->stats.hp / (allies[i]->stats.max_hp + allies[i]->stats.added.max_hp));
             if (!allies[i]->isAlive) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GRAY;
+            // came back to life
+            if (allies[i]->isAlive && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GRAY)
+                eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+            if (allies[i]->isSelected) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GREEN;
+            // deselected
+            if (!allies[i]->isSelected && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GREEN)
+                eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
 //            else eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
         }
+
 
         // todo determine group hud
         Unit * unit;
