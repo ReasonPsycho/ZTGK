@@ -26,6 +26,7 @@ const UnitStats Unit::ALLY_BASE = {
         .hp = 150,
         .move_spd = 8,
         .mine_spd = 1,
+        .atk_spd = 1,
         .added = {}
 };
 
@@ -34,6 +35,7 @@ const UnitStats Unit::ENEMY_BASE_BUG = {
         .hp = 60,
         .move_spd = 9,
         .mine_spd = 0,
+        .atk_spd = 1,
         .added = {}
 };
 
@@ -387,13 +389,13 @@ void Unit::UpdateImpl() {
     previousGridPosition = gridPosition;
 
     if (equipment.item0->cd_sec > 0)
-        equipment.item0->cd_sec -= Time::Instance().DeltaTime();
+        equipment.item0->cd_sec -= Time::Instance().DeltaTime() * (stats.atk_spd + stats.added.atk_speed);
     if (equipment.item1 != nullptr && equipment.item1->cd_sec > 0)
-        equipment.item1->cd_sec -= Time::Instance().DeltaTime();
+        equipment.item1->cd_sec -= Time::Instance().DeltaTime() * (stats.atk_spd + stats.added.atk_speed);
     if (equipment.item2 != nullptr && equipment.item2->cd_sec > 0)
-        equipment.item2->cd_sec -= Time::Instance().DeltaTime();
+        equipment.item2->cd_sec -= Time::Instance().DeltaTime() * (stats.atk_spd + stats.added.atk_speed);
     if (equipment.cd_between_sec > 0)
-        equipment.cd_between_sec -= Time::Instance().DeltaTime();
+        equipment.cd_between_sec -= Time::Instance().DeltaTime() * (stats.atk_spd + stats.added.atk_speed);
 }
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {

@@ -908,11 +908,13 @@ void load_hud() {
     ztgk::game::ui_data.gr_middle = hud->addGroup(ztgk::game::ui_data.gr_game, "Unit Details");
     ztgk::game::ui_data.gr_actions = hud->addGroup(ztgk::game::ui_data.gr_game, "Action Panel");
     ztgk::game::ui_data.gr_top = hud->addGroup(ztgk::game::ui_data.gr_game, "Top Panel");
-    ztgk::game::ui_data.gr_item = hud->addGroup(ztgk::game::ui_data.gr_game, "Item Details");
-    ztgk::game::ui_data.gr_w1_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 1 Offensive");
-    ztgk::game::ui_data.gr_w1_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 1 Passive");
-    ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
-    ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
+
+    ztgk::game::ui_data.gr_item = hud->addGroup(ztgk::game::ui_data.gr_middle, "Item Details");
+
+    ztgk::game::ui_data.gr_w1_offensive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 1 Offensive");
+    ztgk::game::ui_data.gr_w1_passive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 1 Passive");
+    ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 2 Offensive");
+    ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 2 Passive");
 
 
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
@@ -924,14 +926,18 @@ void load_hud() {
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
 
-    ztgk::game::ui_data.gr_game_won = hud->addGroup(0, "Game Won");
-    ztgk::game::ui_data.gr_game_lost = hud->addGroup(0, "Game Lost");
+    ztgk::game::ui_data.gr_game_won = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Won");
+    ztgk::game::ui_data.gr_game_lost = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Lost");
 
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_item)->offset.x = 70;
 
 // menu
     auto emenu = scene.addEntity(ehud, "Menu");
 
     emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title_screen.png"));
+    auto etitle = scene.addEntity(emenu, "Title");
+    etitle->addComponent(make_unique<Sprite>(glm::vec2{ztgk::game::window_size.x / 2,ztgk::game::window_size.y - 200}, glm::vec2{600, 150}, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title.png"));
+    etitle->getComponent<Sprite>()->mode = CENTER;
     float ystep = (ztgk::game::window_size.y - 2*200) / 4.0f;
     glm::vec2 btn_pos = {ztgk::game::window_size.x*4/5, ztgk::game::window_size.y - 200};
     hud->createButton(
@@ -996,137 +1002,193 @@ void load_hud() {
     ename->getComponent<Text>()->mode = TOP_LEFT;
 
     auto emodstip = scene.addEntity(emiddle, "Modstip");
-    emodstip->addComponent(make_unique<Text>("Total stats:", glm::vec2{700, 175}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_middle));
+    emodstip->addComponent(make_unique<Text>("Total added:", glm::vec2{700, 175}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_middle));
     emodstip->getComponent<Text>()->mode = TOP_LEFT;
 
     auto emods = scene.addEntity(emiddle, "Mods");
     auto ent = scene.addEntity(emods, "ATK");
-    hud->createButton("ATK", glm::vec2{680, 137}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_middle);
-    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{710, 137}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{680,125}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/atk.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{710, 125}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "DEF");
-    hud->createButton("DEF", glm::vec2{680, 112}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_middle);
-    ent->addComponent(make_unique<Text>("0.30 + 10", glm::vec2{710, 112}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{680,75}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/def.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(make_unique<Text>("0.30 + 10", glm::vec2{710, 75}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "CD");
-    hud->createButton("CD", glm::vec2{680, 87}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_middle);
-    ent->addComponent(make_unique<Text>("1.00", glm::vec2{710, 87}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{680,25}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/aspd.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{710, 25}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "RNG");
-    hud->createButton("RNG", glm::vec2{680, 62}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_middle);
-    ent->addComponent(make_unique<Text>("4", glm::vec2{710, 62}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{860,125}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/rng.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(make_unique<Text>("4", glm::vec2{890, 125}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "MNSP");
-    hud->createButton("MNSP", glm::vec2{680, 37}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_middle);
-    ent->addComponent(make_unique<Text>("1.00", glm::vec2{710, 37}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{860,75}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/mnspd.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{890, 75}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "MVSP");
-    hud->createButton("MVSP", glm::vec2{680, 12}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_middle);
-    ent->addComponent(make_unique<Text>("5", glm::vec2{710, 12}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{860,25}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/mvspd.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
+    ent->addComponent(make_unique<Text>("5", glm::vec2{890, 25}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
 // WEAPON 1
     auto eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #1");
-    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/item_mop.png"));
-    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1200, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
-    eweapPortrait->getComponent<Text>()->mode = TOP_LEFT;
+    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_mop.png"));
+    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
+    eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
 
     auto eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
     ent = scene.addEntity(eoffstat, "ATK");
-    hud->createButton("ATK", glm::vec2{1170, 200}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
-    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 200}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,190}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w1_offensive, "res/textures/icons/stat/atk.png"));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(eoffstat, "RNG");
-    hud->createButton("RNG", glm::vec2{1170, 175}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
-    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 175}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,190}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w1_offensive, "res/textures/icons/stat/rng.png"));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1350, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(eoffstat, "CD");
-    hud->createButton("CD", glm::vec2{1170, 150}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_offensive);
-    auto eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 150}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w1_offensive, true, 100);
+    auto eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1170, 150}, glm::vec2{280, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w1_offensive, true, 100);
     eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
 
     auto epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
+    auto gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 1");
     ent = scene.addEntity(epassstat, "STAT1");
-    hud->createButton("STAT1", glm::vec2{1170, 200}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_passive);
-    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 200}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_passive));
+    // + 18 - 6
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,190}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT2");
-    hud->createButton("STAT2", glm::vec2{1170, 175}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_passive);
-    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 175}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_passive));
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 2");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,155}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1220, 155}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT3");
-    hud->createButton("STAT3", glm::vec2{1170, 150}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w1_passive);
-    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1200, 150}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_passive));
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 3");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,190}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(epassstat, "STAT4");
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 4");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,155}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 155}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
 // WEAPON 2
     eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #2");
-    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/item_superMop.png"));
-    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1200, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
-    eweapPortrait->getComponent<Text>()->mode = TOP_LEFT;
+    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_superMop.png"));
+    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
+    eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
 
     eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
     ent = scene.addEntity(eoffstat, "ATK");
-    hud->createButton("ATK", glm::vec2{1170, 80}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
-    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 80}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,68}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w2_offensive, "res/textures/icons/stat/atk.png"));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(eoffstat, "RNG");
-    hud->createButton("RNG", glm::vec2{1170, 55}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
-    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 55}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,68}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w2_offensive, "res/textures/icons/stat/rng.png"));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1350, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(eoffstat, "CD");
-    hud->createButton("CD", glm::vec2{1170, 30}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_offensive);
-    eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1200, 30}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w2_offensive, true, 100);
+    eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1170, 30}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w2_offensive, true, 100);
     eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
 
     epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 1");
     ent = scene.addEntity(epassstat, "STAT1");
-    hud->createButton("STAT1", glm::vec2{1170, 80}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_passive);
-    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1200, 80}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_passive));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,68}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT2");
-    hud->createButton("STAT2", glm::vec2{1170, 55}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_passive);
-    ent->addComponent(make_unique<Text>("4", glm::vec2{1200, 55}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_passive));
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 2");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,31}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("4", glm::vec2{1220, 31}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT3");
-    hud->createButton("STAT3", glm::vec2{1170, 30}, glm::vec2{25, 25}, ztgk::color.GRAY, ztgk::color.GRAY, ztgk::color.GRAY, [](){}, ent, ztgk::game::ui_data.gr_w2_passive);
-    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1200, 30}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_passive));
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 3");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,68}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
+    ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+
+    ent = scene.addEntity(epassstat, "STAT4");
+    gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 4");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,31}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
+    ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 31}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
 // ACTIONS
     auto eactions = scene.addEntity(egame, "Action Panel");
     eactions->addComponent(make_unique<Sprite>(glm::vec2{1520,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
-    hud->createButton(
-        glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/icons/pick-me.png", "res/textures/transparent.png",
-        [eactions](){
-            static std::string spr_gabka = "res/textures/icons/pick-me.png";
-            static std::string spr_mine = "res/textures/icons/pickAXE.png";
-
-            if (isLeftMouseButtonHeld) {
-                eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
-            }
-            else if (isRightMouseButtonHeld) {
-                eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
-            }
+    ent = hud->createButton(
+        glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
+        [](){
+            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_1, glfwGetKeyScancode(GLFW_KEY_1), GLFW_PRESS, mods, "Passing selection of unit 1 via action menu to handle_controls func.");
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createButton(
-        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png",
+    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->getComponent<Text>()->mode = CENTER;
+    ent = hud->createButton(
+        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
         [](){
+            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_2, glfwGetKeyScancode(GLFW_KEY_2), GLFW_PRESS, mods, "Passing selection of unit 2 via action menu to handle_controls func.");
+        },
+        eactions, ztgk::game::ui_data.gr_actions
+    );
+    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->getComponent<Text>()->mode = CENTER;
+    ent = hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
+        [](){
+            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_3, glfwGetKeyScancode(GLFW_KEY_3), GLFW_PRESS, mods, "Passing selection of unit 3 via action menu to handle_controls func.");
+        },
+        eactions, ztgk::game::ui_data.gr_actions
+    );
+    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->getComponent<Text>()->mode = CENTER;
+    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png", [](){
             if (ztgk::game::ui_data.tracked_unit_id == -1) return;
             auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
                                   scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
@@ -1137,11 +1199,8 @@ void load_hud() {
             InventoryManager::instance->unassign_item(*unit, item);
             InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
-        },
-        eactions, ztgk::game::ui_data.gr_actions
-    );
-    hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png",
-        [](){
+        }, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png", [](){
             if (ztgk::game::ui_data.tracked_unit_id == -1) return;
             auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
                                   scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
@@ -1152,31 +1211,33 @@ void load_hud() {
             InventoryManager::instance->unassign_item(*unit, item);
             InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
-        },
-        eactions, ztgk::game::ui_data.gr_actions
-    );
-    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+        }, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
 
 // TOP PANEL
     auto etop = scene.addEntity(egame, "Top Panel");
     glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 50};
+//    ent = hud->createButton(
+//        "||", top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
+//        ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
+//        [hud](){
+//            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+//        },
+//        etop, ztgk::game::ui_data.gr_top
+//    );
     ent = hud->createButton(
-        "||", top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
-        ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
+        top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
+        "res/textures/icons/pause.png", "res/textures/rectangles/800x800.png",
         [hud](){
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
         },
         etop, ztgk::game::ui_data.gr_top
     );
-    ent->getComponent<Text>()->pos.x -= 1;
-    ent->getComponent<Text>()->pos.y += 5;
+    ent->getChild("Background")->getComponent<Sprite>()->color = ztgk::color.GRAY * 0.75f;
+//    ent->getComponent<Text>()->pos.x -= 1;
+//    ent->getComponent<Text>()->pos.y += 5;
 
-    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{300, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{450, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top, "res/textures/rectangles/800x400.png"));
     etop->getComponent<Sprite>()->mode = CENTER;
 
     auto etime = scene.addEntity(etop, "Time");
@@ -1185,16 +1246,16 @@ void load_hud() {
     ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
 
     auto epraniumCounter = scene.addEntity(etop, "Pranium Counter");
-    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
+    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{190, 0}, glm::vec2{60, 80}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
     epraniumCounter->getComponent<Sprite>()->mode = CENTER;
-    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{150, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     epraniumCounter->getComponent<Text>()->mode = MIDDLE_LEFT;
     ztgk::game::ui_data.txt_pranium_counter = epraniumCounter->getComponent<Text>();
 
     auto eunitCounter = scene.addEntity(etop, "Unit Counter");
-    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
+    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{190, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
     eunitCounter->getComponent<Sprite>()->mode = CENTER;
-    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{155, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
     ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 
@@ -1259,19 +1320,27 @@ void load_hud() {
     );
 
     // Game Won -> 4 pranium delivered to Washing Machine
-    auto egamewon = scene.addEntity(ehud, "Menu");
+    auto egamewon = scene.addEntity(emenu, "Win Screen");
     egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
-    egamewon->addComponent(make_unique<Text>("CONGRATULATIONS!!! YOU HAVE DEFEATED THE DIRT!!!", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
-    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+    egamewon->addComponent(make_unique<Text>("VICTORY", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 200}, glm::vec2(2), ztgk::color.GOLD, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    egamewon->getComponent<Text>()->mode = CENTER;
+    auto egamewon_desc = scene.addEntity(egamewon, "Win Screen Flavor");
+    egamewon_desc->addComponent(make_unique<Text>("The world is now a cleaner place.", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    egamewon_desc->getComponent<Text>()->mode = CENTER;
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         egamewon, ztgk::game::ui_data.gr_game_won
     );
 
     // Game Lost -> All Gompkas are dead
-    auto egamelost = scene.addEntity(ehud, "Menu");
+    auto egamelost = scene.addEntity(emenu, "Lose Screen");
     egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
-    egamelost->addComponent(make_unique<Text>("YOU HAVE BEEN DEFEATED BY THE DIRT!!!", top_anchor, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
-    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+    egamelost->addComponent(make_unique<Text>("DEFEAT", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 200}, glm::vec2(1.5), ztgk::color.RED, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    egamelost->getComponent<Text>()->mode = CENTER;
+    auto egamelost_desc = scene.addEntity(egamelost, "Lose Screen Flavor");
+    egamelost_desc->addComponent(make_unique<Text>("As The Flith emerges, entropy increases...", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    egamelost_desc->getComponent<Text>()->mode = CENTER;
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         egamelost, ztgk::game::ui_data.gr_game_lost
     );
@@ -1747,6 +1816,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 spdlog::debug("Left double click detected");
                 //deselect all units
                 scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+                ztgk::game::ui_data.tracked_unit_id = -1;
             }
             lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
@@ -1759,16 +1829,31 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
             }
 
-            if (hitAlly) {
+            if (hitAlly && hitAlly->isAlive) {
                 //if it is already selected, deselect it
                 if (hitAlly->isSelected) {
                     scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
+                    if (ztgk::game::ui_data.tracked_unit_id == hitAlly->uniqueID)
+                        ztgk::game::ui_data.tracked_unit_id = -1;
                 }
                     //if it is not selected, select it
                 else {
                     scene.systemManager.getSystem<UnitSystem>()->selectUnit(hitAlly);
+                    ztgk::game::ui_data.tracked_unit_id = hitAlly->uniqueID;
                 }
             }
+
+            Unit * hitEnemy = nullptr;
+            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && !ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+                hitEnemy = ray->getHitEntity()->getComponent<Unit>();
+            } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
+                       && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                       && !ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                hitEnemy = ray->getHitEntity()->getComponent<Tile>()->unit;
+            }
+
+            if (hitEnemy)
+                ztgk::game::ui_data.tracked_unit_id = hitEnemy->uniqueID;
         }
             //if mouse was held for more than 0.1 seconds, consider it a drag
         else {
@@ -2000,30 +2085,42 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         }
     }
     scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
-    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
-        auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
-        ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-    } else {
-        ztgk::game::ui_data.tracked_unit_id = -1;
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
-    }
+//    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
+//        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
+//        auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
+//        ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
+//    } else {
+//        ztgk::game::ui_data.tracked_unit_id = -1;
+//        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
+//    }
 
 }
 
 void handleControls(int key, int scancode, int action, int mods) {
-    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS) {
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == 0 && action == GLFW_PRESS) {
+        scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
         auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
         auto idx = key - GLFW_KEY_1;
         for (auto ally : allies) {
             if (idx == 0) {
                 scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
-                if (ztgk::game::ui_data.tracked_unit_id == -1)
-                    ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
+                ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
                 break;
             }
             --idx;
         }
+    }
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
+                break;
+            }
+            --idx;
+        }
+        ztgk::game::ui_data.tracked_unit_id = -1;
     }
     if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
         auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
@@ -2055,6 +2152,16 @@ void handleControls(int key, int scancode, int action, int mods) {
     }
     if (key == GLFW_KEY_A && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
         scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+        ztgk::game::ui_data.tracked_unit_id = -1;
+    }
+    if (key == GLFW_KEY_A && mods == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT) && action == GLFW_PRESS) {
+        auto old_selection = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
+        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+            scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
+        }
+        for (auto unit : old_selection) {
+            scene.systemManager.getSystem<UnitSystem>()->deselectUnit(unit);
+        }
         ztgk::game::ui_data.tracked_unit_id = -1;
     }
 }

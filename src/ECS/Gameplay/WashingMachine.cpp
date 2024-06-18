@@ -119,6 +119,7 @@ void WashingMachine::onPraniumDelivered() {
     if(currentPranium >= praniumNeeded){
         auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
         hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);
         hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(false);
 
         ztgk::game::audioManager->playSound("win");
