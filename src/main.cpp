@@ -327,9 +327,9 @@ int main(int, char **) {
             render();
 
         // Draw ImGui
-        imgui_begin();
-        imgui_render(); // edit this function to add your own ImGui controls
-        imgui_end(); // this call effectively renders ImGui
+//        imgui_begin();
+//        imgui_render(); // edit this function to add your own ImGui controls
+//        imgui_end(); // this call effectively renders ImGui
 
         // End frame and swap buffers (double buffering)
         end_frame();
