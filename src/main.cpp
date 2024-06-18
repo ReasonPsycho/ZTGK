@@ -411,8 +411,21 @@ bool init() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Scrub Squad", NULL, NULL);
+    
+    GLFWimage icons[1];
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("res/textures/icons/pick-me.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        icons[0].pixels = data;   // Pixel data will be loaded from 'path_to_your_icon.png'
+        icons[0].width = width;   // Width should be the exact width of the image
+        icons[0].height = height; // Height should be the exact height of the image
+        glfwSetWindowIcon(window, 1, icons);
+        stbi_image_free(data);
+    }
+    
     // Create window with graphics context
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
     if (window == NULL) {
         spdlog::error("Failed to create GLFW Window!");
         file_logger->error("Failed to create GLFW Window!");
