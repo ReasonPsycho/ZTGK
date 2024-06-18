@@ -1576,17 +1576,6 @@ void processInput(GLFWwindow *window) {
     
     camera.MoveCamera(window);
 
-    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
-        if (!captureMouseButtonPressed) {
-            captureMouse = !captureMouse;
-        }
-        captureMouseButtonPressed = true;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_RELEASE) {
-        captureMouseButtonPressed = false;
-    }
-
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
             if (timeStep == 0) {
@@ -1600,10 +1589,6 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         timeStepKeyPressed = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 
 //    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
@@ -1677,7 +1662,7 @@ void update_dragged_tiles() {
 }
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods) {
-    
+
     //calculate ray every mouse press
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(ztgk::game::cursor.raw_pos.x, ztgk::game::cursor.raw_pos.y, camera.saved_display_w,
                                                                  camera.saved_display_h);
