@@ -34,8 +34,8 @@ unsigned s_item_types::id_of(Item *item) const {
         return mop;
     if (type == std::type_index(typeid(WaterGun)))
         return water_gun;
-    if (type == std::type_index(typeid(TestBuffItem)))
-        return water_gun;
+    //if (type == std::type_index(typeid(TestBuffItem)))
+        //return water_gun;
     if (type == std::type_index(typeid(PraniumOre)))
         return pranium_ore;
 }

@@ -195,6 +195,19 @@ void Unit::UpdateImpl() {
             hasCombatTarget = false;
         }
 
+//        if(currentState->name == "Idle" && !playinIdleAnimation && isAlly){
+//            auto anim = getEntity()->getComponent<AnimationPlayer>();
+//            if (anim == nullptr) {
+//                spdlog::error("No animation player component found");
+//            } else {
+//                string modelPathGabkaIdle = "res/models/gabka/pan_gabka_cleaned.fbx";
+//                anim->PlayAnimation(modelPathGabkaIdle, true, 6.0f);
+//                playinIdleAnimation = true;
+//            }
+//        }
+
+
+
         auto currentTile = grid->getTileAt(gridPosition);
         if (isAlly && currentTile->dirtinessLevel > 0) {
             auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
@@ -204,6 +217,14 @@ void Unit::UpdateImpl() {
             currentTile->changeDirtinessLevel(newDirtLvl);
             if (newDirtLvl == 0) {
                 ztgk::game::audioManager->playRandomSoundFromGroup("idle");
+//                auto anim = getEntity()->getComponent<AnimationPlayer>();
+//                if (anim == nullptr) {
+//                    spdlog::error("No animation player component found");
+//                } else {
+//                    anim->StopAnimation();
+//                    playinIdleAnimation = false;
+//                }
+
             }
         } else if (!isAlly && currentTile->dirtinessLevel < 100) {
             auto newDirtLvl = currentTile->dirtinessLevel + 10 * Time::Instance().DeltaTime();

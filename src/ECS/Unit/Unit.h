@@ -116,6 +116,8 @@ public:
     bool isAlive = true;
     bool isBeingHealedByWashingMachine = false;
 
+    bool playinIdleAnimation = false;
+
     Vector2Int getClosestWashingMachineTile();
 
 private:
