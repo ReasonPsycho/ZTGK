@@ -895,12 +895,13 @@ void load_hud() {
     ztgk::game::ui_data.gr_middle = hud->addGroup(ztgk::game::ui_data.gr_game, "Unit Details");
     ztgk::game::ui_data.gr_actions = hud->addGroup(ztgk::game::ui_data.gr_game, "Action Panel");
     ztgk::game::ui_data.gr_top = hud->addGroup(ztgk::game::ui_data.gr_game, "Top Panel");
-    ztgk::game::ui_data.gr_item = hud->addGroup(ztgk::game::ui_data.gr_game, "Item Details");
 
-    ztgk::game::ui_data.gr_w1_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 1 Offensive");
-    ztgk::game::ui_data.gr_w1_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 1 Passive");
-    ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
-    ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
+    ztgk::game::ui_data.gr_item = hud->addGroup(ztgk::game::ui_data.gr_middle, "Item Details");
+
+    ztgk::game::ui_data.gr_w1_offensive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 1 Offensive");
+    ztgk::game::ui_data.gr_w1_passive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 1 Passive");
+    ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 2 Offensive");
+    ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_item, "Weapon 2 Passive");
 
 
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
@@ -915,6 +916,7 @@ void load_hud() {
     ztgk::game::ui_data.gr_game_won = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Won");
     ztgk::game::ui_data.gr_game_lost = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Lost");
 
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_item)->offset.x = 70;
 
 // menu
     auto emenu = scene.addEntity(ehud, "Menu");
@@ -1026,8 +1028,8 @@ void load_hud() {
 
 // WEAPON 1
     auto eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #1");
-    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/item_mop.png"));
-    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
+    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_mop.png"));
+    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
     eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
 
     auto eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
@@ -1079,8 +1081,8 @@ void load_hud() {
 
 // WEAPON 2
     eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #2");
-    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/item_superMop.png"));
-    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
+    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_superMop.png"));
+    eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
     eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
 
     eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
@@ -1132,24 +1134,45 @@ void load_hud() {
 // ACTIONS
     auto eactions = scene.addEntity(egame, "Action Panel");
     eactions->addComponent(make_unique<Sprite>(glm::vec2{1520,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
-    hud->createButton(
-        glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/icons/pick-me.png", "res/textures/transparent.png",
-        [eactions](){
-            static std::string spr_gabka = "res/textures/icons/pick-me.png";
-            static std::string spr_mine = "res/textures/icons/pickAXE.png";
-
-            if (isLeftMouseButtonHeld) {
-                eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
-            }
-            else if (isRightMouseButtonHeld) {
-                eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
-            }
+    ent = hud->createButton(
+        glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
+        [](){
+            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_1, glfwGetKeyScancode(GLFW_KEY_1), GLFW_PRESS, mods, "Passing selection of unit 1 via action menu to handle_controls func.");
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createButton(
-        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png",
+    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->getComponent<Text>()->mode = CENTER;
+    ent = hud->createButton(
+        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
         [](){
+            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_2, glfwGetKeyScancode(GLFW_KEY_2), GLFW_PRESS, mods, "Passing selection of unit 2 via action menu to handle_controls func.");
+        },
+        eactions, ztgk::game::ui_data.gr_actions
+    );
+    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->getComponent<Text>()->mode = CENTER;
+    ent = hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
+        [](){
+            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_3, glfwGetKeyScancode(GLFW_KEY_3), GLFW_PRESS, mods, "Passing selection of unit 3 via action menu to handle_controls func.");
+        },
+        eactions, ztgk::game::ui_data.gr_actions
+    );
+    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->getComponent<Text>()->mode = CENTER;
+    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png", [](){
             if (ztgk::game::ui_data.tracked_unit_id == -1) return;
             auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
                                   scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
@@ -1160,11 +1183,8 @@ void load_hud() {
             InventoryManager::instance->unassign_item(*unit, item);
             InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
-        },
-        eactions, ztgk::game::ui_data.gr_actions
-    );
-    hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png",
-        [](){
+        }, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png", [](){
             if (ztgk::game::ui_data.tracked_unit_id == -1) return;
             auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
                                   scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
@@ -1175,14 +1195,7 @@ void load_hud() {
             InventoryManager::instance->unassign_item(*unit, item);
             InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
-        },
-        eactions, ztgk::game::ui_data.gr_actions
-    );
-    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+        }, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
 
 // TOP PANEL

@@ -19,6 +19,18 @@ namespace ztgk {
     Console ztgk::console = Console();
 
     void update_unit_hud() {
+        // this should only happen once due to path re-load guard in Sprite.load
+        auto allies = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents | ranges::views::filter([](Unit * unit){ return unit->isAlly; }) | std::ranges::to<std::vector<Unit *>>();
+        static auto eactions = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Action Panel");
+
+        if (!allies.empty())
+        for (int i = 0; i < 3; ++i) {
+            eactions->children[i]->getComponent<Text>()->content = allies[i]->name;
+            eactions->children[i]->getComponent<Sprite>()->load(allies[i]->icon_path);
+            eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(allies[i]->stats.hp / (allies[i]->stats.max_hp + allies[i]->stats.added.max_hp));
+            if (!allies[i]->isAlive) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GRAY;
+//            else eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        }
 
         // todo determine group hud
         Unit * unit;
