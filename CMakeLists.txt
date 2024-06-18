@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.1)
-project(ZTGK)
+project(Scrub_Squad)
 set(CMAKE_CXX_STANDARD 23)
 
 IF (WIN32)
@@ -51,9 +51,10 @@ file(GLOB_RECURSE ASSETS_FILES "res/*.*")
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES} ${HEADER_FILES})
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${ASSETS_FILES})
 
+#enable rc for the icon
+enable_language("RC")
 # Define the startup executable for the project
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
-
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES} resources.rc)
 # Treat asset files as headers (prevents them from being compiled)
 set_source_files_properties(${ASSETS_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
@@ -110,7 +111,14 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         ${CMAKE_SOURCE_DIR}/tracey
         ${CMAKE_CURRENT_BINARY_DIR}/tracey)
 
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DDEBUG_BUILD)
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+    add_definitions(-DRELEASE_BUILD)
+endif()
 
 if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)
 endif ()
+
+

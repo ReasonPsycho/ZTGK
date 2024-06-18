@@ -80,6 +80,7 @@ void UnitSystem::UpdateImpl() {
     if(Spongies.empty() && ztgk::game::gameStarted && !ztgk::game::gameLost){
         auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
         hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);
         hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(false);
         ztgk::game::gameLost = true;
 

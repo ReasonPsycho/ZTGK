@@ -24,6 +24,7 @@ void AnimationPlayer::UpdateImpl() {
     } else{
         Render *render = getEntity()->getComponent<Render>();
         if (render != nullptr) {
+            render->animationTransforms = animator.GetFinalBoneMatrices();
             render->isAnimated = false;
         }
     }
@@ -58,6 +59,7 @@ void AnimationPlayer::PlayAnimation(std::string path, bool looping, float animat
 
 void AnimationPlayer::StopAnimation() {
     animator.m_CurrentTime = 0;
+    animator.UpdateAnimation(0);
     isPlaying = false;
     looping = false;
     animationSpeed = 1.0f;

@@ -121,6 +121,11 @@ public:
 
     std::vector<Tile*> GetNeighbours(Vector2Int gridpos, bool includeDiagonals = true);
 
+    bool read_names = false;
+    std::vector<std::string> gabka_names = {};
+    std::vector<std::string> shroom_names = {};
+    std::vector<std::string> zuk_names = {};
+    bool read_icons = false;
 private:
     float offsetX = 0;
     float offsetZ = 0;
