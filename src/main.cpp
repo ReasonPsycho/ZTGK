@@ -240,13 +240,6 @@ Entity *playerUnit;
 std::vector<Vector2Int> selectedTiles;
 std::vector<Tile*> tilesSelectedToMine;
 
-//bool captureMouse = false;
-//bool captureMouseButtonPressed = false;
-//
-//ImGuiIO mouseio;
-//double mouseX;
-//double mouseY;
-
 bool isLeftMouseButtonHeld = false;
 float LmouseHeldStartTime = 0.0f;
 float LmouseHeldReleaseTime = 0.0f;
@@ -1489,6 +1482,15 @@ void render() {
 
 void imgui_begin() {
     ZoneScopedN("Imgui begin");
+
+#ifdef DEBUG_BUILD
+    ImGuiIO &io = ImGui::GetIO();
+    if (ztgk::game::cursor.config.capture_move) {
+        io.MouseDrawCursor = true;
+    } else {
+        io.MouseDrawCursor = false;
+    }
+#endif
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

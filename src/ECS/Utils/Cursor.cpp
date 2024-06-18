@@ -31,13 +31,6 @@ void Cursor::init() {
                 config.capture_move = !config.capture_move;
                 config.capture_click = !config.capture_click;
                 config.capture_scroll = !config.capture_scroll;
-#ifdef DEBUG_BUILD
-                if (!config.capture_move) {
-                    mouseio->MouseDrawCursor = true;
-                } else {
-                    mouseio->MouseDrawCursor = false;
-                }
-#endif
             }
             if (data->key == GLFW_KEY_R && data->mods == GLFW_MOD_CONTROL && data->action == GLFW_PRESS) {
                 raw_pos = ztgk::game::window_size / 2;
