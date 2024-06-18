@@ -45,7 +45,7 @@ enum TileSelectionState {
 };
 
 // initializer list
-#define TILE_STATE_NAMES { "FLOOR", "WALL", "CHEST", "ORE", "CORE", "SPONGE" }
+#define TILE_STATE_NAMES { "FLOOR", "WALL", "CHEST", "ORE", "CORE", "SPONGE", "BUG", "SHROOM" }
 
 struct TileStateData {
     // this is only necessary if items are serialized as numbers, if they're saved in the node instead it can be loaded straight into the relevant entity

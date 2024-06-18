@@ -25,6 +25,7 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
             return TOKEN_WALL;
         case CHEST:
             // todo item type id
+            return TOKEN_TREASURE_CHEST_0 + data.chestItemTypeId;
             return TOKEN_TREASURE_CHEST;
         case ORE:
             return TOKEN_ORE;
@@ -51,6 +52,12 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
 }
 
 void ztgk::tile_state_from_token(char token, Tile * tile) {
+    if (token >= TOKEN_TREASURE_CHEST_0 && token <= TOKEN_TREASURE_CHEST_9) {
+        tile->state = CHEST;
+        tile->stateData.chestItemTypeId = token - TOKEN_TREASURE_CHEST_0;
+        return;
+    }
+
     switch (token) {
         default:
         case TOKEN_ERROR:
@@ -216,26 +223,33 @@ void LevelSaving::loadImpl(const string &path) {
     }
 
     spdlog::trace("Initializing tiles with loaded state");
+    ztgk::game::pranium_needed_to_win = 0;
     grid->InitializeTileEntities();
     grid->SetUpWalls();
     grid->UpdateFogData(grid->centerTile);
 
-    spdlog::trace("Reading node");
-    auto units = game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
-    if (!units.empty()) {
-        spdlog::warn("Units already existing! Aborting!");
-    } else {
-        spdlog::trace("Loading unit entities");
-        for (auto unode: node["allies"]) {
-            auto name = unode[nameof(quote(Entity::name))].as<string>();
-
-            auto entity = Unit::serializer_newUnitEntity(game::scene, name);
-            YAML::convert<Unit>::decode(unode, *entity->getComponent<Unit>());
-        }
-    }
+    //todo FIX LOAD EQUIPMENT
+//    spdlog::trace("Reading node");
+//    auto units = game::scene->systemManager.getSystem<UnitSystem>()->unitComponents;
+//    if (!node["allies"]) {
+//        spdlog::trace("No ally details - loading from generated level rather than save file.");
+//    } else {
+//        spdlog::trace("Loading unit equipment");
+//        for (auto unode: node["allies"]) {
+//            auto unit = std::find_if(units.begin(), units.end(), [unode](Unit * unit){ return unit->gridPosition == unode["gridPosition"].as<Vector2Int>(); });
+//            if (unit == units.end()) {
+//                spdlog::warn("Unit not found in generated units!");
+//                continue;
+//            }
+//
+//            (*unit)->equipment = unode["equipment"].as<UnitEquipment>();
+//        }
+//    }
     game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(game::washingMachineModel);
     // todo chests and stuff, once relevant
 
     ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(false);
     spdlog::info("Finished loading");
+
+    ztgk::game::gameStarted = true;
 }

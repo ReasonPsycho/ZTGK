@@ -32,6 +32,8 @@ public:
     bool HasMask(std::string name);
     void UpdateImpl() override;
     void showImGuiDetailsImpl(Camera *camera) override;
+    void ChangeMaskColor(std::string name,glm::vec4 color);
+    glm::vec4 GetMaskColor(std::string name);
     
 private:
     std::map<std::string, ColorMaskData> maskDataMap;

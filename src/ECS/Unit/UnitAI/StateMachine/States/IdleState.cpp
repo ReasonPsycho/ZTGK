@@ -8,9 +8,25 @@
 #include "CombatState.h"
 #include "MiningState.h"
 #include "ECS/Utils/Time.h"
+#include "HealingState.h"
 #include <random>
+#include "ECS/Gameplay/WashingMachineTile.h"
 
 State *IdleState::RunCurrentState() {
+
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        auto moveState = new MovementState(grid);
+        moveState->unit = unit;
+        moveState->unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        return moveState;
+    }
 
     //from Idle to Movement
     if(unit->hasMovementTarget){
@@ -21,7 +37,7 @@ State *IdleState::RunCurrentState() {
     }
     //from Idle to Combat
 
-    if(unit->hasCombatTarget){
+    if(unit->hasCombatTarget && unit->combatTarget != nullptr){
 
         combatState = new CombatState(grid);
         combatState->unit = unit;

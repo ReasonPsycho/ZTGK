@@ -16,7 +16,8 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     textureSampler.init();
     stencilTest.init();
     foamMaskShader.init();
-
+    spriteRenderShader.init();
+    
     downscale.init();
     upscale.init();
 
@@ -115,8 +116,16 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceLightShader.setMatrix4("projection", false, glm::value_ptr(projection));
     phongInstanceLightShader.setMatrix4("view", false, glm::value_ptr(view));
     phongInstanceLightShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    phongInstanceLightShader.setVec3("cameraUp", camera->Up.x, camera->Up.y, camera->Up.z);
     phongInstanceLightShader.setFloat("outlineMapping", lightShaderOutlineMapping);
 
+
+    spriteRenderShader.use();
+    spriteRenderShader.setMatrix4("projection", false, glm::value_ptr(projection));
+    spriteRenderShader.setMatrix4("view", false, glm::value_ptr(view));
+    spriteRenderShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    spriteRenderShader.setVec3("cameraUp", camera->Up.x, camera->Up.y, camera->Up.z);
+    spriteRenderShader.setFloat("outlineMapping", lightShaderOutlineMapping);
     
     glDisable(GL_BLEND);
 }

@@ -5,7 +5,7 @@
 #ifndef ZTGK_PRIMITIVES_H
 #define ZTGK_PRIMITIVES_H
 
-#include "ECS/Render/Camera/Camera.h"
+#include "glad/glad.h"
 
 class Primitives {
 public:

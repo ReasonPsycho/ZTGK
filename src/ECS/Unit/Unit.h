@@ -17,6 +17,7 @@ struct UnitStats {
     float hp{};
 
     float move_spd{20};
+    float move_spd_when_beaten{move_spd/2.0f};
     float mine_spd{};
     // todo atk speed
 
@@ -26,7 +27,8 @@ struct UnitStats {
 class Unit : public Component {
 public:
     static const UnitStats ALLY_BASE;
-    static const UnitStats ENEMY_BASE;
+    static const UnitStats ENEMY_BASE_BUG;
+    static const UnitStats ENEMY_BASE_SHROOM;
 
     bool isSelected = false;
 
@@ -40,6 +42,7 @@ public:
     Grid* grid;
 
     UnitEquipment equipment;
+    std::string icon_path;
 
     //target flags
     bool hasMovementTarget = false;
@@ -50,10 +53,10 @@ public:
 
     //targets
     Vector2Int movementTarget = Vector2Int(0, 0);
-    Unit* combatTarget;
-    PickupubleItem * pickupTarget;
+    Unit* combatTarget = nullptr;
+    PickupubleItem * pickupTarget = nullptr;
 
-    std::vector<IMineable*> miningTargets;
+    std::vector<IMineable*> miningTargets = {};
     IMineable* currentMiningTarget = nullptr;
 
     Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats stats, bool isAlly);
@@ -83,6 +86,7 @@ public:
     bool canFindPathToTarget(Vector2Int target);
     std::vector<IMineable> miningPath;
 
+    void Pickup(PickupubleItem* item);
 
     // serializer
     // only use this with serializer!
@@ -107,6 +111,12 @@ public:
 
     bool canPathToAttackTarget(Unit* target = nullptr);
     bool canPathToMiningTarget();
+
+
+    bool isAlive = true;
+    bool isBeingHealedByWashingMachine = false;
+
+    Vector2Int getClosestWashingMachineTile();
 
 private:
     Vector2Int previousGridPosition;

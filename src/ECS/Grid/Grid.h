@@ -119,7 +119,7 @@ public:
 
     bool isInBounds(Vector2Int anInt);
 
-    std::vector<Tile*> GetNeighbours(Vector2Int gridpos);
+    std::vector<Tile*> GetNeighbours(Vector2Int gridpos, bool includeDiagonals = true);
 
 private:
     float offsetX = 0;
@@ -129,7 +129,7 @@ private:
             std::type_index(typeid(Tile))
     };
 
-    void SpawnUnit(Vector2Int gridPos, bool isAlly);
+    Entity * SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug);
 };
 
 

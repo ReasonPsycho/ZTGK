@@ -77,6 +77,7 @@
 #include "ECS/Gameplay/WashingMachine.h"
 #include "ECS/Audio/AudioManager.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
+#include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 #pragma endregion Includes
 
@@ -95,10 +96,15 @@ string modelPathZuczekIddle = "res/models/zuczek/Zuczek_iddle.fbx";
 string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
-string washingMachinePath = "res/models/washingmachine/uhhhh.fbx";
+string washingMachinePath = "res/models/washingmachine/pralka.fbx";
+string modelProjectilePath = "res/models/projectile/projectile.fbx";
 string modelChestPath = "res/models/chest/chest.fbx";
+string modelMopPath = "res/models/items/mop/mop.fbx";
+string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
+string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
+string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
+string modelPathShroom = "res/models/shroom/shroom.fbx";
 
-ModelLoadingManager modelLoadingManager;
 Model *tileModel;
 Model *model;
 Model *gabka;
@@ -108,6 +114,12 @@ Model *washingMachineModel;
 Model *chestModel;
 Model *cubeModel;
 Model *quadModel;
+Model *projectileModel;
+Model *mopModel;
+Model *mopObrotowyModel;
+Model *tidyPodLauncherModel;
+Model *praniumModel;
+Model *shroomModel;
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -182,13 +194,13 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods);
 
+void handleControls(int key, int scancode, int action, int mods);
+
 void processInput(GLFWwindow *window);
 
 void update_dragged_tiles();
 
 void gen_and_load_lvl(bool gen_new_lvl = false);
-
-void update_weapon_hud(Unit *unit);
 
 #pragma endregion Function definitions
 
@@ -217,6 +229,7 @@ int display_w, display_h;
 Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
+
 PBRPrimitives pbrprimitives;
 
 float lastY;
@@ -225,13 +238,21 @@ float lastX;
 Entity *playerUnit;
 
 std::vector<Vector2Int> selectedTiles;
+std::vector<Tile*> tilesSelectedToMine;
 
 bool isLeftMouseButtonHeld = false;
+float LmouseHeldStartTime = 0.0f;
+float LmouseHeldReleaseTime = 0.0f;
+
+bool isRightMouseButtonHeld = false;
+float RmouseHeldStartTime = 0.0f;
+float RmouseHeldReleaseTime = 0.0f;
+
 glm::vec3 mouseHeldStartPos;
 glm::vec3 mouseHeldEndPos;
-float mouseHeldStartTime = 0.0f;
-float mouseHeldReleaseTime = 0.0f;
 
+float lastLeftClickTime = 0.0f;
+float lastRightClickTime = 0.0f;
 
 // timing
 double deltaTime = Time::Instance().DeltaTime();
@@ -384,8 +405,21 @@ bool init() {
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Scrub Squad", NULL, NULL);
+    
+    GLFWimage icons[1];
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("res/textures/icons/pick-me.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        icons[0].pixels = data;   // Pixel data will be loaded from 'path_to_your_icon.png'
+        icons[0].width = width;   // Width should be the exact width of the image
+        icons[0].height = height; // Height should be the exact height of the image
+        glfwSetWindowIcon(window, 1, icons);
+        stbi_image_free(data);
+    }
+    
     // Create window with graphics context
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL4 example", NULL, NULL);
     if (window == NULL) {
         spdlog::error("Failed to create GLFW Window!");
         file_logger->error("Failed to create GLFW Window!");
@@ -436,6 +470,7 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<WashingMachine>(4, 10));
     scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
     scene.systemManager.addSystem(std::make_unique<MiningSystem>());
+    scene.systemManager.addSystem(std::make_unique<ProjectileSystem>());
 
     scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -454,10 +489,15 @@ void init_systems() {
     scene.systemManager.getSystem<UnitSystem>()->init();
 
     ztgk::game::selectionHandler = new SignalReceiver(
-        Signal::signal_types.mouse_button_signal,
+        Signal::signal_types.mouse_button_signal | Signal::signal_types.keyboard,
         [](const Signal &signal) {
-            auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
-            handle_picking(window, data->button, data->action, data->mods);
+            if (signal.stype == Signal::signal_types.mouse_button_signal) {
+                auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+                handle_picking(window, data->button, data->action, data->mods);
+            } else if (signal.stype == Signal::signal_types.keyboard) {
+                auto data = std::dynamic_pointer_cast<KeySignalData>(signal.data);
+                handleControls(data->key, data->scancode, data->action, data->mods);
+            }
         }
     );
     *ztgk::game::signalQueue += ztgk::game::selectionHandler;
@@ -546,6 +586,10 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
 
 
+    //healing
+    ztgk::game::audioManager->loadSound("res/sounds/heal1.mp3", "heal1");
+    ztgk::game::audioManager->loadSound("res/sounds/heal2.mp3", "heal2");
+
 }
 
 void load_enteties() {
@@ -555,23 +599,34 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-
-    tileModel = modelLoadingManager.GetModel(tileModelPath);
-    model = modelLoadingManager.GetModel(modelPath);
-    gabka = modelLoadingManager.GetModel(modelPathGabka);
-    zuczek = modelLoadingManager.GetModel(modelPathZuczek);
-    wall = modelLoadingManager.GetModel(modelPathWall);
-    washingMachineModel = modelLoadingManager.GetModel(washingMachinePath);
-    chestModel = modelLoadingManager.GetModel(modelChestPath);
-    modelLoadingManager.Innit();
+    ztgk::game::modelLoadingManager =  new ModelLoadingManager;
+    ztgk::game::modelLoadingManager ->Innit();
+    tileModel =   ztgk::game::modelLoadingManager ->GetModel(tileModelPath);
+    model =   ztgk::game::modelLoadingManager ->GetModel(modelPath);
+    gabka =   ztgk::game::modelLoadingManager ->GetModel(modelPathGabka);
+    zuczek =   ztgk::game::modelLoadingManager ->GetModel(modelPathZuczek);
+    wall =   ztgk::game::modelLoadingManager ->GetModel(modelPathWall);
+    washingMachineModel =   ztgk::game::modelLoadingManager ->GetModel(washingMachinePath);
+    chestModel =   ztgk::game::modelLoadingManager ->GetModel(modelChestPath);
+    projectileModel =   ztgk::game::modelLoadingManager->GetModel(modelProjectilePath);
+    mopModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopPath);
+    mopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopObrotowyPath);
+    tidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelTidyPodLauncherPath);
+    praniumModel =   ztgk::game::modelLoadingManager ->GetModel(modelPraniumPath);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
-    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[4], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[4]);
+    quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
 
     ztgk::game::washingMachineModel = washingMachineModel;
     ztgk::game::playerModel = gabka;
     ztgk::game::bugModel = zuczek;
     ztgk::game::chestModel = chestModel;
+    ztgk::game::praniumModel = praniumModel;
+    ztgk::game::projectileModel = projectileModel;
+    ztgk::game::mopModel = mopModel;
+    ztgk::game::mopObrotowyModel = mopObrotowyModel;
+    ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
+    ztgk::game::shroomModel = ztgk::game::modelLoadingManager ->GetModel("res/models/Mushroom/shroom.fbx");
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -602,6 +657,7 @@ void load_enteties() {
     gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
     gameObject->addComponent(make_unique<Render>(wall));;
 
+    /*
 //    gameObject = scene.addEntity("Dir light");
     //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
     gameObject = scene.addEntity("Point Light");;
@@ -622,10 +678,11 @@ void load_enteties() {
     gameObject->addComponent(make_unique<SpotLight>(
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
+*/
+    
     scene.systemManager.getSystem<LightSystem>()->Init();
-
-
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
+    scene.systemManager.getSystem<RenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
 
     //level gen and load___________________________________________________________________________________________________________________________________________________
@@ -728,7 +785,8 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-    load_units();
+  //  load_units();
+
 
 
 }
@@ -739,26 +797,42 @@ void load_units() {
     playerUnit->addComponent(make_unique<Render>(gabka));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager.GetAnimation(modelPathGabkaMove, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager.GetAnimation(modelPathGabkaIdle, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager.GetAnimation(modelPathGabkaMine, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager.GetAnimation(modelPathGabkaAttack, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttack, gabka);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
+    playerUnit = scene.addEntity(playerUnit,"Emote");
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(0, 1, 0));
+    playerUnit->addComponent(make_unique<BetterSpriteRender>(  ztgk::game::modelLoadingManager ->GetTexture("res/textures/icons/pick-me.png")));
+
+
 
     playerUnit = scene.addEntity("Żuczek");
     playerUnit->addComponent(make_unique<Render>(zuczek));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = modelLoadingManager.GetAnimation(modelPathZuczekAttack, zuczek);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = modelLoadingManager.GetAnimation(modelPathZuczekMove, zuczek);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = modelLoadingManager.GetAnimation(modelPathZuczekIddle, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczek);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
+
+    playerUnit = scene.addEntity("Shroom");
+    playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
+    playerUnit->addComponent(make_unique<ColorMask>());
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+  playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
+    
     /*
 playerUnit = scene.addEntity("Player1");
 playerUnit->addComponent(make_unique<Render>(gabka));
@@ -810,7 +884,7 @@ playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), s
     enemyUnit->updateSelfAndChild();
     enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(1, 1, 1)));
     enemyUnit->getComponent<BoxCollider>()->setCenter(enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    enemyUnit->addComponent(make_unique<Unit>("Enemy1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 60), Unit::ENEMY_BASE, false));
+    enemyUnit->addComponent(make_unique<Unit>("Enemy1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 60), Unit::ENEMY_BASE_BUG, false));
     stateManager = new StateManager(enemyUnit->getComponent<Unit>());
     stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
     stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
@@ -834,6 +908,7 @@ void load_hud() {
     ztgk::game::ui_data.gr_w2_offensive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Offensive");
     ztgk::game::ui_data.gr_w2_passive = hud->addGroup(ztgk::game::ui_data.gr_middle, "Weapon 2 Passive");
 
+
     ztgk::game::ui_data.gr_pause = hud->addGroup(0, "Pause");
 
     ztgk::game::ui_data.gr_settings = hud->addGroup(0, "Settings");
@@ -842,6 +917,10 @@ void load_hud() {
 
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
+
+    ztgk::game::ui_data.gr_game_won = hud->addGroup(0, "Game Won");
+    ztgk::game::ui_data.gr_game_lost = hud->addGroup(0, "Game Lost");
+
 
 // menu
     auto emenu = scene.addEntity(ehud, "Menu");
@@ -893,7 +972,7 @@ void load_hud() {
 // game
     auto egame = scene.addEntity(ehud, "Game");
     auto emap = scene.addEntity(egame, "Map");
-    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
+//    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
     emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
@@ -1030,12 +1109,10 @@ void load_hud() {
             static std::string spr_gabka = "res/textures/icons/pick-me.png";
             static std::string spr_mine = "res/textures/icons/pickAXE.png";
 
-            if (ztgk::game::cursor.dragMode == DRAG_UNIT) {
-                ztgk::game::cursor.dragMode = DRAG_TILE;
+            if (isLeftMouseButtonHeld) {
                 eactions->children[0]->getComponent<Sprite>()->load(spr_mine);
             }
-            else if (ztgk::game::cursor.dragMode == DRAG_TILE) {
-                ztgk::game::cursor.dragMode = DRAG_UNIT;
+            else if (isRightMouseButtonHeld) {
                 eactions->children[0]->getComponent<Sprite>()->load(spr_gabka);
             }
         },
@@ -1052,8 +1129,8 @@ void load_hud() {
             auto item = (*unit)->equipment[1];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
-            update_weapon_hud(*unit);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
+            ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
@@ -1067,8 +1144,8 @@ void load_hud() {
             auto item = (*unit)->equipment[2];
             if (item == nullptr) return;
             InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, glm::vec2{(*unit)->worldPosition.x, (*unit)->worldPosition.z});
-            update_weapon_hud(*unit);
+            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
+            ztgk::update_weapon_hud(*unit);
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
@@ -1079,6 +1156,41 @@ void load_hud() {
     hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
 
+// TOP PANEL
+    auto etop = scene.addEntity(egame, "Top Panel");
+    glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 50};
+    ent = hud->createButton(
+        "||", top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
+        ztgk::color.GRAY * glm::vec4{1, 1, 1, 0.75f}, ztgk::color.GRAY * glm::vec4{0.9, 0.9, 0.9, 0.75}, ztgk::color.GRAY * glm::vec4{0.8, 0.8, 0.8, 0.75},
+        [hud](){
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+        },
+        etop, ztgk::game::ui_data.gr_top
+    );
+    ent->getComponent<Text>()->pos.x -= 1;
+    ent->getComponent<Text>()->pos.y += 5;
+
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{300, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->getComponent<Sprite>()->mode = CENTER;
+
+    auto etime = scene.addEntity(etop, "Time");
+    etime->addComponent(make_unique<Text>("00:00", top_anchor, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    etime->getComponent<Text>()->mode = CENTER;
+    ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
+
+    auto epraniumCounter = scene.addEntity(etop, "Pranium Counter");
+    epraniumCounter->addComponent(make_unique<Sprite>(top_anchor - glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pranium.png"));
+    epraniumCounter->getComponent<Sprite>()->mode = CENTER;
+    epraniumCounter->addComponent(make_unique<Text>("00", top_anchor - glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    epraniumCounter->getComponent<Text>()->mode = MIDDLE_LEFT;
+    ztgk::game::ui_data.txt_pranium_counter = epraniumCounter->getComponent<Text>();
+
+    auto eunitCounter = scene.addEntity(etop, "Unit Counter");
+    eunitCounter->addComponent(make_unique<Sprite>(top_anchor + glm::vec2{80, 0}, glm::vec2{60, 60}, ztgk::color.WHITE, ztgk::game::ui_data.gr_top, "res/textures/icons/pick-me.png"));
+    eunitCounter->getComponent<Sprite>()->mode = CENTER;
+    eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{130, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");
@@ -1140,6 +1252,24 @@ void load_hud() {
         ecredits, ztgk::game::ui_data.gr_credits
     );
 
+    // Game Won -> 4 pranium delivered to Washing Machine
+    auto egamewon = scene.addEntity(ehud, "Menu");
+    egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
+    egamewon->addComponent(make_unique<Text>("CONGRATULATIONS!!! YOU HAVE DEFEATED THE DIRT!!!", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamewon, ztgk::game::ui_data.gr_game_won
+    );
+
+    // Game Lost -> All Gompkas are dead
+    auto egamelost = scene.addEntity(ehud, "Menu");
+    egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
+    egamelost->addComponent(make_unique<Text>("YOU HAVE BEEN DEFEATED BY THE DIRT!!!", top_anchor, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
+        egamelost, ztgk::game::ui_data.gr_game_lost
+    );
+
     // groups
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
@@ -1153,6 +1283,8 @@ void load_hud() {
 
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
 //    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true);
 }
 
 void init_imgui() {
@@ -1209,8 +1341,8 @@ void update() {
     scene.systemManager.Update();
     scene.updateScene();
 
-    scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
+    scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
@@ -1223,11 +1355,15 @@ void update() {
     scene.systemManager.getSystem<CollisionSystem>()->Update();
     scene.systemManager.getSystem<RenderSystem>()->Update();
     scene.systemManager.getSystem<MiningSystem>()->Update();
+    scene.systemManager.getSystem<HUD>()->Update();
+    scene.systemManager.getSystem<ProjectileSystem>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
 //            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
 //    }
+
+
 }
 
 void render() {
@@ -1321,6 +1457,11 @@ void imgui_render() {
             .maxEnemies = 2,
             .unitCount = 3,
             .chestCount = 10,
+            .lootTable = {
+                {0, 1.f, 0.f},
+                {1, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -1434,9 +1575,17 @@ void imgui_end() {
 void processInput(GLFWwindow *window) {
     
     camera.MoveCamera(window);
-    
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
+        if (!captureMouseButtonPressed) {
+            captureMouse = !captureMouse;
+        }
+        captureMouseButtonPressed = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_RELEASE) {
+        captureMouseButtonPressed = false;
+    }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
@@ -1457,24 +1606,15 @@ void processInput(GLFWwindow *window) {
         ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
-        ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_UNIT;
-        spdlog::info("Drag mode set to DRAG_UNIT");
-
-    } else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
-        ztgk::game::cursor.dragMode = dragSelectionMode::DRAG_TILE;
-        spdlog::info("Drag mode set to DRAG_TILE");
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
-        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
-        spdlog::debug("clearing tiles in radius");
-        isXpressed = true;
-//        radiusToRemove +=1;
-    }
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
-        isXpressed = false;
-    }
+//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+//        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+//        spdlog::debug("clearing tiles in radius");
+//        isXpressed = true;
+////        radiusToRemove +=1;
+//    }
+//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+//        isXpressed = false;
+//    }
 
 }
 
@@ -1503,6 +1643,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ztgk::game::cursor.scroll({xoffset, yoffset});
+    camera.MoveCamera(yoffset);
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
@@ -1516,7 +1657,7 @@ void update_dragged_tiles() {
                                                                  camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
-    if (isLeftMouseButtonHeld && ray != nullptr && ray->getHitEntity() != nullptr) {
+    if ((isLeftMouseButtonHeld || isRightMouseButtonHeld) && ray != nullptr && ray->getHitEntity() != nullptr) {
         Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
         mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
@@ -1527,32 +1668,28 @@ void update_dragged_tiles() {
             }
         }
         selectedTiles = tilesInArea;
-//        for(auto tile : tilesInArea){
-//            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
-//        }
+        for(auto tile : tilesInArea){
+            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
+        }
 
     }
 
 }
 
 void handle_picking(GLFWwindow *window, int button, int action, int mods) {
-
+    
     //calculate ray every mouse press
     glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(ztgk::game::cursor.raw_pos.x, ztgk::game::cursor.raw_pos.y, camera.saved_display_w,
                                                                  camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
-    if (ray->getHitEntity() != nullptr) {
-        spdlog::info("Ray hit entity: {}", ray->getHitEntity()->name);
-    } else {
-        spdlog::info("Ray hit nothing");
-    }
 
-    if (isLeftMouseButtonHeld && ray->getHitEntity() != nullptr) {
-        spdlog::info("Mouse held");
+    std::vector<Vector2Int> tilesInArea;
+    if ((isLeftMouseButtonHeld || isRightMouseButtonHeld) && ray->getHitEntity() != nullptr) {
+//        spdlog::info("Mouse held");
         Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
         mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
-        std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+        tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
         for (auto tile: tilesInArea) {
             scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
         }
@@ -1560,8 +1697,16 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //if left mouse button is pressed, start timer and save position of the mouse press
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        mouseHeldStartTime = glfwGetTime();
+        LmouseHeldStartTime = glfwGetTime();
         isLeftMouseButtonHeld = true;
+        if (ray->getHitEntity() != nullptr) {
+            mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
+        }
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        RmouseHeldStartTime = glfwGetTime();
+        isRightMouseButtonHeld = true;
         if (ray->getHitEntity() != nullptr) {
             mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
         }
@@ -1569,37 +1714,43 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //if left mouse button is released, check if it was a click or a drag
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-        mouseHeldReleaseTime = glfwGetTime();
+        LmouseHeldReleaseTime = glfwGetTime();
         isLeftMouseButtonHeld = false;
 
-        //if mouse was held for less than 0.2 seconds, consider it a click
-        if (mouseHeldReleaseTime - mouseHeldStartTime < 0.2f) {
+        //if mouse was held for less than 0.1 seconds, consider it a click
+        if (LmouseHeldReleaseTime - LmouseHeldStartTime < 0.2f) {
 
-            // if ray hits an allied unit
-            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr &&
-                ray->getHitEntity()->getComponent<Unit>()->isAlly) {
-
-                //if it is already selected, deselect it
-                if (ray->getHitEntity()->getComponent<Unit>()->isSelected) {
-                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ray->getHitEntity()->getComponent<Unit>());
-                }
-
-                    //if it is not selected, select it
-                else {
-                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(ray->getHitEntity()->getComponent<Unit>());
-                }
-            }
-
-                // if ray hits anyting else than a unit, deselect all units
-            else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() == nullptr) {
+            //check for double click
+            if(glfwGetTime() - lastLeftClickTime < 0.2f){
+                spdlog::debug("Left double click detected");
+                //deselect all units
                 scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
             }
-        }
+            lastLeftClickTime = glfwGetTime();
+            // if ray hits an allied unit
+            Unit * hitAlly = nullptr;
+            if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly) {
+                hitAlly = ray->getHitEntity()->getComponent<Unit>();
+            } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                    && ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
+            }
 
-            //if mouse was held for more than 0.2 seconds, consider it a drag
+            if (hitAlly) {
+                //if it is already selected, deselect it
+                if (hitAlly->isSelected) {
+                    scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
+                }
+                    //if it is not selected, select it
+                else {
+                    scene.systemManager.getSystem<UnitSystem>()->selectUnit(hitAlly);
+                }
+            }
+        }
+            //if mouse was held for more than 0.1 seconds, consider it a drag
         else {
             if (ray->getHitEntity() != nullptr) {
-                dragSelectionMode dsm = ztgk::game::cursor.dragMode;
                 mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
                 Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
                 Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
@@ -1608,203 +1759,281 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
                 }
 
-                std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
+                std::vector<Tile*> tiles;
 
-                if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty() && dsm == dragSelectionMode::DRAG_TILE) {
-                    for (auto unit: scene.systemManager.getSystem<UnitSystem>()->selectedUnits) {
-                        unit->miningTargets.clear();
-                        for (auto tile: tilesInArea) {
-                            auto mineable = scene.systemManager.getSystem<Grid>()->getTileAt(tile)->getEntity()->getComponent<IMineable>();
-                            if (mineable != nullptr && !mineable->isMined) {
-                                unit->miningTargets.push_back(mineable);
-                            }
-                        }
-                    }
-
-                } else if (dsm == dragSelectionMode::DRAG_UNIT) {
-                    scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
-                    for (auto tile: tilesInArea) {
-                        Unit *unitptr = scene.systemManager.getSystem<Grid>()->getTileAt(tile)->unit;
-                        if (unitptr != nullptr) {
-                            if (unitptr->isAlly && !unitptr->isSelected) {
-                                scene.systemManager.getSystem<UnitSystem>()->selectUnit(unitptr);
-                            }
+                //get all tiles in the area
+                for (auto tile: tilesInArea) {
+                    tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
+                }
+                std::vector<Unit*> Sponges;
+                //get all units and mineables in the area
+                for (auto tile: tiles) {
+                    if (tile->unit != nullptr) {
+                        if (tile->unit->isAlly) {
+                            Sponges.push_back(tile->unit);
                         }
                     }
                 }
-            } else {
-                isLeftMouseButtonHeld = false;
-                return;
+
+                //select all Sponges in the area
+                if (!Sponges.empty()) {
+                    for (auto sponge: Sponges) {
+                        scene.systemManager.getSystem<UnitSystem>()->selectUnit(sponge);
+                    }
+                }
+
             }
         }
 
-        scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
 
-
-    //if there are selected units and right mouse button is pressed, set target for selected units
-    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty() && button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        RmouseHeldReleaseTime = glfwGetTime();
+        isRightMouseButtonHeld = false;
 
         Entity *hit = ray->getHitEntity();
+        if(hit == nullptr){
+            return;
+        }
 
-        //if something was hit
-        if (hit != nullptr) {
-            for (auto unit: scene.systemManager.getSystem<UnitSystem>()->selectedUnits) {
-                IMineable *mineable = hit->getMineableComponent<IMineable>(hit);
 
-                //if hit entity is mineable, set it as mining target
-                if (mineable != nullptr && !mineable->isMined) {
-                    unit->miningTargets.clear();
-                    unit->miningTargets.emplace_back(hit->getMineableComponent<IMineable>(hit));
-                    Tile *hitTile = hit->getComponent<Tile>();
-                    hitTile->setTileSelectionState(SELECTED);
-                    unit->hasMiningTarget = true;
-//                    unit->ForcedMiningState = true;
-//                    unit->forcedMiningTarget = mineable;
-                    spdlog::info("Mining target set at {}, {}", mineable->gridPosition.x, mineable->gridPosition.z);
+        //if mouse was held for less than 0.2 seconds, consider it a click
+        if(RmouseHeldReleaseTime - RmouseHeldStartTime < 0.2f){
+            if(glfwGetTime() - lastRightClickTime < 0.2f){
+                spdlog::debug("Right double click detected");
+            }
+            lastRightClickTime = glfwGetTime();
+
+
+
+            std::vector<Unit*> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
+            if(!selectedSponges.empty()){
+
+                auto pickupableItem = hit->getComponent<PickupubleItem>();
+                if(pickupableItem != nullptr){
+                    //sort sponges by distance to pickupable item ascending using pickupableItem->getEntity()->transform.getLocalPosition()
+                    std::sort(selectedSponges.begin(), selectedSponges.end(), [pickupableItem](Unit* a, Unit* b){
+                        return VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(a->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition())) < VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(b->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition()));
+                    });
+
+                    selectedSponges[0]->pickupTarget = pickupableItem;
+                    selectedSponges[0]->hasPickupTarget = true;
+                    selectedSponges[0]->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                            VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    selectedSponges[0]->hasMovementTarget = true;
+
+                    return;
+
                 }
 
-                    //if hit entity is a tile, stop doing anything and set movement target
-                else if (hit->getComponent<Tile>() != nullptr) {
-                    unit->ForcedMovementState = true;
-                    unit->forcedMovementTarget = hit->getComponent<Tile>()->index;
+                auto hitMineable = hit->getMineableComponent<IMineable>(hit);
+                auto hitTile = hit->getComponent<Tile>();
+                auto hitUnit = hit->getComponent<Unit>();
+                if(hitUnit == nullptr && hitTile != nullptr){
+                    if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
+                         hitUnit = hitTile->unit;
+                    }
+                }
+                auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
-                    unit->hasMiningTarget = false;
-                    unit->miningTargets.clear();
-                    unit->hasCombatTarget = false;
-                    unit->combatTarget = nullptr;
-                    unit->hasMovementTarget = true;
-                    unit->pathfinding.path.clear();
-                    unit->hasPickupTarget = false;
-                    unit->pickupTarget = nullptr;
-                    unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                for(auto sponge : selectedSponges){
+                    sponge->hasMovementTarget = false;
+                    sponge->miningTargets.clear();
+                    sponge->currentMiningTarget = nullptr;
+                    sponge->hasMiningTarget = false;
+                    sponge->combatTarget = nullptr;
+                    sponge->hasCombatTarget = false;
+                    sponge->pathfinding.path.clear();
+
+
+                    if(hitUnit!= nullptr){
+                        if(hitUnit->isAlly){} //do nothing
+                        else{
+                            sponge->hasCombatTarget = true;
+                            sponge->combatTarget = hitUnit;
+                            continue;
+                        }
+                    }
+
+                    if(hitMineable != nullptr){
+                        if(!hitMineable->isMined){
+                            sponge->miningTargets.clear();
+                            sponge->miningTargets.emplace_back(hitMineable);
+                            sponge->hasMiningTarget = true;
+                            hitTile->setTileSelectionState(SELECTED);
+                            tilesSelectedToMine.push_back(hitTile);
+                            continue;
+                        }
+                    }
+
+                    if(hitTile != nullptr) {
+                        sponge->ForcedMovementState = true;
+                        sponge->forcedMovementTarget = hitTile->index;
+
+                        sponge->hasMiningTarget = false;
+                        sponge->miningTargets.clear();
+                        sponge->hasCombatTarget = false;
+                        sponge->combatTarget = nullptr;
+
+                        sponge->hasMovementTarget = true;
+                        sponge->pathfinding.path.clear();
+                        sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                                VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+
+                    }
+
+                    if(hitWashingMachine != nullptr){
+                        sponge->ForcedMovementState = true;
+                        sponge->forcedMovementTarget = hitTile->index;
+
+                        sponge->hasMiningTarget = false;
+                        sponge->miningTargets.clear();
+                        sponge->hasCombatTarget = false;
+                        sponge->combatTarget = nullptr;
+
+                        sponge->hasMovementTarget = true;
+                        sponge->pathfinding.path.clear();
+                        sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                                VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
+                    }
                 }
 
-                    //if hit an item model, set it as the pickup & movement target
-                else if (hit->getComponent<PickupubleItem>() != nullptr) {
-                    unit->ForcedMovementState = true;
 
-                    unit->hasMiningTarget = false;
-                    unit->miningTargets.clear();
-                    unit->hasCombatTarget = false;
-                    unit->combatTarget = nullptr;
-                    unit->hasMovementTarget = true;
-                    unit->pathfinding.path.clear();
-                    unit->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
-                    unit->hasPickupTarget = true;
-                    unit->pickupTarget = hit->getComponent<PickupubleItem>();
+            }
+        }
+        //if mouse was held for more, consider it a drag
+        else{
+            if (ray->getHitEntity() != nullptr) {
+                mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
+                Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                        VectorUtils::GlmVec3ToVector3(mouseHeldStartPos));
+                Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
+                        VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
+
+                for (auto tile: selectedTiles) {
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
+                }
+
+                tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
+                selectedTiles = tilesInArea;
+                update_dragged_tiles();
+                std::vector<Tile *> tiles;
+
+                std::vector<IMineable*> Mineables = {};
+                std::vector<Unit*> Enemies = {};
+
+                for(auto tile : tilesInArea){
+                    tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
+                }
+
+                for(auto tile: tiles){
+                    auto possibleMineable = tile->getEntity()->getMineableComponent<IMineable>(tile->getEntity());
+                    if(possibleMineable != nullptr) {
+                        Mineables.push_back(possibleMineable);
+                    }
+
+                    if(tile->unit != nullptr){
+                        if(!tile->unit->isAlly){
+                            Enemies.push_back(tile->unit);
+                        }
+                    }
+                }
+                if(!Enemies.empty()){
+                    if(!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
+                        for(auto Sponge : scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                            //sort enemies by distance to sponge ascending
+                            std::sort(Enemies.begin(), Enemies.end(), [Sponge](Unit* a, Unit* b){
+                                return VectorUtils::Distance(Sponge->gridPosition, a->gridPosition) < VectorUtils::Distance(Sponge->gridPosition, b->gridPosition);
+                            });
+
+                            for(auto enemy : Enemies){
+                                if(Sponge->canPathToAttackTarget(enemy)){
+                                    Sponge->hasCombatTarget = true;
+                                    Sponge->combatTarget = enemy;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                else if(!Mineables.empty()){
+                    if(!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
+                        for(auto Sponge : scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                            Sponge->miningTargets.clear();
+                            for(auto mineable : Mineables){
+                                if(!mineable->isMined){
+                                    Sponge->miningTargets.emplace_back(mineable);
+                                    Sponge->hasMiningTarget = true;
+                                    tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
+                                    mineable->getEntity()->getComponent<Tile>()->setTileSelectionState(SELECTED);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     }
-
+    scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
     if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
         auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
-        auto emods = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Mods");
-        emods->getChild("ATK")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.dmg_perc, unit->stats.added.dmg_flat);
-        emods->getChild("DEF")->getComponent<Text>()->content = std::format("{} + {}", unit->stats.added.def_perc, unit->stats.added.def_flat);
-        emods->getChild("CD")->getComponent<Text>()->content = std::format("{}", unit->stats.added.atk_speed);
-        emods->getChild("RNG")->getComponent<Text>()->content = std::format("{}", unit->stats.added.rng_add);
-        emods->getChild("MNSP")->getComponent<Text>()->content = std::format("{}", unit->stats.mine_spd + unit->stats.added.mine_speed);
-        emods->getChild("MVSP")->getComponent<Text>()->content = std::format("{}", unit->stats.move_spd + unit->stats.added.move_speed);
-
-        scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->stats.max_hp + unit->stats.added.max_hp;
-        scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->stats.hp);
-
         ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-        //hud/game/unit details/mods/mod
-
-        update_weapon_hud(unit);
-
     } else {
+        ztgk::game::ui_data.tracked_unit_id = -1;
         scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
     }
 
 }
 
-void update_weapon_hud(Unit *unit) {
-    if (unit->equipment.item1) {
-        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem1->getComponent<Text>()->content = unit->equipment.item1->name;
-        eitem1->getComponent<Sprite>()->load(unit->equipment.item1->icon_path);
-        if (unit->equipment.item1->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-
-            eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.dmg);
-            eitem1->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item1->stats.range.add);
-            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item1->stats.cd_max_sec;
-            eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item1->cd_sec);
-        } else {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(false);
-
-            auto ent = eitem1->getChild("Passive Stats");
-            int i = 1;
-            for (auto stats : unit->equipment.item1->highlight_passive_stats) {
-                string ent_name = "STAT" + to_string(i);
-                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
-                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                i++;
+void handleControls(int key, int scancode, int action, int mods) {
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
+                if (ztgk::game::ui_data.tracked_unit_id == -1)
+                    ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
+                break;
             }
+            --idx;
         }
-    } else {
-        auto eitem1 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem1->getComponent<Text>()->content = "*No Item*";
-        eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
     }
-
-    if (unit->equipment.item2) {
-        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
-        eitem2->getComponent<Text>()->content = unit->equipment.item2->name;
-        eitem2->getComponent<Sprite>()->load(unit->equipment.item2->icon_path);
-        if (unit->equipment.item2->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
-
-            eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.dmg);
-            eitem2->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item2->stats.range.add);
-            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item2->stats.cd_max_sec;
-            eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item2->cd_sec);
-        } else {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(false);
-
-            auto ent = eitem2->getChild("Passive Stats");
-            int i = 1;
-            for (auto stats : unit->equipment.item2->highlight_passive_stats) {
-                string ent_name = "STAT" + to_string(i);
-                ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
-                ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                i++;
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto idx = key - GLFW_KEY_1;
+        for (auto ally : allies) {
+            if (idx == 0) {
+                scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ally);
+                if (ztgk::game::ui_data.tracked_unit_id == ally->uniqueID)
+                    ztgk::game::ui_data.tracked_unit_id = -1;
+                break;
             }
+            --idx;
         }
-    } else {
-        auto eitem2 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
-        eitem2->getComponent<Text>()->content = "*No Item*";
-        eitem2->getComponent<Sprite>()->load("res/textures/question_mark.png");
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
-        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
     }
-
-    if (!unit->equipment.item1 && !unit->equipment.item2) {
-        auto eitem0 = scene.getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
-        eitem0->getComponent<Text>()->content = unit->equipment.item0->name + " - No Item";
-        eitem0->getComponent<Sprite>()->load(unit->equipment.item0->icon_path);
-        if (unit->equipment.item0->offensive) {
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(false);
-            scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
-
-            eitem0->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.dmg);
-            eitem0->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",unit->equipment.item0->stats.range.add);
-            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = unit->equipment.item0->stats.cd_max_sec;
-            eitem0->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(unit->equipment.item0->cd_sec);
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        auto pause = scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_pause);
+        if (!pause->isHidden()) {
+            auto settings = scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_settings);
         }
+        pause->setHidden(!pause->isHidden());
+    }
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (key == GLFW_KEY_A && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
+        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+            scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
+        }
+    }
+    if (key == GLFW_KEY_A && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
+        scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
+        ztgk::game::ui_data.tracked_unit_id = -1;
     }
 }
 
@@ -1854,17 +2083,23 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .seed {},
             .size {100, 100},
             .wallThickness = 1.f,
-            .baseRadius = RNG::RandomFloat(6.f, 10.f),
+            .baseRadius = RNG::RandomFloat(8.f, 12.f),
             .keyRadius = RNG::RandomFloat(3.f, 5.f),
-            .pocketRadius = RNG::RandomFloat(6.f, 10.f),
+            .pocketRadius = RNG::RandomFloat(4.f, 8.f),
             .noiseImpact = RNG::RandomFloat(0.1f, 0.3f),
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
-            .keyEnemies = RNG::RandomInt(2, 3),
-            .minEnemies = 5,  //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 5,  //4        <---
-            .unitCount = 1,   //3        <---
-            .chestCount = RNG::RandomInt(8, 15),
+            .keyEnemies = RNG::RandomInt(1, 3),
+            .minEnemies = 0,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 4,                       //4        <---
+            .unitCount = 3,                        //3        <---
+            .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
+            .lootTable = {
+                {1, 1.f, 0.f},
+                {3, 0.5f, 0.5f},
+                {2, 0.f, 1.f},
+            },
+
     };
 
     static char seedString[64] = "";
@@ -1889,6 +2124,7 @@ void gen_and_load_lvl(bool gen_new_lvl) {
 
 
     LevelSaving::load();
+
 }
 
 #pragma endregion Functions

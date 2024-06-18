@@ -10,6 +10,11 @@
 #include "ECS/Component.h"
 #include "ECS/Raycasting/Colliders/BoxCollider.h"
 #include "ECS/Raycasting/Colliders/SphereCollider.h"
+
+#include <vector>
+#include <memory>
+#include <algorithm>
+
 class Collider;
 class BoxCollider;
 class SphereCollider;
@@ -33,8 +38,8 @@ public:
 
     std::vector<Collider*> getCollidersInArea(glm::vec3 p1, glm::vec3 p2);
 
-    std::unordered_map<unsigned, std::vector<BoxCollider*>> BoxColliders;
-    std::unordered_map<unsigned, std::vector<SphereCollider*>> SphereColliders;
+   std::vector<BoxCollider*> BoxColliders;
+     std::vector<SphereCollider*> SphereColliders;
     
 
 private:

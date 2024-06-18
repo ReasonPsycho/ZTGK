@@ -9,8 +9,10 @@
 #include "imgui.h"
 #include <ImGuizmo.h>
 #include "glad/glad.h"
+
 #include <vector>
 #include <memory>
+#include <algorithm>
 #include "glm/vec4.hpp"
 #include "Components/ILight.h"
 #include "Components/DirLight.h"
@@ -19,7 +21,6 @@
 #include "../System.h"
 #include "../Component.h"
 #include "ECS/Scene.h"
-#include <algorithm>
 
 
 class LightSystem : public System {
@@ -34,6 +35,12 @@ public:
     void PushToSSBO();
     void UpdateImpl() override;
 
+    void RenderPlaneDepthMapInstanced();
+    void RenderPlaneDepthMap();
+
+    void RenderCubeDepthMapInstanced();
+    void RenderCubeDepthMap();
+    
     void GenerateShadowBuffers();
 
 
@@ -94,7 +101,7 @@ private:
     GLuint cubeShadowMaps;
 
     int maxDirLight = 1;
-    int maxPointLight = 20;
+    int maxPointLight = 120;
     int maxSpotLight = 20;
 
 

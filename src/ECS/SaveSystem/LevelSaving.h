@@ -18,6 +18,16 @@ namespace ztgk {
     const static char TOKEN_FLOOR = ' ';
     const static char TOKEN_WALL = 'O';
     const static char TOKEN_TREASURE_CHEST = '*';
+    const static char TOKEN_TREASURE_CHEST_0 = '0';
+    const static char TOKEN_TREASURE_CHEST_1 = '1';
+    const static char TOKEN_TREASURE_CHEST_2 = '2';
+    const static char TOKEN_TREASURE_CHEST_3 = '3';
+    const static char TOKEN_TREASURE_CHEST_4 = '4';
+    const static char TOKEN_TREASURE_CHEST_5 = '5';
+    const static char TOKEN_TREASURE_CHEST_6 = '6';
+    const static char TOKEN_TREASURE_CHEST_7 = '7';
+    const static char TOKEN_TREASURE_CHEST_8 = '8';
+    const static char TOKEN_TREASURE_CHEST_9 = '9';
     const static char TOKEN_CORE = 'c';
     const static char TOKEN_ORE = '^';
     const static char TOKEN_PLAYER = '+';

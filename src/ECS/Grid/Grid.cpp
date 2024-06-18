@@ -5,7 +5,6 @@
 #include "Grid.h"
 #include "ECS/Entity.h"
 #include "ECS/Render/Components/Render.h"
-#include "ECS/Render/Primitives/Primitives.h"
 #include "ECS/Raycasting/CollisionSystem.h"
 #include "ECS/Unit/Mining/IMineable.h"
 #include "ECS/Utils/Globals.h"
@@ -18,6 +17,11 @@
 #include "ECS/Unit/Unit.h"
 #include "ECS/Unit/UnitAI/UnitAI.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/IdleState.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
+#include "ECS/Render/ModelLoading/ModelLoadingManager.h"
+#include "ECS/Unit/Equipment/ConcreteItems/ItemTypes.h"
+#include "ECS/Unit/Equipment/InventoryManager.h"
+#include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -197,6 +201,12 @@ void Grid::GenerateTileEntities(float scale) {
 
                 }
             }
+            Entity* localLight = scene->addEntity(chunkEntity,"LocalLight");
+            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,0.05f)));
+            localLight->transform.setLocalPosition(glm::vec3(0, 7,0));
+            chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
+            localLight->forceUpdateSelfAndChild();
+            localLight->getComponent<PointLight>()->setIsDirty(true);
         }
     }
     gridEntity->forceUpdateSelfAndChild();
@@ -228,6 +238,7 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
+                    ++ztgk::game::pranium_needed_to_win;
                     break;
                 case CORE:
                     tile->isInFogOfWar = false;
@@ -236,13 +247,12 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 5, 1);
                     break;
                 case SPONGE:
-                    SpawnUnit(tile->index, true);
+                    SpawnUnit(tile->index, true, false);
                     break;
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
                 case CHEST:
-                    // todo item type id
-                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, 1));
+                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, tile->stateData.chestItemTypeId));
                     tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
@@ -252,9 +262,10 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
                     break;
                 case SHROOM:
-                    //todo add shroom spawning with model etc
+                    SpawnUnit(tile->index, false, false);
+                    break;
                 case BUG:
-                    SpawnUnit(tile->index, false);
+                    SpawnUnit(tile->index, false, true);
                     break;
             }
         }
@@ -534,7 +545,7 @@ void Grid::SetUpChunks() {
         }
     }
 }
-std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos) {
+std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos, bool includeDiagonals) {
     std::vector<Tile *> neighbours;
     if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z))) {
         neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z));
@@ -548,20 +559,20 @@ std::vector<Tile *> Grid::GetNeighbours(Vector2Int gridpos) {
     if (isInBounds(Vector2Int(gridpos.x, gridpos.z - 1))) {
         neighbours.push_back(getTileAt(gridpos.x, gridpos.z - 1));
     }
-    //diagonals
-    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z + 1))) {
-        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z + 1));
+    if(includeDiagonals) {
+        if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z + 1))) {
+            neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z + 1));
+        }
+        if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z - 1))) {
+            neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z - 1));
+        }
+        if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z - 1))) {
+            neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z - 1));
+        }
+        if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z + 1))) {
+            neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z + 1));
+        }
     }
-    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z - 1))) {
-        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z - 1));
-    }
-    if (isInBounds(Vector2Int(gridpos.x + 1, gridpos.z - 1))) {
-        neighbours.push_back(getTileAt(gridpos.x + 1, gridpos.z - 1));
-    }
-    if (isInBounds(Vector2Int(gridpos.x - 1, gridpos.z + 1))) {
-        neighbours.push_back(getTileAt(gridpos.x - 1, gridpos.z + 1));
-    }
-
     return neighbours;
 }
 
@@ -650,18 +661,44 @@ void Grid::UpdateFogData(Tile *tile) {
 
 
 
-void Grid::SpawnUnit(Vector2Int gridPos, bool isAlly){
+Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
+    auto modelLoadingManager = ztgk::game::modelLoadingManager;
+    auto gabka = ztgk::game::playerModel;
+
+    string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
+    string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
+    string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
+    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+
+
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
-    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : ztgk::game::bugModel));
+    UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::shroomModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
     UnitEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
     UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
     UnitEntity->updateSelfAndChild();
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));
     UnitEntity->getComponent<BoxCollider>()->setCenter(UnitEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : "Enemy", this, gridPos, isAlly ? Unit::ALLY_BASE : Unit::ENEMY_BASE, isAlly));
+    UnitEntity->addComponent(make_unique<Unit>(isAlly? "Sponge" : bug ? "Bug" : "Shroom", this, gridPos, isAlly ? Unit::ALLY_BASE : bug ? Unit::ENEMY_BASE_BUG : Unit::ENEMY_BASE_SHROOM, isAlly));
+    if(bug){
+        auto unit = UnitEntity->getComponent<Unit>();
+        InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
+    }
+
     auto stateManager = new StateManager(UnitEntity->getComponent<Unit>());
     stateManager->currentState = new IdleState(this);
     stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
+    if(isAlly) {
+        UnitEntity->addComponent(make_unique<AnimationPlayer>());
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
+                modelPathGabkaMove, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
+                modelPathGabkaIdle, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
+                modelPathGabkaMine, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager->GetAnimation(
+                modelPathGabkaAttack, gabka);
+    }
+    return UnitEntity;
 }

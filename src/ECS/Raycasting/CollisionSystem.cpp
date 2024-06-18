@@ -9,24 +9,40 @@
 
 
 void CollisionSystem::addComponent(void *component) {
-    auto c =(Collider*)component;
-    if (c->type == ColliderType::BOX) {
-        auto* boxCollider = static_cast<BoxCollider*>(component);
-        if(boxCollider->collisionType != TILE){
-            BoxColliders[boxCollider->uniqueID].push_back(boxCollider);
+    Component* basePtr = static_cast<Component*>(component);
+
+    BoxCollider* boxPtr = dynamic_cast<BoxCollider*>(basePtr);
+    if(boxPtr != nullptr)
+    {
+        if (boxPtr->collisionType != TILE){
+            BoxColliders.push_back(boxPtr);
         }
-    } else if (c->type == ColliderType::SPHERE) {
-        auto* sphereCollider = static_cast<SphereCollider*>(component);
-        SphereColliders[sphereCollider->uniqueID].push_back(sphereCollider);
+    }
+
+    SphereCollider* spherePtr = dynamic_cast<SphereCollider*>(basePtr);
+
+    if(spherePtr != nullptr)
+    {
+        SphereColliders.push_back(spherePtr);
     }
 }
 
 void CollisionSystem::removeComponent(void *component) {
-    auto c =(Collider*)component;
-    if (c->type == ColliderType::BOX) {
-        erase(BoxColliders[c->uniqueID], dynamic_cast<BoxCollider*>(c));
-    } else if (c->type == ColliderType::SPHERE) {
-        erase(SphereColliders[c->uniqueID], dynamic_cast<SphereCollider*>(c));
+
+
+    auto box_iter = std::find(BoxColliders.begin(), BoxColliders.end(), reinterpret_cast<BoxCollider *const>(component));
+
+    if (box_iter != BoxColliders.end()) {
+        BoxColliders.erase(box_iter);
+        return;
+    }
+
+    
+    auto sphere_iter = std::find(SphereColliders.begin(), SphereColliders.end(), reinterpret_cast<SphereCollider *const>(component));
+
+    if (sphere_iter != SphereColliders.end()) {
+        SphereColliders.erase(sphere_iter);
+        return;
     }
 }
 
@@ -48,15 +64,12 @@ void CollisionSystem::showImGuiDetailsImpl(Camera *camera) {
 
 std::vector<Collider *> CollisionSystem::getColliders() {
     std::vector<Collider *> colliders;
-    for (auto& [id, boxes] : BoxColliders) {
-        for (auto& box : boxes) {
-            colliders.push_back(box);
-        }
+    for (auto&  box : BoxColliders) {
+        colliders.push_back(box);
+
     }
-    for (auto& [id, spheres] : SphereColliders) {
-        for (auto& sphere : spheres) {
-            colliders.push_back(sphere);
-        }
+    for (auto&  sphere : SphereColliders) {
+        colliders.push_back(sphere);
     }
     return colliders;
 }
@@ -78,15 +91,14 @@ std::vector<Collider *> CollisionSystem::getCollidersInArea(glm::vec3 p1, glm::v
     spdlog::info("p1: {} {} {}, p2: {} {} {}, p3: {} {} {}, p4: {} {} {}", p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z, p4.x, p4.y, p4.z);
 
 
-    for(auto collider : BoxColliders)
+    for(auto box : BoxColliders)
     {
-        for(auto box : collider.second)
-        {
+ 
             if(box->intersects(p1, p2, p3, p4))
             {
                 colliders.push_back(box);
             }
-        }
+        
     }
 
     return colliders;
@@ -95,16 +107,16 @@ std::vector<Collider *> CollisionSystem::getCollidersInArea(glm::vec3 p1, glm::v
 }
 
 void CollisionSystem::UpdateImpl() {
-    for(auto& [id, boxes] : BoxColliders)
+    for(auto& box : BoxColliders)
     {
-        for(auto& box : boxes | std::ranges::views::filter([](BoxCollider * coll){ return coll->getIsDirty(); }))
+        if(box->getIsDirty())
         {
             box->Update();
         }
     }
-    for(auto& [id, spheres] : SphereColliders)
+    for(auto& sphere : SphereColliders)
     {
-        for(auto& sphere : spheres | std::ranges::views::filter([](SphereCollider * coll){ return coll->getIsDirty(); }))
+        if(sphere->getIsDirty())
         {
             sphere->Update();
         }

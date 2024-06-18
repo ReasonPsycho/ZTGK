@@ -8,6 +8,7 @@
 #include "ECS/Render/Components/Render.h"
 #include "ECS/Render/ModelLoading/Model.h"
 #include "ECS/Entity.h"
+#include "ECS/HUD/HUD.h"
 
 WashingMachine::WashingMachine(int praniumNeeded, int radiusToClearEveryMilestone) {
     name = "WashingMachine";
@@ -115,10 +116,14 @@ void WashingMachine::onPraniumDelivered() {
     currentPranium++;
     spdlog::debug("\n Pranium delivered, current: {}/{} \n", currentPranium, praniumNeeded);
 
-//    if(currentPranium >= praniumNeeded){
-//        //todo finisz gejm
-//        ztgk::game::audioManager->playSound("win");
-//    }
+    if(currentPranium >= praniumNeeded){
+        auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
+        hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(false);
+
+        ztgk::game::audioManager->playSound("win");
+        ztgk::game::gameWon = true;
+    }
 
 
     auto newTilesToClear_walls = getTilesToClearInRaiuds(Vector2Int(50, 50), radiusToClear);
@@ -173,8 +178,9 @@ void WashingMachine::createWashingMachine(Model* model) {
 
     machineEntity->addComponent(std::make_unique<Render>(model));
 
-    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x,4,centerTileWorldPos.z));
-    machineEntity->transform.setLocalScale(glm::vec3(5, 5, 5));
+    machineEntity->transform.setLocalPosition(glm::vec3(centerTileWorldPos.x - 4.5f,4,centerTileWorldPos.z));
+    machineEntity->transform.setLocalScale(glm::vec3(3, 3, 3));
+    machineEntity->transform.setLocalRotation(glm::vec3(glm::radians(0.0f), glm::radians(-90.0f), glm::radians(0.f)));
     machineEntity->updateSelfAndChild();
 
     machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));
@@ -199,6 +205,10 @@ void WashingMachine::clearNextTile_walls() {
         }
     }
 
+    auto mineable = grid->getTileAt(tile->index)->getEntity()->getComponent<IMineable>();
+    if(mineable != nullptr){
+        mineable->isMined = true;
+    }
     tile->isInFogOfWar = false;
     grid->UpdateFogData(tile);
     tile->changeDirtinessLevel(0);

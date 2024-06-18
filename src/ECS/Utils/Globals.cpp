@@ -16,6 +16,7 @@ namespace ztgk::game {
     Camera * game::camera = nullptr;
     SignalQueue * game::signalQueue = nullptr;
     Cursor game::cursor = {};
+    int game::pranium_needed_to_win = 10;
     std::atomic<bool> game::pause = false;
     std::atomic<bool> game::pause_render = false;
     glm::ivec2 game::window_size = { 1920, 1080 };
@@ -24,11 +25,21 @@ namespace ztgk::game {
     float game::lightMultiplayer = 1.2;
     int game::toon_color_levels = 15;
     Model * game::washingMachineModel = nullptr;
+    Model * game::praniumModel = nullptr;
     AudioManager * game::audioManager = nullptr;
     SignalReceiver * game::selectionHandler = nullptr;
+    ModelLoadingManager * game::modelLoadingManager = nullptr;
     Model * game::playerModel = nullptr;
     Model * game::bugModel = nullptr;
     Model * game::shroomModel = nullptr;
     Model * game::oreModel = nullptr;
     Model * game::chestModel = nullptr;
+    Model * game::projectileModel = nullptr;
+    Model * game::mopModel = nullptr;
+    Model * game::mopObrotowyModel = nullptr;
+    Model * game::tidyPodLauncherModel = nullptr;
+
+    bool game::gameStarted = false;
+    bool game::gameWon = false;
+    bool game::gameLost = false;
 }

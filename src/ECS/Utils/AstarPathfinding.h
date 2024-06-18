@@ -29,12 +29,16 @@ public:
     ~AstarPathfinding() = default;
 
     // Most important method
-    std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target, bool debug = false);
+    std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target,  std::vector<Vector2Int> forbiddenTiles = {}, bool debug = false);
 
     std::vector<Vector2Int> FindPath(Vector2Int start, Vector2Int target, int max_iterations);
 
     Vector2Int GetNearestVacantTile(Vector2Int target, Vector2Int origin);
 
+    // Potrzebowalem bez sprawdzania == origin XOXO
+    Vector2Int GetNearestVacantTileAround(Vector2Int origin, std::vector<Vector2Int> forbiddenTiles);
+
+    Vector2Int GetNearestVacantTileInRange(Vector2Int target, Vector2Int origin, int range);
 private:
     Grid* grid;
     Unit* unit;

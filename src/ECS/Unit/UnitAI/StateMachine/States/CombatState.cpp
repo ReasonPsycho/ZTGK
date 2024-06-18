@@ -12,9 +12,26 @@
 #include "ECS/Utils/Globals.h"
 #include "ECS/HUD/Interactables/HUDSlider.h"
 #include "ECS/Render/Components/ColorMask.h"
+#include "HealingState.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Unit/Equipment/Projectile/Projectile.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
 
 State *CombatState::RunCurrentState() {
 
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        auto moveState = new MovementState(grid);
+        moveState->unit = unit;
+        moveState->unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        return moveState;
+    }
 
     //from Combat to Idle
     if (!unit->hasMovementTarget && !unit->hasCombatTarget && !unit->hasMiningTarget) {
@@ -64,25 +81,18 @@ State *CombatState::RunCurrentState() {
 }
 
 bool CombatState::isTargetInRange() {
-    if(unit->combatTarget == nullptr){
+    if (unit->combatTarget == nullptr) {
         unit->hasCombatTarget = false;
         return false;
     }
-//    bool inRange = unit->equipment.in_range_of(
-//        {unit->gridPosition.x, unit->gridPosition.z},
-//        {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z}
-//    ) != nullptr;
-//    unit->isTargetInRange = inRange;
-//    return inRange;
-     Unit* targ = unit->GetClosestEnemyInWeaponRange();
-    if (targ == nullptr) {
-//        unit->hasCombatTarget = false;
-//        unit->isTargetInRange = false;
-        return false;
-    }
-    unit->combatTarget = targ;
-    unit->isTargetInRange = true;
-    return true;
+        Unit *targ = unit->GetClosestEnemyInWeaponRange();
+        if (targ == nullptr) {
+            return false;
+        }
+        unit->combatTarget = targ;
+        unit->isTargetInRange = true;
+        return true;
+
 
 }
 
@@ -94,7 +104,7 @@ void CombatState::AttackTarget() {
         unit->hasCombatTarget = false;
         return;
     }
-    if(!unit->isTargetInRange){
+    if(!isTargetInRange()){
         unit->hasMovementTarget = true;
         unit->movementTarget = unit->combatTarget->gridPosition;
         return;
@@ -103,21 +113,54 @@ void CombatState::AttackTarget() {
     unit->rotation = angle;
 
     auto target = unit->combatTarget;
+    if(target == nullptr) return; //todo expand on this
 
     float totalAttackDamage =
             (useItem->stats.dmg + useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
             * (1 - target->stats.added.def_perc) - target->stats.added.def_flat;
+    totalAttackDamage = std::max(totalAttackDamage, 0.0f);
 
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
-    target->stats.hp -= totalAttackDamage;
-    auto cm = target->getEntity()->getComponent<ColorMask>();
+    if(useItem->stats.range.add > 1){
+        auto projectileEntity = ztgk::game::scene->addEntity("Projectile");
+        projectileEntity->transform.setLocalPosition(unit->worldPosition);
+        projectileEntity->addComponent(std::make_unique<Render>(ztgk::game::projectileModel));
+        projectileEntity->addComponent(std::make_unique<Projectile>(unit->worldPosition,  target->worldPosition,unit, target, totalAttackDamage));
+        projectileEntity->transform.setLocalScale({0.1f, 0.1f, 0.1f});
+        projectileEntity->updateSelfAndChild();
+    }
+    else{
+        auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+        if(anim == nullptr)
+        {
+            spdlog::error("No animation player component found");
+        }
+        else
+        {
+            string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
+            anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+        }
+        applyDamage(unit, target, totalAttackDamage);
+    }
+
+}
+
+ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
+    target->stats.hp -= damage;
+    ColorMask* cm;
+    if(target!= nullptr && target->getEntity() != nullptr)
+        cm = target->getEntity()->getComponent<ColorMask>();
+    else{
+        unit->hasCombatTarget = false;
+        unit->combatTarget = nullptr;
+        return;
+    }
     if (cm == nullptr){
         target->getEntity()->addComponent(std::make_unique<ColorMask>());
         cm = target->getEntity()->getComponent<ColorMask>();
     }
     cm->AddMask("DMG_taken", {120.0f/250.0f, 0, 0, 0.5f}, 0.6f);
-    spdlog::info("Unit {} attacked unit {} for {} damage", unit->name, target->name, totalAttackDamage);
     if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
         ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = target->stats.max_hp + target->stats.added.max_hp;
         ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(target->stats.hp);
@@ -128,15 +171,24 @@ void CombatState::AttackTarget() {
 
 
     if(target->stats.hp <= 0){
-        ztgk::game::audioManager->playRandomSoundFromGroup(unit->combatTarget->isAlly ? "deathSponge" : "deathEnemy");
+        ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
 
         unit->hasCombatTarget = false;
+        target->isAlive = false;
+        unit->combatTarget = nullptr;
 
-        target->DIEXD();
+        if(!target->isAlly)
+            target->DIEXD();
+        else{
+            target->hasCombatTarget = false;
+            target->combatTarget = nullptr;
+            target->currentMiningTarget = nullptr;
+            target->hasMiningTarget = false;
+            target->miningTargets.clear();
+            target->hasMovementTarget = false;
+        }
     }
 }
-
-
 
 
 CombatState::CombatState(Grid *grid) {
@@ -196,11 +248,11 @@ bool CombatState::isAttackOnCooldown() {
         }
     }
 
-    if (it != nullptr && it->cd_sec < 0) {
+    if (it != nullptr && it->cd_sec <= 0) {
         useItem = it;
         return false;
     }
-    if (sec_it != nullptr && sec_it->cd_sec < 0) {
+    if (sec_it != nullptr && sec_it->cd_sec <= 0) {
         useItem = sec_it;
         return false;
     }

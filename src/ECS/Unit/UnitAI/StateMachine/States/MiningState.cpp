@@ -9,9 +9,26 @@
 #include "MovementState.h"
 #include "CombatState.h"
 #include "IdleState.h"
+#include "HealingState.h"
+#include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
 
 
 State *MiningState::RunCurrentState() {
+    if(!unit->isAlive && unit->isAlly){
+        auto neighs = grid->GetNeighbours(unit->gridPosition);
+        for(auto n : neighs){
+            if(n->getEntity()->getComponent<WashingMachineTile>() != nullptr){
+                auto healingState = new HealingState(grid, unit);
+                return healingState;
+            }
+        }
+        auto moveState = new MovementState(grid);
+        moveState->unit = unit;
+        moveState->unit->movementTarget = unit->pathfinding.GetNearestVacantTile(unit->getClosestWashingMachineTile(), unit->gridPosition);
+        return moveState;
+    }
+
     isTargetInRange();
 
     //from Mining to Idle
@@ -58,22 +75,22 @@ State *MiningState::RunCurrentState() {
         return moveState;
     }
 
-    //from Mining to Combat
-    if(unit->hasCombatTarget){
-        combatState = new CombatState(grid);
-        combatState->unit = unit;
-
-        if(combatState->isTargetInRange())
-            return combatState;
-        else
-        {
-            unit->hasMovementTarget = true;
-            unit->movementTarget = unit->combatTarget->gridPosition;
-            moveState = new MovementState(grid);
-            moveState->unit = unit;
-            return moveState;
-        }
-    }
+//    //from Mining to Combat
+//    if(unit->hasCombatTarget){
+//        combatState = new CombatState(grid);
+//        combatState->unit = unit;
+//
+//        if(combatState->isTargetInRange())
+//            return combatState;
+//        else
+//        {
+//            unit->hasMovementTarget = true;
+//            unit->movementTarget = unit->combatTarget->gridPosition;
+//            moveState = new MovementState(grid);
+//            moveState->unit = unit;
+//            return moveState;
+//        }
+//    }
     return this;
 }
 
@@ -113,10 +130,34 @@ void MiningState::Mine() {
     if(isTargetInRange()){
         if(unit->currentMiningTarget->getTimeToMineRemaining() == unit->currentMiningTarget->timeToMine){
             ztgk::game::audioManager->playRandomSoundFromGroup("mining");
+            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+            if(anim == nullptr)
+            {
+                spdlog::error("No animation player component found");
+            }
+            else
+            {
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_mine.fbx";
+                anim->PlayAnimation(modelPathGabkaMove, true, 4.0f);
+            }
         }
         unit->currentMiningTarget->Mine(unit);
+        //rotate unit towards the mining target
+        float angle = atan2(unit->currentMiningTarget->gridPosition.x - unit->gridPosition.x, unit->currentMiningTarget->gridPosition.z - unit->gridPosition.z);
+        unit->rotation = angle;
+
 
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
+            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+            if(anim == nullptr)
+            {
+                spdlog::error("No animation player component found");
+            }
+            else
+            {
+                anim->StopAnimation();
+            }
+
             miningTargets.erase(miningTargets.begin());
             if(miningTargets.empty()){
                 unit->hasMiningTarget = false;
