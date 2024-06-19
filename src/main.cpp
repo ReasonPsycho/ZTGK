@@ -240,13 +240,6 @@ Entity *playerUnit;
 std::vector<Vector2Int> selectedTiles;
 std::vector<Tile*> tilesSelectedToMine;
 
-bool captureMouse = false;
-bool captureMouseButtonPressed = false;
-
-ImGuiIO mouseio;
-double mouseX;
-double mouseY;
-
 bool isLeftMouseButtonHeld = false;
 float LmouseHeldStartTime = 0.0f;
 float LmouseHeldReleaseTime = 0.0f;
@@ -334,9 +327,11 @@ int main(int, char **) {
             render();
 
         // Draw ImGui
+#ifdef DEBUG_BUILD
         imgui_begin();
         imgui_render(); // edit this function to add your own ImGui controls
         imgui_end(); // this call effectively renders ImGui
+#endif
 
         // End frame and swap buffers (double buffering)
         end_frame();
@@ -410,9 +405,12 @@ bool init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#ifdef RELEASE_BUILD
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+#endif
 
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Scrub Squad", NULL, NULL);
-    
+
     GLFWimage icons[1];
     int width, height, nrChannels;
     unsigned char *data = stbi_load("res/textures/icons/pick-me.png", &width, &height, &nrChannels, 0);
@@ -424,7 +422,7 @@ bool init() {
         glfwSetWindowIcon(window, 1, icons);
         stbi_image_free(data);
     }
-    
+
     // Create window with graphics context
     if (window == NULL) {
         spdlog::error("Failed to create GLFW Window!");
@@ -685,7 +683,7 @@ void load_enteties() {
             SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
                           glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
 */
-    
+
     scene.systemManager.getSystem<LightSystem>()->Init();
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<RenderSystem>()->tileModel = quadModel;
@@ -838,7 +836,7 @@ void load_units() {
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-    
+
     /*
 playerUnit = scene.addEntity("Player1");
 playerUnit->addComponent(make_unique<Render>(gabka));
@@ -1391,7 +1389,11 @@ void input() {
     ZoneScopedN("Input");
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+#ifdef DEBUG_BUILD
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#elif defined(RELEASE_BUILD)
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+#endif
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glfwSetScrollCallback(window, scroll_callback);
@@ -1404,15 +1406,15 @@ void input() {
 void update() {
     ZoneScopedN("Update");
     scene.systemManager.getSystem<SignalQueue>()->Update();
-    
+
     //no need to check every frame, every 5 sec is good enough
     if ((int) glfwGetTime() % 5 == 0 && glfwGetTime() - (int) glfwGetTime() < 0.02) {
         ztgk::game::audioManager->playAmbientMusic();
     }
 
     //UpdateImpl mouse position
-    mouseX = mouseio.MousePos.x;
-    mouseY = mouseio.MousePos.y;
+//    mouseX = mouseio.MousePos.x;
+//    mouseY = mouseio.MousePos.y;
 
     ztgk::game::cursor.update();
     scene.systemManager.Update();
@@ -1481,14 +1483,14 @@ void render() {
 void imgui_begin() {
     ZoneScopedN("Imgui begin");
 
+#ifdef DEBUG_BUILD
     ImGuiIO &io = ImGui::GetIO();
-    mouseio = io;
-    // Start the Dear ImGui frame
-    if (!captureMouse) {
+    if (ztgk::game::cursor.config.capture_move) {
         io.MouseDrawCursor = true;
     } else {
         io.MouseDrawCursor = false;
     }
+#endif
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -1659,19 +1661,8 @@ void imgui_end() {
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
-    
+
     camera.MoveCamera(window);
-
-    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_PRESS) {
-        if (!captureMouseButtonPressed) {
-            captureMouse = !captureMouse;
-        }
-        captureMouseButtonPressed = true;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_GRAVE_ACCENT) == GLFW_RELEASE) {
-        captureMouseButtonPressed = false;
-    }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
@@ -1686,10 +1677,6 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         timeStepKeyPressed = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        ImGui::GetIO().MousePos = ImVec2(0, 0);
     }
 
 //    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
@@ -1707,7 +1694,7 @@ void processInput(GLFWwindow *window) {
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
     display_h = height;
@@ -1742,7 +1729,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 void update_dragged_tiles() {
     ZoneScopedN("Update dragged tiles");
 
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, camera.saved_display_w,
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(ztgk::game::cursor.raw_pos.x, ztgk::game::cursor.raw_pos.y, camera.saved_display_w,
                                                                  camera.saved_display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
@@ -1768,7 +1755,7 @@ void update_dragged_tiles() {
 void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     //calculate ray every mouse press and release
-    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(mouseX - 10, mouseY - 10, display_w,
+    glm::vec3 worldPressCoords = camera.getDirFromCameraToCursor(ztgk::game::cursor.raw_pos.x, ztgk::game::cursor.raw_pos.y, display_w,
                                                                  display_h);
     std::unique_ptr<Ray> ray = make_unique<Ray>(camera.Position, worldPressCoords, scene.systemManager.getSystem<CollisionSystem>());
 
@@ -2173,7 +2160,9 @@ void handleControls(int key, int scancode, int action, int mods) {
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     *ztgk::game::signalQueue += KeySignalData::signal(key, scancode, action, mods, "Forwarding GLFW event.");
+#ifdef DEBUG_BUILD
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+#endif
 }
 
 void end_frame() {
