@@ -15,6 +15,7 @@
 
 
 State *MiningState::RunCurrentState() {
+    unit->playinIdleAnimation = false;
     if(!unit->isAlive && unit->isAlly){
         auto neighs = grid->GetNeighbours(unit->gridPosition);
         for(auto n : neighs){

@@ -18,6 +18,7 @@ HealingState::HealingState(Grid *grid, Unit* unit) {
 }
 
 State *HealingState::RunCurrentState() {
+    unit->playinIdleAnimation = false;
     if (unit->stats.hp < unit->stats.max_hp) {
         HealSelf();
     } else {

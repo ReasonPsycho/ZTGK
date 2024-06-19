@@ -18,7 +18,7 @@
 #include "ECS/Render/Components/AnimationPlayer.h"
 
 State *CombatState::RunCurrentState() {
-
+    unit->playinIdleAnimation = false;
     if(!unit->isAlive && unit->isAlly){
         auto neighs = grid->GetNeighbours(unit->gridPosition);
         for(auto n : neighs){

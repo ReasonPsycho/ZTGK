@@ -15,6 +15,7 @@
 #include "ECS/Render/Components/AnimationPlayer.h"
 
 State *MovementState::RunCurrentState() {
+    unit->playinIdleAnimation = false;
 
     if(!unit->isAlive && unit->isAlly){
         auto neighs = grid->GetNeighbours(unit->gridPosition);
