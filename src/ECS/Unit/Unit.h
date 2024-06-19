@@ -19,7 +19,7 @@ struct UnitStats {
     float move_spd{20};
     float move_spd_when_beaten{move_spd/2.0f};
     float mine_spd{};
-    // todo atk speed
+    float atk_spd{1};
 
     Modifiers added{};
 };
@@ -115,6 +115,8 @@ public:
 
     bool isAlive = true;
     bool isBeingHealedByWashingMachine = false;
+
+    bool playinIdleAnimation = false;
 
     Vector2Int getClosestWashingMachineTile();
 

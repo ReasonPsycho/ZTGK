@@ -19,6 +19,26 @@ namespace ztgk {
     Console ztgk::console = Console();
 
     void update_unit_hud() {
+        // this should only happen once due to path re-load guard in Sprite.load
+        auto allies = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents | ranges::views::filter([](Unit * unit){ return unit->isAlly; }) | std::ranges::to<std::vector<Unit *>>();
+        static auto eactions = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Action Panel");
+
+        if (!allies.empty())
+        for (int i = 0; i < 3; ++i) {
+            eactions->children[i]->getComponent<Text>()->content = allies[i]->name;
+            eactions->children[i]->getComponent<Sprite>()->load(allies[i]->icon_path);
+            eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(allies[i]->stats.hp / (allies[i]->stats.max_hp + allies[i]->stats.added.max_hp));
+            if (!allies[i]->isAlive) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GRAY;
+            // came back to life
+            if (allies[i]->isAlive && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GRAY)
+                eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+            if (allies[i]->isSelected) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GREEN;
+            // deselected
+            if (!allies[i]->isSelected && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GREEN)
+                eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+//            else eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        }
+
 
         // todo determine group hud
         Unit * unit;
@@ -90,9 +110,16 @@ namespace ztgk {
                 auto ent = eitem1->getChild("Passive Stats");
                 int i = 1;
                 for (auto stats : item->highlight_passive_stats) {
+                    if (i > 5) break;
                     string ent_name = "STAT" + to_string(i);
-                    ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                    ent->getChild(ent_name)->getComponent<Sprite>()->load(stats.first);
                     ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                    i++;
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(false);
+                }
+                if (i > 1) i++;
+                while (i <= 4) {
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(true);
                     i++;
                 }
             }
@@ -127,9 +154,16 @@ namespace ztgk {
                 auto ent = eitem2->getChild("Passive Stats");
                 int i = 1;
                 for (auto stats : item->highlight_passive_stats) {
+                    if (i > 4) break;
                     string ent_name = "STAT" + to_string(i);
-                    ent->getChild(ent_name)->getChild("Button - " + ent_name)->getComponent<Text>()->content = stats.first;
+                    ent->getChild(ent_name)->getComponent<Sprite>()->load(stats.first);
                     ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
+                    i++;
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(false);
+                }
+                if (i > 1) i++;
+                while (i <= 4) {
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(true);
                     i++;
                 }
             }

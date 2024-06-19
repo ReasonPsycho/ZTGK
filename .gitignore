@@ -10,5 +10,6 @@ CTestTestfile.cmake
 
 [Bb]uild/
 /cmake-build-debug/*
+/cmake-build-release/*
 /.idea/*
 /res/logs/*
