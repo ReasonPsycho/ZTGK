@@ -21,7 +21,7 @@ void InventoryManager::init() {
     item_constructors.emplace(Item::item_types.hands, [](){ return new Hands(); });
     item_constructors.emplace(Item::item_types.mop, [](){ return new Mop(); });
     item_constructors.emplace(Item::item_types.water_gun, [](){ return new WaterGun(); });
-    item_constructors.emplace(Item::item_types.test_buff_item, [](){ return new TestBuffItem(); });
+    item_constructors.emplace(Item::item_types.test_buff_item, [](){ return new Mop(); });
     item_constructors.emplace(Item::item_types.pranium_ore, [](){ return new PraniumOre(); });
 }
 
@@ -156,8 +156,12 @@ bool InventoryManager::unassign_and_delete_item(Unit *unit, Item *item) {
 void InventoryManager::spawn_item_on_map(Item *item, Vector2Int grid_pos) {
     auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(grid_pos);
     tile->state = FLOOR;
-    tile->parentEntity->addComponent(std::make_unique<Render>(item->model));
-    tile->parentEntity->addComponent(std::make_unique<PickupubleItem>(item, grid_pos));
+    auto kiddo = ztgk::game::scene->addEntity(tile->parentEntity,"OnMapItem");
+    kiddo->addComponent(std::make_unique<Render>(item->model));
+    kiddo->addComponent(std::make_unique<PickupubleItem>(item, grid_pos));
+    kiddo->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
+    kiddo->transform.setLocalScale(glm::vec3(0.5f, 0.5f, 2.0f));
+    kiddo->updateSelfAndChild();
 }
 
 void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
