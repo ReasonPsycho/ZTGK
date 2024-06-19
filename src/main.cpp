@@ -1237,7 +1237,7 @@ void load_hud() {
         glm::vec2{100, ztgk::game::window_size.y - 100}, glm::vec2(1), glm::vec4{36, 54, 110, 255}/255.0f, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_credits
     ));
     eteam->getComponent<Text>()->mode = TOP_LEFT;
-    eteam->addComponent(make_unique<Sprite>(glm::vec2{100,400}, glm::vec2{400, 225}, ztgk::color.WHITE, ztgk::game::ui_data.gr_credits, "res/textures/credits.jpg"));
+    eteam->addComponent(make_unique<Sprite>(glm::vec2{100,400}, glm::vec2{400, 225}, ztgk::color.WHITE, ztgk::game::ui_data.gr_credits, "res/textures/credits.png"));
     eteam->getComponent<Sprite>()->mode = MIDDLE_LEFT;
 
     auto elicenses = scene.addEntity(ecredits, "Licenses");
