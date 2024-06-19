@@ -23,7 +23,7 @@ public:
                 .knockback = 1
         }
     }) {
-        icon_path = "res/textures/perwoll.jpg";
+        icon_path = "res/textures/pranium.png";
         highlight_passive_stats = {
                 {"res/textures/icons/stat/atk.png", "100"},
                 {"res/textures/icons/stat/atk.png", "0.5"},

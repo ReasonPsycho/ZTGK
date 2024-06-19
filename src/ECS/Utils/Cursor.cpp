@@ -32,14 +32,14 @@ void Cursor::init() {
                 config.capture_click = !config.capture_click;
                 config.capture_scroll = !config.capture_scroll;
             }
+#ifdef RELEASE_DEBUG
             if (data->key == GLFW_KEY_R && data->mods == GLFW_MOD_CONTROL && data->action == GLFW_PRESS) {
                 raw_pos = ztgk::game::window_size / 2;
                 raw_prev_pos = ztgk::game::window_size / 2;
-#ifdef RELEASE_BUILD
                 glfwSetCursorPos(ztgk::game::window, raw_pos.x, raw_pos.y);
-#endif
                 update_ui_pos();
             }
+#endif
         }
     };
     *ztgk::game::signalQueue += &toggleHandler;
