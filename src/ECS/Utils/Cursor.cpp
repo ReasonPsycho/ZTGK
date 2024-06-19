@@ -14,7 +14,9 @@
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseButtonSignalData.h"
 
 void Cursor::init() {
+#ifdef DEBUG_BUILD
     mouseio = &ImGui::GetIO();
+#endif
     double tx, ty;
     glfwGetCursorPos(ztgk::game::window, &tx, &ty);
     glfw_prev_pos = {tx, ty};
@@ -33,6 +35,10 @@ void Cursor::init() {
             if (data->key == GLFW_KEY_R && data->mods == GLFW_MOD_CONTROL && data->action == GLFW_PRESS) {
                 raw_pos = ztgk::game::window_size / 2;
                 raw_prev_pos = ztgk::game::window_size / 2;
+#ifdef RELEASE_BUILD
+                glfwSetCursorPos(ztgk::game::window, raw_pos.x, raw_pos.y);
+#endif
+                update_ui_pos();
             }
         }
     };
@@ -44,7 +50,9 @@ void Cursor::move(glm::vec2 newpos) {
     if (config.capture_move) {
         raw_prev_pos = raw_pos;
         raw_pos -= glfw_offset;
+#ifdef DEBUG_BUILD
         mouseio->MousePos = {raw_pos.x, raw_pos.y};
+#endif
         update_ui_pos();
         if (config.forward_move) {
             *ztgk::game::signalQueue += MouseMoveSignalData::signal(ui_pos,ui_prev_pos,"Cursor forwarding MOVE");
@@ -57,7 +65,9 @@ void Cursor::move(glm::vec2 newpos) {
 
 void Cursor::scroll(glm::vec2 offset) {
     if (config.capture_scroll) {
+#ifdef DEBUG_BUILD
         ImGui_ImplGlfw_ScrollCallback(ztgk::game::window, offset.x, offset.y);
+#endif
         if (config.forward_scroll) {
             *ztgk::game::signalQueue += MouseScrollSignalData::signal(offset, raw_pos, "Cursor forwarding SCROLL");
         }
@@ -68,7 +78,9 @@ void Cursor::scroll(glm::vec2 offset) {
 
 void Cursor::click(int button, int action, int mods) {
     if (config.capture_click) {
+#ifdef DEBUG_BUILD
         ImGui_ImplGlfw_MouseButtonCallback(ztgk::game::window, button, action, mods);
+#endif
         if (config.forward_click) {
             *ztgk::game::signalQueue += MouseButtonSignalData::signal(button, action, mods,
                                           {raw_pos.x, ztgk::game::window_size.y - raw_pos.y},
