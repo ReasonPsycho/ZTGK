@@ -11,6 +11,7 @@
 #include "HealingState.h"
 #include <random>
 #include "ECS/Gameplay/WashingMachineTile.h"
+#include "ECS/Render/Components/AnimationPlayer.h"
 
 State *IdleState::RunCurrentState() {
 
@@ -94,6 +95,43 @@ State *IdleState::RunCurrentState() {
         idleTimer = 0;
         return moveState;
     }
+
+    auto currentTile = grid->getTileAt(unit->gridPosition);
+
+    if (unit->isAlly && currentTile->dirtinessLevel > 0) {
+        auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+        if (anim == nullptr) {
+        } else if(!unit->playinIdleAnimation) {
+            string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
+            anim->PlayAnimation(modelPathGabkaIdle, true, 2.0f);
+            if(!unit->playinIdleAnimation)
+                ztgk::game::audioManager->playRandomSoundFromGroup("idle");
+            unit->playinIdleAnimation = true;
+
+        }
+        auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
+        if (newDirtLvl < 0) {
+            newDirtLvl = 0;
+        }
+        currentTile->changeDirtinessLevel(newDirtLvl);
+        if (newDirtLvl == 0) {
+
+        }
+    }
+
+    else if (!unit->isAlly && currentTile->dirtinessLevel < 100) {
+        auto newDirtLvl = currentTile->dirtinessLevel + 10 * Time::Instance().DeltaTime();
+        if (newDirtLvl > 100) {
+            newDirtLvl = 100;
+        }
+        currentTile->changeDirtinessLevel(newDirtLvl);
+    }
+
+
+
+
+
+
     return this;
 
 }
