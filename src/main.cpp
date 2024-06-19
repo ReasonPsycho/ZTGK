@@ -104,6 +104,9 @@ string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
 string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
 string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
 string modelPathShroom = "res/models/shroom/shroom.fbx";
+string modelPathHangerMop = "res/models/chest/hanger_and_items_models/hanger_mop.fbx";
+string modelPathHangerRotationMop = "res/models/chest/hanger_and_items_models/hanger_rotation_mop.fbx";
+string modelPathHangerTidyPodLauncher = "res/models/chest/hanger_and_items_models/hanger_launcher.fbx";
 
 Model *tileModel;
 Model *model;
@@ -120,6 +123,11 @@ Model *mopObrotowyModel;
 Model *tidyPodLauncherModel;
 Model *praniumModel;
 Model *shroomModel;
+Model *hangerMopModel;
+Model *hangerMopObrotowyModel;
+Model *hangerTidyPodLauncherModel;
+
+
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -617,6 +625,9 @@ void load_enteties() {
     mopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopObrotowyPath);
     tidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelTidyPodLauncherPath);
     praniumModel =   ztgk::game::modelLoadingManager ->GetModel(modelPraniumPath);
+    hangerMopModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerMop);
+    hangerMopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerRotationMop);
+    hangerTidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerTidyPodLauncher);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
@@ -631,6 +642,10 @@ void load_enteties() {
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
     ztgk::game::shroomModel = ztgk::game::modelLoadingManager ->GetModel("res/models/Mushroom/shroom.fbx");
+    ztgk::game::hangerMopModel = hangerMopModel;
+    ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
+    ztgk::game::hangerTidyPodLauncherModel = hangerTidyPodLauncherModel;
+
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -1927,6 +1942,13 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 }
 
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
+                if(hitMineable == nullptr){
+                    Entity* chestChild = hit->getChild("ChestChild");
+                    if(chestChild != nullptr){
+                        hitMineable = chestChild->getMineableComponent<IMineable>(chestChild);
+                    }
+                }
+
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
                 if(hitUnit == nullptr && hitTile != nullptr){

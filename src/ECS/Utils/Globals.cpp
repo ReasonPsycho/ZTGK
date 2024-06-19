@@ -38,6 +38,9 @@ namespace ztgk::game {
     Model * game::mopModel = nullptr;
     Model * game::mopObrotowyModel = nullptr;
     Model * game::tidyPodLauncherModel = nullptr;
+    Model * game::hangerMopModel = nullptr;
+    Model * game::hangerMopObrotowyModel = nullptr;
+    Model * game::hangerTidyPodLauncherModel = nullptr;
 
     bool game::gameStarted = false;
     bool game::gameWon = false;
