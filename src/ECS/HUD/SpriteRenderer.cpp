@@ -56,6 +56,11 @@ void SpriteRenderer::render(Sprite * sprite) {
     shader.setMatrix4("projection", false, glm::value_ptr(projection));
     shader.setVec4("inColor", sprite->color);
     shader.setBool("hasTex", sprite->hasTexture);
+    shader.setVec2("size", size(sprite));
+    shader.setFloat("radius", sprite->roundingRadius);
+    shader.setFloat("frameSize", sprite->frameSize);
+    shader.setVec4("frameColor", sprite->frameColor);
+    shader.setBool("frameRounded", sprite->frameRoundedInside);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

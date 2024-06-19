@@ -942,6 +942,11 @@ void load_hud() {
         [hud]() { gen_and_load_lvl(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); },
         emenu, ztgk::game::ui_data.gr_mainMenu
     );
+    auto bspr = emenu->getChild("Button - START")->getComponent<Sprite>();
+    bspr->roundingRadius = 0.2;
+    bspr->frameColor = ztgk::color.ROSE * glm::vec4{0.5, 0.5, 0.5, 1};
+    bspr->frameSize = 5;
+    bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
         "LOAD", btn_pos, glm::vec2{200, 80},
@@ -949,6 +954,11 @@ void load_hud() {
         [hud]() { gen_and_load_lvl(false); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); },
         emenu, ztgk::game::ui_data.gr_mainMenu
     );
+    bspr = emenu->getChild("Button - LOAD")->getComponent<Sprite>();
+    bspr->roundingRadius = 0.2;
+    bspr->frameColor = ztgk::color.ROSE * glm::vec4{0.5, 0.5, 0.5, 1};
+    bspr->frameSize = 5;
+    bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
         "Settings", btn_pos, glm::vec2{200, 80},
@@ -956,6 +966,11 @@ void load_hud() {
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(false); },
         emenu, ztgk::game::ui_data.gr_mainMenu
     );
+    bspr = emenu->getChild("Button - Settings")->getComponent<Sprite>();
+    bspr->roundingRadius = 0.2;
+    bspr->frameColor = ztgk::color.ROSE * glm::vec4{0.5, 0.5, 0.5, 1};
+    bspr->frameSize = 5;
+    bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
         "Credits", btn_pos, glm::vec2{200, 80},
@@ -963,6 +978,11 @@ void load_hud() {
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(false); },
         emenu, ztgk::game::ui_data.gr_mainMenu
     );
+    bspr = emenu->getChild("Button - Credits")->getComponent<Sprite>();
+    bspr->roundingRadius = 0.2;
+    bspr->frameColor = ztgk::color.ROSE * glm::vec4{0.5, 0.5, 0.5, 1};
+    bspr->frameSize = 5;
+    bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
         "Quit", btn_pos, glm::vec2{200, 80},
@@ -970,6 +990,11 @@ void load_hud() {
         []() { glfwSetWindowShouldClose(window, true); },
         emenu, ztgk::game::ui_data.gr_mainMenu
     );
+    bspr = emenu->getChild("Button - Quit")->getComponent<Sprite>();
+    bspr->roundingRadius = 0.2;
+    bspr->frameColor = ztgk::color.ROSE * glm::vec4{0.5, 0.5, 0.5, 1};
+    bspr->frameSize = 5;
+    bspr->frameRoundedInside = true;
 
 // load/save screen
     auto eload = scene.addEntity(emenu, "Load Screen");
@@ -988,10 +1013,13 @@ void load_hud() {
 
     auto emiddle = scene.addEntity(egame, "Unit Details");
     emiddle->addComponent(make_unique<Sprite>(glm::vec2{400,0}, glm::vec2{1120,250}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_middle));
-    hud->createSlider_Bar(HORIZONTAL, glm::vec2{400, 275}, glm::vec2{1120, 50}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, emiddle, ztgk::game::ui_data.gr_middle, true, 100);
+    auto ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{400, 275}, glm::vec2{1120, 50}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, emiddle, ztgk::game::ui_data.gr_middle, true, 100);
+    ebar->getComponent<Sprite>()->frame(2, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(2, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
     auto eportrait = scene.addEntity(emiddle, "Portrait");
     eportrait->addComponent(make_unique<Sprite>(glm::vec2{400,0}, glm::vec2{250,250}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/gabka_cool.png"));
+    eportrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     auto ename = scene.addEntity(emiddle, "Name");
     ename->addComponent(make_unique<Text>("SPONGE", glm::vec2{700, 240}, glm::vec2(1.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
@@ -1043,6 +1071,7 @@ void load_hud() {
     eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_mop.png"));
     eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
     eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
+    eweapPortrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     auto eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
     ent = scene.addEntity(eoffstat, "ATK");
@@ -1060,6 +1089,8 @@ void load_hud() {
     ent = scene.addEntity(eoffstat, "CD");
     auto eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1170, 150}, glm::vec2{280, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w1_offensive, true, 100);
     eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
+    eslider->getComponent<Sprite>()->frame(2, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    eslider->getChild("Background")->getComponent<Sprite>()->frame(2, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
 
     auto epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
     auto gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 1");
@@ -1096,6 +1127,7 @@ void load_hud() {
     eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_superMop.png"));
     eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
     eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
+    eweapPortrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
     ent = scene.addEntity(eoffstat, "ATK");
@@ -1113,6 +1145,8 @@ void load_hud() {
     ent = scene.addEntity(eoffstat, "CD");
     eslider = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1170, 30}, glm::vec2{250, 25}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_w2_offensive, true, 100);
     eslider->getComponent<HUDSlider>()->displayFormat = "{:.1f}s / {:.1f}s";
+    eslider->getComponent<Sprite>()->frame(2, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    eslider->getChild("Background")->getComponent<Sprite>()->frame(2, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
 
     epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 1");
@@ -1155,9 +1189,13 @@ void load_hud() {
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
     ent->getComponent<Text>()->mode = CENTER;
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
+
     ent = hud->createButton(
         glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
         [](){
@@ -1167,9 +1205,13 @@ void load_hud() {
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
     ent->getComponent<Text>()->mode = CENTER;
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
+
     ent = hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
         [](){
             auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
@@ -1178,9 +1220,13 @@ void load_hud() {
         },
         eactions, ztgk::game::ui_data.gr_actions
     );
-    hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
     ent->getComponent<Text>()->mode = CENTER;
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
+
     hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
@@ -1222,22 +1268,22 @@ void load_hud() {
 //        etop, ztgk::game::ui_data.gr_top
 //    );
     ent = hud->createButton(
-        top_anchor - glm::vec2{0, 50}, glm::vec2{35, 35},
-        "res/textures/icons/pause.png", "res/textures/rectangles/800x800.png",
+        top_anchor - glm::vec2{0, 15}, glm::vec2{30, 30},
+        "res/textures/icons/pause.png", "res/textures/transparent.png",
         [hud](){
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
         },
         etop, ztgk::game::ui_data.gr_top
     );
-    ent->getChild("Background")->getComponent<Sprite>()->color = ztgk::color.GRAY * 0.75f;
+    ent->getChild("Background")->getComponent<Sprite>()->round(0.2f)->frame(2, ztgk::color.BLACK);
 //    ent->getComponent<Text>()->pos.x -= 1;
 //    ent->getComponent<Text>()->pos.y += 5;
 
-    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{450, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top, "res/textures/rectangles/800x400.png"));
-    etop->getComponent<Sprite>()->mode = CENTER;
+    etop->addComponent(make_unique<Sprite>(top_anchor, glm::vec2{450, 70}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_top));
+    etop->getComponent<Sprite>()->from(CENTER)->round(0.2f)->frame(2, glm::vec4{0, 0, 0.75, 0.8});
 
     auto etime = scene.addEntity(etop, "Time");
-    etime->addComponent(make_unique<Text>("00:00", top_anchor, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
+    etime->addComponent(make_unique<Text>("00:00", glm::vec2{top_anchor.x, 1045}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     etime->getComponent<Text>()->mode = CENTER;
     ztgk::game::ui_data.txt_time_display = etime->getComponent<Text>();
 
