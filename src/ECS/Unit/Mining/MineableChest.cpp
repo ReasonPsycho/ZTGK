@@ -20,9 +20,14 @@ void MineableChest::onMined(Unit *unit) {
     IMineable::onMined(unit);
     if (parentEntity->getComponent<Render>())
         parentEntity->getComponent<Render>()->Remove();
+    parentEntity->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
     auto item = InventoryManager::instance->create_item(item_type_id);
-    auto pos = grid->GridToWorldPosition(gridPosition);
-    InventoryManager::instance->spawn_item_on_map(item, gridPosition);
+//    auto pos = grid->GridToWorldPosition(gridPosition);
+//    InventoryManager::instance->spawn_item_on_map(item, gridPosition);
+    InventoryManager::instance->assign_item(item, unit, -1);
+
+    //To prevent unit from walking on empty hanger vvvv
+    grid->getTileAt(gridPosition)->state = CHEST;
     spdlog::debug("Mined chest");
 }
 
@@ -40,7 +45,7 @@ MineableChest::MineableChest(const Vector2Int &gridPosition, Grid *grid, unsigne
     this->gridPosition = gridPosition;
     this->grid = grid;
     this->item_type_id = itemTypeId;
-    this->timeToMine = 5;
+    this->timeToMine = 0.1f;
     this->timeToMineRemaining = timeToMine;
     //ztgk::game::scene->systemManager.getSystem<MiningSystem>()->addComponent(this);
 

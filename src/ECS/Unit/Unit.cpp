@@ -329,12 +329,26 @@ void Unit::UpdateImpl() {
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
-    if (currentRotation > rotation) {
-        currentRotation -= 0.1f;
+    const float rotationSpeed = 0.1f; // The speed at which to rotate each frame
+    float deltaRotation = rotation - currentRotation;
+
+// Normalize the deltaRotation to be within the range [-180, 180]
+    if (deltaRotation > 180.0f) {
+        deltaRotation -= 360.0f;
     }
-    if (currentRotation < rotation) {
-        currentRotation += 0.1f;
+    if (deltaRotation < -180.0f) {
+        deltaRotation += 360.0f;
     }
+
+// Apply the rotation
+    if (deltaRotation > 0.1f) {
+        currentRotation += rotationSpeed;
+    } else if (deltaRotation < -0.1f) {
+        currentRotation -= rotationSpeed;
+    } else {
+        currentRotation = rotation; // Snap to the target rotation when close enough
+    }
+
     getEntity()->transform.setLocalRotation(glm::vec3(0, currentRotation, 0));
 
     if ((equipment.item1 != nullptr && equipment.item1->name == "Pranium Ore") ||
