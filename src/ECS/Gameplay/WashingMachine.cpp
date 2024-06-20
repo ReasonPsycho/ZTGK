@@ -64,6 +64,34 @@ void WashingMachine::UpdateImpl() {
             clearNextTile_floors();
     }
 
+
+    if(!ztgk::game::enableWashingMachineSwaying) { return;}
+    // Sway washing machine by changing its rotation and y position
+    auto machineEntity = ztgk::game::scene->getChild("WashingMachine");
+
+    currentSwayAngle += swaySpeed * swayDirection;
+    if (currentSwayAngle > maxSwayAngle || currentSwayAngle < -maxSwayAngle) {
+        swayDirection *= -1;
+        currentSwayAngle = glm::clamp(currentSwayAngle, -maxSwayAngle, maxSwayAngle); // Ensure the angle doesn't exceed max limits
+    }
+
+    if (machineEntity != nullptr) {
+        glm::quat machineRotation = machineEntity->transform.getLocalRotation();
+        glm::vec3 machinePosition = machineEntity->transform.getLocalPosition();
+
+        // Correct the quaternion update for rotation
+        float swayAngleRadians = glm::radians(currentSwayAngle);
+        glm::quat rotationChange = glm::angleAxis(swayAngleRadians, glm::vec3(1.0f, 0.0f, 0.0f)); // Sway around x-axis
+        glm::quat newRotation = rotationChange * machineRotation;
+
+        // Apply the rotation and adjust the y position based on sway
+        machineEntity->transform.setLocalRotation(newRotation);
+        machineEntity->transform.setLocalPosition(
+                glm::vec3(machinePosition.x, machinePosition.y + swayHeight * std::sin(swayAngleRadians*2), machinePosition.z));
+
+        machineEntity->updateSelfAndChild();
+    }
+
 }
 
 std::vector<Tile*> WashingMachine::getTilesToClearInRaiuds(Vector2Int position, int radius) {
@@ -127,6 +155,7 @@ void WashingMachine::onPraniumDelivered() {
     }
 
 
+
     auto newTilesToClear_walls = getTilesToClearInRaiuds(Vector2Int(50, 50), radiusToClear);
     for(auto tile : newTilesToClear_walls){
         tilesToClear_walls.push_back(tile);
@@ -139,6 +168,23 @@ void WashingMachine::onPraniumDelivered() {
     tilesToClear_floors = sortInSpiralPattern(tilesToClear_floors, Vector2Int(50, 50));
 
     radiusToClear *= 1.3f;
+    maxSwayAngle += .5f;
+    swaySpeed += 0.2f;
+    swayHeight += 1.f;
+
+    if(currentPranium > 0){
+        if(!ztgk::game::audioManager->isSoundPlaying("sfx_pralka1"))
+            ztgk::game::audioManager->playSound("sfx_pralka1", -1);
+    }
+
+    if(currentPranium > 2){
+        ztgk::game::audioManager->stopSound("sfx_pralka1");
+        if(!ztgk::game::audioManager->isSoundPlaying("sfx_pralka2"))
+            ztgk::game::audioManager->playSound("sfx_pralka2", -1);
+
+    }
+
+
 
 }
 

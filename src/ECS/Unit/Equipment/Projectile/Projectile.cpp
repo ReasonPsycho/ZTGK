@@ -26,7 +26,7 @@ std::vector<glm::vec3> Projectile::generateCurvePoints(int steps) {
     for (int i = 0; i < steps; i++) {
         float t = (float)i / (float)steps;
         glm::vec3 point = (1 - t) * startPosition + t * targetPosition;
-        point.y += sin(t * 3.14f);
+        point.y += glm::distance(startPosition, targetPosition)/3.0f * sin(t * 3.14f);
         points.push_back(point);
     }
     return points;
@@ -36,7 +36,7 @@ std::vector<glm::vec3> Projectile::generateCurvePoints(int steps) {
 void Projectile::UpdateImpl() {
     // Define the margin of error for checking the target position
     float epsilon = 0.5f;
-    if(target == nullptr || unit == nullptr){
+    if(target->getEntity() == nullptr || unit->getEntity() == nullptr){
         ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->removeComponent(this);
         getEntity()->Destroy();
         return;

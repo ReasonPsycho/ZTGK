@@ -90,6 +90,9 @@ namespace ztgk::game {
     extern Model* hangerTidyPodLauncherModel;
 
 
+    extern bool enableWashingMachineSwaying;
+
+
     extern bool gameStarted;
     extern bool gameWon;
     extern bool gameLost;

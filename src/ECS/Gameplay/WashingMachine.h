@@ -49,6 +49,14 @@ private:
 
     std::vector<Tile*> sortInSpiralPattern(std::vector<Tile*> tiles, Vector2Int position);
 
+    float maxSwayAngle = 0.0f;
+    float swaySpeed = 0.0f;
+    float currentSwayAngle = 0.0f;
+    int swayDirection = 1;
+    float swayHeight = 0.0f;
+
+
+
 };
 
 
