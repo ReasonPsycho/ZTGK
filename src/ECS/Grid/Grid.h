@@ -121,6 +121,8 @@ public:
 
     std::vector<Tile*> GetNeighbours(Vector2Int gridpos, bool includeDiagonals = true);
 
+    Vector2Int GetNearestWashingMachineTile(Vector2Int origin);
+
     bool read_names = false;
     std::vector<std::string> gabka_names = {};
     std::vector<std::string> shroom_names = {};

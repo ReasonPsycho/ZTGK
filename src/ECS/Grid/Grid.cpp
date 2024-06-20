@@ -750,3 +750,25 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     }
     return UnitEntity;
 }
+
+Vector2Int Grid::GetNearestWashingMachineTile(Vector2Int origin) {
+    auto tilez = ztgk::game::scene->systemManager.getSystem<WashingMachine>()->WashingMachineTiles;
+    std::vector<Vector2Int> tilesGridPos = {};
+    for (auto tile : tilez) {
+        tilesGridPos.push_back(tile.second[0]->gridPosition);
+    }
+    //get the closest one to origin
+    Vector2Int closest = tilesGridPos[0];
+    float closestDist = glm::distance(glm::vec2(origin.x, origin.z), glm::vec2(tilesGridPos[0].x, tilesGridPos[0].z));
+    for (auto tile : tilesGridPos) {
+        float dist = glm::distance(glm::vec2(origin.x, origin.z), glm::vec2(tile.x, tile.z));
+        if (dist < closestDist) {
+            closest = tile;
+            closestDist = dist;
+        }
+    }
+
+    return closest;
+
+
+}

@@ -1943,7 +1943,10 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     return;
 
                 }
-
+                Entity* hitWashingMachine = nullptr;
+                if(hit->getComponent<BoxCollider>()->collisionType == CollisionType::WASHING_MACHINE){
+                    hitWashingMachine = hit;
+                }
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
                 if(hitMineable == nullptr){
                     Entity* chestChild = hit->getChild("ChestChild");
@@ -1959,7 +1962,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                          hitUnit = hitTile->unit;
                     }
                 }
-                auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
                 for(auto sponge : selectedSponges){
                     sponge->hasMovementTarget = false;
@@ -1969,6 +1971,22 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     sponge->combatTarget = nullptr;
                     sponge->hasCombatTarget = false;
                     sponge->pathfinding.path.clear();
+
+                    if(hitWashingMachine != nullptr){
+                        sponge->ForcedMovementState = true;
+                        sponge->forcedMovementTarget = sponge->pathfinding.GetNearestVacantTile(scene.systemManager.getSystem<Grid>()->GetNearestWashingMachineTile(sponge->gridPosition), sponge->gridPosition);
+
+                        sponge->hasMiningTarget = false;
+                        sponge->miningTargets.clear();
+                        sponge->hasCombatTarget = false;
+                        sponge->combatTarget = nullptr;
+                        sponge->currentMiningTarget = nullptr;
+
+                        sponge->hasMovementTarget = true;
+                        sponge->pathfinding.path.clear();
+                        sponge->movementTarget = sponge->forcedMovementTarget;
+
+                    }
 
 
                     if(hitUnit!= nullptr){
@@ -2005,21 +2023,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                         sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
                                 VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
 
-                    }
-
-                    if(hitWashingMachine != nullptr){
-                        sponge->ForcedMovementState = true;
-                        sponge->forcedMovementTarget = hitTile->index;
-
-                        sponge->hasMiningTarget = false;
-                        sponge->miningTargets.clear();
-                        sponge->hasCombatTarget = false;
-                        sponge->combatTarget = nullptr;
-
-                        sponge->hasMovementTarget = true;
-                        sponge->pathfinding.path.clear();
-                        sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
-                                VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
                     }
                 }
 

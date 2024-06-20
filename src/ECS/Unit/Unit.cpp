@@ -166,6 +166,12 @@ void Unit::UpdateImpl() {
     if (isBeingHealedByWashingMachine && stats.hp >= stats.max_hp) {
         isBeingHealedByWashingMachine = false;
     }
+
+    float dirtLvl = 1 - (stats.hp / (stats.max_hp + stats.added.max_hp));
+    auto render = getEntity()->getComponent<Render>();
+    if (render != nullptr) {
+        render->dirtLevel = dirtLvl;
+    }
     if (!isAlive && isAlly) {
         ztgk::game::scene->systemManager.getSystem<UnitSystem>()->deselectUnit(this);
         //if unit stands next to washing machine it will be healed by it
