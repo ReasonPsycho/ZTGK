@@ -947,7 +947,7 @@ void load_hud() {
 
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_item)->offset.x = 70;
 
-// menu
+#pragma region menu
     auto emenu = scene.addEntity(ehud, "Menu");
 
     emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title_screen.png"));
@@ -1013,13 +1013,17 @@ void load_hud() {
     bspr->frameColor = ztgk::color.ROSE * glm::vec4{0.5, 0.5, 0.5, 1};
     bspr->frameSize = 5;
     bspr->frameRoundedInside = true;
+#pragma endregion
 
+#pragma region loadscreen
 // load/save screen
     auto eload = scene.addEntity(emenu, "Load Screen");
     eload->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_loadScreen));
     eload->addComponent(make_unique<Text>("Loading...", glm::vec2{ztgk::game::window_size.x/5, ztgk::game::window_size.y*8/10}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_loadScreen));
     eload->getComponent<Text>()->mode = CENTER;
+#pragma endregion
 
+#pragma region game
 // game
     auto egame = scene.addEntity(ehud, "Game");
     auto emap = scene.addEntity(egame, "Map");
@@ -1028,7 +1032,7 @@ void load_hud() {
     emap->getComponent<Text>()->mode = CENTER;
     emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
 
-
+#pragma region unit details
     auto emiddle = scene.addEntity(egame, "Unit Details");
     emiddle->addComponent(make_unique<Sprite>(glm::vec2{400,0}, glm::vec2{1120,250}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_middle));
     auto ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{400, 275}, glm::vec2{1120, 50}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, emiddle, ztgk::game::ui_data.gr_middle, true, 100);
@@ -1083,7 +1087,9 @@ void load_hud() {
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("5", glm::vec2{890, 25}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+#pragma endregion
 
+#pragma region weapon details
 // WEAPON 1
     auto eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #1");
     eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_mop.png"));
@@ -1194,7 +1200,9 @@ void load_hud() {
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 31}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
+#pragma endregion
 
+#pragma region actions
 // ACTIONS
     auto eactions = scene.addEntity(egame, "Action Panel");
     eactions->addComponent(make_unique<Sprite>(glm::vec2{1520,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
@@ -1273,7 +1281,9 @@ void load_hud() {
             ztgk::update_weapon_hud(*unit);
         }, eactions, ztgk::game::ui_data.gr_actions);
     hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+#pragma endregion
 
+#pragma region top panel
 // TOP PANEL
     auto etop = scene.addEntity(egame, "Top Panel");
     glm::vec2 top_anchor = {ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 50};
@@ -1318,6 +1328,18 @@ void load_hud() {
     eunitCounter->addComponent(make_unique<Text>("00", top_anchor + glm::vec2{155, 0}, glm::vec2(0.7), ztgk::color.KHAKI, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_top));
     eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
     ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
+#pragma endregion
+#pragma endregion
+
+#pragma region settings
+    auto gr_concreteSettings = hud->addGroup(ztgk::game::ui_data.gr_settings, "Concrete Settings");
+    auto gr_settingHeaders = hud->addGroup(gr_concreteSettings, "Setting Headers");
+    auto gr_settingSliders = hud->addGroup(gr_concreteSettings, "Setting Sliders");
+
+    hud->getGroupOrAddDefault(gr_concreteSettings)->offset.x = 50;
+    hud->getGroupOrAddDefault(gr_concreteSettings)->offset.y = -30;
+    hud->getGroupOrAddDefault(gr_settingHeaders)->offset.y = 5; // centering the texts to sliders because text rendering SUCKSSSSSS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    hud->getGroupOrAddDefault(gr_settingSliders)->offset.x = 50;
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");
@@ -1325,20 +1347,39 @@ void load_hud() {
     esettings->addComponent(make_unique<Text>("Settings", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_settings));
     esettings->getComponent<Text>()->mode = TOP_CENTER;
 
+    auto eslider_gamma = scene.addEntity(esettings, "Gamma ");
+    eslider_gamma->addComponent(make_unique<Text>("Gamma", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 300}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_gamma->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 300}, {1000, 50}, eslider_gamma, gr_settingSliders, 3, 0.75, "{:.2f}");
+    eslider_gamma->getChild("Setting Slider")->getComponent<HUDSlider>()->set_in_display_range(scene.systemManager.getSystem<PhongPipeline>()->getGamma());
+
     auto eslider_master = scene.addEntity(esettings, "Master Volume ");
-    eslider_master->addComponent(make_unique<Text>("Master Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_settings));
+    eslider_master->addComponent(make_unique<Text>("Master Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_master->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, {1000, 80}, eslider_master, ztgk::game::ui_data.gr_settings, 128, 0, "{:.0f}/{:.0f}");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, {1000, 50}, eslider_master, gr_settingSliders, 100, 0, "{:.0f}%");
 
     auto eslider_ambient = scene.addEntity(esettings, "Music Volume ");
-    eslider_ambient->addComponent(make_unique<Text>("Music Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_settings));
+    eslider_ambient->addComponent(make_unique<Text>("Music Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 500}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_ambient->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, {1000, 80}, eslider_ambient, ztgk::game::ui_data.gr_settings, 128, 0, "{:.0f}/{:.0f}");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 500}, {1000, 50}, eslider_ambient, gr_settingSliders, 100, 0, "{:.0f}%");
+
+    auto eslider_sfx = scene.addEntity(esettings, "SFX Volume ");
+    eslider_sfx->addComponent(make_unique<Text>("SFX Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_sfx->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, {1000, 50}, eslider_sfx, gr_settingSliders, 100, 0, "{:.0f}%");
+
+    auto eslider_click = scene.addEntity(esettings, "Click Volume ");
+    eslider_click->addComponent(make_unique<Text>("Click Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 700}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_click->getComponent<Text>()->mode = MIDDLE_RIGHT;
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 700}, {1000, 50}, eslider_click, gr_settingSliders, 100, 0, "{:.0f}%");
 
     hud->createButton("Save", {ztgk::game::window_size.x/2, 100}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [eslider_master, eslider_ambient]() {
-            ztgk::game::audioManager->setGlobalVolume(eslider_master->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
-            ztgk::game::audioManager->setVolumeForGroup("ambient", eslider_ambient->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
+        [eslider_master, eslider_ambient, eslider_sfx, eslider_click, eslider_gamma]() {
+            ztgk::game::audioManager->setGlobalVolume(eslider_master->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+            ztgk::game::audioManager->setVolumeForGroup("ambient", eslider_ambient->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+            ztgk::game::audioManager->setVolumeForGroup("sfx", eslider_sfx->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+            ztgk::game::audioManager->setVolumeForGroup("click", eslider_click->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+            ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->setGamma(eslider_gamma->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
         },
         esettings, ztgk::game::ui_data.gr_settings
     );
@@ -1347,7 +1388,9 @@ void load_hud() {
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         esettings, ztgk::game::ui_data.gr_settings
     );
+#pragma endregion
 
+#pragma region credits
 // credits
     auto ecredits = scene.addEntity(ehud, "Credits");
     ecredits->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_credits));
@@ -1378,7 +1421,9 @@ void load_hud() {
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         ecredits, ztgk::game::ui_data.gr_credits
     );
+#pragma endregion
 
+#pragma region win-lose screen
     // Game Won -> 4 pranium delivered to Washing Machine
     auto egamewon = scene.addEntity(emenu, "Win Screen");
     egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
@@ -1404,6 +1449,7 @@ void load_hud() {
         [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
         egamelost, ztgk::game::ui_data.gr_game_lost
     );
+#pragma endregion
 
     // groups
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_menu)->setHidden(false);

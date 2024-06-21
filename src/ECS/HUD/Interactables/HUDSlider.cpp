@@ -6,6 +6,7 @@
 #include "ECS/HUD/Components/Text.h"
 #include "ECS/HUD/Components/Sprite.h"
 #include "ECS/HUD/Interactables/HUDButton.h"
+#include "ECS/HUD/HUD.h"
 #include "ECS/SignalQueue/Signal.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "ECS/SignalQueue/DataCargo/MouseEvents/MouseMoveSignalData.h"
@@ -110,12 +111,14 @@ void HUDSlider::init_control_listener() {
 }
 
 void HUDSlider::set_from_pos(glm::vec2 pos) {
+    auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
+
     switch (this->direction) {
     case HORIZONTAL:
-        this->set(std::clamp((pos.x - this->control->collisionSprite->pos.x) / this->control->collisionSprite->size.x, 0.0f, 1.0f));
+        this->set(std::clamp((pos.x - this->control->collisionSprite->pos.x - hud->getGroupTreeOffset(control->groupID).x) / this->control->collisionSprite->size.x, 0.0f, 1.0f));
         break;
     case VERTICAL:
-        this->set(std::clamp((pos.y - this->control->collisionSprite->pos.y) / this->control->collisionSprite->size.y, 0.0f, 1.0f));
+        this->set(std::clamp((pos.y - this->control->collisionSprite->pos.y - hud->getGroupTreeOffset(control->groupID).y) / this->control->collisionSprite->size.y, 0.0f, 1.0f));
         break;
     }
 }

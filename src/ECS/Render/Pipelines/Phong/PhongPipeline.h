@@ -26,6 +26,11 @@ public:
     void PrepareFoamMap(Camera* camera);
     void CheckFramebuffer();
 
+    float getGamma() const { return gamma; }
+    void setGamma(float gamma) { this->gamma = gamma; }
+    float getBloomIntensity() const { return m_bloom_intensity; }
+    void setBloomIntensity(float bloomIntensity) { this->m_bloom_intensity = bloomIntensity; }
+
     //ECS
     void registerComponents() override{};
     void addComponent(void* component) override;
