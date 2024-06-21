@@ -605,6 +605,11 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/sfx_heal1.mp3", "sfx_heal1");
     ztgk::game::audioManager->loadSound("res/sounds/sfx_heal2.mp3", "sfx_heal2");
 
+    //click
+    ztgk::game::audioManager->loadSound("res/sounds/click_click1.mp3", HUDButton::sound_light);
+    ztgk::game::audioManager->loadSound("res/sounds/click_click2.mp3", HUDButton::sound_normal);
+    ztgk::game::audioManager->setVolumeForGroup("click", 6);
+
 }
 
 void load_enteties() {
@@ -1213,7 +1218,7 @@ void load_hud() {
             mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
             *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_1, glfwGetKeyScancode(GLFW_KEY_1), GLFW_PRESS, mods, "Passing selection of unit 1 via action menu to handle_controls func.");
         },
-        eactions, ztgk::game::ui_data.gr_actions
+        eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
@@ -1229,7 +1234,7 @@ void load_hud() {
             mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
             *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_2, glfwGetKeyScancode(GLFW_KEY_2), GLFW_PRESS, mods, "Passing selection of unit 2 via action menu to handle_controls func.");
         },
-        eactions, ztgk::game::ui_data.gr_actions
+        eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
@@ -1244,7 +1249,7 @@ void load_hud() {
             mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
             *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_3, glfwGetKeyScancode(GLFW_KEY_3), GLFW_PRESS, mods, "Passing selection of unit 3 via action menu to handle_controls func.");
         },
-        eactions, ztgk::game::ui_data.gr_actions
+        eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
@@ -1253,9 +1258,9 @@ void load_hud() {
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
-    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
     hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png", [](){
             if (ztgk::game::ui_data.tracked_unit_id == -1) return;
             auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
@@ -1267,7 +1272,7 @@ void load_hud() {
             InventoryManager::instance->unassign_item(*unit, item);
             InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
-        }, eactions, ztgk::game::ui_data.gr_actions);
+        }, eactions, ztgk::game::ui_data.gr_actions, false);
     hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png", [](){
             if (ztgk::game::ui_data.tracked_unit_id == -1) return;
             auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
@@ -1279,8 +1284,8 @@ void load_hud() {
             InventoryManager::instance->unassign_item(*unit, item);
             InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
             ztgk::update_weapon_hud(*unit);
-        }, eactions, ztgk::game::ui_data.gr_actions);
-    hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions);
+        }, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
 #pragma endregion
 
 #pragma region top panel
@@ -1372,8 +1377,9 @@ void load_hud() {
     eslider_click->addComponent(make_unique<Text>("Click Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 700}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_click->getComponent<Text>()->mode = MIDDLE_RIGHT;
     hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 700}, {1000, 50}, eslider_click, gr_settingSliders, 100, 0, "{:.0f}%");
+    eslider_click->getChild("Setting Slider")->getComponent<HUDSlider>()->set_in_display_range(6);
 
-    hud->createButton("Save", {ztgk::game::window_size.x/2, 100}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+    ent = hud->createButton("Save", {ztgk::game::window_size.x/2, 100}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
         [eslider_master, eslider_ambient, eslider_sfx, eslider_click, eslider_gamma]() {
             ztgk::game::audioManager->setGlobalVolume(eslider_master->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
             ztgk::game::audioManager->setVolumeForGroup("ambient", eslider_ambient->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);

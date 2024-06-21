@@ -7,9 +7,23 @@
 #include "ECS/HUD/Components/Sprite.h"
 #include "ECS/Entity.h"
 
-HUDButton::HUDButton(Sprite * collisionSprite, unsigned groupID, button_func onPress, button_func onRelease)
-: AHUDComponent(BUTTON, groupID), collisionSprite(collisionSprite), onPress(std::move(onPress)), onRelease(std::move(onRelease)) {
+HUDButton::HUDButton(Sprite * collisionSprite, unsigned groupID, button_func onPress, button_func onRelease, bool hasSound)
+: AHUDComponent(BUTTON, groupID), collisionSprite(collisionSprite), _onPress(std::move(onPress)), _onRelease(std::move(onRelease)), has_sound(hasSound) {
     name = "Button";
+}
+
+void HUDButton::onPress(HUDButton *self) {
+    if (has_sound) {
+        ztgk::game::audioManager->playSound(sound_normal);
+    }
+    _onPress(self);
+}
+
+void HUDButton::onRelease(HUDButton *self) {
+    if (has_sound) {
+        ztgk::game::audioManager->playSound(sound_light);
+    }
+    _onRelease(self);
 }
 
 void HUDButton::showImGuiDetailsImpl(Camera *camera) {

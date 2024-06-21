@@ -124,6 +124,18 @@ void HUDSlider::set_from_pos(glm::vec2 pos) {
 }
 
 void HUDSlider::update_display() {
+    if (controlHandle && controlHandleForeground) {
+        switch (direction) {
+        case HORIZONTAL:
+            controlHandle->collisionSprite->pos.x = barBackground->pos.x + barBackground->size.x * value;
+            controlHandleForeground->pos.x = controlHandle->collisionSprite->pos.x;
+            break;
+        case VERTICAL:
+            controlHandle->collisionSprite->pos.y = barBackground->pos.y + barBackground->size.y * value;
+            controlHandleForeground->pos.y = controlHandle->collisionSprite->pos.y;
+            break;
+        }
+    }
     if (display) {
         display->content = get_display_string();
         if (controlHandle) {
@@ -135,18 +147,6 @@ void HUDSlider::update_display() {
                 display->pos.y = controlHandle->collisionSprite->pos.y;
                 break;
             }
-        }
-    }
-    if (controlHandle && controlHandleForeground) {
-        switch (direction) {
-        case HORIZONTAL:
-            controlHandle->collisionSprite->pos.x = barBackground->pos.x + barBackground->size.x * value;
-            controlHandleForeground->pos.x = controlHandle->collisionSprite->pos.x;
-            break;
-        case VERTICAL:
-            controlHandle->collisionSprite->pos.y = barBackground->pos.y + barBackground->size.y * value;
-            controlHandleForeground->pos.y = controlHandle->collisionSprite->pos.y;
-            break;
         }
     }
 }
