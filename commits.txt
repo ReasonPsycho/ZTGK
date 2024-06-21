@@ -1,0 +1,845 @@
+idle anim added
+2024-06-19 18:18:42
+
+macros, only release works for now
+2024-06-18 21:03:52
+
+redo glfw cursor
+2024-06-18 20:19:35
+
+Misc changes for gameplay recording
+2024-06-18 19:18:20
+
+selection on group status
+2024-06-18 04:27:43
+
+group status & selection on action panel
+2024-06-18 04:10:57
+
+enemy inspection, names
+2024-06-18 02:46:48
+
+🔄 Renamed project and added icon support 🖼️
+2024-06-18 01:57:35
+
+many updates to details ui
+2024-06-18 01:37:11
+
+Shroom now has WaterGun + Unit turns towards mining target while mining it
+2024-06-17 23:20:31
+
+🔄 Update animation player and renderer components 🔄
+2024-06-17 22:52:57
+
+animations, small fixes
+2024-06-17 22:44:37
+
+atk speed lol, win/lose screen grouping
+2024-06-17 22:32:28
+
+🆕 Add mushroom model file
+2024-06-17 22:30:41
+
+ui changes
+2024-06-17 21:58:40
+
+🔧 Changed ModelLoadingManager from struct to class
+2024-06-17 21:24:26
+
+Add ModelLoadingManager to global namespace 🌐
+2024-06-17 21:16:19
+
+YOU ONLY NEED TO COPY MODEL AND TEXTURES AND UNCOMMENT LINES IN MAIN AND CHANGE BUGMODEL TO SHROOMMODEL GRID::SPAWNUNIT
+2024-06-17 21:09:13
+
+🚀 Added BetterSpriteRender component and related functionalities 🎨
+2024-06-17 20:14:46
+
+res/rects
+2024-06-17 17:22:40
+
+klamra fix
+2024-06-17 16:50:06
+
+minor changes
+2024-06-17 15:51:11
+
+finally fixed range attacks
+2024-06-17 15:45:40
+
+some shit done
+2024-06-17 15:15:03
+
+Models with temp textires loading properly (mostly)
+2024-06-17 12:37:51
+
+update counters for the new changes
+2024-06-17 02:53:55
+
+clamp damage taken to avoid negative dmg LOL
+2024-06-17 02:48:33
+
+set combat target on tile hit under unit
+2024-06-17 02:25:32
+
+set selection when hitting tile beneath unit
+2024-06-17 02:09:51
+
+Projectiles added with Watergun LOL
+2024-06-16 21:20:45
+
+adjustment for new loot generation
+2024-06-16 20:02:50
+
+Spongus now heal next to washing machine
+2024-06-16 15:38:45
+
+Add item assignment to level generation
+2024-06-16 14:54:02
+
+small fix to the extra controls
+2024-06-16 03:23:40
+
+some extra controls
+2024-06-16 03:20:36
+
+fix to pranium ore logic to make it identical to chest
+2024-06-16 02:35:14
+
+fix to unit selection pointer handling logic
+2024-06-16 02:23:28
+
+temp skipping minimap draw to save on some fps maybe?
+2024-06-16 02:09:07
+
+self tex id management on sprite to avoid reloading constantly
+2024-06-16 02:01:15
+
+fix to equip & hud logic for 2-slot items
+2024-06-16 01:09:43
+
+epic fix for not attacking with non-default items
+2024-06-16 00:54:55
+
+more top panel work
+2024-06-16 00:35:30
+
+Add/remove extra max hp on eq, fix some ui updates
+2024-06-15 23:39:23
+
+fix crash on pickup when eq full
+2024-06-15 22:37:23
+
+Item pickup fix woooo
+2024-06-15 21:43:30
+
+work on top panel
+2024-06-15 17:05:58
+
+🔄 Refactored collision system and improved performance 💡
+2024-06-15 16:59:26
+
+comment
+2024-06-15 16:40:51
+
+minimap broken
+2024-06-15 16:33:24
+
+fixed dragging on right mouse button, enemies now attack and follow spongiez
+2024-06-14 19:56:17
+
+some new level gen params
+2024-06-14 02:00:59
+
+todo fix eq reading
+2024-06-14 01:51:38
+
+glfw cursor
+2024-06-14 01:25:20
+
+🔧 Update SignalQueue system and camera restrictions
+2024-06-13 23:52:52
+
+Update camera and cursor functionality 📸😎
+2024-06-13 23:45:19
+
+massive update to cursor handler shit in main and many bugfixes
+2024-06-13 22:31:02
+
+some real actions
+2024-06-13 15:28:38
+
+working on minimap
+2024-06-13 15:07:59
+
+🟢 Adjust color values and minor attribute tweaks 💡
+2024-06-13 09:40:32
+
+item 2 passive, CD slider formatting, minor slider fix
+2024-06-13 04:07:23
+
+passive item stat highlight selection
+2024-06-13 03:20:36
+
+testing some icon paths
+2024-06-13 02:58:59
+
+basic item data substitution
+2024-06-13 02:53:22
+
+HUD Fixes
+2024-06-13 00:44:58
+
+🔧 Adjusted rendering to consider fog of war and optimized texture loading 🎯🎨🔮
+2024-06-12 22:44:44
+
+"Refine shader layout and tweak light parameters 🎨🔧"
+2024-06-12 21:26:46
+
+🔄 Update image loading and color mask handling 🎨
+2024-06-11 22:54:22
+
+mid panel
+2024-06-11 03:22:24
+
+nawet mi sie kruwa nie chce pisac
+2024-06-11 00:47:11
+
+settings
+2024-06-10 22:49:50
+
+credits
+2024-06-10 20:08:56
+
+🛠️Fixed animation looping & speed settings
+2024-06-10 01:50:50
+
+main menu
+2024-06-09 23:18:28
+
+Something went wrong please try again later.
+2024-06-09 21:44:01
+
+quick fix to double selection handling
+2024-06-09 20:33:34
+
+fixed some shit, much more to go
+2024-06-09 19:03:15
+
+🔧 Updated vertex shader and added backup shader files 🎨🗂️
+2024-06-09 14:56:52
+
+loading screen
+2024-06-09 00:04:42
+
+🔄 Updated PhongPipeline and lighting calculations in shader files ⚡🎮
+2024-06-08 19:36:08
+
+in progress
+2024-06-08 15:33:39
+
+Pranium pickup, delivery to washing machine, music on win xd
+2024-06-06 21:31:16
+
+Sounds added in most cases lessgoo
+2024-06-06 20:12:05
+
+Background music added, all sounds final version added
+2024-06-06 19:38:36
+
+Fixed loading MP3 files, added all needed sound effects
+2024-06-05 21:21:05
+
+🔧 Added fog of war and foam mask support in the rendering pipeline.
+2024-06-05 20:40:59
+
+🚀 Removed asteroids system and updated grid entities in main 👍
+2024-06-04 01:17:54
+
+Added punching sfx for testing, everything works just fine <3
+2024-06-03 21:13:28
+
+Audio implemented
+2024-06-03 20:33:32
+
+🔧 Added bloom post-processing and improved lighting performance 🎉
+2024-06-02 15:28:16
+
+rotation while combat (to be fixed)
+2024-06-02 14:31:37
+
+Can mine pranium, should drop correctly on map
+2024-06-02 12:54:03
+
+Pranium ore generates
+2024-06-01 18:22:44
+
+working on pralka rendering
+2024-05-26 20:35:06
+
+Create pull_request_template.md
+2024-05-25 21:20:01
+
+Added washing machine system
+2024-05-25 20:29:31
+
+Changes to LevelGenerator - spawning 5x5 washing machine
+2024-05-25 19:36:49
+
+hide demo on main, adjust parent tree, remove logs
+2024-05-24 02:27:48
+
+Interactable button filtering (LMB)
+2024-05-24 02:19:09
+
+sprite texture optimization
+2024-05-24 02:08:45
+
+small text centering fix
+2024-05-24 01:55:34
+
+🚀 Add new shaders and enhance Phong shading pipeline 🚀
+2024-05-24 01:43:45
+
+🎨 Added rim lighting features to shaders 🎮
+2024-05-23 20:17:48
+
+Humble begginnings
+2024-05-23 19:35:02
+
+slider refactor main part
+2024-05-23 03:20:19
+
+🚀 Enhanced shaders with new lighting and shading techniques🎨
+2024-05-23 00:12:21
+
+🚀 Added toon shading in fragment shaders, updated dirtiness level in grid and improved raycast algorithm 📝
+2024-05-22 20:01:14
+
+Update Ray.cpp
+2024-05-22 14:45:36
+
+Fixed collider issues mainly when loading grid from file
+2024-05-22 13:24:16
+
+fixing dangerous bracket placings
+2024-05-20 17:53:04
+
+🔄 Updated shaders and introduced randomness in wall dirtiness 🎲
+2024-05-20 17:45:55
+
+button create funcs, fix one-line pivot, fix transparency
+2024-05-20 17:25:18
+
+🎨 Added color saturation control for shaders
+2024-05-20 01:21:49
+
+📦 Add new cleaned 3D model "pan_gabka" to resources
+2024-05-20 00:38:27
+
+🖌️ Added support for dirt layer in shader and rendering system
+2024-05-19 17:40:26
+
+🛠️ Enhance shaders and improve texture handling capabilities 🖌️
+2024-05-19 02:20:00
+
+🔄 Revamped shaders and updated texture handling 🎨
+2024-05-18 17:00:40
+
+Enemy is not bipolar anymore
+2024-05-16 19:04:48
+
+Commit to large like my... Can't be done by AI or by hand.
+2024-05-16 15:12:14
+
+imgui
+2024-05-16 11:45:27
+
+fixing cursor pos forwarding frfr this time
+2024-05-16 11:24:23
+
+trying to fix mirrored y... half success???
+2024-05-16 01:43:57
+
+working button & hoverable
+2024-05-16 01:33:26
+
+newlines & more or less working pivots
+2024-05-15 13:39:53
+
+hud elem draw mode (pivot)
+2024-05-15 02:01:38
+
+Fixed some collider issues
+2024-05-14 14:55:51
+
+chests kinda work, TB loaded properly, also post-load issues
+2024-05-14 03:11:08
+
+fix grid load problems & entity tree deletion problems
+2024-05-14 02:08:09
+
+PICKING UP ITEMS
+2024-05-13 22:11:23
+
+Added visible drag selection
+2024-05-13 13:53:33
+
+working on chests & pickups, movement broken rn
+2024-05-13 12:27:10
+
+Inspector for manager, working equip fx
+2024-05-13 02:53:42
+
+🔄 Refactor code to remove unnecessary system parameters and fix shadowing issues 🐛
+2024-05-12 14:34:40
+
+👁️‍🗨️ Improve visibility check and ambient calculation in shaders
+2024-05-10 22:59:15
+
+🔧 Adjusted shaders and light system codes for better visual output 🎨
+2024-05-10 22:59:15
+
+🛠️ Optimized shadow rendering by removing repeated geometry shader calls, reduced bias in shadow calculations 🔦
+2024-05-10 22:59:15
+
+📝Improve shadow computation and shader performance
+2024-05-10 22:59:15
+
+🔧 Improved shader & lighting, and added grid calculations 🔌
+2024-05-10 22:59:14
+
+🔄 Moved camera PushToSSBO function from InstanceRenderSystem to main file
+2024-05-10 22:57:38
+
+👁️‍🗨️ Improve visibility check and ambient calculation in shaders
+2024-05-10 22:50:37
+
+🔧 Adjusted shaders and light system codes for better visual output 🎨
+2024-05-10 22:42:23
+
+🛠️ Optimized shadow rendering by removing repeated geometry shader calls, reduced bias in shadow calculations 🔦
+2024-05-09 00:13:54
+
+fixes for grid range
+2024-05-08 22:35:55
+
+smol range display fix
+2024-05-08 21:06:16
+
+she guing on my im till i inspect'er
+2024-05-08 21:04:58
+
+Units now can mine an area
+2024-05-08 20:17:41
+
+📝Improve shadow computation and shader performance
+2024-05-08 01:19:30
+
+🔧 Improved shader & lighting, and added grid calculations 🔌
+2024-05-08 00:21:49
+
+inventory manager build & run
+2024-05-07 02:59:46
+
+mining fixed
+2024-05-06 18:15:33
+
+item stuff compiles and runs
+2024-05-06 04:01:54
+
+Fixed drag selection
+2024-05-03 19:14:56
+
+🔧 Adjusted ray collision detection and grid positioning 🐛
+2024-05-03 18:01:18
+
+Fixed raycasting with chunk
+2024-05-03 16:47:26
+
+🛠️ Refactored grid and chunk handling in ECS 🔧
+2024-05-03 02:05:57
+
+inspector window with const id to stay in place
+2024-05-02 23:03:17
+
+Fix unit inspect crash
+2024-05-02 21:49:00
+
+🔧 Enhanced shader and added tile selection 🎨
+2024-05-02 21:43:57
+
+🚀 Improved code formatting and consistency in main.cpp file 🧹
+2024-05-02 18:26:54
+
+🔄 Updated the handling of Tiles and Grids in ECS 🛠️
+2024-05-02 18:00:04
+
+cleanup
+2024-05-02 01:37:22
+
+putting raycasts in a receiver, mouse sig refactor
+2024-05-01 23:57:50
+
+🔧 Refactored spot light shadows code and shader inputs
+2024-05-01 10:42:01
+
+🔧 Refactored spot light shadows code and shader inputs
+2024-05-01 02:50:18
+
+🛠️ Update CMake configurations for Visual Studio 2022
+2024-05-01 02:32:04
+
+🔧 Fixed code indentation in various light component files 📚
+2024-05-01 02:24:50
+
+🔄 Optimized scene update process and enhanced debugging features 🐛
+2024-05-01 02:20:01
+
+🚀 Added pthreads dependency and warning suppression 🛠️
+2024-05-01 01:51:44
+
+🔄 Refactored Update(), showImGuiDetails() and some features for Optimization 🚀
+2024-05-01 01:21:12
+
+📈 Integrated Tracy Profiler for better diagnostics
+2024-04-30 20:44:29
+
+fix missing include
+2024-04-30 20:15:05
+
+mining kinda works?
+2024-04-30 18:07:59
+
+small tweak to logging, clearing up debug logs
+2024-04-30 15:02:41
+
+Add functionality to clear walls in Grid 🚧
+2024-04-29 01:28:43
+
+fixing a mismatched check
+2024-04-26 16:35:19
+
+save-load in menubar
+2024-04-26 16:11:53
+
+tile render as floor if not wall specifically
+2024-04-26 16:07:35
+
+loading units, auto initializing grid
+2024-04-26 15:59:58
+
+Refactor and optimize Grid and Renderer code 🛠️
+2024-04-25 21:02:26
+
+Unit sie obraca lol
+2024-04-25 17:13:49
+
+Disable GL_BLEND in TextRenderer 🚫
+2024-04-25 02:29:26
+
+☁️ Disable GL_BLEND in WireRendered.cpp 🎨
+2024-04-25 02:28:46
+
+PoC (needs mouse click signal refactor)
+2024-04-25 02:03:51
+
+resizing grid manually
+2024-04-25 01:58:29
+
+Expand level generator parameters
+2024-04-25 01:26:49
+
+🛠️ Updated BoxCollider and cleaned WireRenderer 🧼
+2024-04-25 01:22:02
+
+fix remove entity crash bug B) B) B)
+2024-04-25 00:30:39
+
+🔄 Introduced ray and box rendering in WireRenderer 🎨
+2024-04-25 00:26:07
+
+🛠️ Implement fog of war & frustum culling for performance 🖥️
+2024-04-24 23:37:02
+
+GUI for level generator
+2024-04-24 23:24:01
+
+Add LevelGenerator class
+2024-04-24 23:03:10
+
+Update Grid.cpp
+2024-04-24 18:26:12
+
+tryin to merge v3
+2024-04-24 18:24:05
+
+Mining kinda works? Not visually tho
+2024-04-24 17:08:01
+
+🔧 Updated shaders and reorganized pipeline 🎨
+2024-04-24 14:50:02
+
+sth sth
+2024-04-24 12:48:33
+
+sanity fixes
+2024-04-22 23:36:31
+
+smol fixes for imgui sanity
+2024-04-21 15:12:05
+
+Upgraded unit selection
+2024-04-18 19:13:41
+
+Added UnitSystem to manage and update units
+2024-04-18 18:03:48
+
+ITS ALIVE!!!!!!
+2024-04-18 17:07:38
+
+Workin on player movement
+2024-04-17 20:49:16
+
+Update InstanceRenderSystem.cpp
+2024-04-17 16:33:44
+
+Post-merge fixes
+2024-04-17 12:32:49
+
+🆕 Add instance rendering system for grid tiles 🎨
+2024-04-16 23:22:21
+
+🔧 Adjusted PointLight and shader code 🎨
+2024-04-16 20:33:51
+
+Added collision system
+2024-04-16 14:07:52
+
+Update Grid.cpp
+2024-04-16 10:53:14
+
+AI stoped working on this one lol
+2024-04-16 09:28:30
+
+"Updated tile model path and cleaned up code 🧹"
+2024-04-13 11:27:00
+
+finally works as it should
+2024-04-12 20:15:07
+
+Editor signaling HUD updates, globals refactor
+2024-04-11 03:26:17
+
+Add wireframe rendering for colliders and rays 🔍
+2024-04-10 23:34:22
+
+🔧 Enhanced framebuffer rendering and error handling 🖼️
+2024-04-10 22:22:19
+
+They still do not work correctly....
+2024-04-10 21:23:08
+
+Build fix
+2024-04-10 04:00:22
+
+Cleanup, pkgik TASK
+2024-04-10 03:56:21
+
+Z-DEPTH SORTING!!!!, Editor features, QoL editor features
+2024-04-10 02:45:16
+
+Component editor features & some bugfixes
+2024-04-10 00:16:34
+
+fix funny bug
+2024-04-09 11:51:05
+
+Fix texture loading
+2024-04-09 11:15:54
+
+Added Editor features, something is VERY broken with multiple elements & sprites :///
+2024-04-09 03:42:06
+
+Added logic to calc. ray dir. from mouse position. Does not work lol
+2024-04-08 20:31:27
+
+Group offset, work HUD as system, w/ renderer coupling
+2024-04-08 18:19:59
+
+RAYCAST FINALLY WORKS OMGG
+2024-04-07 20:13:28
+
+Font loading (correct) w/ set of free-license fonts
+2024-04-07 02:48:54
+
+Util Colors
+2024-04-05 01:10:36
+
+Added frustum cull and raycast logic
+2024-04-03 21:58:52
+
+Text renders
+2024-04-02 14:23:34
+
+Add entity and component removal mechanism
+2024-04-02 00:45:51
+
+Text renderer initial impl
+2024-03-27 15:47:05
+
+comment cleanup
+2024-03-25 22:09:44
+
+tiles spawn corrected
+2024-03-25 21:22:29
+
+Basic equipment system added
+2024-03-25 20:35:13
+
+Fix tile draw also fix ui cursor bug
+2024-03-25 18:00:09
+
+Add support for longpaths and cache vcpkg packages in workflow
+2024-03-25 12:30:27
+
+Enable ImGui viewport and add new package dependencies
+2024-03-25 12:10:36
+
+Added Time utility class
+2024-03-25 12:06:11
+
+Switch point light to spot light; update lighting position and transform
+2024-03-25 11:05:56
+
+Refactor SignalQueue path in accordance with recent organization changes
+2024-03-24 21:37:50
+
+Final cleanup before merge
+2024-03-24 20:37:45
+
+Updated UnitAI logic and StateMachine states
+2024-03-24 20:34:21
+
+Added Unit movement logic
+2024-03-24 19:19:58
+
+Refactor shadow rendering and light space calculations
+2024-03-24 02:04:32
+
+Update lighting and rendering functionalities
+2024-03-24 01:21:38
+
+Queue & Receiver editor features
+2024-03-23 20:16:30
+
+StateMachine upgrades
+2024-03-23 19:36:20
+
+Add PBRPrimitives class and improve texture loading
+2024-03-23 17:08:26
+
+Data structs impl, event forwarding in place
+2024-03-23 04:31:00
+
+receivers editor inspection, groundwork for signal cargo
+2024-03-23 01:05:38
+
+StateMachine and AI blueprints
+2024-03-22 15:30:03
+
+A* pathfinding
+2024-03-22 14:11:15
+
+Update token in GitHub Workflow
+2024-03-22 11:27:07
+
+Update GitHub workflow and add site README
+2024-03-22 11:06:15
+
+Create jekyll-gh-pages.yml
+2024-03-22 10:44:16
+
+Started working on Grid component
+2024-03-22 01:43:49
+
+printin q
+2024-03-21 15:46:43
+
+SignalQ mockup now via SystemManager
+2024-03-21 15:14:54
+
+Signal Queue impl w/ mockup
+2024-03-21 13:39:38
+
+Add UpdateData method to lights and update light data
+2024-03-19 11:18:44
+
+Refactor light system and update transform class
+2024-03-19 08:58:11
+
+Implement scene management and entity enhancements
+2024-02-19 03:00:29
+
+Refactor deltaTime type and adjustments for SCR_WIDTH and SCR_HEIGHT
+2024-02-18 12:49:54
+
+Update LICENSE
+2024-02-16 02:28:20
+
+Implement Transform class and refactor existing Entities code
+2024-01-30 23:21:45
+
+Refactor shadow mapping and improve asteroid rendering
+2024-01-30 22:05:40
+
+Implement improved shadow mapping and asteroid rendering
+2024-01-30 11:31:33
+
+Update shadow generation and refactor code
+2024-01-30 05:15:32
+
+Remove ShadowSystem and refactor code
+2024-01-30 04:05:11
+
+Working PBR and graph
+2024-01-10 04:13:29
+
+Fully working collisons on compute shader
+2024-01-02 16:32:28
+
+Working collsions!!!
+2023-12-30 01:34:40
+
+Almost working parraler sorting fully on GPU!
+2023-12-20 11:02:26
+
+Working instancing and basic compute shader
+2023-12-16 01:48:40
+
+Adding color to the shader
+2023-11-29 03:10:39
+
+Adding regions to main
+2023-11-21 23:40:53
+
+Adding camera
+2023-11-21 23:34:25
+
+The deconstructor was the problem
+2023-11-21 01:02:28
+
+Working cube class (witout textures)
+2023-11-21 00:23:41
+
+Depth test was the reason it didn't render ;-;
+2023-11-20 18:18:21
+
+IDK man renderdoc shows me that it shooould work
+2023-11-15 04:05:01
+
+Adding basic handling off shaders and textures (main doesn't work for some reason ;-;)
+2023-11-15 01:48:54
+
+Initial commit
+2023-10-18 19:14:05

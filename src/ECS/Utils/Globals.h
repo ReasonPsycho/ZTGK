@@ -85,6 +85,12 @@ namespace ztgk::game {
     extern Model* mopModel;
     extern Model* mopObrotowyModel;
     extern Model* tidyPodLauncherModel;
+    extern Model* hangerMopModel;
+    extern Model* hangerMopObrotowyModel;
+    extern Model* hangerTidyPodLauncherModel;
+
+
+    extern bool enableWashingMachineSwaying;
 
 
     extern bool gameStarted;

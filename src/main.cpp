@@ -104,6 +104,9 @@ string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
 string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
 string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
 string modelPathShroom = "res/models/shroom/shroom.fbx";
+string modelPathHangerMop = "res/models/chest/hanger_and_items_models/hanger_mop.fbx";
+string modelPathHangerRotationMop = "res/models/chest/hanger_and_items_models/hanger_rotation_mop.fbx";
+string modelPathHangerTidyPodLauncher = "res/models/chest/hanger_and_items_models/hanger_launcher.fbx";
 
 Model *tileModel;
 Model *model;
@@ -120,6 +123,11 @@ Model *mopObrotowyModel;
 Model *tidyPodLauncherModel;
 Model *praniumModel;
 Model *shroomModel;
+Model *hangerMopModel;
+Model *hangerMopObrotowyModel;
+Model *hangerTidyPodLauncherModel;
+
+
 unsigned bggroup, zmgroup;
 Sprite *zmspr;
 Text *zmtxt;
@@ -522,77 +530,80 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient", 255);
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
 
     //intro music
-    ztgk::game::audioManager->loadSound("res/sounds/intro_music.mp3", "intro_music");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_intro_music.mp3", "sfx_intro_music");
 
     //lose music
-    ztgk::game::audioManager->loadSound("res/sounds/lose.mp3", "lose");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_lose.mp3", "sfx_lose");
 
     //win music
-    ztgk::game::audioManager->loadSound("res/sounds/win.mp3", "win");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_win.mp3", "sfx_win");
 
     //punch sounds
-    ztgk::game::audioManager->loadSound("res/sounds/punch1.wav", "punch1");
-    ztgk::game::audioManager->loadSound("res/sounds/punch2.wav", "punch2");
-    ztgk::game::audioManager->loadSound("res/sounds/punch3.wav", "punch3");
-    ztgk::game::audioManager->loadSound("res/sounds/punch4.wav", "punch4");
-    ztgk::game::audioManager->loadSound("res/sounds/punch5.wav", "punch5");
-    ztgk::game::audioManager->loadSound("res/sounds/punch6.wav", "punch6");
-    ztgk::game::audioManager->loadSound("res/sounds/punch7.wav", "punch7");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch1.wav", "sfx_punch1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch2.wav", "sfx_punch2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch3.wav", "sfx_punch3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch4.wav", "sfx_punch4");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch5.wav", "sfx_punch5");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch6.wav", "sfx_punch6");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_punch7.wav", "sfx_punch7");
 
     //bubble pop
-    ztgk::game::audioManager->loadSound("res/sounds/bubble1.mp3", "bubble1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_bubble1.mp3", "sfx_bubble1");
 
     //bubbles bulbulbulbul
-    ztgk::game::audioManager->loadSound("res/sounds/bubbles.mp3", "bubbles");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_bubbles.mp3", "sfx_bubbles");
 
     //bug walking
-    ztgk::game::audioManager->loadSound("res/sounds/bug1.mp3", "bug2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_bug1.mp3", "sfx_bug2");
 
     //clicks for UI
-    ztgk::game::audioManager->loadSound("res/sounds/click1.mp3", "click1");
-    ztgk::game::audioManager->loadSound("res/sounds/click2.mp3", "click2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_click1.mp3", "sfx_click1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_click2.mp3", "sfx_click2");
 
     //death sounds OOF
-    ztgk::game::audioManager->loadSound("res/sounds/deathEnemy1.mp3", "deathEnemy1");
-    ztgk::game::audioManager->loadSound("res/sounds/deathEnemy2.mp3", "deathEnemy2");
-    ztgk::game::audioManager->loadSound("res/sounds/deathSponge1.wav", "deathSponge1");
-    ztgk::game::audioManager->loadSound("res/sounds/deathSponge2.wav", "deathSponge2");
-    ztgk::game::audioManager->loadSound("res/sounds/deathSponge3.mp3", "deathSponge3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathEnemy1.mp3", "sfx_deathEnemy1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathEnemy2.mp3", "sfx_deathEnemy2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge1.wav", "sfx_deathSponge1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge2.wav", "sfx_deathSponge2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge3.mp3", "sfx_deathSponge3");
 
     //gabka walking
-    ztgk::game::audioManager->loadSound("res/sounds/gabka1.mp3", "gabka1");
-    ztgk::game::audioManager->loadSound("res/sounds/gabka2.mp3", "gabka2");
-    ztgk::game::audioManager->loadSound("res/sounds/gabka3.mp3", "gabka3");
-    ztgk::game::audioManager->loadSound("res/sounds/gabka4.mp3", "gabka4");
-    ztgk::game::audioManager->loadSound("res/sounds/gabka5.mp3", "gabka5");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka1.mp3", "sfx_gabka1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka2.mp3", "sfx_gabka2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka3.mp3", "sfx_gabka3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka4.mp3", "sfx_gabka4");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka5.mp3", "sfx_gabka5");
 
     //gabka celaning tiles
-    ztgk::game::audioManager->loadSound("res/sounds/idle1.mp3", "idle1");
-    ztgk::game::audioManager->loadSound("res/sounds/idle2.mp3", "idle2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_idle1.mp3", "sfx_idle1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_idle2.mp3", "sfx_idle2");
 
     //mining sound
-    ztgk::game::audioManager->loadSound("res/sounds/mining1.mp3", "mining1");
-    ztgk::game::audioManager->loadSound("res/sounds/mining2.mp3", "mining2");
-    ztgk::game::audioManager->loadSound("res/sounds/mining3.mp3", "mining3");
-    ztgk::game::audioManager->loadSound("res/sounds/mining4.mp3", "mining4");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_mining1.mp3", "sfx_mining1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_mining2.mp3", "sfx_mining2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_mining3.mp3", "sfx_mining3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_mining4.mp3", "sfx_mining4");
 
     //pralka 1 - slow pralka sounds
-    ztgk::game::audioManager->loadSound("res/sounds/pralka1.mp3", "pralka1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pralka1.mp3", "sfx_pralka1");
 
     //pralka 2 - crazy fast pralka sounds
-    ztgk::game::audioManager->loadSound("res/sounds/pralka2.mp3", "pralka2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pralka2.mp3", "sfx_pralka2");
+
+    ztgk::game::audioManager->setSoundVolume("sfx_pralka2", 100);
+    ztgk::game::audioManager->setSoundVolume("sfx_pralka2", 50);
 
     //quack
-    ztgk::game::audioManager->loadSound("res/sounds/rubberduck1.mp3", "rubberduck1");
-    ztgk::game::audioManager->loadSound("res/sounds/rubberduck2.mp3", "rubberduck2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_rubberduck1.mp3", "sfx_rubberduck1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_rubberduck2.mp3", "sfx_rubberduck2");
 
 
     //healing
-    ztgk::game::audioManager->loadSound("res/sounds/heal1.mp3", "heal1");
-    ztgk::game::audioManager->loadSound("res/sounds/heal2.mp3", "heal2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_heal1.mp3", "sfx_heal1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_heal2.mp3", "sfx_heal2");
 
 }
 
@@ -617,6 +628,9 @@ void load_enteties() {
     mopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopObrotowyPath);
     tidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelTidyPodLauncherPath);
     praniumModel =   ztgk::game::modelLoadingManager ->GetModel(modelPraniumPath);
+    hangerMopModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerMop);
+    hangerMopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerRotationMop);
+    hangerTidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerTidyPodLauncher);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
@@ -631,6 +645,10 @@ void load_enteties() {
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
     ztgk::game::shroomModel = ztgk::game::modelLoadingManager ->GetModel("res/models/Mushroom/shroom.fbx");
+    ztgk::game::hangerMopModel = hangerMopModel;
+    ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
+    ztgk::game::hangerTidyPodLauncherModel = hangerTidyPodLauncherModel;
+
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
@@ -1725,15 +1743,15 @@ void processInput(GLFWwindow *window) {
         timeStepKeyPressed = false;
     }
 
-//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
-//        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
-//        spdlog::debug("clearing tiles in radius");
-//        isXpressed = true;
-////        radiusToRemove +=1;
-//    }
-//    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
-//        isXpressed = false;
-//    }
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+        spdlog::debug("clearing tiles in radius");
+        isXpressed = true;
+//        radiusToRemove +=1;
+    }
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+        isXpressed = false;
+    }
 
 }
 
@@ -1971,8 +1989,18 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     return;
 
                 }
-
+                Entity* hitWashingMachine = nullptr;
+                if(hit->getComponent<BoxCollider>()->collisionType == CollisionType::WASHING_MACHINE){
+                    hitWashingMachine = hit;
+                }
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
+                if(hitMineable == nullptr){
+                    Entity* chestChild = hit->getChild("ChestChild");
+                    if(chestChild != nullptr){
+                        hitMineable = chestChild->getMineableComponent<IMineable>(chestChild);
+                    }
+                }
+
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
                 if(hitUnit == nullptr && hitTile != nullptr){
@@ -1980,7 +2008,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                          hitUnit = hitTile->unit;
                     }
                 }
-                auto hitWashingMachine = hit->getComponent<WashingMachineTile>();
 
                 for(auto sponge : selectedSponges){
                     sponge->hasMovementTarget = false;
@@ -1990,6 +2017,22 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     sponge->combatTarget = nullptr;
                     sponge->hasCombatTarget = false;
                     sponge->pathfinding.path.clear();
+
+                    if(hitWashingMachine != nullptr){
+                        sponge->ForcedMovementState = true;
+                        sponge->forcedMovementTarget = sponge->pathfinding.GetNearestVacantTile(scene.systemManager.getSystem<Grid>()->GetNearestWashingMachineTile(sponge->gridPosition), sponge->gridPosition);
+
+                        sponge->hasMiningTarget = false;
+                        sponge->miningTargets.clear();
+                        sponge->hasCombatTarget = false;
+                        sponge->combatTarget = nullptr;
+                        sponge->currentMiningTarget = nullptr;
+
+                        sponge->hasMovementTarget = true;
+                        sponge->pathfinding.path.clear();
+                        sponge->movementTarget = sponge->forcedMovementTarget;
+
+                    }
 
 
                     if(hitUnit!= nullptr){
@@ -2026,21 +2069,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                         sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
                                 VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
 
-                    }
-
-                    if(hitWashingMachine != nullptr){
-                        sponge->ForcedMovementState = true;
-                        sponge->forcedMovementTarget = hitTile->index;
-
-                        sponge->hasMiningTarget = false;
-                        sponge->miningTargets.clear();
-                        sponge->hasCombatTarget = false;
-                        sponge->combatTarget = nullptr;
-
-                        sponge->hasMovementTarget = true;
-                        sponge->pathfinding.path.clear();
-                        sponge->movementTarget = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
-                                VectorUtils::GlmVec3ToVector3(hit->transform.getGlobalPosition()));
                     }
                 }
 

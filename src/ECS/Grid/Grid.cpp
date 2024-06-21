@@ -226,6 +226,7 @@ void Grid::InitializeTileEntities() {
             }
 
             tile->isInFogOfWar = true;
+
             switch (tile->state) {
                 // todo these once relevant
                 // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
@@ -251,13 +252,33 @@ void Grid::InitializeTileEntities() {
                     break;
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
-                case CHEST:
-                    tile->getEntity()->addComponent(std::make_unique<MineableChest>(Vector2Int(i, j), this, tile->stateData.chestItemTypeId));
+                case CHEST: {
+                    Model* model = nullptr;
+                    auto chestChild = ztgk::game::scene->addEntity(tile->getEntity(), "ChestChild");
+                    chestChild->addComponent(
+                            std::make_unique<MineableChest>(Vector2Int(i, j), this, tile->stateData.chestItemTypeId));
                     tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
                     tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
-                    tile->getEntity()->getComponent<BoxCollider>()->setCenter(tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
-                    tile->getEntity()->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
+                    tile->getEntity()->getComponent<BoxCollider>()->setCenter(
+                            tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
+
+                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
+                        model = ztgk::game::hangerTidyPodLauncherModel;
+                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
+                        model = ztgk::game::hangerMopModel;
+                    }
+//                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
+//                        model = ztgk::game::hangerMopObrotowyModel;
+//                    }
+                    else {
+                        model = ztgk::game::chestModel;
+                    }
+                    chestChild->addComponent(std::make_unique<Render>(model));
+                    //chestChild->transform.setLocalScale(glm::vec3(1, 1, 2));
+                    //chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
+                    chestChild->updateSelfAndChild();
                     break;
+                }
                 case WALL:
                     tile->getEntity()->addComponent(std::make_unique<IMineable>(1.0f, Vector2Int(i, j), this));
                     break;
@@ -728,4 +749,26 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
     }
     return UnitEntity;
+}
+
+Vector2Int Grid::GetNearestWashingMachineTile(Vector2Int origin) {
+    auto tilez = ztgk::game::scene->systemManager.getSystem<WashingMachine>()->WashingMachineTiles;
+    std::vector<Vector2Int> tilesGridPos = {};
+    for (auto tile : tilez) {
+        tilesGridPos.push_back(tile.second[0]->gridPosition);
+    }
+    //get the closest one to origin
+    Vector2Int closest = tilesGridPos[0];
+    float closestDist = glm::distance(glm::vec2(origin.x, origin.z), glm::vec2(tilesGridPos[0].x, tilesGridPos[0].z));
+    for (auto tile : tilesGridPos) {
+        float dist = glm::distance(glm::vec2(origin.x, origin.z), glm::vec2(tile.x, tile.z));
+        if (dist < closestDist) {
+            closest = tile;
+            closestDist = dist;
+        }
+    }
+
+    return closest;
+
+
 }
