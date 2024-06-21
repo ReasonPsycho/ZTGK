@@ -94,6 +94,8 @@ uniform float saturationMultiplayer;// sat multiplier is the factor by which you
 uniform float lightMultiplayer;// sat multiplier is the factor by which you increase saturation
 uniform int toon_color_levels;
 
+uniform float dirtMultiplayer;
+
 vec3 selectionColor[5] = vec3[]
 (
 vec3(1, 1, 1), //Just here to simplyfiy the logic
@@ -235,8 +237,8 @@ void main()
 
 
     if (dirtinessMap > 0.1){
-        diffuse -= vec3(dirtinessMap) * 0.5;
-        specular -= vec3(dirtinessMap)* 0.5;
+        diffuse -= vec3(dirtinessMap) * dirtMultiplayer;
+        specular -= vec3(dirtinessMap)* dirtMultiplayer;
     }
 
     vec3 result = vec3(0);

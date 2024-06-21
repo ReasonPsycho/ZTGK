@@ -75,6 +75,9 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongInstanceShader.setFloat("far_plane", 25.0f);
 
+    phongInstanceShader.setFloat("dirtMultiplayer", dirtMultiplayer);
+    
+    
     phongInstanceShader.setFloat("ambient", ambient);
     phongInstanceShader.setFloat("saturationMultiplayer", saturationMultiplayer);
     phongInstanceShader.setFloat("lightMultiplayer", lightMultiplayer);
@@ -94,6 +97,8 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongShader.setMatrix4("view", false, glm::value_ptr(view));
     phongShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongShader.setFloat("far_plane", 25.0f);
+    
+    phongShader.setFloat("dirtMultiplayer", dirtMultiplayer);
 
     phongShader.setFloat("ambient", ambient);
     phongShader.setFloat("saturationMultiplayer", saturationMultiplayer);
@@ -118,6 +123,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceLightShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
     phongInstanceLightShader.setVec3("cameraUp", camera->Up.x, camera->Up.y, camera->Up.z);
     phongInstanceLightShader.setFloat("outlineMapping", lightShaderOutlineMapping);
+
 
 
     spriteRenderShader.use();
@@ -376,6 +382,14 @@ void PhongPipeline::showImGuiDetailsImpl(Camera *camera) {
         ImGui::DragFloat("Gamma", &gamma, 0.1f);
         ImGui::Unindent();
     }
+
+    if (ImGui::CollapsingHeader("Dirt mask"))
+    {
+        ImGui::Indent();
+        ImGui::DragFloat("Dirt multiplayer", &dirtMultiplayer, 0.01f);
+        ImGui::Unindent();
+    }
+
 
     if (ImGui::CollapsingHeader("Bloom Settings"))
     {
