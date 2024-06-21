@@ -93,4 +93,25 @@ void Sprite::showImGuiDetailsImpl(Camera *camera) {
     }
     static const char * const modes[] = MODE_NAMES;
     ImGui::Combo(std::format("Draw Mode##{}", uniqueID).c_str(), reinterpret_cast<int *>(&mode), modes, num_modes);
+    ImGui::DragFloat(std::format("Rounding Radius##{}", uniqueID).c_str(), &roundingRadius);
+    ImGui::DragFloat(std::format("Frame Size##{}", uniqueID).c_str(), &frameSize);
+    ImGui::ColorEdit4(std::format("Frame Color##{}", uniqueID).c_str(), glm::value_ptr(frameColor));
+    ImGui::Checkbox(std::format("Frame Rounded Inside##{}", uniqueID).c_str(), &frameRoundedInside);
+}
+
+Sprite * Sprite::from(drawMode mode) {
+    this->mode = mode;
+    return this;
+}
+
+Sprite * Sprite::round(float radius) {
+    roundingRadius = radius;
+    return this;
+}
+
+Sprite * Sprite::frame(float size, const glm::vec4 &color, bool rounded) {
+    frameSize = size;
+    frameColor = color;
+    frameRoundedInside = rounded;
+    return this;
 }

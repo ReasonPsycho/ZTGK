@@ -169,10 +169,12 @@ void Unit::UpdateImpl() {
         isBeingHealedByWashingMachine = false;
     }
 
-    float dirtLvl = 1 - (stats.hp / (stats.max_hp + stats.added.max_hp));
-    auto render = getEntity()->getComponent<Render>();
-    if (render != nullptr) {
-        render->dirtLevel = dirtLvl;
+    if (isAlly) {
+        float dirtLvl = 1 - (stats.hp / (stats.max_hp + stats.added.max_hp));
+        auto render = getEntity()->getComponent<Render>();
+        if (render != nullptr) {
+            render->dirtLevel = dirtLvl;
+        }
     }
     if (!isAlive && isAlly) {
         ztgk::game::scene->systemManager.getSystem<UnitSystem>()->deselectUnit(this);

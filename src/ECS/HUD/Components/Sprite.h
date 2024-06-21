@@ -28,6 +28,10 @@ struct Sprite : public AHUDComponent {
     GLuint texture = -1;
     glm::vec4 color;
     bool hasTexture = false;
+    float roundingRadius = 0.0f;
+    float frameSize = 0.0f;
+    glm::vec4 frameColor = ztgk::color.BLACK;
+    bool frameRoundedInside = true;
 
     void load(const std::string & path = "", bool force = false);
 
@@ -35,4 +39,9 @@ struct Sprite : public AHUDComponent {
     static const unsigned editor_path_len = 100;
     char editor_path[editor_path_len];
     void showImGuiDetailsImpl(Camera *camera) override;
+
+    Sprite * from(drawMode mode);
+    // 1.0 = 100% of shorter edge
+    Sprite * round(float radius);
+    Sprite * frame(float size, const glm::vec4 &color = ztgk::color.BLACK, bool rounded = true);
 };

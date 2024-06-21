@@ -51,15 +51,15 @@ public:
     Entity *createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 defaultColor,
                          HUDHoverable::hover_func onHoverEnter, HUDHoverable::hover_func onHoverExit,
                          HUDButton::button_func onPress, HUDButton::button_func onRelease, Entity *parent,
-                         unsigned int parentGroupID = 0);
+                         unsigned int parentGroupID = 0, bool hasSound = true);
     Entity *
     createButton(glm::vec2 centerPos, glm::vec2 size, const std::string &foregroundSpritePath,
                  const std::string &backgroundSpritePath, const std::function<void()> &onRelease, Entity *parent,
-                 unsigned int parentGroupID = 0);
+                 unsigned int parentGroupID = 0, bool hasSound = true);
     Entity *
     createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 color, glm::vec4 hoverColor,
                  glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
-                 unsigned int parentGroupID = 0);
+                 unsigned int parentGroupID = 0, bool hasSound = true);
 
     Entity * createSlider_Bar(SliderDirection direction, glm::vec2 midLeftPos, glm::vec2 size, glm::vec4 backgroundColor, glm::vec4 fillColor,
                               Entity * parent = nullptr, unsigned parentGroupID = 0,
