@@ -173,7 +173,17 @@ void LightSystem::addComponent(void *component) {
 }
 
 void LightSystem::showImGuiDetailsImpl(Camera *camera) {
-    
+    ImGui::ColorEdit4("Diffuse", glm::value_ptr(gloabalPointLightData.diffuse));
+    ImGui::ColorEdit4("Specular", glm::value_ptr(gloabalPointLightData.specular));
+    ImGui::InputFloat("Constant", &gloabalPointLightData.constant);
+    ImGui::InputFloat("Linear", &gloabalPointLightData.linear);
+    ImGui::InputFloat("Quadratic", &gloabalPointLightData.quadratic);
+    if (ImGui::Button("Update lights globally")){
+        for (auto pointLight: pointLights) {
+            pointLight->data = gloabalPointLightData;
+            pointLight->setIsDirty(true);
+        }
+    }
 }
 
 void LightSystem::removeComponent(void *component) {
