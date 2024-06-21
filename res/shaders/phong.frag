@@ -15,6 +15,7 @@ in VS_OUT {
     vec2 TexCoords;
     vec3 WorldPos;
     vec3 LocalPos;
+    vec3 NonAnimatedLocalPos;
     vec3 Normal;
     TangentData tangentData;
 }fs_in;
@@ -223,9 +224,9 @@ void main()
         if (texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
         discard;
 
-        float dirtinessMap  =  1 *  cnoise(fs_in.LocalPos*2) +
-        +  0.5 * cnoise(fs_in.LocalPos*4) +
-        + 0.25 * cnoise(fs_in.LocalPos*8);
+        float dirtinessMap  =  1 *  cnoise(fs_in.NonAnimatedLocalPos*2) +
+        +  0.5 * cnoise(fs_in.NonAnimatedLocalPos*4) +
+        + 0.25 * cnoise(fs_in.NonAnimatedLocalPos*8);
         dirtinessMap = dirtinessMap / (1 + 0.5 + 0.25);
         dirtinessMap = pow(dirtinessMap, dirtLevel * 4);
         //dirtinessMap = (dirtinessMap + 1) * 0.5; // Scale the noise from -1.0 - 1.0 to 0.0 - 1.0
