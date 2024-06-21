@@ -16,6 +16,7 @@
 #include "ECS/Gameplay/WashingMachineTile.h"
 #include "ECS/Unit/Equipment/Projectile/Projectile.h"
 #include "ECS/Render/Components/AnimationPlayer.h"
+#include "ECS/Render/Components/BetterSpriteRender.h"
 
 State *CombatState::RunCurrentState() {
     unit->playinIdleAnimation = false;
@@ -169,6 +170,7 @@ void CombatState::AttackTarget() {
 
     ztgk::game::audioManager->playRandomSoundFromGroup("punch");
 
+     unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
 
     if(target->stats.hp <= 0){
         ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");

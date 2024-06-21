@@ -67,7 +67,7 @@ private:
     GLuint foamColorAttachment;
     
     //gamma mapping
-    float exposure = 1;
+    float exposure = 1.0;
     float gamma = 1.5;
 
     //bloom

@@ -21,6 +21,7 @@ State *HealingState::RunCurrentState() {
     unit->playinIdleAnimation = false;
     if (unit->stats.hp < unit->stats.max_hp) {
         HealSelf();
+        unit->tryToSendEmote(ztgk::game::EMOTES::BUBBLE_CUTE, 0.5f);
     } else {
         unit->isAlive = true;
         unit->isBeingHealedByWashingMachine = false;

@@ -142,7 +142,15 @@ void MiningState::Mine() {
                 anim->PlayAnimation(modelPathGabkaMove, true, 4.0f);
             }
         }
+        auto emote1 = ztgk::game::EMOTES::Y_BUBBLE_SAD;
+        auto emote2 = ztgk::game::EMOTES::Y_BUBBLE_SUS;
+
+        unit->tryToSendEmote(RNG::RandomBool() ? emote1 : emote2);
+
         unit->currentMiningTarget->Mine(unit);
+
+
+
         //rotate unit towards the mining target
         float angle = atan2(unit->currentMiningTarget->gridPosition.x - unit->gridPosition.x, unit->currentMiningTarget->gridPosition.z - unit->gridPosition.z);
         unit->rotation = angle;

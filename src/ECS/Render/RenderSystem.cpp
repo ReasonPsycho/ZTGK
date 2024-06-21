@@ -18,10 +18,14 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
     }
     
     for (auto & betterRender: betterRenderPlayerComponents) {
-        if(betterRender->draw(ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->spriteRenderShader, &frustum)) {
-            glBindVertexArray(tileModel->meshes[0].VAO);
-            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[0].indices.size()), GL_UNSIGNED_INT, (void*)0);
-            glBindVertexArray(0);  
+        if(betterRender!= nullptr && betterRender->getEntity() != nullptr) {
+            if (betterRender->draw(ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->spriteRenderShader,
+                                   &frustum)) {
+                glBindVertexArray(tileModel->meshes[0].VAO);
+                glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[0].indices.size()),
+                               GL_UNSIGNED_INT, (void *) 0);
+                glBindVertexArray(0);
+            }
         }
     }
     
@@ -75,15 +79,25 @@ void RenderSystem::addComponent(void *component) {
 
 void RenderSystem::UpdateImpl() {
     for (auto colorMask: colorMaskComponents) {
-            colorMask->Update();
+        colorMask->Update();
     }
 
     for (auto animationPlayer: animationPlayerComponents) {
         animationPlayer->Update();
     }
 
+    std::vector<BetterSpriteRender *> toBeDeleted;
     for (auto betterSprite: betterRenderPlayerComponents) {
+        if (betterSprite->toBeDeleted) {
+            toBeDeleted.push_back(betterSprite);
+            continue;
+        }
         betterSprite->Update();
+    }
+
+    //delete all BetterSptiteRenderers that are marked to be deleted
+    for (auto betterSprite: toBeDeleted) {
+        betterSprite->Remove();
     }
 }
 

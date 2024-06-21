@@ -27,6 +27,17 @@ public:
     float scale = 1.0f;
     float alpha = 1.0f;
     float depthBias = 1.0f;
+
+    bool toBeDeleted = false;
+
+private:
+    float originalTimer;
+    float absMaxSwayDistance = scale;
+    int Xdirection = 1;
+    float Xspeed = 1.f;
+    int Zdirection = 1;
+    float Zspeed = 1.f;
+    bool firstFrame = true;
 };
 
 
