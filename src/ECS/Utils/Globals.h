@@ -17,6 +17,20 @@ class ModelLoadingManager;
 struct Text;
 
 namespace ztgk::game {
+    enum EMOTES {
+        BUBBLE_CUTE,
+        BUBBLE_TONGUE,
+        BUBBLE_HAPPY,
+        P_BUBBLE_CUTE,
+        P_BUBBLE_SAD,
+        P_BUBBLE_TONGUE,
+        P_BUBBLE_EEPY,
+        Y_BUBBLE_SAD,
+        Y_BUBBLE_ANGRY,
+        Y_BUBBLE_SUS
+    };
+
+
 
     struct s_ui_data {
         enum class ui_phase {
@@ -96,4 +110,7 @@ namespace ztgk::game {
     extern bool gameStarted;
     extern bool gameWon;
     extern bool gameLost;
+
+    extern std::unordered_map<EMOTES, Texture*> emotes;
+
 }

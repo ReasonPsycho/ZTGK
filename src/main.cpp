@@ -79,6 +79,8 @@
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
 #include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
+#include <filesystem>
+namespace fs = std::filesystem;
 #pragma endregion Includes
 
 #pragma region constants
@@ -530,7 +532,7 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient", 0);
+    ztgk::game::audioManager->setVolumeForGroup("ambient",5);
 
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/sfx_intro_music.mp3", "sfx_intro_music");
@@ -648,6 +650,20 @@ void load_enteties() {
     ztgk::game::hangerMopModel = hangerMopModel;
     ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
     ztgk::game::hangerTidyPodLauncherModel = hangerTidyPodLauncherModel;
+
+
+
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_CUTE, new Texture("res/textures/emotes/bubble;3.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_TONGUE, new Texture("res/textures/emotes/bubble;p.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_HAPPY, new Texture("res/textures/emotes/bubblec;.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_CUTE, new Texture("res/textures/emotes/pinkbubble;3.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_SAD, new Texture("res/textures/emotes/pinkbubble;c.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_TONGUE, new Texture("res/textures/emotes/pinkbubble;p.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_EEPY, new Texture("res/textures/emotes/pinkbubble-eepy.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SAD, new Texture("res/textures/emotes/yellobubble;c.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_ANGRY, new Texture("res/textures/emotes/yellobubbleangy.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SUS, new Texture("res/textures/emotes/yellobubblesus.png", "emote")));
+
 
 
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);

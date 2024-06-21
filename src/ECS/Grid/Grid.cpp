@@ -262,17 +262,18 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(
                             tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
 
-                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
-                        model = ztgk::game::hangerTidyPodLauncherModel;
-                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
-                        model = ztgk::game::hangerMopModel;
-                    }
-//                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
-//                        model = ztgk::game::hangerMopObrotowyModel;
+//                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
+//                        model = ztgk::game::hangerTidyPodLauncherModel;
+//                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
+//                        model = ztgk::game::hangerMopModel;
 //                    }
-                    else {
-                        model = ztgk::game::chestModel;
-                    }
+////                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
+////                        model = ztgk::game::hangerMopObrotowyModel;
+////                    }
+//                    else {
+//                        model = ztgk::game::chestModel;
+//                    }
+                    model = ztgk::game::chestModel;
                     chestChild->addComponent(std::make_unique<Render>(model));
                     //chestChild->transform.setLocalScale(glm::vec3(1, 1, 2));
                     //chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
@@ -716,7 +717,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
     UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::shroomModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
-    UnitEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
+    UnitEntity->transform.setLocalPosition(glm::vec3(0, -1.5, 0));
     UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
     UnitEntity->updateSelfAndChild();
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));

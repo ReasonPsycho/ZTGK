@@ -62,6 +62,8 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     grid->getTileAt(gridPosition)->unit = this;
     // todo switch on isAlly & randomize gabka portraits
     icon_path = "res/textures/icons/gabka_cool.png";
+    mostRecentEmote = isAlly ?  ztgk::game::EMOTES::BUBBLE_CUTE : ztgk::game::EMOTES::P_BUBBLE_SAD;
+
     UpdateStats();
 }
 
@@ -317,12 +319,41 @@ void Unit::UpdateImpl() {
         hasCombatTarget = false;
     }
 
-
     if (gridPosition != previousGridPosition) {
         grid->getTileAt(previousGridPosition)->state = FLOOR;
         grid->getTileAt(gridPosition)->state = SPONGE;
         grid->getTileAt(previousGridPosition)->unit = nullptr;
         grid->getTileAt(gridPosition)->unit = this;
+        auto emote =ztgk::game::EMOTES::BUBBLE_TONGUE;
+        auto randInt = RNG::RandomInt(0, 2);
+        if(isAlly){
+            switch (randInt) {
+                case 0:
+                    emote = ztgk::game::EMOTES::BUBBLE_TONGUE;
+                    break;
+                case 1:
+                    emote = ztgk::game::EMOTES::BUBBLE_HAPPY;
+                    break;
+                case 2:
+                    emote = ztgk::game::EMOTES::BUBBLE_CUTE;
+                    break;
+            }
+        } else{
+            switch (randInt) {
+                case 0:
+                    emote = ztgk::game::EMOTES::P_BUBBLE_TONGUE;
+                    break;
+                case 1:
+                    emote = ztgk::game::EMOTES::P_BUBBLE_CUTE;
+                    break;
+                case 2:
+                    emote = ztgk::game::EMOTES::P_BUBBLE_EEPY;
+                    break;
+            }
+
+        }
+
+        tryToSendEmote(emote);
 
         ztgk::game::audioManager->playRandomSoundFromGroup(isAlly ? "gabka" : "bug");
         auto anim = getEntity()->getComponent<AnimationPlayer>();
@@ -332,6 +363,8 @@ void Unit::UpdateImpl() {
             string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
             anim->PlayAnimation(modelPathGabkaMove, false, 6.0f);
         }
+
+
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);
@@ -734,5 +767,21 @@ Vector2Int Unit::getClosestWashingMachineTile() {
               });
 
     return washingMachineTilesGridPos[0];
+}
+
+void Unit::tryToSendEmote(ztgk::game::EMOTES emote, float time) {
+    if (getEntity()->getChild("Emote") == nullptr) {
+        ztgk::game::scene->addEntity(getEntity(), "Emote");
+    }
+    auto emoChild = getEntity()->getChild("Emote");
+
+    if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
+        emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(emote) , 2));
+        mostRecentEmote = emote;
+    }
+    else if(emoChild->getComponent<BetterSpriteRender>() != nullptr && emoChild->getComponent<BetterSpriteRender>()->toBeDeleted) {
+        emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
+    }
+
 }
 

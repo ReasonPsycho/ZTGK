@@ -120,6 +120,10 @@ public:
 
     Vector2Int getClosestWashingMachineTile();
 
+    void tryToSendEmote(ztgk::game::EMOTES emote, float time = 2);
+
+    ztgk::game::EMOTES mostRecentEmote;
+
 private:
     Vector2Int previousGridPosition;
 

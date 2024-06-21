@@ -164,7 +164,7 @@ void MovementState::MoveOnPath() {
         Vector2Int nextTile = unit->pathfinding.path[0];
 
         glm::vec3 nextTileWorldPosition = unit->grid->GridToWorldPosition(nextTile);
-        if(unit->worldPosition == nextTileWorldPosition){
+        if(unit->worldPosition.x == nextTileWorldPosition.x && unit->worldPosition.z == nextTileWorldPosition.z){
             unit->pathfinding.path.erase(unit->pathfinding.path.begin());
             if (unit->pathfinding.path.size() == 0) {
                 unit->hasMovementTarget = false;
@@ -176,7 +176,7 @@ void MovementState::MoveOnPath() {
 
 
             Vector3 worldPos = Vector3(unit->worldPosition.x, unit->worldPosition.y, unit->worldPosition.z);
-            Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, nextTileWorldPosition.y, nextTileWorldPosition.z);
+            Vector3 nextWorldPos = Vector3(nextTileWorldPosition.x, -1, nextTileWorldPosition.z);
             Vector3 moveTowards = VectorUtils::MoveTowards(worldPos, nextWorldPos, (unit->isAlive ? unit->stats.move_spd + unit->stats.added.move_speed : unit->stats.move_spd_when_beaten + unit->stats.added.move_speed/2.0f) * Time::Instance().DeltaTime());
             unit->worldPosition = glm::vec3(moveTowards.x, moveTowards.y, moveTowards.z);
             unit->rotation = rotationAngle;

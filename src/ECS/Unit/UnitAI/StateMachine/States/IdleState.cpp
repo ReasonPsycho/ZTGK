@@ -12,6 +12,7 @@
 #include <random>
 #include "ECS/Gameplay/WashingMachineTile.h"
 #include "ECS/Render/Components/AnimationPlayer.h"
+#include "ECS/Render/Components/BetterSpriteRender.h"
 
 State *IdleState::RunCurrentState() {
 
@@ -108,6 +109,20 @@ State *IdleState::RunCurrentState() {
                 ztgk::game::audioManager->playRandomSoundFromGroup("idle");
             unit->playinIdleAnimation = true;
 
+            auto emote =ztgk::game::EMOTES::BUBBLE_TONGUE;
+            auto randInt = RNG::RandomInt(0, 2);
+            switch (randInt) {
+                case 0:
+                    emote = ztgk::game::EMOTES::BUBBLE_TONGUE;
+                    break;
+                case 1:
+                    emote = ztgk::game::EMOTES::BUBBLE_HAPPY;
+                    break;
+                case 2:
+                    emote = ztgk::game::EMOTES::BUBBLE_CUTE;
+                    break;
+            }
+            unit->tryToSendEmote(emote);
         }
         auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
         if (newDirtLvl < 0) {
@@ -127,10 +142,24 @@ State *IdleState::RunCurrentState() {
         currentTile->changeDirtinessLevel(newDirtLvl);
     }
 
-
-
-
-
+    if(!unit->isAlly){
+        if(!currentTile->isInFogOfWar){
+            auto emote =ztgk::game::EMOTES::P_BUBBLE_TONGUE;
+            auto randInt = RNG::RandomInt(0, 2);
+            switch (randInt) {
+                case 0:
+                    emote = ztgk::game::EMOTES::P_BUBBLE_TONGUE;
+                    break;
+                case 1:
+                    emote = ztgk::game::EMOTES::P_BUBBLE_CUTE;
+                    break;
+                case 2:
+                    emote = ztgk::game::EMOTES::P_BUBBLE_EEPY;
+                    break;
+            }
+            unit->tryToSendEmote(emote);
+        }
+    }
 
     return this;
 
