@@ -262,18 +262,17 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(
                             tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
 
-//                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
-//                        model = ztgk::game::hangerTidyPodLauncherModel;
-//                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
-//                        model = ztgk::game::hangerMopModel;
+                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
+                        model = ztgk::game::hangerTidyPodLauncherModel;
+                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
+                        model = ztgk::game::hangerMopModel;
+                    }
+//                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
+//                        model = ztgk::game::hangerMopObrotowyModel;
 //                    }
-////                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
-////                        model = ztgk::game::hangerMopObrotowyModel;
-////                    }
-//                    else {
-//                        model = ztgk::game::chestModel;
-//                    }
-                    model = ztgk::game::chestModel;
+                    else {
+                        model = ztgk::game::chestModel;
+                    }
                     chestChild->addComponent(std::make_unique<Render>(model));
                     //chestChild->transform.setLocalScale(glm::vec3(1, 1, 2));
                     //chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
