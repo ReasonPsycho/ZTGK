@@ -30,6 +30,7 @@ out VS_OUT {
     vec2 TexCoords;
     vec3 WorldPos;
     vec3 LocalPos;
+    vec3 NonAnimatedLocalPos;
     vec3 Normal;
     TangentData tangentData;
 }vs_out;
@@ -59,6 +60,7 @@ void main()
     //Standard calculation
     vs_out.TexCoords = aTexCoords;
     vs_out.LocalPos = vec3(totalPosition);
+    vs_out.NonAnimatedLocalPos = aPos;
     vs_out.WorldPos = vec3(model* totalPosition);
     vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
     gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);

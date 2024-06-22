@@ -499,7 +499,7 @@ Group *HUD::findGroupByName(const string &name) const {
 Entity *HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 defaultColor,
                           HUDHoverable::hover_func onHoverEnter, HUDHoverable::hover_func onHoverExit,
                           HUDButton::button_func onPress, HUDButton::button_func onRelease, Entity *parent,
-                          unsigned int parentGroupID) {
+                          unsigned int parentGroupID, bool hasSound) {
     Entity * entity;
     if (parent)
         entity = ztgk::game::scene->addEntity(parent, "Button - " + text);
@@ -520,7 +520,8 @@ Entity *HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec
     ));
     entity->addComponent(std::make_unique<HUDButton>(
         entity->getComponent<Sprite>(), group,
-        std::move(onPress), std::move(onRelease)
+        std::move(onPress), std::move(onRelease),
+        hasSound
     ));
 
     return entity;
@@ -528,8 +529,7 @@ Entity *HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec
 
 Entity *HUD::createButton(glm::vec2 centerPos, glm::vec2 size, const std::string &foregroundSpritePath,
                           const std::string &backgroundSpritePath, const std::function<void()> &onRelease,
-                          Entity *parent,
-                          unsigned int parentGroupID) {
+                          Entity *parent, unsigned int parentGroupID, bool hasSound) {
     Entity * entity;
     auto fgname = foregroundSpritePath.substr(foregroundSpritePath.find_last_of('/'));
     auto bgname = backgroundSpritePath.substr(backgroundSpritePath.find_last_of('/'));
@@ -566,7 +566,8 @@ Entity *HUD::createButton(glm::vec2 centerPos, glm::vec2 size, const std::string
         [spr, onRelease](HUDButton * self) {
             onRelease();
             spr->color = hoverColor;
-        }
+        },
+        hasSound
     ));
 
     return entity;
@@ -575,7 +576,7 @@ Entity *HUD::createButton(glm::vec2 centerPos, glm::vec2 size, const std::string
 Entity *
 HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, glm::vec4 color, glm::vec4 hoverColor,
                   glm::vec4 pressColor, const std::function<void()> &onRelease, Entity *parent,
-                  unsigned int parentGroupID) {
+                  unsigned int parentGroupID, bool hasSound) {
     Entity * entity;
     if (parent)
         entity = ztgk::game::scene->addEntity(parent, "Button - " + text);
@@ -605,7 +606,8 @@ HUD::createButton(const std::string &text, glm::vec2 centerPos, glm::vec2 size, 
         [onRelease, hoverColor](HUDButton * self) {
             onRelease();
             self->collisionSprite->color = hoverColor;
-        }
+        },
+        hasSound
     ));
 
     return entity;
@@ -771,6 +773,7 @@ Entity *HUD::createSlider_SettingBar(SliderDirection direction, glm::vec2 midLef
 
     ent->addComponent(std::make_unique<Text>("", handlePos + glm::vec2{0, size.y}, glm::vec2{1,1}, ztgk::color.WHITE, ztgk::font.default_font, NONE, handleGroup));
     ent->getComponent<Text>()->mode = CENTER;
+    ent->getComponent<Text>()->color.a = 0;
 
     auto display = ent->getComponent<Text>();
 
