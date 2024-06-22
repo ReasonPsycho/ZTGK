@@ -20,6 +20,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/MiningState.h"
 #include "ECS/Unit/UnitAI/StateMachine/States/CombatState.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
+#include "ECS/Utils/CooldownComponentXDD.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 150,
@@ -776,6 +777,11 @@ void Unit::tryToSendEmote(ztgk::game::EMOTES emote, float time) {
         ztgk::game::scene->addEntity(getEntity(), "Emote");
     }
     auto emoChild = getEntity()->getChild("Emote");
+
+    if(emoChild->getComponent<CooldownComponentXDD>() != nullptr){
+        emoChild->getComponent<CooldownComponentXDD>()->UpdateImpl();
+        return;
+    }
 
     if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
         emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(emote) , 2));

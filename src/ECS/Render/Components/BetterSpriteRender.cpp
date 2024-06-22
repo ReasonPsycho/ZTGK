@@ -7,6 +7,7 @@
 #include "ECS/Utils/Globals.h"
 #include "ECS/Render/RenderSystem.h"
 #include "ECS/Utils/RNG.h"
+#include "ECS/Utils/CooldownComponentXDD.h"
 
 bool BetterSpriteRender::draw(Shader &regularShader, Frustum *frustum) {
     ZoneScopedN("Draw");
@@ -67,6 +68,7 @@ void BetterSpriteRender::UpdateImpl() {
         if (timer <= 0) {
             toBeDeleted = true;
             getEntity()->transform.setLocalPosition(glm::vec3(0,0,0));
+            getEntity()->addComponent(std::make_unique<CooldownComponentXDD>(RNG::RandomFloat(1.f, 3.f)));
         }
 
 
