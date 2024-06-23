@@ -221,19 +221,19 @@ void Unit::UpdateImpl() {
                                     miningTargets.end());
             }
         }
-
+        if(hasMiningTarget) {
             if (currentMiningTarget == nullptr) {
                 //erease currentMiningTarget from miningTargets
                 miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), currentMiningTarget),
                                     miningTargets.end());
                 currentMiningTarget = findClosestMineable();
-                if(currentMiningTarget == nullptr){
+                if (currentMiningTarget == nullptr) {
                     hasMiningTarget = false;
-                }
-                else{
+                } else {
                     hasMiningTarget = true;
-            }
+                }
 
+            }
         }
 
         if (hasMovementTarget) {
