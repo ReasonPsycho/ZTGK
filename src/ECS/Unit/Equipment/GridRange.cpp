@@ -59,7 +59,7 @@ std::vector<Tile *> GridRange::get_tiles(glm::ivec2 center) {
 
 std::vector<Unit *> GridRange::find_any(glm::ivec2 center) {
     auto tiles = get_tiles(center) | std::ranges::views::filter([](Tile * tile){
-        return tile->unit != nullptr;
+        return tile->unit != nullptr && tile->unit->isAlive;
     });
     std::vector<Unit *> ret{};
     for (auto & tile : tiles) {
@@ -68,9 +68,9 @@ std::vector<Unit *> GridRange::find_any(glm::ivec2 center) {
     return ret;
 }
                                                                     //vv mySide defines if the unit that looks for its enemies is on player side or bug side
-std::vector<Unit *> GridRange::find_enemies(glm::ivec2 center, bool mySide) {
+std::vector<Unit *> GridRange::find_my_enemies(glm::ivec2 center, bool mySide) {
     auto tiles = get_tiles(center) | std::ranges::views::filter([&mySide](Tile * tile){
-        return tile->unit != nullptr && tile->unit->IsAlly() != mySide;
+        return tile->unit != nullptr && tile->unit->isAlive && tile->unit->IsAlly() != mySide;
     });
     std::vector<Unit *> ret{};
     for (auto & tile : tiles) {
@@ -79,9 +79,9 @@ std::vector<Unit *> GridRange::find_enemies(glm::ivec2 center, bool mySide) {
     return ret;
 }
 
-std::vector<Unit *> GridRange::find_allies(glm::ivec2 center) {
-    auto tiles = get_tiles(center) | std::ranges::views::filter([](Tile * tile){
-        return tile->unit != nullptr && tile->unit->IsAlly();
+std::vector<Unit *> GridRange::find_my_allies(glm::ivec2 center, bool mySide) {
+    auto tiles = get_tiles(center) | std::ranges::views::filter([mySide](Tile * tile){
+        return tile->unit != nullptr && tile->unit->isAlive && tile->unit->IsAlly() == mySide;
     });
     std::vector<Unit *> ret{};
     for (auto & tile : tiles) {

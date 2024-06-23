@@ -116,33 +116,17 @@ void CombatState::AttackTarget() {
     auto target = unit->combatTarget;
     if(target == nullptr) return; //todo expand on this
 
-    float totalAttackDamage =
-            (useItem->stats.dmg + useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
-            * (1 - target->stats.added.def_perc) - target->stats.added.def_flat;
-    totalAttackDamage = std::max(totalAttackDamage, 0.0f);
-
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
-    if(useItem->stats.range.add > 1){
-        auto projectileEntity = ztgk::game::scene->addEntity("Projectile");
-        projectileEntity->transform.setLocalPosition(unit->worldPosition);
-        projectileEntity->addComponent(std::make_unique<Render>(ztgk::game::projectileModel));
-        projectileEntity->addComponent(std::make_unique<Projectile>(unit->worldPosition,  target->worldPosition,unit, target, totalAttackDamage));
-        projectileEntity->transform.setLocalScale({0.1f, 0.1f, 0.1f});
-        projectileEntity->updateSelfAndChild();
-    }
-    else{
-        auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
-        if(anim == nullptr)
-        {
-            spdlog::error("No animation player component found");
-        }
-        else
-        {
-            string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
-            anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
-        }
-        applyDamage(unit, target, totalAttackDamage);
+
+    useItem->do_attack(unit, target);
+
+    auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+    if(anim == nullptr) {
+        spdlog::error("No animation player component found");
+    } else {
+        string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
+        anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
     }
 
 }
