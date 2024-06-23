@@ -96,6 +96,8 @@ uniform float specular_levels;
 uniform float light_shade_cutoff;
 uniform float dark_shade_cutoff;
 
+uniform float dirtMultiplayer;
+
 uniform float rim_threshold;
 uniform float rim_amount;
 uniform float rim_multiplier;
@@ -247,8 +249,8 @@ void main()
         vec3 specular = vec3(texture(material.specularTexture, texCoords));
 
         if (dirtinessMap > 0.1){
-            diffuse -= vec3(dirtinessMap) * 0.5;
-            specular -= vec3(dirtinessMap)* 0.5;
+            diffuse -= vec3(dirtinessMap) * dirtMultiplayer;
+            specular -= vec3(dirtinessMap)* dirtMultiplayer;
         }
 
         vec3 result = ambient * diffuse;//We do be calculating ambient here

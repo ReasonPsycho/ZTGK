@@ -27,7 +27,10 @@ namespace ztgk::game {
         P_BUBBLE_EEPY,
         Y_BUBBLE_SAD,
         Y_BUBBLE_ANGRY,
-        Y_BUBBLE_SUS
+        Y_BUBBLE_SUS,
+        CLEAN_BUBBLE1,
+        CLEAN_BUBBLE2,
+        PRANIUM
     };
 
 
@@ -111,6 +114,6 @@ namespace ztgk::game {
     extern bool gameWon;
     extern bool gameLost;
 
-    extern std::unordered_map<EMOTES, Texture*> emotes;
+    extern std::unordered_map<EMOTES, std::shared_ptr<Texture>> emotes;
 
 }

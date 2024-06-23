@@ -202,7 +202,7 @@ void Grid::GenerateTileEntities(float scale) {
                 }
             }
             Entity* localLight = scene->addEntity(chunkEntity,"LocalLight");
-            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,0.05f)));
+            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,0.2f)));
             localLight->transform.setLocalPosition(glm::vec3(0, 7,0));
             chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
             localLight->forceUpdateSelfAndChild();
@@ -770,5 +770,27 @@ Vector2Int Grid::GetNearestWashingMachineTile(Vector2Int origin) {
 
     return closest;
 
+
+}
+
+void Grid::Update() {
+    bubbleCooldown += Time::Instance().DeltaTime();
+    if(bubbleCooldown > 1){
+        bubbleCooldown = 0;
+        std::vector<Tile*> tiles = {};
+        for(int i = 25; i > 0; i--){
+            auto tile = getTileAt(RNG::RandomInt(0, 99), RNG::RandomInt(0, 99));
+            if(tile != nullptr){
+                tiles.push_back(tile);
+            }
+        }
+        for(auto tile : tiles){
+            if(tile->isInFogOfWar){
+                tile->UpdateImpl();
+            }
+        }
+
+        return;
+    }
 
 }

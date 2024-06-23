@@ -65,6 +65,10 @@ private:
 
     GLuint foamFrameBuffer;
     GLuint foamColorAttachment;
+
+
+    //dirtMask 
+    float dirtMultiplayer = 0.4;
     
     //gamma mapping
     float exposure = 1.0;
