@@ -41,7 +41,7 @@ std::vector<glm::vec3> Projectile::generateCurvePoints(int steps) {
 void Projectile::UpdateImpl() {
     // Define the margin of error for checking the target position
     float epsilon = 0.5f;
-    if(target->getEntity() == nullptr || unit->getEntity() == nullptr){
+    if(target == nullptr || unit == nullptr){
         ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->removeComponent(this);
         getEntity()->Destroy();
         return;

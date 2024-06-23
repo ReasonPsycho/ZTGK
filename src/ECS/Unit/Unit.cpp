@@ -21,6 +21,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/CombatState.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Utils/CooldownComponentXDD.h"
+#include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 150,
@@ -649,6 +650,18 @@ void Unit::DIEXD() {
         }
     }
 
+    //remove all projectiles that target or come from this unit (the projectile will handle this on its update)
+    for (auto projectile : ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->projectiles
+        | std::views::filter([this](Projectile *projectile) { return projectile->unit == this || projectile->target == this; })) {
+        projectile->unit = nullptr;
+        projectile->target = nullptr;
+    }
+
+    InventoryManager::instance->unassign_item(this, short(0));
+    if(equipment.item1)
+        InventoryManager::instance->unassign_item(this, 1);
+    if(equipment.item2)
+        InventoryManager::instance->unassign_item(this, 2);
 
     getEntity()->Destroy();
 
