@@ -114,6 +114,6 @@ namespace ztgk::game {
     extern bool gameWon;
     extern bool gameLost;
 
-    extern std::unordered_map<EMOTES, Texture*> emotes;
+    extern std::unordered_map<EMOTES, std::shared_ptr<Texture>> emotes;
 
 }

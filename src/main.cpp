@@ -670,20 +670,20 @@ void load_enteties() {
 
 
 
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_CUTE, new Texture("res/textures/emotes/blue_3.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_TONGUE, new Texture("res/textures/emotes/blue_p.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_HAPPY, new Texture("res/textures/emotes/blue_c.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_CUTE, new Texture("res/textures/emotes/pink_3.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_SAD, new Texture("res/textures/emotes/pink_v.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_TONGUE, new Texture("res/textures/emotes/pink_p.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_EEPY, new Texture("res/textures/emotes/pink_eep.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SAD, new Texture("res/textures/emotes/yellow_v.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_ANGRY, new Texture("res/textures/emotes/yellow_angy.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SUS, new Texture("res/textures/emotes/yellow_sus.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE1, new Texture("res/textures/emotes/clean_bubble1.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_CUTE, std::make_shared<Texture>("res/textures/emotes/blue_3.png", "emote") ));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_TONGUE, std::make_shared<Texture>("res/textures/emotes/blue_p.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_HAPPY, std::make_shared<Texture>("res/textures/emotes/blue_c.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_CUTE, std::make_shared<Texture>("res/textures/emotes/pink_3.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_SAD, std::make_shared<Texture>("res/textures/emotes/pink_v.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_TONGUE, std::make_shared<Texture>("res/textures/emotes/pink_p.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_EEPY, std::make_shared<Texture>("res/textures/emotes/pink_eep.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SAD, std::make_shared<Texture>("res/textures/emotes/yellow_v.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_ANGRY, std::make_shared<Texture>("res/textures/emotes/yellow_angy.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SUS, std::make_shared<Texture>("res/textures/emotes/yellow_sus.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE1, std::make_shared<Texture>("res/textures/emotes/clean_bubble1.png", "emote")));
     //ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE1, new Texture({255,0,0,50})));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE2, new Texture("res/textures/emotes/clean_bubble2.png", "emote")));
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::PRANIUM, new Texture("res/textures/emotes/pranium_cut.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE2, std::make_shared<Texture>("res/textures/emotes/clean_bubble2.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::PRANIUM, std::make_shared<Texture>("res/textures/emotes/pranium_cut.png", "emote")));
 
 
 

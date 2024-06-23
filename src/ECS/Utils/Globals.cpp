@@ -48,5 +48,5 @@ namespace ztgk::game {
     bool game::gameWon = false;
     bool game::gameLost = false;
 
-    std::unordered_map<EMOTES, Texture*> game::emotes = {};
+    std::unordered_map<EMOTES, std::shared_ptr<Texture>> game::emotes = {};
 }
