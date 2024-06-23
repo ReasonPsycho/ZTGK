@@ -103,6 +103,8 @@ public:
     void SetUpWall(Tile *tile);
     void UpdateFogData(Tile *tile);
 
+    void Update();
+
     void ClearWall(Tile *tile);
 
     //system methods
@@ -129,6 +131,7 @@ public:
     std::vector<std::string> zuk_names = {};
     bool read_icons = false;
 private:
+    float bubbleCooldown = 0;
     float offsetX = 0;
     float offsetZ = 0;
     int visibilityRange = 3;

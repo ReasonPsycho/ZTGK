@@ -7,6 +7,9 @@
 #include <utility>
 #include "ECS/Unit/Unit.h"
 #include "ECS/Grid/Chunk.h"
+#include "ECS/Render/Components/BetterSpriteRender.h"
+#include "ECS/Utils/CooldownComponentXDD.h"
+
 
 Tile::~Tile() {
     //delete this;
@@ -61,6 +64,27 @@ void Tile::changeWallsFogOfWarState(bool isInFogOfWar) {
     for(auto wall : walls){
         wall->data[1] = isInFogOfWar;
     }
+}
+
+void Tile::tryToSendBubble() {
+    ztgk::game::EMOTES bubble1 = ztgk::game::EMOTES::CLEAN_BUBBLE1;
+    ztgk::game::EMOTES bubble2 = ztgk::game::EMOTES::CLEAN_BUBBLE2;
+
+    if (getEntity()->getChild("Emote") == nullptr) {
+        ztgk::game::scene->addEntity(getEntity(), "Emote");
+    }
+    auto emoChild = getEntity()->getChild("Emote");
+
+    if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
+        emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(RNG::RandomBool() ? bubble1 : bubble2) , 4));
+    }
+    else if(emoChild->getComponent<BetterSpriteRender>() != nullptr && emoChild->getComponent<BetterSpriteRender>()->toBeDeleted) {
+        emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
+    }
+}
+
+void Tile::UpdateImpl() {
+    tryToSendBubble();
 }
 
 

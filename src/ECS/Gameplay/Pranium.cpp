@@ -9,6 +9,11 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Equipment/ConcreteItems/PraniumOre.h"
 #include "ECS/Unit/Mining/MiningSystem.h"
+#include "ECS/Render/Components/BetterSpriteRender.h"
+#include "ECS/Utils/RNG.h"
+
+
+
 Pranium::Pranium(float timeToMine, Vector2Int gridPosition, Grid *grid) : IMineable(timeToMine, gridPosition, grid) {
     name = "Pranium";
     //ztgk::game::scene->systemManager.getSystem<MiningSystem>()->addComponent(this);
@@ -51,8 +56,26 @@ void Pranium::UpdateImpl() {
     auto render = getEntity()->getChild("Pralka")->getComponent<Render>();
     if(tile == nullptr || render == nullptr) return;
     render->isInFogOfWar = tile->isInFogOfWar;
+
+    tryToSendEmote();
+
+
 }
 
 Pranium::~Pranium() {
     ztgk::game::scene->systemManager.getSystem<MiningSystem>()->removeComponent(this);
+}
+
+void Pranium::tryToSendEmote() {
+    if (getEntity()->getChild("Emote") == nullptr) {
+        ztgk::game::scene->addEntity(getEntity(), "Emote");
+    }
+    auto emoChild = getEntity()->getChild("Emote");
+
+    if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
+        emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(ztgk::game::EMOTES::PRANIUM) , 4));
+    }
+    else if(emoChild->getComponent<BetterSpriteRender>() != nullptr && emoChild->getComponent<BetterSpriteRender>()->toBeDeleted) {
+        emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
+    }
 }

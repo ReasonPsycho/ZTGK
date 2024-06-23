@@ -680,6 +680,9 @@ void load_enteties() {
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SAD, new Texture("res/textures/emotes/yellow_v.png", "emote")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_ANGRY, new Texture("res/textures/emotes/yellow_angy.png", "emote")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SUS, new Texture("res/textures/emotes/yellow_sus.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE1, new Texture("res/textures/emotes/clean_bubble1.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE2, new Texture("res/textures/emotes/clean_bubble2.png", "emote")));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::PRANIUM, new Texture("res/textures/emotes/pranium_cut.png", "emote")));
 
 
 
@@ -1580,6 +1583,7 @@ void update() {
     scene.systemManager.getSystem<MiningSystem>()->Update();
     scene.systemManager.getSystem<HUD>()->Update();
     scene.systemManager.getSystem<ProjectileSystem>()->Update();
+    scene.systemManager.getSystem<Grid>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
