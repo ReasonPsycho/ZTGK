@@ -74,8 +74,10 @@ void Pranium::tryToSendEmote() {
 
     if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
         emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(ztgk::game::EMOTES::PRANIUM) , 4));
+        //emoChild->addComponent(std::make_unique<PointLight>());
     }
     else if(emoChild->getComponent<BetterSpriteRender>() != nullptr && emoChild->getComponent<BetterSpriteRender>()->toBeDeleted) {
         emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
+        //emoChild->removeComponentFromMap(emoChild->getComponent<PointLight>());
     }
 }

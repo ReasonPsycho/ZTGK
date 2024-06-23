@@ -681,6 +681,7 @@ void load_enteties() {
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_ANGRY, new Texture("res/textures/emotes/yellow_angy.png", "emote")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::Y_BUBBLE_SUS, new Texture("res/textures/emotes/yellow_sus.png", "emote")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE1, new Texture("res/textures/emotes/clean_bubble1.png", "emote")));
+    //ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE1, new Texture({255,0,0,50})));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::CLEAN_BUBBLE2, new Texture("res/textures/emotes/clean_bubble2.png", "emote")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::PRANIUM, new Texture("res/textures/emotes/pranium_cut.png", "emote")));
 
