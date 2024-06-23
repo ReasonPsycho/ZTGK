@@ -76,7 +76,7 @@ void Tile::tryToSendBubble() {
     auto emoChild = getEntity()->getChild("Emote");
 
     if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
-        emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(RNG::RandomBool() ? bubble1 : bubble2) , 4));
+        emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(RNG::RandomBool() ? bubble1 : bubble2).get() , 4));
     }
     else if(emoChild->getComponent<BetterSpriteRender>() != nullptr && emoChild->getComponent<BetterSpriteRender>()->toBeDeleted) {
         emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
