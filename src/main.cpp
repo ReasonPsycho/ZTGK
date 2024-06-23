@@ -602,6 +602,18 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/sfx_rubberduck1.mp3", "sfx_rubberduck1");
     ztgk::game::audioManager->loadSound("res/sounds/sfx_rubberduck2.mp3", "sfx_rubberduck2");
 
+    //pick
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_duty1.mp3", "sfx_pickUnit_duty1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_huhu1.mp3", "sfx_pickUnit_huhu1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_huhu2.mp3", "sfx_pickUnit_huhu2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_orders1.mp3", "sfx_pickUnit_orders1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_orders2.mp3", "sfx_pickUnit_orders2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_yessir1.mp3", "sfx_pickUnit_yessir1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_yessir2.mp3", "sfx_pickUnit_yessir2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_yessir3.mp3", "sfx_pickUnit_yessir3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_pickUnit_yessir4.mp3", "sfx_pickUnit_yessir4");
+
+
 
     //healing
     ztgk::game::audioManager->loadSound("res/sounds/sfx_heal1.mp3", "sfx_heal1");
