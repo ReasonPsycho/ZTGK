@@ -34,17 +34,21 @@ const UnitStats Unit::ALLY_BASE = {
 const UnitStats Unit::ENEMY_BASE_BUG = {
         .max_hp = 60,
         .hp = 60,
-        .move_spd = 9,
+        .move_spd = 7,
         .mine_spd = 0,
-        .atk_spd = 1,
-        .added = {}
+        .atk_spd = 0.8,
+        .added = {
+                .def_flat = 3,
+                .dmg_flat = 3,
+                },
 };
 
 const UnitStats Unit::ENEMY_BASE_SHROOM = {
         .max_hp = 40,
         .hp = 40,
-        .move_spd = 15,
+        .move_spd = 7,
         .mine_spd = 0,
+        .atk_spd = 1.5,
         .added = {.rng_add = 3}
 };
 
@@ -218,16 +222,18 @@ void Unit::UpdateImpl() {
             }
         }
 
-        while(!miningTargets.empty()) {
             if (currentMiningTarget == nullptr) {
                 //erease currentMiningTarget from miningTargets
                 miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), currentMiningTarget),
                                     miningTargets.end());
                 currentMiningTarget = findClosestMineable();
+                if(currentMiningTarget == nullptr){
+                    hasMiningTarget = false;
+                }
+                else{
+                    hasMiningTarget = true;
             }
-            else {
-                break;
-            }
+
         }
 
         if (hasMovementTarget) {
