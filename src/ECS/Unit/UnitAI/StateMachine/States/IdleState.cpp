@@ -73,7 +73,7 @@ State *IdleState::RunCurrentState() {
             unit->hasMovementTarget = true;
             IMineable* mineable = unit->findClosestMineable();
             if(mineable != nullptr) {
-                unit->movementTarget = unit->findClosestMineable()->gridPosition;
+                unit->movementTarget = unit->pathfinding.GetNearestVacantTile(mineable->gridPosition, unit->gridPosition);
                 moveState = new MovementState(grid);
                 moveState->unit = unit;
                 idleTimer = 0;

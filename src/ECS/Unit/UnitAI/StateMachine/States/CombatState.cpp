@@ -68,7 +68,7 @@ State *CombatState::RunCurrentState() {
             unit->hasMovementTarget = true;
             auto closestMineable = unit->findClosestMineable();
             if (closestMineable != nullptr) {
-                unit->movementTarget = closestMineable->gridPosition;
+                unit->movementTarget = unit->pathfinding.GetNearestVacantTile(closestMineable->gridPosition, unit->gridPosition);
                 moveState = new MovementState(grid);
                 moveState->unit = unit;
                 return moveState;

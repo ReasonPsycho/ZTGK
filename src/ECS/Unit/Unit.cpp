@@ -218,12 +218,15 @@ void Unit::UpdateImpl() {
             }
         }
 
-        if (!miningTargets.empty() && currentMiningTarget == nullptr) {
-            currentMiningTarget = findClosestMineable();
-            if (currentMiningTarget != nullptr) {
-                hasMiningTarget = true;
-            } else {
-                hasMiningTarget = false;
+        while(!miningTargets.empty()) {
+            if (currentMiningTarget == nullptr) {
+                //erease currentMiningTarget from miningTargets
+                miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), currentMiningTarget),
+                                    miningTargets.end());
+                currentMiningTarget = findClosestMineable();
+            }
+            else {
+                break;
             }
         }
 
@@ -252,33 +255,6 @@ void Unit::UpdateImpl() {
             }
         }
 
-        if (ForcedMiningState && !ForcedMovementState) {
-            if (forcedMiningTarget->isMined) {
-                ForcedMiningState = false;
-                forcedMiningTarget = nullptr;
-            } else {
-                hasMiningTarget = true;
-                hasCombatTarget = false;
-                hasMovementTarget = true;
-                combatTarget = nullptr;
-                currentMiningTarget = forcedMiningTarget;
-                auto targ = pathfinding.GetNearestVacantTile(forcedMiningTarget->gridPosition, gridPosition);
-                auto miningState = new MiningState(grid);
-                miningState->unit = this;
-                if (!miningState->isTargetInRange()) {
-                    spdlog::info("Target not in range, moving to mining target");
-                    forcedMovementTarget = targ;
-                    ForcedMovementState = true;
-                    ForcedMiningState = false;
-                } else {
-                    ForcedMovementState = false;
-                    ForcedMiningState = false;
-                    currentMiningTarget = forcedMiningTarget;
-                }
-                delete miningState;
-            }
-
-        }
         if (!isAlly && !ForcedMovementState && !ForcedMiningState) {
             combatTarget = GetClosestPathableEnemyInSight();
 //            if (combatTarget == nullptr) {
@@ -510,46 +486,55 @@ Entity *Unit::serializer_newUnitEntity(Scene *scene, const std::string &name) {
 
 IMineable *Unit::findClosestMineable(const std::vector<IMineable> &MineablesToExclude) {
     ZoneScopedN("Find closest mineable");
+
     if (miningTargets.empty()) {
         spdlog::error("IN SPONGE::findClosestMineable: No mining targets!");
         return nullptr;
     }
 
     IMineable *closestMineable = nullptr;
+    float closestDistance = std::numeric_limits<float>::max();  // Use the maximum float value
 
-    float closestDistance = 1000000;
-    for (auto tile: miningTargets) {
-        for (auto &excluded: MineablesToExclude) {
+    for (auto tile : miningTargets) {
+        bool isExcluded = false;
+        for (auto &excluded : MineablesToExclude) {
             if (tile->gridPosition == excluded.gridPosition) {
-                continue;
+                isExcluded = true;
+                break;  // Stop checking other exclusions
             }
         }
+
+        if (isExcluded) {
+            continue;  // Skip excluded targets
+        }
+
         float distance = VectorUtils::Distance(Vector2Int(gridPosition.x, gridPosition.z),
                                                Vector2Int(tile->gridPosition.x, tile->gridPosition.z));
+
         if (distance < closestDistance) {
-            auto neigh = grid->GetNeighbours(gridPosition);
-            bool found = false;
-            for (auto n: neigh) {
-                if (n->index == gridPosition) {
-                    found = true;
-                    break;
+            auto neighbors = grid->GetNeighbours(tile->gridPosition);
+            bool isNeighbor = false;
+            for (auto &neighbor : neighbors) {
+                if (neighbor->index == gridPosition) {
+                    isNeighbor = true;
+                    break;  // Target is a direct neighbor
                 }
             }
 
-            if (found || !pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition,
-                                                                                              gridPosition)).empty()) {
+            if (isNeighbor || !pathfinding.FindPath(gridPosition, pathfinding.GetNearestVacantTile(tile->gridPosition, gridPosition)).empty()) {
                 closestDistance = distance;
                 closestMineable = tile;
             }
         }
     }
+
     if (closestMineable == nullptr) {
         spdlog::error("IN SPONGE::findClosestMineable: No reachable mining target in area!");
-        Wait(2);
     }
 
     return closestMineable;
 }
+
 
 void Unit::sortMiningTargetsByDistance() {
     std::sort(miningTargets.begin(), miningTargets.end(), [this](IMineable *mineable, IMineable *mineable1) {
@@ -696,8 +681,8 @@ bool Unit::canPathToMiningTarget() {
         }
     }
     auto pathToTarget = pathfinding.FindPath(gridPosition,
-                                             pathfinding.GetNearestVacantTile(currentMiningTarget->gridPosition,
-                                                                              gridPosition));
+                                             currentMiningTarget->gridPosition
+                                                                              );
     return !pathToTarget.empty();
 }
 
