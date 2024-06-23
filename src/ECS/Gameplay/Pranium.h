@@ -20,7 +20,9 @@ public:
 
     void UpdateImpl() override;
 
-
+private:
+    void tryToSendEmote();
+    float bubbleCooldown = 0;
 };
 
 

@@ -27,7 +27,10 @@ namespace ztgk::game {
         P_BUBBLE_EEPY,
         Y_BUBBLE_SAD,
         Y_BUBBLE_ANGRY,
-        Y_BUBBLE_SUS
+        Y_BUBBLE_SUS,
+        CLEAN_BUBBLE1,
+        CLEAN_BUBBLE2,
+        PRANIUM
     };
 
 

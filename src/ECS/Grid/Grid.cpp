@@ -772,3 +772,25 @@ Vector2Int Grid::GetNearestWashingMachineTile(Vector2Int origin) {
 
 
 }
+
+void Grid::Update() {
+    bubbleCooldown += Time::Instance().DeltaTime();
+    if(bubbleCooldown > 1){
+        bubbleCooldown = 0;
+        std::vector<Tile*> tiles = {};
+        for(int i = 25; i > 0; i--){
+            auto tile = getTileAt(RNG::RandomInt(0, 99), RNG::RandomInt(0, 99));
+            if(tile != nullptr){
+                tiles.push_back(tile);
+            }
+        }
+        for(auto tile : tiles){
+            if(tile->isInFogOfWar){
+                tile->UpdateImpl();
+            }
+        }
+
+        return;
+    }
+
+}

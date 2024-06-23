@@ -78,12 +78,15 @@ public:
     void changeWallsSelection(TileSelectionState state);
     void changeWallsFogOfWarState(bool isInFogOfWar);
     void changeDirtinessLevel(float newDirtLevel);
+
+    void UpdateImpl() override;
     
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
 
     
 private:
     TileSelectionState tileSelectionState = NOT_SELECTED;
+    void tryToSendBubble();
 };
 
 #endif //ZTGK_TILE_H
