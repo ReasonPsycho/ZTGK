@@ -13,8 +13,8 @@ public:
         icon_path = "res/textures/icons/item_tidePodLauncher.png";
         model = ztgk::game::tidyPodLauncherModel;
 
-//        determine_damage = [this](Unit * me, Unit * target, glm::vec2 hitPoint) { return Item::aoe_explosion_formula(me, target, this, hitPoint); };
-        do_attack = [this](Unit * me, Unit * target) { Item::do_ranged_attack(me, target, this); };
+        determine_damage = [this](Unit * me, Unit * target, glm::vec2 hitPoint) { return Item::aoe_explosion_formula(me, target, this, hitPoint); };
+        do_attack = [this](Unit * me, Unit * target) { Item::do_ranged_aoe_attack(me, target, this); };
     }
 };
 

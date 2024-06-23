@@ -89,13 +89,29 @@ void Item::do_ranged_attack(Unit *me, Unit *target, Item *usedItem) {
     auto projectileEntity = ztgk::game::scene->addEntity("Projectile");
     projectileEntity->transform.setLocalPosition(me->worldPosition);
     projectileEntity->addComponent(std::make_unique<Render>(ztgk::game::projectileModel));
-    projectileEntity->addComponent(std::make_unique<Projectile>(me->worldPosition,  target->worldPosition, me, target, totalAttackDamage));
+    projectileEntity->addComponent(std::make_unique<Projectile>(me->worldPosition,  target->worldPosition, me, target, usedItem, totalAttackDamage));
     projectileEntity->transform.setLocalScale({0.1f, 0.1f, 0.1f});
     projectileEntity->updateSelfAndChild();
 }
 
 void Item::do_ranged_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
-    // todo callback in projectile
+    float totalAttackDamage = usedItem->determine_damage(me, target, VectorUtils::Vector2IntToGlmVec2(target->gridPosition));
+
+    auto projectileEntity = ztgk::game::scene->addEntity("Projectile");
+    projectileEntity->transform.setLocalPosition(me->worldPosition);
+    projectileEntity->addComponent(std::make_unique<Render>(ztgk::game::projectileModel));
+    projectileEntity->addComponent(std::make_unique<Projectile>(me->worldPosition,  target->worldPosition, me, target, usedItem, totalAttackDamage));
+    projectileEntity->transform.setLocalScale({0.1f, 0.1f, 0.1f});
+    projectileEntity->updateSelfAndChild();
+    auto projectile = projectileEntity->getComponent<Projectile>();
+    projectile->onHit = [projectile]() -> std::vector<Unit *> {
+        auto targets = projectile->sourceItem->stats.aoe_range.find_my_enemies({projectile->target->gridPosition.x, projectile->target->gridPosition.z}, projectile->unit->IsAlly());
+        for (auto & tgt : targets) {
+            float totalAttackDamage = projectile->sourceItem->determine_damage(projectile->unit, tgt, {projectile->target->gridPosition.x, projectile->target->gridPosition.z}); // hit point here is explosion center so original target position
+            CombatState::applyDamage(projectile->unit, tgt, totalAttackDamage);
+        }
+        return targets;
+    };
 }
 
 void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
@@ -103,7 +119,7 @@ void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
 
     for (auto & tgt : targets) {
         float totalHealAmount = usedItem->determine_damage(me, tgt, {me->gridPosition.x, me->gridPosition.z}); // hit point here is explosion center so original ME position - this is for beacon centered on unit
-        tgt->stats.hp = std::min(tgt->stats.hp + totalHealAmount, tgt->stats.max_hp + tgt->stats.added.max_hp);
+        CombatState::applyDamage(me, tgt, totalHealAmount);
     }
 }
 
@@ -115,15 +131,4 @@ Unit *Item::default_determine_target(Unit *me, GridRange * range, bool findAlly)
         return VectorUtils::GridDistance(me->gridPosition, a->gridPosition) < VectorUtils::GridDistance(me->gridPosition, b->gridPosition);
     });
     return sorted.empty() ? nullptr : sorted.at(0);
-}
-
-void Item::play_atk_anim(Unit *me) {
-    auto anim = me->getEntity()->getComponent<AnimationPlayer>();
-    if(anim == nullptr)
-        spdlog::error("No animation player component found");
-    else {
-        // todo change to appropraite enemy attack anim
-        string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
-        anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
-    }
 }
