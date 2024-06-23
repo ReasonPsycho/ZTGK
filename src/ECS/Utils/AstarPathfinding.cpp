@@ -208,31 +208,29 @@ std::vector<Vector2Int> AstarPathfinding::GetNeighbours(Vector2Int current, bool
 Vector2Int AstarPathfinding::GetNearestVacantTile(Vector2Int target, Vector2Int origin) {
     ZoneScopedN("GetNearestVacantTile");
     Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
-    std::vector<Vector2Int> list;
-    list.push_back(target);
+    std::queue<Vector2Int> queue;
+    queue.push(target);
     std::unordered_set<Vector2Int> visited;
     visited.insert(target);
 
-    while(list.size() > 0){
-        Vector2Int current = list[0];
-        list.erase(list.begin());
-        if(grid->getTileAt(current)->vacant() || current == origin){
+    while (!queue.empty()) {
+        Vector2Int current = queue.front();
+        queue.pop();
+        if (grid->getTileAt(current)->vacant() || current == origin) {
             return current;
         }
 
-        for(Vector2Int dir : directions){
+        for (Vector2Int dir : directions) {
             Vector2Int next = current + dir;
-            if(grid->getTileAt(next)!= nullptr && !visited.contains(next)){
-                list.push_back(next);
+            if (grid->getTileAt(next) != nullptr && visited.find(next) == visited.end()) {
+                queue.push(next);
                 visited.insert(next);
             }
         }
-        std::sort(list.begin(), list.end(), [origin](Vector2Int a, Vector2Int b){
-            return VectorUtils::Distance(a, origin) < VectorUtils::Distance(b, origin);
-        });
     }
     return target;
 }
+
 
 Vector2Int AstarPathfinding::GetNearestVacantTileAround(Vector2Int origin, std::vector<Vector2Int> forbiddenTiles) {
     ZoneScopedN("GetNearestVacantTileAround");
