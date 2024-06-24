@@ -7,94 +7,53 @@
 #include <unordered_map>
 #include "spdlog/spdlog.h"
 #include <queue>
+#include "ECS/System.h"
+#include "Speaker.h"
+#include <typeindex> // Ensure you have this included
 
 /**
  * @class AudioManager
  * @brief Manages audio operations such as loading, playing, pausing, stopping, and setting volume for sounds.
  */
-class AudioManager {
+class AudioManager : public System {
 public:
-    /**
-     * @brief Constructor for AudioManager.
-     */
     AudioManager();
+    ~AudioManager() override;
 
-    /**
-     * @brief Destructor for AudioManager.
-     */
-    ~AudioManager();
+    void addComponent(void *component) override;
+    void removeComponent(void *component) override;
+    const std::type_index *getComponentTypes() override;
+    int getNumComponentTypes() override { return 1; }
 
-    /**
-     * @brief Initializes the audio system.
-     * @return True if initialization is successful, false otherwise.
-     */
+    void UpdateImpl() override;
+    void showImGuiDetailsImpl(Camera *camera) override;
+    void registerComponents() override {}
+
     bool init();
-
-    /**
-     * @brief Closes the audio system and frees resources.
-     */
     void close();
 
-    /**
-     * @brief Loads a sound from a file.
-     * @param filePath The path to the sound file.
-     * @param soundKey The key to associate with the loaded sound.
-     * @return True if the sound is loaded successfully, false otherwise.
-     */
     bool loadSound(const std::string& filePath, const std::string& soundKey);
-
-    /**
-     * @brief Plays a sound.
-     * @param soundKey The key of the sound to play.
-     * @param loops Number of times to loop the sound. -1 means infinite loop.
-     */
-    void playSound(const std::string& soundKey, int loops = 0);
-
-    /**
-     * @brief Stops a sound.
-     * @param soundKey The key of the sound to stop. If empty, stops all sounds.
-     */
+    void playSound(const std::string& soundKey, int loops = 0, int panning = -1);
     void stopSound(const std::string& soundKey = "");
-
-    /**
-     * @brief Pauses a sound.
-     * @param soundKey The key of the sound to pause. If empty, pauses all sounds.
-     */
     void pauseSound(const std::string& soundKey = "");
-
-    /**
-     * @brief Resumes a sound.
-     * @param soundKey The key of the sound to resume. If empty, resumes all sounds.
-     */
     void resumeSound(const std::string& soundKey = "");
-
-    /**
-     * @brief Sets the volume for a specific sound.
-     * @param soundKey The key of the sound to set volume for.
-     * @param volume The volume level (0 to 128).
-     */
     void setSoundVolume(const std::string& soundKey, int volume);
-
-    /**
-     * @brief Sets the global volume for all sounds.
-     * @param volume The global volume level (0 to 128).
-     */
     void setGlobalVolume(int volume);
-
     bool isSoundPlaying(const std::string& soundKey);
-
     void setVolumeForGroup(const std::string& groupName, int volume);
-
     void playAmbientMusic();
+    void playRandomSoundFromGroup(const std::string& groupName, int padding = -1);
 
-    void playRandomSoundFromGroup(const std::string& groupName);
+    std::vector<Speaker*> speakers;
 
 private:
-    std::unordered_map<std::string, Mix_Chunk*> soundMap; ///< Map of sound keys to their corresponding Mix_Chunk objects.
-
-    std::queue<std::string> soundQueue; ///< Queue of sound keys to play
+    std::array<std::type_index, 1> componentTypes = {
+            std::type_index(typeid(Speaker))
+    };
 
     void setAmbientQueue();
+    std::unordered_map<std::string, Mix_Chunk*> soundMap; // Map of sound keys to their corresponding Mix_Chunk objects.
+    std::queue<std::string> soundQueue; // Queue of sound keys to play
 };
 
 #endif // AUDIOMANAGER_H

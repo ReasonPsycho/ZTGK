@@ -236,7 +236,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
+Camera camera(glm::vec3(90.0f, 40.0f, 90.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
 
@@ -458,8 +458,10 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::window = window;
+    scene.systemManager.addSystem(std::make_unique<AudioManager>());
 
-    ztgk::game::audioManager = new AudioManager();
+
+    ztgk::game::audioManager = scene.systemManager.getSystem<AudioManager>();
     ztgk::game::audioManager->init();
     spdlog::info("Initialized audio manager.");
     load_sounds();
@@ -1585,12 +1587,14 @@ void update() {
     scene.systemManager.getSystem<HUD>()->Update();
     scene.systemManager.getSystem<ProjectileSystem>()->Update();
     scene.systemManager.getSystem<Grid>()->Update();
+    scene.systemManager.getSystem<AudioManager>()->Update();
 
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
 //            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
 //    }
 
+    spdlog::debug("camera position: {} {} {}", camera.Position.x, camera.Position.y, camera.Position.z);
 
 }
 

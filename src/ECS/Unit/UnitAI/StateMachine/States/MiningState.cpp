@@ -130,7 +130,7 @@ void MiningState::Mine() {
 
     if(isTargetInRange()){
         if(unit->currentMiningTarget->getTimeToMineRemaining() == unit->currentMiningTarget->timeToMine){
-            ztgk::game::audioManager->playRandomSoundFromGroup("mining");
+            unit->speaker->PlayRandomSoundFromGroup("mining");
             auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
             if(anim == nullptr)
             {

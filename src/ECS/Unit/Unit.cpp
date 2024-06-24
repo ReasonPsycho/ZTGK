@@ -167,6 +167,11 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void Unit::UpdateImpl() {
+    if(firstUpdate){
+        onFirstUpdate();
+    }
+
+
     if (stats.hp <= 0) {
         isAlive = false;
     }
@@ -341,7 +346,7 @@ void Unit::UpdateImpl() {
 
         tryToSendEmote(emote);
 
-        ztgk::game::audioManager->playRandomSoundFromGroup(isAlly ? "gabka" : "bug");
+        speaker->PlayRandomSoundFromGroup(isAlly ? "gabka" : "bug");
         auto anim = getEntity()->getComponent<AnimationPlayer>();
         if (anim == nullptr) {
             spdlog::error("No animation player component found");
@@ -785,5 +790,12 @@ void Unit::tryToSendEmote(ztgk::game::EMOTES emote, float time) {
         emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
     }
 
+}
+
+void Unit::onFirstUpdate() {
+    getEntity()->addComponent(std::make_unique<Speaker>());
+    speaker = parentEntity->getComponent<Speaker>();
+
+    firstUpdate = false;
 }
 
