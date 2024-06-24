@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "ECS/Utils/Globals.h"
+#include "ECS/Unit/Unit.h"
 
 Speaker::Speaker() {
     name = "Speaker";

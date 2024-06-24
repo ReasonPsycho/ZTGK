@@ -1594,7 +1594,6 @@ void update() {
 //            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
 //    }
 
-    spdlog::debug("camera position: {} {} {}", camera.Position.x, camera.Position.y, camera.Position.z);
 
 }
 
