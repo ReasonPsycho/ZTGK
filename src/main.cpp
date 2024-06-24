@@ -1578,7 +1578,7 @@ void update() {
 
     update_dragged_tiles();
     for (auto tile: selectedTiles) {
-        scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::POINTED_AT);
+        scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::SELECTION_LMB_GREEN);
     }
 
     scene.systemManager.getSystem<CollisionSystem>()->Update();
@@ -1906,7 +1906,7 @@ void update_dragged_tiles() {
         }
         selectedTiles = tilesInArea;
         for(auto tile : tilesInArea){
-            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
+            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(SELECTION_LMB_GREEN);
         }
 
     }
@@ -1928,7 +1928,10 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
         tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
         for (auto tile: tilesInArea) {
-            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
+            if (isRightMouseButtonHeld)
+                scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(SELECTION_LMB_GREEN);
+            else if (isLeftMouseButtonHeld)
+                scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(SELECTION_RMB_BLUE);
         }
     }
 
@@ -2146,7 +2149,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                             sponge->miningTargets.clear();
                             sponge->miningTargets.emplace_back(hitMineable);
                             sponge->hasMiningTarget = true;
-                            hitTile->setTileSelectionState(SELECTED);
+                            hitTile->setTileSelectionState(SELECTION_RMB_BLUE);
                             tilesSelectedToMine.push_back(hitTile);
                             continue;
                         }
@@ -2237,7 +2240,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                                     Sponge->miningTargets.emplace_back(mineable);
                                     Sponge->hasMiningTarget = true;
                                     tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
-                                    mineable->getEntity()->getComponent<Tile>()->setTileSelectionState(SELECTED);
+                                    mineable->getEntity()->getComponent<Tile>()->setTileSelectionState(SELECTION_RMB_BLUE);
                                 }
                             }
                         }

@@ -40,8 +40,13 @@ enum TileState {
 
 enum TileSelectionState {
     NOT_SELECTED,
-    POINTED_AT,
-   SELECTED //lol
+    SELECTION_LMB_GREEN,
+    SELECTION_RMB_BLUE,
+    HIGHLIGHT_ENEMY_RED,
+    HIGHLIGHT_ITEM_GOLD,
+    EXPLOSION_LIGHT_BLUE,
+    HEAL_LIGHT_GREEN,
+    HIGHLIGHT_RANGE_V_LIGHT_BLUE,
 };
 
 // initializer list
