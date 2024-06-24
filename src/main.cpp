@@ -236,7 +236,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(100.0f, 40.0f, 100.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
+Camera camera(glm::vec3(90.0f, 40.0f, 90.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
 
 Primitives primitives;
 
@@ -458,8 +458,10 @@ void init_systems() {
     ztgk::game::scene = &scene;
     ztgk::game::camera = &camera;
     ztgk::game::window = window;
+    scene.systemManager.addSystem(std::make_unique<AudioManager>());
 
-    ztgk::game::audioManager = new AudioManager();
+
+    ztgk::game::audioManager = scene.systemManager.getSystem<AudioManager>();
     ztgk::game::audioManager->init();
     spdlog::info("Initialized audio manager.");
     load_sounds();
@@ -1585,10 +1587,11 @@ void update() {
     scene.systemManager.getSystem<HUD>()->Update();
     scene.systemManager.getSystem<ProjectileSystem>()->Update();
     scene.systemManager.getSystem<Grid>()->Update();
-
+    scene.systemManager.getSystem<AudioManager>()->Update();
+//
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
-//            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
+//            spdlog::info("Unit: {} -- State: {}  -- currentMinTarg {} {}", u->name, u->currentState->name, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.x, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.z);
 //    }
 
 
@@ -1811,8 +1814,9 @@ void imgui_end() {
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
 
-    camera.MoveCamera(window);
-
+    if (ztgk::game::gameStarted) {
+        camera.MoveCamera(window);
+    }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
             if (timeStep == 0) {
@@ -1858,14 +1862,18 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
-    ztgk::game::cursor.move({xposIn, yposIn});
+        ztgk::game::cursor.move({xposIn, yposIn});
+    
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    ztgk::game::cursor.scroll({xoffset, yoffset});
+    if (ztgk::game::gameStarted) {
+
+        ztgk::game::cursor.scroll({xoffset, yoffset});
     camera.MoveCamera(yoffset);
+    }
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {

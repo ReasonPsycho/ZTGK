@@ -96,7 +96,7 @@ void UnitSystem::selectUnit(Unit *unit) {
     if (std::find(selectedUnits.begin(), selectedUnits.end(), unit) == selectedUnits.end())
         selectedUnits.push_back(unit);
     unit->isSelected = true;
-    ztgk::game::audioManager->playRandomSoundFromGroup("pickUnit");
+    unit->speaker->PlayRandomSoundFromGroup("pickUnit");
 }
 
 void UnitSystem::deselectUnit(Unit *unit) {

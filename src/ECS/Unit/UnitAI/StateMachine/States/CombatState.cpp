@@ -167,7 +167,7 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     }
 
     if(target->stats.hp <= 0){
-        ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
+        unit->speaker->PlayRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
 
         unit->hasCombatTarget = false;
         target->isAlive = false;

@@ -106,7 +106,7 @@ State *IdleState::RunCurrentState() {
             string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
             anim->PlayAnimation(modelPathGabkaIdle, true, 2.0f);
             if(!unit->playinIdleAnimation)
-                ztgk::game::audioManager->playRandomSoundFromGroup("idle");
+                unit->speaker->PlayRandomSoundFromGroup("idle");
             unit->playinIdleAnimation = true;
 
             auto emote =ztgk::game::EMOTES::BUBBLE_TONGUE;

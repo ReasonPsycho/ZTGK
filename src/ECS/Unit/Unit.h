@@ -124,8 +124,13 @@ public:
 
     ztgk::game::EMOTES mostRecentEmote;
 
+    Speaker* speaker;
+
+    bool checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot();
 private:
     Vector2Int previousGridPosition;
+    void onFirstUpdate();
+    bool firstUpdate = true;
 
 };
 

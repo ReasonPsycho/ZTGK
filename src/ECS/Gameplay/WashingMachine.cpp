@@ -174,13 +174,13 @@ void WashingMachine::onPraniumDelivered() {
 
     if(currentPranium > 0){
         if(!ztgk::game::audioManager->isSoundPlaying("sfx_pralka1"))
-            ztgk::game::audioManager->playSound("sfx_pralka1", -1);
+            speaker->PlaySound("sfx_pralka1", -1);
     }
 
     if(currentPranium > 2){
         ztgk::game::audioManager->stopSound("sfx_pralka1");
         if(!ztgk::game::audioManager->isSoundPlaying("sfx_pralka2"))
-            ztgk::game::audioManager->playSound("sfx_pralka2", -1);
+            speaker->PlaySound("sfx_pralka2", -1);
 
     }
 
@@ -232,6 +232,8 @@ void WashingMachine::createWashingMachine(Model* model) {
 
     machineEntity->addComponent(std::make_unique<BoxCollider>(machineEntity, glm::vec3(5,5,5), WASHING_MACHINE));
 
+    machineEntity->addComponent(std::make_unique<Speaker>());
+    speaker = machineEntity->getComponent<Speaker>();
 }
 
 void WashingMachine::clearNextTile_walls() {

@@ -7,6 +7,7 @@
 
 #include "ECS/System.h"
 #include "WashingMachineTile.h"
+#include "ECS/Audio/Speaker.h"
 
 class WashingMachine : public System{
 public:
@@ -54,9 +55,7 @@ private:
     float currentSwayAngle = 0.0f;
     int swayDirection = 1;
     float swayHeight = 0.0f;
-
-
-
+    Speaker* speaker;
 };
 
 
