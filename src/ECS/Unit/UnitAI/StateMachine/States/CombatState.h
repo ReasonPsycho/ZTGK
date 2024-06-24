@@ -27,8 +27,9 @@ public:
     bool isAttackOnCooldown();
     static void applyDamage(Unit* unit, Unit* target, float dmg);
 
-private:
     void AttackTarget();
+    // spaghetti way of exposing attack logic without forcing target checks, for active non-offensive items without rewriting the logic
+    static void AttackSideFX(Item * useItem, Unit * unit, Unit * target);
 };
 
 

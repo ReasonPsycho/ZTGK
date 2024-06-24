@@ -115,7 +115,7 @@ void Item::do_ranged_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
 }
 
 void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
-    auto targets = usedItem->stats.aoe_range.find_my_allies({target->gridPosition.x, target->gridPosition.z}, me->IsAlly());
+    auto targets = me->equipment.range_of(usedItem)->find_my_allies({target->gridPosition.x, target->gridPosition.z}, me->IsAlly());
 
     for (auto & tgt : targets) {
         float totalHealAmount = usedItem->determine_damage(me, tgt, {me->gridPosition.x, me->gridPosition.z}); // hit point here is explosion center so original ME position - this is for beacon centered on unit
@@ -123,12 +123,23 @@ void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
     }
 }
 
-Unit *Item::default_determine_target(Unit *me, GridRange * range, bool findAlly) {
+Unit *Item::default_determine_target(Unit *me, GridRange * range) {
     std::vector<Unit *> sorted = {};
-    if (findAlly) sorted = range->find_my_allies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly());
-    else sorted = range->find_my_enemies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly());
+    sorted = range->find_my_enemies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly());
     std::sort(sorted.begin(), sorted.end(), [me](Unit * a, Unit * b) {
         return VectorUtils::GridDistance(me->gridPosition, a->gridPosition) < VectorUtils::GridDistance(me->gridPosition, b->gridPosition);
     });
+    return sorted.empty() ? nullptr : sorted.at(0);
+}
+
+Unit *Item::determine_healing_target(Unit *me, GridRange *range) {
+    std::vector<Unit *> sorted = {};
+    sorted = range->find_my_allies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly())
+            | std::views::filter([](Unit * u) { return u->stats.hp < u->stats.max_hp + u->stats.added.max_hp; })
+            | std::ranges::to<std::vector<Unit*>>();
+    std::sort(sorted.begin(), sorted.end(), [me](Unit * a, Unit * b) {
+        return VectorUtils::GridDistance(me->gridPosition, a->gridPosition) < VectorUtils::GridDistance(me->gridPosition, b->gridPosition);
+    });
+
     return sorted.empty() ? nullptr : sorted.at(0);
 }
