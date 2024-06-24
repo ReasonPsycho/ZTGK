@@ -240,6 +240,11 @@ void Unit::UpdateImpl() {
                 }
 
             }
+            if(currentMiningTarget != nullptr && checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot()){
+                miningTargets.erase(std::remove(miningTargets.begin(), miningTargets.end(), currentMiningTarget),
+                                    miningTargets.end());
+                currentMiningTarget = findClosestMineable();
+            }
         }
 
         if (hasMovementTarget) {
@@ -695,7 +700,7 @@ bool Unit::canPathToMiningTarget() {
         }
     }
     auto pathToTarget = pathfinding.FindPath(gridPosition,
-                                             currentMiningTarget->gridPosition
+                                             pathfinding.GetNearestVacantTile(currentMiningTarget->gridPosition, gridPosition)
                                                                               );
     return !pathToTarget.empty();
 }
@@ -797,5 +802,17 @@ void Unit::onFirstUpdate() {
     speaker = parentEntity->getComponent<Speaker>();
 
     firstUpdate = false;
+}
+
+bool Unit::checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot(){
+    for (auto &unit: ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents) {
+        if(unit == this){
+            continue;
+        }
+        if (unit->isAlly && unit->hasMiningTarget && unit->currentMiningTarget == currentMiningTarget) {
+            return true;
+        }
+    }
+    return false;
 }
 

@@ -126,6 +126,7 @@ public:
 
     Speaker* speaker;
 
+    bool checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot();
 private:
     Vector2Int previousGridPosition;
     void onFirstUpdate();

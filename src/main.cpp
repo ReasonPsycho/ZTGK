@@ -1588,10 +1588,10 @@ void update() {
     scene.systemManager.getSystem<ProjectileSystem>()->Update();
     scene.systemManager.getSystem<Grid>()->Update();
     scene.systemManager.getSystem<AudioManager>()->Update();
-
+//
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
-//            spdlog::info("Unit: {} -- State: {}", u->name, u->currentState->name);
+//            spdlog::info("Unit: {} -- State: {}  -- currentMinTarg {} {}", u->name, u->currentState->name, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.x, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.z);
 //    }
 
 
