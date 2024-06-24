@@ -21,6 +21,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/CombatState.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Utils/CooldownComponentXDD.h"
+#include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 150,
@@ -422,34 +423,24 @@ void Unit::UpdateImpl() {
 Unit *Unit::GetClosestEnemyInWeaponRange() {
     std::vector<Unit *> enemies;
 
-    bool mySide = isAlly;
     if (equipment.use_default()) {
-        auto found = equipment.rangeEff0.find_enemies({gridPosition.x, gridPosition.z}, mySide);
-        enemies.insert(enemies.end(), found.begin(), found.end());
-    } else {
-        if (equipment.item1 != nullptr && equipment.item1->offensive) {
-            auto found = equipment.rangeEff1.find_enemies({gridPosition.x, gridPosition.z}, mySide);
-            enemies.insert(enemies.end(), found.begin(), found.end());
-        }
-        if (equipment.item2 != nullptr && equipment.item2->offensive) {
-            auto found = equipment.rangeEff2.find_enemies({gridPosition.x, gridPosition.z}, mySide);
-            enemies.insert(enemies.end(), found.begin(), found.end());
-        }
+        return equipment.item0->determine_target(this);
     }
 
-    //remove enemies that are not alive
-    enemies.erase(std::remove_if(enemies.begin(), enemies.end(), [](Unit *enemy) {
-        return !enemy->isAlive;
-    }), enemies.end());
-
+    if (equipment.item1 != nullptr && equipment.item1->offensive) {
+        enemies.push_back(equipment.item1->determine_target(this));
+    }
+    if (equipment.item2 != nullptr && equipment.item2->offensive) {
+        enemies.push_back(equipment.item2->determine_target(this));
+    }
 
     if (enemies.empty())
         return nullptr;
 
-    // todo see if this kills performance
+    // this just compares 2 values at most now
     std::sort(enemies.begin(), enemies.end(), [this](Unit *enemy, Unit *enemy1) {
-        return VectorUtils::Distance(this->gridPosition, enemy->gridPosition) <
-               VectorUtils::Distance(this->gridPosition, enemy1->gridPosition);
+        return VectorUtils::GridDistance(this->gridPosition, enemy->gridPosition) <
+               VectorUtils::GridDistance(this->gridPosition, enemy1->gridPosition);
     });
     return enemies.at(0);
 //
@@ -650,6 +641,18 @@ void Unit::DIEXD() {
         }
     }
 
+    //remove all projectiles that target or come from this unit (the projectile will handle this on its update)
+    for (auto projectile : ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->projectiles
+        | std::views::filter([this](Projectile *projectile) { return projectile->unit == this || projectile->target == this; })) {
+        projectile->unit = nullptr;
+        projectile->target = nullptr;
+    }
+
+    InventoryManager::instance->unassign_item(this, short(0));
+    if(equipment.item1)
+        InventoryManager::instance->unassign_item(this, 1);
+    if(equipment.item2)
+        InventoryManager::instance->unassign_item(this, 2);
 
     getEntity()->Destroy();
 

@@ -7,7 +7,7 @@
 #include "ECS/Unit/UnitAI/StateMachine/States/CombatState.h"
 #include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
-Projectile::Projectile(glm::vec3 startPos, glm::vec3 targetPos,Unit* un, Unit* targ, float dmg) {
+Projectile::Projectile(glm::vec3 startPos, glm::vec3 targetPos,Unit* un, Unit* targ, Item * source, float dmg) {
     name= "Projectile";
     this->startPosition = startPos;
     this->targetPosition = targetPos;
@@ -16,8 +16,13 @@ Projectile::Projectile(glm::vec3 startPos, glm::vec3 targetPos,Unit* un, Unit* t
     worldPosition = startPosition;
     this->target = targ;
     this->unit = un;
+    this->sourceItem = source;
     this->damage = dmg;
-    ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->addComponent(this);
+
+    this->onHit = [this]() -> std::vector<Unit *>{
+        CombatState::applyDamage(unit, target, damage);
+        return {target};
+    };
 
 }
 
@@ -36,7 +41,7 @@ std::vector<glm::vec3> Projectile::generateCurvePoints(int steps) {
 void Projectile::UpdateImpl() {
     // Define the margin of error for checking the target position
     float epsilon = 0.5f;
-    if(target->getEntity() == nullptr || unit->getEntity() == nullptr){
+    if(target == nullptr || unit == nullptr){
         ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->removeComponent(this);
         getEntity()->Destroy();
         return;
@@ -52,7 +57,14 @@ void Projectile::UpdateImpl() {
     // Check if the projectile has reached the target using the margin of error
     if (glm::length(worldPosition - targetPosition) < epsilon || curvePoints.empty()) {
         // Apply damage and remove the projectile
-        CombatState::applyDamage(unit, target, damage);
+        auto damagedUnits = onHit();
+        if (unit != nullptr) {
+            for (auto damagedUnit: damagedUnits) {
+                if (damagedUnit == nullptr) continue;
+                if (!damagedUnit->hasCombatTarget)
+                    damagedUnit->combatTarget = unit;
+            }
+        }
         ztgk::game::scene->systemManager.getSystem<ProjectileSystem>()->removeComponent(this);
         getEntity()->Destroy();
         return;

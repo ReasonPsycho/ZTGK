@@ -12,8 +12,12 @@ class Item;
 struct s_item_types {
     unsigned hands;
     unsigned mop;
+    unsigned super_mop;
     unsigned water_gun;
+    unsigned beacon;
     unsigned test_buff_item;
+    unsigned detergent;
+    unsigned pendant;
     unsigned pranium_ore;
 
     std::unordered_map<unsigned, std::string> map;

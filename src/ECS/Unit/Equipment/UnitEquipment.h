@@ -66,6 +66,13 @@ public:
                 return nullptr;
         }
     }
+    GridRange * range_of(Item * item) {
+        if (item == item0) return &rangeEff0;
+        if (item == item1) return &rangeEff1;
+        if (item == item2) return &rangeEff2;
+        spdlog::error("Accessing grid range for incorrect item!");
+        return nullptr;
+    }
     bool has(Item * item) {
         return item0 == item || item1 == item || item2 == item;
     }

@@ -2376,9 +2376,12 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .unitCount = 3,                        //3        <---
             .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
             .lootTable = {
-                {1, 1.f, 0.f},
-                {3, 0.5f, 0.5f},
-                {2, 0.f, 1.f},
+                {static_cast<int>(Item::item_types.mop), 1.f, 0.f},
+                {static_cast<int>(Item::item_types.super_mop), 0.5f, 0.5f},
+                {static_cast<int>(Item::item_types.water_gun), 0.f, 1.f},
+                {static_cast<int>(Item::item_types.beacon), 10.f, 0.f, 2},
+                {static_cast<int>(Item::item_types.detergent), 0.5f, 0.5f},
+                {static_cast<int>(Item::item_types.pendant), 0.5f, 1.5f},
             },
 
     };

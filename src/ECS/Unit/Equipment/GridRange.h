@@ -33,10 +33,10 @@ struct GridRange {
 
     // Finds any type of unit within the effective range. Excludes self.
     std::vector<Unit *> find_any(glm::ivec2 center);
-    // Finds units with `isAlly() == false` within the effective range. Excludes self.
-    std::vector<Unit *> find_enemies(glm::ivec2 center, bool mySide);
-    // Finds units with `isAlly() == true` within the effective range. Excludes self.
-    std::vector<Unit *> find_allies(glm::ivec2 center);
+    // Finds units with `isAlly() != myside` within the effective range. Excludes self.
+    std::vector<Unit *> find_my_enemies(glm::ivec2 center, bool mySide);
+    // Finds units with `isAlly() == myside` within the effective range. Excludes self.
+    std::vector<Unit *> find_my_allies(glm::ivec2 center, bool mySide);
 
     void imgui_preview() const;
 };

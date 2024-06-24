@@ -168,6 +168,10 @@ public:
         return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
     }
 
+    static int GridDistance(Vector2Int a, Vector2Int b) {
+        return abs(a.x - b.x) + abs(a.z - b.z);
+    }
+
     static float DistanceSquared(Vector2Int a, Vector2Int b) {
         return pow(a.x - b.x, 2) + pow(a.z - b.z, 2);
     }

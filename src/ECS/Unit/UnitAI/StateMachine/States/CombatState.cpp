@@ -116,38 +116,22 @@ void CombatState::AttackTarget() {
     auto target = unit->combatTarget;
     if(target == nullptr) return; //todo expand on this
 
-    float totalAttackDamage =
-            (useItem->stats.dmg + useItem->stats.dmg * unit->stats.added.dmg_perc + unit->stats.added.dmg_flat)
-            * (1 - target->stats.added.def_perc) - target->stats.added.def_flat;
-    totalAttackDamage = std::max(totalAttackDamage, 0.0f);
-
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
-    if(useItem->stats.range.add > 1){
-        auto projectileEntity = ztgk::game::scene->addEntity("Projectile");
-        projectileEntity->transform.setLocalPosition(unit->worldPosition);
-        projectileEntity->addComponent(std::make_unique<Render>(ztgk::game::projectileModel));
-        projectileEntity->addComponent(std::make_unique<Projectile>(unit->worldPosition,  target->worldPosition,unit, target, totalAttackDamage));
-        projectileEntity->transform.setLocalScale({0.1f, 0.1f, 0.1f});
-        projectileEntity->updateSelfAndChild();
-    }
-    else{
-        auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
-        if(anim == nullptr)
-        {
-            spdlog::error("No animation player component found");
-        }
-        else
-        {
-            string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
-            anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
-        }
-        applyDamage(unit, target, totalAttackDamage);
+
+    useItem->do_attack(unit, target);
+
+    auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+    if(anim == nullptr) {
+        spdlog::error("No animation player component found");
+    } else {
+        string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
+        anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
     }
 
 }
 
- void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
+void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     target->stats.hp -= damage;
     ColorMask* cm;
     if(target!= nullptr && target->getEntity() != nullptr)
@@ -161,16 +145,18 @@ void CombatState::AttackTarget() {
         target->getEntity()->addComponent(std::make_unique<ColorMask>());
         cm = target->getEntity()->getComponent<ColorMask>();
     }
-    cm->AddMask("DMG_taken", {120.0f/250.0f, 0, 0, 0.5f}, 0.6f);
-    if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
-        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = target->stats.max_hp + target->stats.added.max_hp;
-        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(target->stats.hp);
+
+    if (damage < 0) { // heal
+        // todo make tile flash this color too
+        cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
+        ztgk::game::audioManager->playRandomSoundFromGroup("heal");
+        unit->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
+    } else {
+        // todo make tile flash this color too
+        cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
+        ztgk::game::audioManager->playRandomSoundFromGroup("punch");
+        unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
     }
-
-
-    ztgk::game::audioManager->playRandomSoundFromGroup("punch");
-
-     unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
 
     if(target->stats.hp <= 0){
         ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
