@@ -4,7 +4,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/Beacon.h"
 #include "ECS/Unit/Unit.h"
 
-Beacon::Beacon() : Item("Soap Refill", "Refresh for the bravest!", false, ItemStats(5, 10, GridRange(4, 0), GridRange(0, 0)), true) {
+Beacon::Beacon() : Item("Soap Refill", "Refresh for the bravest!", false, ItemStats(10, 5, GridRange(4, 0), GridRange(0, 0)), true) {
     active = true;
     icon_path = "res/textures/icons/item_beacon.png";
     model = ztgk::game::tidyPodLauncherModel; // todo change model
