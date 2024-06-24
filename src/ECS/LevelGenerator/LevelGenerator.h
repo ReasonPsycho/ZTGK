@@ -22,6 +22,12 @@ struct ItemTemplate {
 	int maxCount = unlimited;
 };
 
+struct EnemyTemplate {
+	char id = '?';
+	float chanceEarlyGame = 1.f;
+	float chanceLateGame = 1.f;
+};
+
 struct LevelLayout {
 	struct Tile {
 		enum class Type {
@@ -31,12 +37,12 @@ struct LevelLayout {
 			ore,
 			core,
 			unit,
-			bug,
-            shroom
+			enemy,
 		};
 
 		Type type = Type::wall;
 		int itemId = -1;
+		char enemyId = '?';
 		int pocketIndex = -1;
 		bool dfsVisited = false;
 	};
@@ -66,6 +72,7 @@ public:
 		int unitCount {};
 		int chestCount {};
 		std::vector<ItemTemplate> lootTable {};
+		std::vector<EnemyTemplate> encounterTable {};
 	};
 
 	inline LevelGenerator(LevelLayout& level) noexcept : level(level) {}
@@ -114,6 +121,7 @@ private:
 	bool addChestToPocket(int index, PcgEngine& rand) noexcept;
 
 	void assignChestItems(glm::vec2 center, const std::vector<ItemTemplate>& lootTable, PcgEngine& rand);
+	void assignEnemyTypes(glm::vec2 center, const std::vector<EnemyTemplate>& encounterTable, PcgEngine& rand);
 
 	static constexpr glm::ivec2 directions[4] {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
