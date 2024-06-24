@@ -12,4 +12,9 @@ Beacon::Beacon() : Item("Soap Refill", "Refresh for the bravest!", false, ItemSt
     determine_target = [this](Unit * me) { return Item::determine_healing_target(me, me->equipment.range_of(this)); };
     do_attack = [this](Unit * me, Unit * target){ Item::do_heal(me, target, this); };
     determine_damage = [this](Unit * me, Unit * target, glm::vec2 hitPoint) { return Item::heal_formula(me, target, this); };
+
+    highlight_passive_stats = {
+        {"res/textures/icons/stat/hp.png", "5"},
+        {"res/textures/icons/stat/rng.png", "4"}
+    };
 }
