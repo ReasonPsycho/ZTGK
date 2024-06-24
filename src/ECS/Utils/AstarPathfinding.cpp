@@ -364,4 +364,33 @@ Vector2Int AstarPathfinding::GetNearestVacantTileInRange(Vector2Int target, Vect
     return GetNearestVacantTileInRange(target, origin, range - 1);
 }
 
+Vector2Int AstarPathfinding::old_GetNearestVacantTile(Vector2Int target, Vector2Int origin) {
+    ZoneScopedN("GetNearestVacantTile");
+    Vector2Int directions[] = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1)};
+    std::vector<Vector2Int> list;
+    list.push_back(target);
+    std::unordered_set<Vector2Int> visited;
+    visited.insert(target);
+
+    while(list.size() > 0){
+        Vector2Int current = list[0];
+        list.erase(list.begin());
+        if(grid->getTileAt(current)->vacant() || current == origin){
+            return current;
+        }
+
+        for(Vector2Int dir : directions){
+            Vector2Int next = current + dir;
+            if(grid->getTileAt(next)!= nullptr && !visited.contains(next)){
+                list.push_back(next);
+                visited.insert(next);
+            }
+        }
+        std::sort(list.begin(), list.end(), [origin](Vector2Int a, Vector2Int b){
+            return VectorUtils::Distance(a, origin) < VectorUtils::Distance(b, origin);
+        });
+    }
+    return target;
+}
+
 
