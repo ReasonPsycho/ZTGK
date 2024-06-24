@@ -123,12 +123,23 @@ void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
     }
 }
 
-Unit *Item::default_determine_target(Unit *me, GridRange * range, bool findAlly) {
+Unit *Item::default_determine_target(Unit *me, GridRange * range) {
     std::vector<Unit *> sorted = {};
-    if (findAlly) sorted = range->find_my_allies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly());
-    else sorted = range->find_my_enemies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly());
+    sorted = range->find_my_enemies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly());
     std::sort(sorted.begin(), sorted.end(), [me](Unit * a, Unit * b) {
         return VectorUtils::GridDistance(me->gridPosition, a->gridPosition) < VectorUtils::GridDistance(me->gridPosition, b->gridPosition);
     });
+    return sorted.empty() ? nullptr : sorted.at(0);
+}
+
+Unit *Item::determine_healing_target(Unit *me, GridRange *range) {
+    std::vector<Unit *> sorted = {};
+    sorted = range->find_my_allies({me->gridPosition.x, me->gridPosition.z}, me->IsAlly())
+            | std::views::filter([](Unit * u) { return u->stats.hp < u->stats.max_hp + u->stats.added.max_hp; })
+            | std::ranges::to<std::vector<Unit*>>();
+    std::sort(sorted.begin(), sorted.end(), [me](Unit * a, Unit * b) {
+        return VectorUtils::GridDistance(me->gridPosition, a->gridPosition) < VectorUtils::GridDistance(me->gridPosition, b->gridPosition);
+    });
+
     return sorted.empty() ? nullptr : sorted.at(0);
 }

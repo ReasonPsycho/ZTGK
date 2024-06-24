@@ -116,6 +116,10 @@ void CombatState::AttackTarget() {
     auto target = unit->combatTarget;
     if(target == nullptr) return; //todo expand on this
 
+    AttackSideFX(useItem, unit, target);
+}
+
+void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
 
@@ -128,7 +132,7 @@ void CombatState::AttackTarget() {
         string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
         anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
     }
-
+    // todo highlight tiles, play particles
 }
 
 void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
