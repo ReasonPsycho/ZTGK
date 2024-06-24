@@ -58,7 +58,7 @@ public:
     void UpdateData(int height, int width) override;
 
 private:
-    float near_plane = 0.1f, far_plane = 17.0f;
+    float near_plane = 0.1f, far_plane = 15.5f;
     std::vector<glm::mat4> shadowTransforms;
 };
 
