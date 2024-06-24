@@ -14,8 +14,8 @@ Speaker::Speaker() {
 }
 
 void Speaker::showImGuiDetailsImpl(Camera* camera) {
-    ImGui::Text("Speaker");
-    // Add ImGui controls for volume and other properties if needed
+//    ImGui::Text("Speaker");
+//    // Add ImGui controls for volume and other properties if needed
 }
 
 void Speaker::PlaySound(std::string soundName, int loops) {
