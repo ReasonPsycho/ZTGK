@@ -6,10 +6,14 @@
 #include "ECS/Unit/Unit.h"
 #include "ECS/Unit/UnitSystem.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Mop.h"
+#include "ECS/Unit/Equipment/ConcreteItems/SuperMop.h"
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Hands.h"
 #include "ECS/Unit/Equipment/ConcreteItems/TestBuffItem.h"
 #include "ECS/Unit/Equipment/ConcreteItems/PraniumOre.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Pendant.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Detergent.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Beacon.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
 #include "ECS/Utils/Util.h"
 
@@ -20,8 +24,12 @@ void InventoryManager::init() {
 
     item_constructors.emplace(Item::item_types.hands, [](){ return new Hands(); });
     item_constructors.emplace(Item::item_types.mop, [](){ return new Mop(); });
+    item_constructors.emplace(Item::item_types.super_mop, [](){ return new SuperMop(); });
     item_constructors.emplace(Item::item_types.water_gun, [](){ return new WaterGun(); });
-    item_constructors.emplace(Item::item_types.test_buff_item, [](){ return new Mop(); });
+    item_constructors.emplace(Item::item_types.beacon, [](){ return new Beacon(); });
+    item_constructors.emplace(Item::item_types.test_buff_item, [](){ return new TestBuffItem(); });
+    item_constructors.emplace(Item::item_types.detergent, [](){ return new Detergent(); });
+    item_constructors.emplace(Item::item_types.pendant, [](){ return new Pendant(); });
     item_constructors.emplace(Item::item_types.pranium_ore, [](){ return new PraniumOre(); });
 }
 

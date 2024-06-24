@@ -13,6 +13,7 @@ struct ItemStats {
     float dmg{0};
     float cd_max_sec{1};
     GridRange range{};
+    GridRange aoe_range{};
     // ability
 
     Modifiers add_to_unit{};
@@ -36,6 +37,28 @@ public:
     ItemStats stats{};
     bool takesTwoSlots;
     Model * model;
+    static inline const std::string ally_attack_animation_path = "res/models/gabka/pan_gabka_attack.fbx";
+    static inline const std::string enemy_attack_animation_path = "";
+
+// behavior implementations
+    static void do_meele_attack(Unit * me, Unit * target, Item * usedItem);
+    static void do_meele_aoe_attack(Unit * me, Unit * target, Item * usedItem);
+    static void do_ranged_attack(Unit * me, Unit * target, Item * usedItem);
+    static void do_ranged_aoe_attack(Unit * me, Unit * target, Item * usedItem);
+    static void do_heal(Unit * me, Unit * target, Item * usedItem);
+
+    static Unit * default_determine_target(Unit * me, GridRange * range, bool findAlly = false);
+    static void play_atk_anim(Unit * me);
+
+// damage formulas
+    static float default_damage_formula(Unit * me, Unit * target, Item * usedItem);
+    static float aoe_explosion_formula(Unit * me, Unit * target, Item * usedItem, glm::vec2 explosionPoint);
+    static float heal_formula(Unit * me, Unit * target, Item * usedItem);
+
+// behavior references
+    std::function<Unit *(Unit * me)> determine_target;
+    std::function<void(Unit * me, Unit * target)> do_attack;
+    std::function<float(Unit * me, Unit * target, glm::vec2 hitPoint)> determine_damage;
 
     std::unordered_map<std::string, std::string> highlight_passive_stats = {};
 
