@@ -137,6 +137,10 @@ void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
 
 void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     target->stats.hp -= damage;
+    // avoid overheal
+    if (target->stats.hp > target->stats.max_hp + target->stats.added.max_hp)
+        target->stats.hp = target->stats.max_hp + target->stats.added.max_hp;
+
     ColorMask* cm;
     if(target!= nullptr && target->getEntity() != nullptr)
         cm = target->getEntity()->getComponent<ColorMask>();
@@ -154,12 +158,12 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
         // todo make tile flash this color too
         cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
         ztgk::game::audioManager->playRandomSoundFromGroup("heal");
-        unit->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
+        target->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
     } else {
         // todo make tile flash this color too
         cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
         ztgk::game::audioManager->playRandomSoundFromGroup("punch");
-        unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
+        target->tryToSendEmote(target->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
     }
 
     if(target->stats.hp <= 0){

@@ -101,7 +101,7 @@ namespace ztgk {
     
                 eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",item->stats.dmg);
                 // if there are more active items than just the beacon this needs to work similar to below or just make a new group
-                if (item->offensive) eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/dmg.png");
+                if (item->offensive) eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/atk.png");
                 else if (item->active) eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/hp.png");
                 eitem1->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",item->stats.range.add);
                 eitem1->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = item->stats.cd_max_sec;
@@ -130,7 +130,7 @@ namespace ztgk {
             auto eitem1 = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
             eitem1->getComponent<Text>()->content = "*No Item*";
             eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
-            eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/dmg.png");
+            eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/atk.png");
             ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
             ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
         }
@@ -149,7 +149,7 @@ namespace ztgk {
     
                 eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Text>()->content = std::format("{}",item->stats.dmg);
                 // if there are more active items than just the beacon this needs to work similar to below or just make a new group
-                if (item->offensive) eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/dmg.png");
+                if (item->offensive) eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/atk.png");
                 else if (item->active) eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/hp.png");
                 eitem2->getChild("Offensive Stats")->getChild("RNG")->getComponent<Text>()->content = std::format("{}",item->stats.range.add);
                 eitem2->getChild("Offensive Stats")->getChild("CD")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = item->stats.cd_max_sec;
@@ -178,7 +178,7 @@ namespace ztgk {
             auto eitem2 = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #2");
             eitem2->getComponent<Text>()->content = "*No Item*";
             eitem2->getComponent<Sprite>()->load("res/textures/question_mark.png");
-            eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/dmg.png");
+            eitem2->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/atk.png");
             ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_offensive)->setHidden(true);
             ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
         }

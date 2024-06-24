@@ -34,10 +34,10 @@ void HUDSlider::set(float value) {
     this->value = clamp(value, 0.0f, 1.0f);
     switch (direction) {
     case HORIZONTAL:
-        bar->size.x = barBackground->size.x * value;
+        bar->size.x = barBackground->size.x * this->value;
         break;
     case VERTICAL:
-        bar->size.y = barBackground->size.y * value;
+        bar->size.y = barBackground->size.y * this->value;
         break;
     }
 
