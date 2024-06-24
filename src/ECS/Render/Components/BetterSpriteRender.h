@@ -22,6 +22,7 @@ public:
     AABB aabb= AABB(glm::vec3(-0.1),glm::vec3(0.1));
 
     bool isConstant = false;
+    bool isInFogOfWar = false;
     bool isBilborded = true;
     float timer = 0.0f;
     float scale = 1.0f;

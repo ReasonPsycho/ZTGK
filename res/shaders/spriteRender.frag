@@ -23,7 +23,7 @@ void main()
     vec4 diffuse = vec4(texture(diffuseTexture, texCoords));
 
     diffuse.a *= alpha;
-    if(diffuse.a < 0.1)
+    if(diffuse.a < 0.02)
     discard;
     
     vec3 normal = fs_in.Normal;

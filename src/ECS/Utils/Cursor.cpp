@@ -58,7 +58,9 @@ void Cursor::move(glm::vec2 newpos) {
             *ztgk::game::signalQueue += MouseMoveSignalData::signal(ui_pos,ui_prev_pos,"Cursor forwarding MOVE");
         }
     } else {
-        ztgk::game::camera->ProcessMouseMovement(-glfw_offset.x, glfw_offset.y, true, Time::Instance().DeltaTime());
+        if (ztgk::game::gameStarted) {
+            ztgk::game::camera->ProcessMouseMovement(-glfw_offset.x, glfw_offset.y, true, Time::Instance().DeltaTime());
+        }
     }
     glfw_prev_pos = newpos;
 }
