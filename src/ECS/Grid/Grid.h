@@ -13,6 +13,7 @@
 #include "ECS/Scene.h"
 #include "ECS/Render/ModelLoading/Model.h"
 #include "Chunk.h"
+#include "ECS/Utils/RNG.h"
 
 class CollisionSystem;
 

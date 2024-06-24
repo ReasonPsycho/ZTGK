@@ -1814,8 +1814,9 @@ void imgui_end() {
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
 
-    camera.MoveCamera(window);
-
+    if (ztgk::game::gameStarted) {
+        camera.MoveCamera(window);
+    }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!timeStepKeyPressed) {
             if (timeStep == 0) {
@@ -1861,14 +1862,18 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
-    ztgk::game::cursor.move({xposIn, yposIn});
+        ztgk::game::cursor.move({xposIn, yposIn});
+    
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    ztgk::game::cursor.scroll({xoffset, yoffset});
+    if (ztgk::game::gameStarted) {
+
+        ztgk::game::cursor.scroll({xoffset, yoffset});
     camera.MoveCamera(yoffset);
+    }
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {

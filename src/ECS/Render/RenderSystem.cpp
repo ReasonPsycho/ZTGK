@@ -8,7 +8,6 @@
 void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
     regularShader->use();
 
-
     Frustum frustum = createFrustumFromCamera(*camera);
 
     for (auto &renderComponent: renderComponents) {
@@ -16,7 +15,9 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
             renderComponent->draw(*regularShader, &frustum);
         }
     }
-    
+    PhongPipeline *phongPipline = systemManager->getSystem<PhongPipeline>();\
+    glEnable(GL_BLEND);
+    glDisablei(GL_BLEND, phongPipline->colorAttachments[2]);
     for (auto & betterRender: betterRenderPlayerComponents) {
         if(betterRender!= nullptr && betterRender->getEntity() != nullptr) {
             if (betterRender->draw(ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->spriteRenderShader,
@@ -28,7 +29,9 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
             }
         }
     }
-    
+    glDisable(GL_BLEND);
+
+
 }
 
 void RenderSystem::SimpleDrawScene(Shader *regularShader, glm::vec3 viewPos, float farPlane) {
