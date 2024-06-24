@@ -9,7 +9,7 @@
 
 class WaterGun : public Item{
 public:
-    WaterGun() : Item("Water Gun", "A water gun to clean the floor", true, ItemStats(10, 2, GridRange(3, 0), GridRange(1, 0)), true) {
+    WaterGun() : Item("Capsule Gun", "Works on 100% common stains.", true, ItemStats(15, 2, GridRange(3, 0), GridRange(2, 0)), true) {
         icon_path = "res/textures/icons/item_tidePodLauncher.png";
         model = ztgk::game::tidyPodLauncherModel;
 

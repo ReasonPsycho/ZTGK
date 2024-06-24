@@ -131,8 +131,7 @@ void CombatState::AttackTarget() {
 
 }
 
-// todo take mask data, emote sets, sound sets
- void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
+void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     target->stats.hp -= damage;
     ColorMask* cm;
     if(target!= nullptr && target->getEntity() != nullptr)
@@ -146,17 +145,18 @@ void CombatState::AttackTarget() {
         target->getEntity()->addComponent(std::make_unique<ColorMask>());
         cm = target->getEntity()->getComponent<ColorMask>();
     }
-    cm->AddMask("DMG_taken", {120.0f/250.0f, 0, 0, 0.5f}, 0.6f);
-// delete this, update does this on its own
-    if (ztgk::game::ui_data.tracked_unit_id == target->uniqueID) {
-        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->displayMax = target->stats.max_hp + target->stats.added.max_hp;
-        ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Display Bar")->getComponent<HUDSlider>()->set_in_display_range(target->stats.hp);
+
+    if (damage < 0) { // heal
+        // todo make tile flash this color too
+        cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
+        ztgk::game::audioManager->playRandomSoundFromGroup("heal");
+        unit->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
+    } else {
+        // todo make tile flash this color too
+        cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
+        ztgk::game::audioManager->playRandomSoundFromGroup("punch");
+        unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
     }
-
-
-    ztgk::game::audioManager->playRandomSoundFromGroup("punch");
-
-     unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
 
     if(target->stats.hp <= 0){
         ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
