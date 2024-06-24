@@ -1702,6 +1702,10 @@ void imgui_render() {
                 {1, 0.5f, 0.5f},
                 {2, 0.f, 1.f},
             },
+            .encounterTable = {
+                {'x', 1.f, 1.f},
+                {'s', 0.f, 2.f},
+            },
     };
     static char seedString[64] = "";
     ImGui::Begin("Level generator");
@@ -2391,7 +2395,10 @@ void gen_and_load_lvl(bool gen_new_lvl) {
                 {static_cast<int>(Item::item_types.detergent), 0.5f, 0.5f},
                 {static_cast<int>(Item::item_types.pendant), 0.5f, 1.5f},
             },
-
+            .encounterTable = {
+                {'x', 1.f, 1.f},
+                {'s', 0.f, 2.f},
+            },
     };
 
     static char seedString[64] = "";
