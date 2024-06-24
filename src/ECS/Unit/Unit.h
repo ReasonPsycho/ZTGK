@@ -124,8 +124,12 @@ public:
 
     ztgk::game::EMOTES mostRecentEmote;
 
+    Speaker* speaker;
+
 private:
     Vector2Int previousGridPosition;
+    void onFirstUpdate();
+    bool firstUpdate = true;
 
 };
 

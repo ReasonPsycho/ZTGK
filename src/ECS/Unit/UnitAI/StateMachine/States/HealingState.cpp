@@ -46,7 +46,7 @@ void HealingState::HealSelf() {
        unit->stats.hp += healingAmount;
        lastHealingTime = glfwGetTime();
        colorMask->AddMask("Healing", glm::vec4(0, 255, 0, 255), 1);
-       ztgk::game::audioManager->playRandomSoundFromGroup("heal");
+        unit->speaker->PlayRandomSoundFromGroup("heal");
    }
     else{
         auto value = colorMask->GetMaskColor("Healing").a - 255.f * 1.3*Time::Instance().DeltaTime();

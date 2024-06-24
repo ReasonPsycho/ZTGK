@@ -149,17 +149,17 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     if (damage < 0) { // heal
         // todo make tile flash this color too
         cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
-        ztgk::game::audioManager->playRandomSoundFromGroup("heal");
+        unit->speaker->PlayRandomSoundFromGroup("heal");
         unit->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
     } else {
         // todo make tile flash this color too
         cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
-        ztgk::game::audioManager->playRandomSoundFromGroup("punch");
+        unit->speaker->PlayRandomSoundFromGroup("punch");
         unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
     }
 
     if(target->stats.hp <= 0){
-        ztgk::game::audioManager->playRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
+        unit->speaker->PlayRandomSoundFromGroup(target->isAlly ? "deathSponge" : "deathEnemy");
 
         unit->hasCombatTarget = false;
         target->isAlive = false;
