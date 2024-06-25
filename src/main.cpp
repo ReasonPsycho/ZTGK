@@ -1580,10 +1580,6 @@ void update() {
         ztgk::game::audioManager->playAmbientMusic();
     }
 
-    //UpdateImpl mouse position
-//    mouseX = mouseio.MousePos.x;
-//    mouseY = mouseio.MousePos.y;
-
     ztgk::game::cursor.update();
     scene.systemManager.Update();
     scene.updateScene();
@@ -1594,9 +1590,18 @@ void update() {
     scene.systemManager.getSystem<UnitSystem>()->Update();
     scene.systemManager.getSystem<WashingMachine>()->Update();
 
+    for (auto tile : tilesSelectedToMine) {
+        tile->setHighlight(CLEAR);
+        tile->setHighlightPresetFromState();
+    }
+    tilesSelectedToMine.clear();
     update_dragged_tiles();
-    for (auto tile: selectedTiles) {
-        scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(TileSelectionState::SELECTION_LMB_GREEN);
+    for (auto sponge : scene.systemManager.getSystem<UnitSystem>()->allies) {
+        for (auto mineable : sponge->miningTargets)
+            tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
+    }
+    for (auto tile: tilesSelectedToMine) {
+        tile->setHighlight(TileHighlightState::SELECTION_RMB_BLUE);
     }
 
     scene.systemManager.getSystem<CollisionSystem>()->Update();
@@ -1919,12 +1924,19 @@ void update_dragged_tiles() {
         std::vector<Vector2Int> tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
         if (!selectedTiles.empty()) {
             for (auto tile: selectedTiles) {
-                scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
+                auto cTile = scene.systemManager.getSystem<Grid>()->getTileAt(tile);
+                cTile->setHighlight(CLEAR);
+                cTile->setHighlightPresetFromState();
             }
         }
         selectedTiles = tilesInArea;
         for(auto tile : tilesInArea){
-            scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(SELECTION_LMB_GREEN);
+            auto cTile = scene.systemManager.getSystem<Grid>()->getTileAt(tile);
+            if (isLeftMouseButtonHeld)
+                cTile->setHighlight(SELECTION_LMB_GREEN);
+            // do not select it blue - that is handled every update just for mining targets
+            else if (isRightMouseButtonHeld)
+                cTile->setHighlight(SELECTION_RMB_BLUE);
         }
 
     }
@@ -1945,12 +1957,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
         Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
         tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
-        for (auto tile: tilesInArea) {
-            if (isRightMouseButtonHeld)
-                scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(SELECTION_LMB_GREEN);
-            else if (isLeftMouseButtonHeld)
-                scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(SELECTION_RMB_BLUE);
-        }
     }
 
     //if left mouse button is pressed, start timer and save position of the mouse press
@@ -1997,6 +2003,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             }
 
             if (hitAlly && hitAlly->isAlive) {
+                // todo handle selection with mods for unified controls, rework shortcuts
+                // do not update tile highlight here -> unit update will take care of this
                 //if it is already selected, deselect it
                 if (hitAlly->isSelected) {
                     scene.systemManager.getSystem<UnitSystem>()->deselectUnit(hitAlly);
@@ -2019,6 +2027,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 hitEnemy = ray->getHitEntity()->getComponent<Tile>()->unit;
             }
 
+            // unit update will take care of highlight under self
             if (hitEnemy)
                 ztgk::game::ui_data.tracked_unit_id = hitEnemy->uniqueID;
         }
@@ -2030,32 +2039,40 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 Vector2Int mouseHeldEndGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
 
                 for (auto tile: selectedTiles) {
-                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setHighlight(CLEAR);
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setHighlightPresetFromState();
                 }
 
                 tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
-                std::vector<Tile *> tiles;
+                std::vector<Tile *> cTilesInArea;
 
-                //get all tiles in the area
+                //get all cTilesInArea in the area
                 for (auto tile: tilesInArea) {
-                    tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
+                    cTilesInArea.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
                 }
                 std::vector<Unit *> Sponges;
+                std::vector<Unit *> enemies;
                 //get all units and mineables in the area
-                for (auto tile: tiles) {
+                for (auto tile: cTilesInArea) {
                     if (tile->unit != nullptr) {
                         if (tile->unit->isAlly) {
                             Sponges.push_back(tile->unit);
+                        } else {
+                            enemies.push_back(tile->unit);
                         }
                     }
                 }
 
+                // this will highlight allies
                 //select all Sponges in the area
                 if (!Sponges.empty()) {
                     for (auto sponge: Sponges) {
                         scene.systemManager.getSystem<UnitSystem>()->selectUnit(sponge);
                     }
+                } else if (!enemies.empty()) {
+                    // if there is group preview for enemies, select them here
+                    ztgk::game::ui_data.tracked_unit_id = enemies.at(0)->uniqueID;
                 }
 
             }
@@ -2166,8 +2183,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                             sponge->miningTargets.clear();
                             sponge->miningTargets.emplace_back(hitMineable);
                             sponge->hasMiningTarget = true;
-                            hitTile->setTileSelectionState(SELECTION_RMB_BLUE);
-                            tilesSelectedToMine.push_back(hitTile);
                             continue;
                         }
                     }
@@ -2202,22 +2217,23 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                         VectorUtils::GlmVec3ToVector3(mouseHeldEndPos));
 
                 for (auto tile: selectedTiles) {
-                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(NOT_SELECTED);
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setHighlight(CLEAR);
+                    scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setHighlightPresetFromState();
                 }
 
                 tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
                 update_dragged_tiles();
-                std::vector<Tile *> tiles;
+                std::vector<Tile *> cTilesInArea;
 
                 std::vector<IMineable *> Mineables = {};
                 std::vector<Unit *> Enemies = {};
 
                 for (auto tile: tilesInArea) {
-                    tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
+                    cTilesInArea.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
                 }
 
-                for (auto tile: tiles) {
+                for (auto tile: cTilesInArea) {
                     auto possibleMineable = tile->getEntity()->getMineableComponent<IMineable>(tile->getEntity());
                     if (possibleMineable != nullptr) {
                         Mineables.push_back(possibleMineable);
@@ -2255,8 +2271,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                                 if (!mineable->isMined) {
                                     Sponge->miningTargets.emplace_back(mineable);
                                     Sponge->hasMiningTarget = true;
-                                    tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
-                                    mineable->getEntity()->getComponent<Tile>()->setTileSelectionState(SELECTION_RMB_BLUE);
                                 }
                             }
                         }
@@ -2266,14 +2280,6 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         }
     }
     scene.systemManager.getSystem<WireRenderSystem>()->rayComponents.push_back(std::move(ray));
-//    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
-//        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(false);
-//        auto unit = scene.systemManager.getSystem<UnitSystem>()->selectedUnits[0];
-//        ztgk::game::ui_data.tracked_unit_id = unit->uniqueID;
-//    } else {
-//        ztgk::game::ui_data.tracked_unit_id = -1;
-//        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_middle)->setHidden(true);
-//    }
 
 }
 

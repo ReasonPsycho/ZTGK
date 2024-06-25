@@ -31,8 +31,8 @@ public:
     void fixOverlappingUnits();
 
     std::vector<Unit* > selectedUnits;
-
     std::vector<Unit *> unitComponents;
+    std::vector<Unit *> allies;
 
     std::vector<Vector2Int> getAllUnitsPositionsExceptMe(Unit* unit);
 private:

@@ -38,10 +38,11 @@ enum TileState {
     state_count // for ImGui
 };
 
-enum TileSelectionState {
-    NOT_SELECTED,
+enum TileHighlightState {
+    CLEAR,
     SELECTION_LMB_GREEN,
     SELECTION_RMB_BLUE,
+    MOVE_ORDER_YELLOW,
     HIGHLIGHT_ENEMY_RED,
     HIGHLIGHT_ITEM_GOLD,
     EXPLOSION_LIGHT_BLUE,
@@ -67,8 +68,8 @@ public:
     Chunk* chunk = nullptr;
     bool isInFogOfWar = false;
     float dirtinessLevel = 100;
-    void setTileSelectionState(TileSelectionState state );
-    TileSelectionState getTileSelectionState();
+    void setHighlight(TileHighlightState state);
+    TileHighlightState getTileSelectionState();
     // Constructors
     explicit Tile(Vector2Int index, Chunk* chunkPtr = nullptr, TileState state = FLOOR, std::string name = "Tile");
     Tile(int index_x, int index_z, Chunk* chunkPtr = nullptr, TileState state = FLOOR, std::string name = "Tile");
@@ -80,9 +81,11 @@ public:
     // Methods
     [[nodiscard]] bool vacant() const { return state == FLOOR; };
     void showImGuiDetailsImpl(Camera *camera) override;
-    void changeWallsSelection(TileSelectionState state);
+    void changeWallsSelection(TileHighlightState state);
     void changeWallsFogOfWarState(bool isInFogOfWar);
     void changeDirtinessLevel(float newDirtLevel);
+
+    void setHighlightPresetFromState();
 
     void UpdateImpl() override;
     
@@ -90,7 +93,7 @@ public:
 
     
 private:
-    TileSelectionState tileSelectionState = NOT_SELECTED;
+    TileHighlightState tileHighlightState = CLEAR;
     void tryToSendBubble();
 };
 

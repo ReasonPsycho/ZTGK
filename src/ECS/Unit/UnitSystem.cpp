@@ -21,7 +21,10 @@ UnitSystem::UnitSystem() {
 }
 
 void UnitSystem::addComponent(void *component) {
-    unitComponents.push_back((Unit *)component);
+    auto unit = (Unit *)component;
+    unitComponents.push_back(unit);
+    if (unit->IsAlly())
+        allies.push_back(unit);
 }
 
 void UnitSystem::removeComponent(void *component) {
@@ -35,6 +38,9 @@ void UnitSystem::removeComponent(void *component) {
     }
     if (std::find(selectedUnits.begin(), selectedUnits.end(), (Unit *)component) != selectedUnits.end()) {
         selectedUnits.erase(std::find(selectedUnits.begin(), selectedUnits.end(), (Unit *)component));
+    }
+    if (std::find(allies.begin(), allies.end(), (Unit *)component) != allies.end()) {
+        allies.erase(std::find(allies.begin(), allies.end(), (Unit *)component));
     }
 }
 

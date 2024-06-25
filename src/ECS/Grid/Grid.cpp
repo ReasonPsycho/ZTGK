@@ -230,6 +230,7 @@ void Grid::InitializeTileEntities() {
             }
 
             tile->isInFogOfWar = true;
+            tile->setHighlightPresetFromState();
 
             switch (tile->state) {
                 // todo these once relevant
