@@ -200,8 +200,10 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
         target->isAlive = false;
         unit->combatTarget = nullptr;
 
-        if(!target->isAlly)
-            target->DIEXD();
+        if(!target->isAlly){
+            target->isAlive = false;
+            target->flingDirection = target->calculateFlingDirection(unit->gridPosition);
+        }
         else{
             target->hasCombatTarget = false;
             target->combatTarget = nullptr;
@@ -280,4 +282,5 @@ bool CombatState::isAttackOnCooldown() {
         return false;
     }
     return true;
+
 }
