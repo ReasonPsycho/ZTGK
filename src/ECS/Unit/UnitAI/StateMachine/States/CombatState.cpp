@@ -129,14 +129,35 @@ void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
     if(anim == nullptr) {
         spdlog::error("No animation player component found");
     } else if(unit->unitType == UnitType::UNIT_SPONGE) {
-       string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_right.fbx";
-        anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+        //if unit has default weapon or has 2 weapons, change attack animation based on last used attack - right or left
+        if(unit->equipment.use_default() || (unit->equipment.item1 != nullptr && unit->equipment.item2 != nullptr)){
+            if(unit->lastUsedRightAttack){
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_left.fbx";
+                anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+
+            }
+            else{
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_right.fbx";
+                anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+            }
+            unit->lastUsedRightAttack = !unit->lastUsedRightAttack;
+        }
+        else{
+            if(unit->equipment.item1 != nullptr){
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_left.fbx";
+                anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+            }
+            else if(unit->equipment.item2 != nullptr){
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_right.fbx";
+                anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
+            }
+        }
     } else if(unit->unitType == UNIT_BUG){
         string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
         anim->PlayAnimation(modelPathBugMove, false, 5.0f);
     } else if(unit->unitType == UNIT_SHROOM){
-//        string modelPathShroomMove = "res/models/grzyb/grzyb_attack.fbx";
-//        anim->PlayAnimation(modelPathShroomMove, false, 5.0f);
+        string modelPathShroomMove = "res/models/Mushroom/shroom_spit.fbx";
+        anim->PlayAnimation(modelPathShroomMove, false, 5.0f);
     }
     // todo highlight tiles, play particles
 }
@@ -179,8 +200,10 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
         target->isAlive = false;
         unit->combatTarget = nullptr;
 
-        if(!target->isAlly)
-            target->DIEXD();
+        if(!target->isAlly){
+            target->isAlive = false;
+            target->flingDirection = target->calculateFlingDirection(unit->gridPosition);
+        }
         else{
             target->hasCombatTarget = false;
             target->combatTarget = nullptr;
@@ -260,10 +283,4 @@ bool CombatState::isAttackOnCooldown() {
     }
     return true;
 
-//    float time = unit->attackCooldown;
-//
-//    if(time > 1 / unit->added.attackSpeed){
-//        return false;
-//    }
-//    return true;
 }

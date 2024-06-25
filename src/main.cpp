@@ -721,28 +721,7 @@ void load_enteties() {
        gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
        gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
        gameObject->addComponent(make_unique<Render>(wall));;
-   
-      
-   //    gameObject = scene.addEntity("Dir light");
-       //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
-       gameObject = scene.addEntity("Point Light");;
-       gameObject->transform.setLocalPosition(glm::vec3(100, 16, 105));
-       gameObject->addComponent(make_unique<PointLight>(
-               PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
-                              0.05f)));
-   
-       gameObject = scene.addEntity("Point Light");;
-       gameObject->transform.setLocalPosition(glm::vec3(105, 16, 100));
-       gameObject->addComponent(make_unique<PointLight>(
-               PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
-                              0.05f)));
-       //  gameObject = scene.addEntity("Point Light 2");
-       // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-       gameObject = scene.addEntity("Spot Light");
-       gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
-       gameObject->addComponent(make_unique<SpotLight>(
-               SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
-                             glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
+
    */
 
     scene.systemManager.getSystem<LightSystem>()->Init();
@@ -750,140 +729,39 @@ void load_enteties() {
     scene.systemManager.getSystem<RenderSystem>()->tileModel = quadModel;
     scene.systemManager.getSystem<Grid>()->LoadTileEntities(1.0f);
 
-    //level gen and load___________________________________________________________________________________________________________________________________________________
-    //comment it out if u want fast load for testing
-
-//    gen_and_load_lvl(true);
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-
-//    auto ehud = scene.addEntity("HUD DEMO");
-//
-//    auto drag = scene.systemManager.getSystem<HUD>()->createButton(
-//        "Drag\nme!",
-//        {1000, 1000}, {100, 100}, ztgk::color.BLACK,
-//        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1}; },
-//        [](HUDHoverable *self) {
-//                                                       self->collisionSprite->color = ztgk::color.BLACK; },
-//                                                       [](HUDButton * self){
-//                                                   self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.75, 0.75, 0.75, 1};
-//            self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = Signal::signal_types.mouse_move_signal;
-//        },
-//        [](HUDButton *self) {
-//                                                    self->collisionSprite->color = ztgk::color.GRAY * glm::vec4{0.85, 0.85, 0.85, 1};
-//            self->parentEntity->getComponent<SignalReceiver>()->receive_type_mask = 0;
-//        },
-//        ehud
-//   );
-//    drag->addComponent(std::make_unique<SignalReceiver>(
-//                                                       0,
-//                                                       [drag](const Signal & signal) {
-//    auto data = dynamic_pointer_cast<MouseMoveSignalData>(signal.data);
-//            drag->getComponent<Sprite>()->pos = data->pos;
-//                                                    drag->getComponent<Text>()->pos = data->pos;
-//                                                }
-//    ));
-//
-//    scene.systemManager.getSystem<HUD>()->createButton("Button text",
-//                                                       {1750, 575}, {300, 100}, ztgk::color.CYAN, ztgk::color.TURQUOISE,
-//                                                       ztgk::color.BLUE, []() { spdlog::info("Button pressed!"); },
-//                                                       ehud);
-//
-//    scene.systemManager.getSystem<HUD>()->createButton(
-//            {1750, 775}, {300, 300},
-//            "res/textures/puni.png", "res/textures/container2.png",
-//            []() { spdlog::info("2SPR Button pressed!"); },
-//            ehud
-//    );
-//
-//    scene.systemManager.getSystem<HUD>()->createButton(
-//        "Func button textt", {1750, 1000}, {300, 150}, ztgk::color.BROWN,
-//        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; },
-//        [](HUDHoverable * self){ self->collisionSprite->color = ztgk::color.BROWN; },
-//        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.75, 0.75, 0.75, 1}; },
-//        [](HUDButton * self){ self->collisionSprite->color = ztgk::color.BROWN * glm::vec4{0.85, 0.85, 0.85, 1}; spdlog::info("Func Button pressed!"); },
-//        ehud
-//    );
-//
-//    scene.systemManager.getSystem<HUD>()->createSlider_Bar(
-//        HORIZONTAL, {100, 100}, {1000, 100},
-//        ztgk::color.CYAN * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.CYAN,
-//        ehud
-//    );
-//    scene.systemManager.getSystem<HUD>()->createSlider_Bar(
-//        HORIZONTAL, {100, 200}, {1000, 100},
-//        ztgk::color.BLUE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.BLUE,
-//        ehud, 0,
-//        true, 100
-//        );
-//
-//    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
-//        HORIZONTAL, {100, 300}, {1000, 100},
-//        ztgk::color.RED * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.RED,
-//        ehud
-//    );
-//    scene.systemManager.getSystem<HUD>()->createSlider_BarControllable(
-//        HORIZONTAL, {100, 400}, {1000, 100},
-//        ztgk::color.ROSE * glm::vec4{0.8, 0.8, 0.8, 1}, ztgk::color.ROSE,
-//        ehud, 0,
-//        true, 100
-//    );
-//
-//    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(HORIZONTAL, {100, 500}, {1000, 100}, ehud);
-//    scene.systemManager.getSystem<HUD>()->createSlider_SettingBar(
-//        HORIZONTAL, {100, 600}, {1000, 100},
-//        ehud, 0,
-//        1, 0, "{:.2f}/{:.2f}"
-//    );
-//
-//
-//    auto efg = scene.addEntity(ehud, "Foreground");
-//    auto fgelem = scene.addEntity(efg, "Fixed");
-//    fgelem->addComponent(make_unique<Text>("One line text", glm::vec2{100, 1000}));
-//    zmgroup = scene.systemManager.getSystem<HUD>()->addGroup();
-//    fgelem = scene.addEntity(efg, "Variable Text");
-//    auto tx = Text("Multiline\ntext\nyea", glm::vec2(100, 800));
-//    tx.groupID = zmgroup;
-//    fgelem->addComponent(make_unique<Text>(tx));
-//    zmtxt = fgelem->getComponent<Text>();
-//
-//    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
-
-    load_units();
+    //load_units();
 
 
 }
 
 void load_units() {
-
-//     playerUnit = scene.addEntity("Gabka");
-//    playerUnit->addComponent(make_unique<Render>(gabka));
-// 
-     playerUnit = scene.addEntity("Mop");
+    playerUnit = scene.addEntity("Mop");
     playerUnit->addComponent(make_unique<Render>(mopModel));
-//    playerUnit->addComponent(make_unique<ColorMask>());
-//    playerUnit->addComponent(make_unique<AnimationPlayer>());
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka);
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka);
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka);
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttack, gabka);
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//
-//
-//    playerUnit = scene.addEntity("Żuczek");
-//    playerUnit->addComponent(make_unique<Render>(zuczekTest));
-//    playerUnit->addComponent(make_unique<ColorMask>());
-//    playerUnit->addComponent(make_unique<AnimationPlayer>());
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
-//    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
-//    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
+    playerUnit->addComponent(make_unique<ColorMask>());
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttack, gabka);
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+
+
+    playerUnit = scene.addEntity("Żuczek");
+    playerUnit->addComponent(make_unique<Render>(zuczekTest));
+    playerUnit->addComponent(make_unique<ColorMask>());
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
 
     playerUnit = scene.addEntity("Shroom");
     playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
@@ -897,64 +775,6 @@ void load_units() {
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-
-    /*
-playerUnit = scene.addEntity("Player1");
-playerUnit->addComponent(make_unique<Render>(gabka));
-playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-playerUnit->updateSelfAndChild();
-playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-playerUnit->addComponent(make_unique<Unit>("Player1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 50), Unit::ALLY_BASE, true));
-stateManager = new StateManager(playerUnit->getComponent<Unit>());
-stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-
-playerUnit = scene.addEntity("Player2");
-playerUnit->addComponent(make_unique<Render>(&gabka));
-playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-playerUnit->updateSelfAndChild();
-playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-playerUnit->addComponent(make_unique<Unit>("Player2", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 50), Unit::ALLY_BASE, true));
-stateManager = new StateManager(playerUnit->getComponent<Unit>());
-stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-playerUnit = scene.addEntity("Player3");
-playerUnit->addComponent(make_unique<Render>(&gabka));
-playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-playerUnit->transform.setLocalPosition(glm::vec3(0, -1, 0));
-playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-playerUnit->updateSelfAndChild();
-playerUnit->addComponent(make_unique<BoxCollider>(playerUnit, glm::vec3(1, 1, 1)));
-playerUnit->getComponent<BoxCollider>()->setCenter(playerUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-playerUnit->addComponent(make_unique<Unit>("Player3", scene.systemManager.getSystem<Grid>(), Vector2Int(60, 60), Unit::ALLY_BASE, true));
-stateManager = new StateManager(playerUnit->getComponent<Unit>());
-stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-stateManager->currentState->unit = playerUnit->getComponent<Unit>();
-playerUnit->addComponent(make_unique<UnitAI>(playerUnit->getComponent<Unit>(), stateManager));
-
-    Entity *enemyUnit = scene.addEntity("Enemy1");
-    enemyUnit->addComponent(make_unique<Render>(zuczek));
-    enemyUnit->transform.setLocalScale(glm::vec3(2, 2, 2));
-    enemyUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    enemyUnit->updateSelfAndChild();
-    enemyUnit->addComponent(make_unique<BoxCollider>(enemyUnit, glm::vec3(1, 1, 1)));
-    enemyUnit->getComponent<BoxCollider>()->setCenter(enemyUnit->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
-    enemyUnit->addComponent(make_unique<Unit>("Enemy1", scene.systemManager.getSystem<Grid>(), Vector2Int(50, 60), Unit::ENEMY_BASE_BUG, false));
-    stateManager = new StateManager(enemyUnit->getComponent<Unit>());
-    stateManager->currentState = new IdleState(scene.systemManager.getSystem<Grid>());
-    stateManager->currentState->unit = enemyUnit->getComponent<Unit>();
-    enemyUnit->addComponent(make_unique<UnitAI>(enemyUnit->getComponent<Unit>(), stateManager));
-//    */
 
 }
 
@@ -2403,16 +2223,16 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .size {100, 100},
             .wallThickness = 1.f,
             .baseRadius = RNG::RandomFloat(8.f, 12.f),
-            .keyRadius = RNG::RandomFloat(3.f, 5.f),
-            .pocketRadius = RNG::RandomFloat(4.f, 8.f),
+            .keyRadius = RNG::RandomFloat(5.f, 8.f),
+            .pocketRadius = RNG::RandomFloat(3.f, 8.f),
             .noiseImpact = RNG::RandomFloat(0.1f, 0.3f),
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
-            .keyEnemies = RNG::RandomInt(1, 3),
-            .minEnemies = 0,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 4,                       //4        <---
+            .keyEnemies = RNG::RandomInt(3, 4),
+            .minEnemies = 2,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 5,                       //4        <---
             .unitCount = 3,                        //3        <---
-            .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
+            .chestCount = RNG::RandomInt(20, 30),  //20, 30    <---
             .lootTable = {
                     {static_cast<int>(Item::item_types.mop),       1.f,  0.f},
                     {static_cast<int>(Item::item_types.super_mop), 0.5f, 0.5f},

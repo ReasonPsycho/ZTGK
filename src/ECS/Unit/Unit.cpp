@@ -156,14 +156,6 @@ void Unit::showImGuiDetailsImpl(Camera *camera) {
     ImGui::Separator();
     ImGui::Text("Forced movement state? %s", ForcedMovementState ? "true" : "false");
     ImGui::Text("Forced movement target: (%d, %d)", forcedMovementTarget.x, forcedMovementTarget.z);
-    ImGui::Text("Forced idle state? %s", forcedIdleState ? "true" : "false");
-    ImGui::Text("Wait timer: %f", waitTimer);
-    ImGui::Text("Forced mining state? %s", ForcedMiningState ? "true" : "false");
-    ImGui::Text("Forced mining target: %s (%d, %d)",
-                forcedMiningTarget != nullptr ? forcedMiningTarget->name.c_str() : "No mining target",
-                forcedMiningTarget != nullptr ? forcedMiningTarget->gridPosition.x : 0,
-                forcedMiningTarget != nullptr ? forcedMiningTarget->gridPosition.z : 0);
-
 }
 
 void Unit::UpdateImpl() {
@@ -205,12 +197,24 @@ void Unit::UpdateImpl() {
         }
     }
     if (!isAlive && !isAlly) {
-        DIEXD();
+        deathTimer -= Time::Instance().DeltaTime();
+        if(deathTimer<= 0){
+            Omae_wa_mou_shindeiru = true;
+            return;
+        }
+        else{
+            //move unit in flingdirection
+            worldPosition += glm::vec3(flingDirection.x * Time::Instance().DeltaTime() * 50, flingDirection.y * Time::Instance().DeltaTime() * 10, flingDirection.z * Time::Instance().DeltaTime() * 50);
+            getEntity()->transform.setLocalPosition(worldPosition);
+            getEntity()->updateSelfAndChild();
+            return;
+        }
     }
 
 
-    gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+
     if (isAlive) {
+        gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
         auto currentTile = grid->getTileAt(gridPosition);
         if(isAlly){
             auto n = grid->GetNeighbours(gridPosition, true);
@@ -239,7 +243,7 @@ void Unit::UpdateImpl() {
         }
 
 
-        if (combatTarget != nullptr && !combatTarget->isAlive) {
+        if (combatTarget != nullptr && (!combatTarget->isAlive || combatTarget->Omae_wa_mou_shindeiru)) {
             combatTarget = nullptr;
             hasCombatTarget = false;
         }
@@ -297,16 +301,6 @@ void Unit::UpdateImpl() {
                     movementTarget = pathfinding.GetNearestVacantTile(forcedMovementTarget, gridPosition);
                     forcedMovementTarget = movementTarget;
                 }
-            }
-        }
-
-        if (!isAlly && !ForcedMovementState && !ForcedMiningState) {
-            combatTarget = GetClosestPathableEnemyInSight();
-//            if (combatTarget == nullptr) {
-//                combatTarget = GetClosestEnemyInSight();
-            if (combatTarget != nullptr) {
-                movementTarget = combatTarget->gridPosition;
-//                }
             }
         }
 
@@ -601,23 +595,6 @@ IMineable *Unit::findClosestMineable(const std::vector<IMineable> &MineablesToEx
     return closestMineable;
 }
 
-
-void Unit::sortMiningTargetsByDistance() {
-    std::sort(miningTargets.begin(), miningTargets.end(), [this](IMineable *mineable, IMineable *mineable1) {
-        return VectorUtils::Distance(this->gridPosition,
-                                     Vector2Int(mineable->gridPosition.x, mineable->gridPosition.z)) >
-               VectorUtils::Distance(this->gridPosition,
-                                     Vector2Int(mineable1->gridPosition.x, mineable1->gridPosition.z));
-    });
-
-}
-
-void Unit::Wait(float seconds) {
-    forcedIdleState = true;
-    waitTimer = seconds;
-
-}
-
 std::vector<Unit *> Unit::GetPathableEnemiesInSight() {
     std::vector<Unit *> enemies;
     int sightRange = isAlly ? 6 : 4;
@@ -879,5 +856,15 @@ bool Unit::checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTar
         }
     }
     return false;
+}
+
+glm::vec3 Unit::calculateFlingDirection(Vector2Int killerPos) {
+    glm::vec3 direction = glm::vec3(0, 0, 0);
+    glm::vec3 killerPos3D = grid->GridToWorldPosition(killerPos);
+    glm::vec3 unitPos3D = grid->GridToWorldPosition(gridPosition);
+    direction = glm::normalize(unitPos3D - killerPos3D);
+    direction.y += RNG::RandomFloat(1.0f, 3.f);
+
+    return direction;
 }
 

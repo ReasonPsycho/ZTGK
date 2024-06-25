@@ -104,14 +104,8 @@ public:
 
 
     IMineable* findClosestMineable(const std::vector<IMineable>& MineablesToExclude = {});
-    void sortMiningTargetsByDistance();
-    bool forcedIdleState = false;
-    float waitTimer = 0;
-    void Wait(float seconds);
 
     bool ForcedMovementState = false;
-    bool ForcedMiningState = false;
-    IMineable* forcedMiningTarget = nullptr;
     Vector2Int forcedMovementTarget = Vector2Int(0, 0);
     void DIEXD();
 
@@ -137,10 +131,20 @@ public:
     float animationcooldown = 0;
 
     bool checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot();
+
+    bool lastUsedRightAttack = true;
+
+    glm::vec3 calculateFlingDirection(Vector2Int killerPos);
+    glm::vec3 flingDirection;
+
+    //bool to decide if the unit is dead -> cannot kill right in Update because UnitSystem update crashes if we remove a unit from the list while iterating over it
+    bool Omae_wa_mou_shindeiru = false;
+
 private:
     Vector2Int previousGridPosition;
     void onFirstUpdate();
     bool firstUpdate = true;
+    float deathTimer = 3;
 
 };
 

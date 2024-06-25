@@ -12,7 +12,7 @@ Projectile::Projectile(glm::vec3 startPos, glm::vec3 targetPos,Unit* un, Unit* t
     this->startPosition = startPos;
     this->targetPosition = targetPos;
     curvePoints = generateCurvePoints(10);
-    speed = 5 ;
+    speed = 10 ;
     worldPosition = startPosition;
     this->target = targ;
     this->unit = un;
@@ -52,6 +52,9 @@ void Projectile::UpdateImpl() {
         startPosition = worldPosition;
         targetPosition = target->worldPosition;
         curvePoints = generateCurvePoints(10);
+        //erase the first point
+        curvePoints.erase(curvePoints.begin());
+        curvePoints.erase(curvePoints.begin());
     }
 
     // Check if the projectile has reached the target using the margin of error
