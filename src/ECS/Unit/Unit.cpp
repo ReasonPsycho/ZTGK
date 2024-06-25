@@ -471,6 +471,22 @@ void Unit::UpdateImpl() {
         }
     }
 
+    if (isAlly) {
+        Entity *child = parentEntity->getChild("RHand");
+        AnimationPlayer *player;
+        if (child) {
+            player = child->getComponent<AnimationPlayer>();
+            if (player)
+                child->transform.setLocalMatrix(player->animator.m_CurrentAnimation->GetBoneOffSet("Hand.R"));
+        }
+        child = parentEntity->getChild("LHand");
+        if (child) {
+            player = child->getComponent<AnimationPlayer>();
+            if (player)
+                child->transform.setLocalMatrix(player->animator.m_CurrentAnimation->GetBoneOffSet("Hand.L"));
+        }
+    }
+
 }
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {
@@ -803,13 +819,9 @@ void Unit::Pickup(PickupubleItem *item) {
     if (drop.first)
         InventoryManager::instance->spawn_item_on_map(drop.first, first_pos);
     if (drop.second)
-        InventoryManager::instance->spawn_item_on_map(drop.second, pathfinding.GetNearestVacantTileAround(spawn_origin,
-                                                                                                          drop.first
-                                                                                                          ? std::vector{
-                                                                                                                  spawn_origin,
-                                                                                                                  first_pos}
-                                                                                                          : std::vector{
-                                                                                                                  spawn_origin}));
+        InventoryManager::instance->spawn_item_on_map(
+                drop.second,
+                pathfinding.GetNearestVacantTileAround(spawn_origin,drop.first ? std::vector{spawn_origin,first_pos} : std::vector{spawn_origin}));
 }
 
 Vector2Int Unit::getClosestWashingMachineTile() {

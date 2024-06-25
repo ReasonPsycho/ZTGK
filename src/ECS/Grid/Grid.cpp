@@ -695,7 +695,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
     string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
     string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
-    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack_right.fbx";
 
     string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
     string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
@@ -751,6 +751,9 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
+
+        ztgk::game::scene->addEntity(UnitEntity, "RHand");
+        ztgk::game::scene->addEntity(UnitEntity, "LHand");
     } else if (unit->unitType == UnitType::UNIT_BUG) {
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());

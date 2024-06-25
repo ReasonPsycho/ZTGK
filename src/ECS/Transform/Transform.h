@@ -14,6 +14,7 @@
 #include "imgui.h"
 #include "ImGuizmo.h"
 #include "ECS/Render/Camera/Camera.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 class Transform {
 protected:
@@ -44,6 +45,8 @@ public:
     const glm::vec3 getGlobalPosition() const;
 
     const glm::vec3 &getLocalPosition() const;
+    
+    void  setLocalMatrix(const glm::mat4& transformMatrix);
 
     const glm::quat &getLocalRotation() const;
     

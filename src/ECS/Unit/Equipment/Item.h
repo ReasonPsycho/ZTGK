@@ -38,7 +38,7 @@ public:
     ItemStats stats{};
     bool takesTwoSlots;
     Model * model;
-    static inline const std::string ally_attack_animation_path = "res/models/gabka/pan_gabka_attack.fbx";
+    static inline const std::string ally_attack_animation_path = "res/models/gabka/pan_gabka_attack_right.fbx";
     static inline const std::string enemy_attack_animation_path = "";
 
 // behavior implementations

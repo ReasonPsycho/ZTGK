@@ -129,7 +129,7 @@ void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
     if(anim == nullptr) {
         spdlog::error("No animation player component found");
     } else if(unit->unitType == UnitType::UNIT_SPONGE) {
-        string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
+       string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_right.fbx";
         anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
     } else if(unit->unitType == UNIT_BUG){
         string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
