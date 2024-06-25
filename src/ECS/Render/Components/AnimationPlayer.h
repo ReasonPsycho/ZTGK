@@ -25,9 +25,9 @@ public:
     void showImGuiDetailsImpl(Camera *camera) override;
 
     std::map<std::string, Animation*> animationMap;
-    
-private:
+
     Animator animator = nullptr;
+private:
     bool looping = false;
     bool isPlaying = false;
     float animationSpeed = 1;

@@ -16,6 +16,7 @@ void MineableChest::showImGuiDetailsImpl(Camera *camera) {
     IMineable::showImGuiDetailsImpl(camera);
 }
 
+// todo fix item swaps
 void MineableChest::onMined(Unit *unit) {
     IMineable::onMined(unit);
     if (parentEntity->getComponent<Render>())

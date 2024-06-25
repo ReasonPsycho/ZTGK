@@ -102,7 +102,7 @@ State *IdleState::RunCurrentState() {
     if (unit->isAlly && currentTile->dirtinessLevel > 0) {
         auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
         if (anim == nullptr) {
-        } else if(!unit->playinIdleAnimation) {
+        } else if(unit->unitType == UnitType::UNIT_SPONGE && !unit->playinIdleAnimation) {
             string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
             anim->PlayAnimation(modelPathGabkaIdle, true, 2.0f);
             if(!unit->playinIdleAnimation)
@@ -124,14 +124,7 @@ State *IdleState::RunCurrentState() {
             }
             unit->tryToSendEmote(emote);
         }
-        auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
-        if (newDirtLvl < 0) {
-            newDirtLvl = 0;
-        }
-        currentTile->changeDirtinessLevel(newDirtLvl);
-        if (newDirtLvl == 0) {
 
-        }
     }
 
     else if (!unit->isAlly && currentTile->dirtinessLevel < 100) {
@@ -158,6 +151,19 @@ State *IdleState::RunCurrentState() {
                     break;
             }
             unit->tryToSendEmote(emote);
+        }
+
+        if (unit->unitType == UNIT_BUG && !grid->getTileAt(unit->gridPosition)->isInFogOfWar) {
+            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+            if(anim!= nullptr){
+                string modelPathBugMove = "res/models/zuczek/Zuczek_sleep - copia.fbx";
+                if (unit->animationcooldown > anim->animationMap[modelPathBugMove]->GetDuration() /
+                                              (anim->animationMap[modelPathBugMove]->GetTicksPerSecond() * 2.0f)) {
+                    anim->PlayAnimation(modelPathBugMove, false, 2.0f);
+                    unit->animationcooldown = 0;
+                }
+            }
+
         }
     }
 

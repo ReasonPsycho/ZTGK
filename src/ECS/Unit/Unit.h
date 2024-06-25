@@ -24,6 +24,12 @@ struct UnitStats {
     Modifiers added{};
 };
 
+enum UnitType{
+    UNIT_SPONGE,
+    UNIT_BUG,
+    UNIT_SHROOM
+};
+
 class Unit : public Component {
 public:
     static const UnitStats ALLY_BASE;
@@ -125,6 +131,10 @@ public:
     ztgk::game::EMOTES mostRecentEmote;
 
     Speaker* speaker;
+
+    UnitType unitType;
+
+    float animationcooldown = 0;
 
     bool checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot();
 private:
