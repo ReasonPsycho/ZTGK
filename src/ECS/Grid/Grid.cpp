@@ -689,11 +689,17 @@ void Grid::UpdateFogData(Tile *tile) {
 Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     auto modelLoadingManager = ztgk::game::modelLoadingManager;
     auto gabka = ztgk::game::playerModel;
+    auto zuczekTest = ztgk::game::bugModel;
+    auto shroom = ztgk::game::shroomModel;
 
     string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
     string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
     string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
     string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+
+    string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
+    string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
+    string modelPathZuczekMove = "res/models/zuczek/Zuczek_run - copia.fbx";
 
     if (!read_names) {
         std::string line;
@@ -726,12 +732,13 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));
     UnitEntity->getComponent<BoxCollider>()->setCenter(UnitEntity->transform.getGlobalPosition() + glm::vec3(0, 0, 0.5));
     UnitEntity->addComponent(make_unique<Unit>(name, this, gridPos, isAlly ? Unit::ALLY_BASE : bug ? Unit::ENEMY_BASE_BUG : Unit::ENEMY_BASE_SHROOM, isAlly));
-
+    UnitEntity->getComponent<Unit>()->unitType = isAlly ? UnitType::UNIT_SPONGE : bug ? UnitType::UNIT_BUG : UnitType::UNIT_SHROOM;
     auto stateManager = new StateManager(UnitEntity->getComponent<Unit>());
     stateManager->currentState = new IdleState(this);
     stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
-    if(isAlly) {
+    auto unit = UnitEntity->getComponent<Unit>();
+    if(unit->unitType == UnitType::UNIT_SPONGE) {
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
         UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
                 modelPathGabkaMove, gabka);
@@ -744,11 +751,13 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
-    }
-    else if (bug) {
+    } else if (unit->unitType == UnitType::UNIT_BUG) {
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
-    } else if(!isAlly && !bug){
-        auto unit = UnitEntity->getComponent<Unit>();
+        UnitEntity->addComponent(make_unique<AnimationPlayer>());
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
+    } else if(unit->unitType == UnitType::UNIT_SHROOM) {
         InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
     }
