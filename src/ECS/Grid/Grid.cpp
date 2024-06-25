@@ -720,7 +720,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     Entity* UnitEntity = ztgk::game::scene->addEntity(isAlly ? "Sponge" : "Enemy");
     UnitEntity->addComponent(make_unique<Render>(isAlly ? ztgk::game::playerModel : bug ? ztgk::game::bugModel : ztgk::game::shroomModel));
     UnitEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
-    UnitEntity->transform.setLocalPosition(glm::vec3(0, -1.5, 0));
+    UnitEntity->transform.setLocalPosition(glm::vec3(0, isAlly? -1.5 : bug? -3 : -2, 0));
     UnitEntity->transform.setLocalRotation(glm::vec3(0, 0, 0));
     UnitEntity->updateSelfAndChild();
     UnitEntity->addComponent(make_unique<BoxCollider>(UnitEntity, glm::vec3(1, 1, 1)));

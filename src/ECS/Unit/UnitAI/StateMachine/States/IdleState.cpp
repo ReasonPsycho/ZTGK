@@ -124,14 +124,6 @@ State *IdleState::RunCurrentState() {
             }
             unit->tryToSendEmote(emote);
         }
-        auto newDirtLvl = currentTile->dirtinessLevel - 30 * Time::Instance().DeltaTime();
-        if (newDirtLvl < 0) {
-            newDirtLvl = 0;
-        }
-        currentTile->changeDirtinessLevel(newDirtLvl);
-        if (newDirtLvl == 0) {
-
-        }
     }
 
     else if (!unit->isAlly && currentTile->dirtinessLevel < 100) {

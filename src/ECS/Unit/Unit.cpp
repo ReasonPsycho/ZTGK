@@ -210,13 +210,40 @@ void Unit::UpdateImpl() {
 
     gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
     if (isAlive) {
+        auto currentTile = grid->getTileAt(gridPosition);
+        if(isAlly){
+            auto n = grid->GetNeighbours(gridPosition, true);
+            n.push_back(currentTile);
+            for(auto &neigh : n){
+                if(neigh->vacant()) {
+                    auto newDirtLvl = neigh->dirtinessLevel - 90 * Time::Instance().DeltaTime();
+                    if (newDirtLvl < 0) {
+                        newDirtLvl = 0;
+                    }
+                    neigh->changeDirtinessLevel(newDirtLvl);
+                }
+            }
+        }else{
+            auto n = grid->GetNeighbours(gridPosition, true);
+            n.push_back(currentTile);
+            for(auto &neigh : n){
+                if(neigh->vacant()) {
+                    auto newDirtLvl = neigh->dirtinessLevel + 30 * Time::Instance().DeltaTime();
+                    if (newDirtLvl > 100) {
+                        newDirtLvl = 100;
+                    }
+                    neigh->changeDirtinessLevel(newDirtLvl);
+                }
+            }
+        }
+
 
         if (combatTarget != nullptr && !combatTarget->isAlive) {
             combatTarget = nullptr;
             hasCombatTarget = false;
         }
 
-        auto currentTile = grid->getTileAt(gridPosition);
+
         if (currentMiningTarget != nullptr && currentMiningTarget->isMined) {
             currentMiningTarget = nullptr;
         }
@@ -626,13 +653,22 @@ Unit *Unit::GetClosestPathableEnemyInSight() {
 Vector2Int Unit::GetDirtiestTileAround() {
     int dirtiestLevel = 0;
     Vector2Int dirtiestTile = gridPosition;
-    std::vector<Vector2Int> directions = {Vector2Int(1, 0), Vector2Int(-1, 0), Vector2Int(0, 1), Vector2Int(0, -1),
-                                          Vector2Int(1, 1), Vector2Int(-1, -1), Vector2Int(1, -1), Vector2Int(-1, 1)};
-    //randomize the directions vector
-    std::shuffle(directions.begin(), directions.end(), std::mt19937(std::random_device()()));
+    std::vector<Vector2Int> positions;
 
-    for (auto &dir: directions) {
-        Vector2Int pos = gridPosition + dir;
+    // Populate positions within a 2-tile radius
+    for (int x = -2; x <= 2; ++x) {
+        for (int y = -2; y <= 2; ++y) {
+            if (x != 0 || y != 0) {  // Exclude the current position
+                positions.push_back(Vector2Int(x, y));
+            }
+        }
+    }
+
+    // Randomize the positions vector
+    std::shuffle(positions.begin(), positions.end(), std::mt19937(std::random_device()()));
+
+    for (auto &offset: positions) {
+        Vector2Int pos = gridPosition + offset;
         if (grid->isInBounds(pos)) {
             Tile *tile = grid->getTileAt(pos);
             if (tile->dirtinessLevel > dirtiestLevel) {
@@ -643,6 +679,7 @@ Vector2Int Unit::GetDirtiestTileAround() {
     }
     return dirtiestTile;
 }
+
 
 void Unit::DIEXD() {
     if (ztgk::game::ui_data.tracked_unit_id == uniqueID) {
