@@ -14,5 +14,7 @@ public:
         .cd_max_sec = 1,
         .range = GridRange(1),
         .add_to_unit = {}
-    }) {}
+    }) {
+        icon_path = "res/textures/icons/item_hands.png";
+    }
 };

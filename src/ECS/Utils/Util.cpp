@@ -129,7 +129,8 @@ namespace ztgk {
         } else {
             auto eitem1 = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Unit Details")->getChild("Weapon Portrait #1");
             eitem1->getComponent<Text>()->content = "*No Item*";
-            eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
+            if (unit->equipment.item2) // todo smarter slot select for hands, for now just check if the icon will be swapped to hands icon and don't load question mark if so
+                eitem1->getComponent<Sprite>()->load("res/textures/question_mark.png");
             eitem1->getChild("Offensive Stats")->getChild("ATK")->getComponent<Sprite>()->load("res/textures/icons/stat/atk.png");
             ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_offensive)->setHidden(true);
             ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
