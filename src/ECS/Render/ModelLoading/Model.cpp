@@ -118,6 +118,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
     ExtractBoneWeightForVertices(vertices,mesh,scene);
 
+    for (int i = 0; i < vertices.size(); ++i) {
+        Normalize(vertices[i]);
+    }
+    
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, material);
 }
@@ -180,6 +184,32 @@ void Model::SetVertexBoneData(Vertex &vertex, int boneID, float weight) {
         }
     }
 }
+
+void Model::Normalize(Vertex &vertex) {
+    float sumOfWeights = 0;
+    for (int i = 0; i < MAX_BONE_INFLUENCE; ++i) {
+        if(vertex.m_BoneIDs[i] != -1){
+            sumOfWeights += vertex.m_Weights[i];
+        }
+    }
+
+    if(   sumOfWeights == 0 ) {
+        vertex.m_Weights[0] = 1;
+    }
+    
+    // Ensure sumOfWeights is not zero to avoid division by zero
+    if (sumOfWeights != 0) {
+        for (int i = 0; i < MAX_BONE_INFLUENCE; ++i) {
+            if(vertex.m_BoneIDs[i] != -1){
+                vertex.m_Weights[i] /= sumOfWeights;
+            }
+
+        }
+    }
+
+}
+
+
 
 
 

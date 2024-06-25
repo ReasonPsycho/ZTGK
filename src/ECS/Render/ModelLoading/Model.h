@@ -49,6 +49,7 @@ public:
     int& GetBoneCount() { return m_BoneCounter; }
     void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
     void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+    void Normalize(Vertex& vertex);
 
     void SetVertexBoneDataToDefault(Vertex& vertex);
 

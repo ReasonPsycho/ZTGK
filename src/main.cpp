@@ -80,6 +80,7 @@
 #include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
 
 #include <filesystem>
+
 namespace fs = std::filesystem;
 #pragma endregion Includes
 
@@ -93,9 +94,10 @@ string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
 string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
 string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
 string modelPathZuczek = "res/models/zuczek/Zuczek.fbx";
-string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack.fbx";
-string modelPathZuczekIddle = "res/models/zuczek/Zuczek_iddle.fbx";
-string modelPathZuczekMove = "res/models/zuczek/Zuczek_move.fbx";
+string modelPathZuczekTest = "res/models/zuczek/Zuczek_run - copia.fbx";
+string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
+string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
+string modelPathZuczekMove = "res/models/zuczek/Zuczek_run - copia.fbx";
 string modelPathWall = "res/models/BathroomWall/BathroomWall.fbx";
 string tileModelPath = "res/models/plane/Plane.fbx";
 string washingMachinePath = "res/models/washingmachine/pralka.fbx";
@@ -114,6 +116,7 @@ Model *tileModel;
 Model *model;
 Model *gabka;
 Model *zuczek;
+Model *zuczekTest;
 Model *wall;
 Model *washingMachineModel;
 Model *chestModel;
@@ -143,7 +146,6 @@ shared_ptr<spdlog::logger> file_logger;
 //MY SHIT FOR DEBUGING, IF I FORGOT TO REMOVE FEEL FREE TO DO IT <3
 bool isXpressed = false;
 int radiusToRemove = 5;
-
 
 
 #pragma region Function definitions
@@ -236,7 +238,7 @@ ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 //Camera set up
 int display_w, display_h;
-Camera camera(glm::vec3(90.0f, 40.0f, 90.0f),glm::vec3(0, 1.0f, 0), 30,-50,0.1,1000.0f);
+Camera camera(glm::vec3(90.0f, 40.0f, 90.0f), glm::vec3(0, 1.0f, 0), 30, -50, 0.1, 1000.0f);
 
 Primitives primitives;
 
@@ -248,7 +250,7 @@ float lastX;
 Entity *playerUnit;
 
 std::vector<Vector2Int> selectedTiles;
-std::vector<Tile*> tilesSelectedToMine;
+std::vector<Tile *> tilesSelectedToMine;
 
 bool isLeftMouseButtonHeld = false;
 float LmouseHeldStartTime = 0.0f;
@@ -424,8 +426,7 @@ bool init() {
     GLFWimage icons[1];
     int width, height, nrChannels;
     unsigned char *data = stbi_load("res/textures/icons/pick-me.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
+    if (data) {
         icons[0].pixels = data;   // Pixel data will be loaded from 'path_to_your_icon.png'
         icons[0].width = width;   // Width should be the exact width of the image
         icons[0].height = height; // Height should be the exact height of the image
@@ -505,16 +506,16 @@ void init_systems() {
     scene.systemManager.getSystem<UnitSystem>()->init();
 
     ztgk::game::selectionHandler = new SignalReceiver(
-        Signal::signal_types.mouse_button_signal | Signal::signal_types.keyboard,
-        [](const Signal &signal) {
-            if (signal.stype == Signal::signal_types.mouse_button_signal) {
-                auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
-                handle_picking(window, data->button, data->action, data->mods);
-            } else if (signal.stype == Signal::signal_types.keyboard) {
-                auto data = std::dynamic_pointer_cast<KeySignalData>(signal.data);
-                handleControls(data->key, data->scancode, data->action, data->mods);
+            Signal::signal_types.mouse_button_signal | Signal::signal_types.keyboard,
+            [](const Signal &signal) {
+                if (signal.stype == Signal::signal_types.mouse_button_signal) {
+                    auto data = std::dynamic_pointer_cast<MouseButtonSignalData>(signal.data);
+                    handle_picking(window, data->button, data->action, data->mods);
+                } else if (signal.stype == Signal::signal_types.keyboard) {
+                    auto data = std::dynamic_pointer_cast<KeySignalData>(signal.data);
+                    handleControls(data->key, data->scancode, data->action, data->mods);
+                }
             }
-        }
     );
     *ztgk::game::signalQueue += ztgk::game::selectionHandler;
 }
@@ -534,7 +535,7 @@ void load_sounds() {
 
 
     //SET TO 0 CUZ IM LISTENING TO MY OWN MUSIC, CHANGE LATER XD   vvvvvvvvvvvvv
-    ztgk::game::audioManager->setVolumeForGroup("ambient",5);
+    ztgk::game::audioManager->setVolumeForGroup("ambient", 5);
 
     //intro music
     ztgk::game::audioManager->loadSound("res/sounds/sfx_intro_music.mp3", "sfx_intro_music");
@@ -635,23 +636,24 @@ void load_enteties() {
 
     // Convert the array to a vector
     std::vector<unsigned int> vec(pbrprimitives.quadIndices, pbrprimitives.quadIndices + n);
-    ztgk::game::modelLoadingManager =  new ModelLoadingManager;
-    ztgk::game::modelLoadingManager ->Innit();
-    tileModel =   ztgk::game::modelLoadingManager ->GetModel(tileModelPath);
-    model =   ztgk::game::modelLoadingManager ->GetModel(modelPath);
-    gabka =   ztgk::game::modelLoadingManager ->GetModel(modelPathGabka);
-    zuczek =   ztgk::game::modelLoadingManager ->GetModel(modelPathZuczek);
-    wall =   ztgk::game::modelLoadingManager ->GetModel(modelPathWall);
-    washingMachineModel =   ztgk::game::modelLoadingManager ->GetModel(washingMachinePath);
-    chestModel =   ztgk::game::modelLoadingManager ->GetModel(modelChestPath);
-    projectileModel =   ztgk::game::modelLoadingManager->GetModel(modelProjectilePath);
-    mopModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopPath);
-    mopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelMopObrotowyPath);
-    tidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelTidyPodLauncherPath);
-    praniumModel =   ztgk::game::modelLoadingManager ->GetModel(modelPraniumPath);
-    hangerMopModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerMop);
-    hangerMopObrotowyModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerRotationMop);
-    hangerTidyPodLauncherModel =   ztgk::game::modelLoadingManager ->GetModel(modelPathHangerTidyPodLauncher);
+    ztgk::game::modelLoadingManager = new ModelLoadingManager;
+    ztgk::game::modelLoadingManager->Innit();
+    tileModel = ztgk::game::modelLoadingManager->GetModel(tileModelPath);
+    model = ztgk::game::modelLoadingManager->GetModel(modelPath);
+    gabka = ztgk::game::modelLoadingManager->GetModel(modelPathGabka);
+    zuczek = ztgk::game::modelLoadingManager->GetModel(modelPathZuczek);
+    zuczekTest = ztgk::game::modelLoadingManager->GetModel(modelPathZuczekTest);
+    wall = ztgk::game::modelLoadingManager->GetModel(modelPathWall);
+    washingMachineModel = ztgk::game::modelLoadingManager->GetModel(washingMachinePath);
+    chestModel = ztgk::game::modelLoadingManager->GetModel(modelChestPath);
+    projectileModel = ztgk::game::modelLoadingManager->GetModel(modelProjectilePath);
+    mopModel = ztgk::game::modelLoadingManager->GetModel(modelMopPath);
+    mopObrotowyModel = ztgk::game::modelLoadingManager->GetModel(modelMopObrotowyPath);
+    tidyPodLauncherModel = ztgk::game::modelLoadingManager->GetModel(modelTidyPodLauncherPath);
+    praniumModel = ztgk::game::modelLoadingManager->GetModel(modelPraniumPath);
+    hangerMopModel = ztgk::game::modelLoadingManager->GetModel(modelPathHangerMop);
+    hangerMopObrotowyModel = ztgk::game::modelLoadingManager->GetModel(modelPathHangerRotationMop);
+    hangerTidyPodLauncherModel = ztgk::game::modelLoadingManager->GetModel(modelPathHangerTidyPodLauncher);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
@@ -665,14 +667,13 @@ void load_enteties() {
     ztgk::game::mopModel = mopModel;
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
-    ztgk::game::shroomModel = ztgk::game::modelLoadingManager ->GetModel("res/models/Mushroom/shroom.fbx");
+    ztgk::game::shroomModel = ztgk::game::modelLoadingManager->GetModel("res/models/Mushroom/shroom.fbx");
     ztgk::game::hangerMopModel = hangerMopModel;
     ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
     ztgk::game::hangerTidyPodLauncherModel = hangerTidyPodLauncherModel;
 
 
-
-    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_CUTE, std::make_shared<Texture>("res/textures/emotes/blue_3.png", "") ));
+    ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_CUTE, std::make_shared<Texture>("res/textures/emotes/blue_3.png", "")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_TONGUE, std::make_shared<Texture>("res/textures/emotes/blue_p.png", "")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_HAPPY, std::make_shared<Texture>("res/textures/emotes/blue_c.png", "")));
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::P_BUBBLE_CUTE, std::make_shared<Texture>("res/textures/emotes/pink_3.png", "")));
@@ -688,58 +689,58 @@ void load_enteties() {
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::PRANIUM, std::make_shared<Texture>("res/textures/emotes/pranium_cut.png", "")));
 
 
-
     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->createWashingMachine(washingMachineModel);
 
 
     Entity *gameObject;
 
-    gameObject = scene.addEntity("Wall");;
-    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
-    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
-    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
-    gameObject->addComponent(make_unique<Render>(wall));;
-
-    gameObject = scene.addEntity("Wall1");;
-    gameObject->transform.setLocalPosition(glm::vec3(100, 50, 200));
-    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
-    gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
-    gameObject->addComponent(make_unique<Render>(wall));;
-//
-    gameObject = scene.addEntity("Wall2");;
-    gameObject->transform.setLocalPosition(glm::vec3(0, 50, 100));
-    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
-    gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
-    gameObject->addComponent(make_unique<Render>(wall));;
-//
-    gameObject = scene.addEntity("Wall3");;
-    gameObject->transform.setLocalPosition(glm::vec3(200, 50, 100));
-    gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
-    gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
-    gameObject->addComponent(make_unique<Render>(wall));;
-
     /*
-//    gameObject = scene.addEntity("Dir light");
-    //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
-    gameObject = scene.addEntity("Point Light");;
-    gameObject->transform.setLocalPosition(glm::vec3(100, 16, 105));
-    gameObject->addComponent(make_unique<PointLight>(
-            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
-                           0.05f)));
-
-    gameObject = scene.addEntity("Point Light");;
-    gameObject->transform.setLocalPosition(glm::vec3(105, 16, 100));
-    gameObject->addComponent(make_unique<PointLight>(
-            PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
-                           0.05f)));
-    //  gameObject = scene.addEntity("Point Light 2");
-    // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
-    gameObject = scene.addEntity("Spot Light");
-    gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
-    gameObject->addComponent(make_unique<SpotLight>(
-            SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
-                          glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
-*/
+       gameObject = scene.addEntity("Wall");;
+       gameObject->transform.setLocalPosition(glm::vec3(100, 50, 0));
+       gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+       gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
+       gameObject->addComponent(make_unique<Render>(wall));;
+   
+       gameObject = scene.addEntity("Wall1");;
+       gameObject->transform.setLocalPosition(glm::vec3(100, 50, 200));
+       gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+       gameObject->transform.setLocalRotation(glm::quat(glm::vec3(0, 0, 0)));
+       gameObject->addComponent(make_unique<Render>(wall));;
+   //
+       gameObject = scene.addEntity("Wall2");;
+       gameObject->transform.setLocalPosition(glm::vec3(0, 50, 100));
+       gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+       gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
+       gameObject->addComponent(make_unique<Render>(wall));;
+   //
+       gameObject = scene.addEntity("Wall3");;
+       gameObject->transform.setLocalPosition(glm::vec3(200, 50, 100));
+       gameObject->transform.setLocalScale(glm::vec3(100, 50, 10));
+       gameObject->transform.setLocalRotation((glm::quat(glm::radians(glm::vec3(0, 90, 0)))));
+       gameObject->addComponent(make_unique<Render>(wall));;
+   
+      
+   //    gameObject = scene.addEntity("Dir light");
+       //  gameObject->addComponent(make_unique<DirLight>(DirLightData(glm::vec4(glm::vec3(255), 1),glm::vec4(glm::vec3(255), 1), glm::vec4(1))));
+       gameObject = scene.addEntity("Point Light");;
+       gameObject->transform.setLocalPosition(glm::vec3(100, 16, 105));
+       gameObject->addComponent(make_unique<PointLight>(
+               PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
+                              0.05f)));
+   
+       gameObject = scene.addEntity("Point Light");;
+       gameObject->transform.setLocalPosition(glm::vec3(105, 16, 100));
+       gameObject->addComponent(make_unique<PointLight>(
+               PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,
+                              0.05f)));
+       //  gameObject = scene.addEntity("Point Light 2");
+       // gameObject->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(glm::vec3(255),1),glm::vec4(glm::vec3(0),1),glm::vec4(0), 1.0f, 1.0f, 1.0f)));
+       gameObject = scene.addEntity("Spot Light");
+       gameObject->transform.setLocalPosition(glm::vec3(100, 4, 100));
+       gameObject->addComponent(make_unique<SpotLight>(
+               SpotLightData(glm::vec4(glm::vec3(5), 1), glm::vec4(glm::vec3(0), 1), glm::vec4(0), glm::vec4(1),
+                             glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)), 0.1f, 0.2f, 0.05f)));
+   */
 
     scene.systemManager.getSystem<LightSystem>()->Init();
     scene.systemManager.getSystem<InstanceRenderSystem>()->tileModel = quadModel;
@@ -846,15 +847,14 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-  //  load_units();
-
+    load_units();
 
 
 }
 
 void load_units() {
 
-    playerUnit = scene.addEntity("Gabka");
+     playerUnit = scene.addEntity("Gabka");
     playerUnit->addComponent(make_unique<Render>(gabka));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
@@ -865,34 +865,28 @@ void load_units() {
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
-    playerUnit = scene.addEntity(playerUnit,"Emote");
-    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(0, 1, 0));
-    playerUnit->addComponent(make_unique<BetterSpriteRender>(  ztgk::game::modelLoadingManager ->GetTexture("res/textures/icons/pick-me.png")));
-
 
 
     playerUnit = scene.addEntity("Żuczek");
-    playerUnit->addComponent(make_unique<Render>(zuczek));
+    playerUnit->addComponent(make_unique<Render>(zuczekTest));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczek);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczek);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczek);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
 
-    playerUnit = scene.addEntity("Shroom");
-    playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
-    playerUnit->addComponent(make_unique<ColorMask>());
-    playerUnit->addComponent(make_unique<AnimationPlayer>());
-  playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
-    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-    playerUnit->updateSelfAndChild();
+//    playerUnit = scene.addEntity("Shroom");
+//    playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
+//    playerUnit->addComponent(make_unique<ColorMask>());
+//    playerUnit->addComponent(make_unique<AnimationPlayer>());
+//  playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+//    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+//    playerUnit->updateSelfAndChild();
 
     /*
 playerUnit = scene.addEntity("Player1");
@@ -989,15 +983,18 @@ void load_hud() {
 #pragma region menu
     auto emenu = scene.addEntity(ehud, "Menu");
 
-    emenu->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title_screen.png"));
+    emenu->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_mainMenu, "res/textures/title_screen.png"));
     auto etitle = scene.addEntity(emenu, "Title");
-    float ystep = (ztgk::game::window_size.y - 3*200) / 4.0f;
-    glm::vec2 btn_pos = {ztgk::game::window_size.x*4/5, ztgk::game::window_size.y - 400};
+    float ystep = (ztgk::game::window_size.y - 3 * 200) / 4.0f;
+    glm::vec2 btn_pos = {ztgk::game::window_size.x * 4 / 5, ztgk::game::window_size.y - 400};
     hud->createButton(
-        "START", btn_pos, glm::vec2{200, 80},
-        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { gen_and_load_lvl(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); },
-        emenu, ztgk::game::ui_data.gr_mainMenu
+            "START", btn_pos, glm::vec2{200, 80},
+            ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+            [hud]() {
+                gen_and_load_lvl(true);
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+            },
+            emenu, ztgk::game::ui_data.gr_mainMenu
     );
     auto bspr = emenu->getChild("Button - START")->getComponent<Sprite>();
     bspr->roundingRadius = 0.2;
@@ -1006,10 +1003,13 @@ void load_hud() {
     bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
-        "LOAD", btn_pos, glm::vec2{200, 80},
-        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { gen_and_load_lvl(false); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); },
-        emenu, ztgk::game::ui_data.gr_mainMenu
+            "LOAD", btn_pos, glm::vec2{200, 80},
+            ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+            [hud]() {
+                gen_and_load_lvl(false);
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+            },
+            emenu, ztgk::game::ui_data.gr_mainMenu
     );
     bspr = emenu->getChild("Button - LOAD")->getComponent<Sprite>();
     bspr->roundingRadius = 0.2;
@@ -1018,10 +1018,13 @@ void load_hud() {
     bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
-        "Settings", btn_pos, glm::vec2{200, 80},
-        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(false); },
-        emenu, ztgk::game::ui_data.gr_mainMenu
+            "Settings", btn_pos, glm::vec2{200, 80},
+            ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+            [hud]() {
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(false);
+            },
+            emenu, ztgk::game::ui_data.gr_mainMenu
     );
     bspr = emenu->getChild("Button - Settings")->getComponent<Sprite>();
     bspr->roundingRadius = 0.2;
@@ -1030,10 +1033,13 @@ void load_hud() {
     bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
-        "Credits", btn_pos, glm::vec2{200, 80},
-        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(false); },
-        emenu, ztgk::game::ui_data.gr_mainMenu
+            "Credits", btn_pos, glm::vec2{200, 80},
+            ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+            [hud]() {
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(false);
+            },
+            emenu, ztgk::game::ui_data.gr_mainMenu
     );
     bspr = emenu->getChild("Button - Credits")->getComponent<Sprite>();
     bspr->roundingRadius = 0.2;
@@ -1042,10 +1048,10 @@ void load_hud() {
     bspr->frameRoundedInside = true;
     btn_pos.y -= ystep;
     hud->createButton(
-        "Quit", btn_pos, glm::vec2{200, 80},
-        ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        []() { glfwSetWindowShouldClose(window, true); },
-        emenu, ztgk::game::ui_data.gr_mainMenu
+            "Quit", btn_pos, glm::vec2{200, 80},
+            ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+            []() { glfwSetWindowShouldClose(window, true); },
+            emenu, ztgk::game::ui_data.gr_mainMenu
     );
     bspr = emenu->getChild("Button - Quit")->getComponent<Sprite>();
     bspr->roundingRadius = 0.2;
@@ -1057,8 +1063,8 @@ void load_hud() {
 #pragma region loadscreen
 // load/save screen
     auto eload = scene.addEntity(emenu, "Load Screen");
-    eload->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_loadScreen));
-    eload->addComponent(make_unique<Text>("Loading...", glm::vec2{ztgk::game::window_size.x/5, ztgk::game::window_size.y*8/10}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_loadScreen));
+    eload->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.WHITE, ztgk::game::ui_data.gr_loadScreen));
+    eload->addComponent(make_unique<Text>("Loading...", glm::vec2{ztgk::game::window_size.x / 5, ztgk::game::window_size.y * 8 / 10}, glm::vec2(1), ztgk::color.PLUM, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_loadScreen));
     eload->getComponent<Text>()->mode = CENTER;
 #pragma endregion
 
@@ -1069,17 +1075,17 @@ void load_hud() {
 //    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
-    emap->addComponent(make_unique<Minimap>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::game::ui_data.gr_map));
+    emap->addComponent(make_unique<Minimap>(glm::vec2{0, 0}, glm::vec2{400, 400}, ztgk::game::ui_data.gr_map));
 
 #pragma region unit details
     auto emiddle = scene.addEntity(egame, "Unit Details");
-    emiddle->addComponent(make_unique<Sprite>(glm::vec2{400,0}, glm::vec2{1120,250}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_middle));
+    emiddle->addComponent(make_unique<Sprite>(glm::vec2{400, 0}, glm::vec2{1120, 250}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_middle));
     auto ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{400, 275}, glm::vec2{1120, 50}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, emiddle, ztgk::game::ui_data.gr_middle, true, 100);
     ebar->getComponent<Sprite>()->frame(2, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(2, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
     auto eportrait = scene.addEntity(emiddle, "Portrait");
-    eportrait->addComponent(make_unique<Sprite>(glm::vec2{400,0}, glm::vec2{250,250}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/gabka_cool.png"));
+    eportrait->addComponent(make_unique<Sprite>(glm::vec2{400, 0}, glm::vec2{250, 250}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/gabka_cool.png"));
     eportrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     auto ename = scene.addEntity(emiddle, "Name");
@@ -1092,37 +1098,37 @@ void load_hud() {
 
     auto emods = scene.addEntity(emiddle, "Mods");
     auto ent = scene.addEntity(emods, "ATK");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{680,125}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/atk.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{680, 125}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/atk.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{710, 125}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "DEF");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{680,75}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/def.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{680, 75}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/def.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("0.30 + 10", glm::vec2{710, 75}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "CD");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{680,25}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/aspd.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{680, 25}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/aspd.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{710, 25}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "RNG");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{860,125}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/rng.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{860, 125}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/rng.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("4", glm::vec2{890, 125}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "MNSP");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{860,75}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/mnspd.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{860, 75}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/mnspd.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{890, 75}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(emods, "MVSP");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{860,25}, glm::vec2{50,50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/mvspd.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{860, 25}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_middle, "res/textures/icons/stat/mvspd.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
     ent->addComponent(make_unique<Text>("5", glm::vec2{890, 25}, glm::vec2(0.6), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_middle));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
@@ -1131,20 +1137,20 @@ void load_hud() {
 #pragma region weapon details
 // WEAPON 1
     auto eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #1");
-    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,135}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_mop.png"));
+    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050, 135}, glm::vec2{100, 100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_mop.png"));
     eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 235}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
     eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
     eweapPortrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     auto eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
     ent = scene.addEntity(eoffstat, "ATK");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,190}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w1_offensive, "res/textures/icons/stat/atk.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170, 190}, glm::vec2{37, 37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w1_offensive, "res/textures/icons/stat/atk.png"));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(eoffstat, "RNG");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,190}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w1_offensive, "res/textures/icons/stat/rng.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300, 190}, glm::vec2{37, 37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w1_offensive, "res/textures/icons/stat/rng.png"));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("4", glm::vec2{1350, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w1_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
@@ -1159,48 +1165,48 @@ void load_hud() {
     auto gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 1");
     ent = scene.addEntity(epassstat, "STAT1");
     // + 18 - 6
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,190}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170, 190}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT2");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 2");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,155}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170, 155}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("4", glm::vec2{1220, 155}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT3");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 3");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,190}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300, 190}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 190}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT4");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w1_passive, "Weapon 1 STAT 4");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,155}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300, 155}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 155}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
 // WEAPON 2
     eweapPortrait = scene.addEntity(emiddle, "Weapon Portrait #2");
-    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050,15}, glm::vec2{100,100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_superMop.png"));
+    eweapPortrait->addComponent(make_unique<Sprite>(glm::vec2{1050, 15}, glm::vec2{100, 100}, ztgk::color.WHITE, ztgk::game::ui_data.gr_item, "res/textures/icons/item_superMop.png"));
     eweapPortrait->addComponent(make_unique<Text>("Mop", glm::vec2{1295, 115}, glm::vec2(0.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_item));
     eweapPortrait->getComponent<Text>()->mode = TOP_CENTER;
     eweapPortrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     eoffstat = scene.addEntity(eweapPortrait, "Offensive Stats");
     ent = scene.addEntity(eoffstat, "ATK");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,68}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w2_offensive, "res/textures/icons/stat/atk.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170, 68}, glm::vec2{37, 37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w2_offensive, "res/textures/icons/stat/atk.png"));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(eoffstat, "RNG");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,68}, glm::vec2{37,37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w2_offensive, "res/textures/icons/stat/rng.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300, 68}, glm::vec2{37, 37}, ztgk::color.WHITE, ztgk::game::ui_data.gr_w2_offensive, "res/textures/icons/stat/rng.png"));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("4", glm::vec2{1350, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_w2_offensive));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
@@ -1214,28 +1220,28 @@ void load_hud() {
     epassstat = scene.addEntity(eweapPortrait, "Passive Stats");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 1");
     ent = scene.addEntity(epassstat, "STAT1");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,68}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170, 68}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("0.05 + 10", glm::vec2{1220, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT2");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 2");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1170,31}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1170, 31}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("4", glm::vec2{1220, 31}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT3");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 3");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,68}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300, 68}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 68}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
 
     ent = scene.addEntity(epassstat, "STAT4");
     gr = hud->addGroup(ztgk::game::ui_data.gr_w2_passive, "Weapon 2 STAT 4");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1300,31}, glm::vec2{37,37}, ztgk::color.WHITE, gr));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1300, 31}, glm::vec2{37, 37}, ztgk::color.WHITE, gr));
     ent->getComponent<Sprite>()->mode = MIDDLE_LEFT;
     ent->addComponent(make_unique<Text>("1.00", glm::vec2{1350, 31}, glm::vec2(0.5), ztgk::color.WHITE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr));
     ent->getComponent<Text>()->mode = MIDDLE_LEFT;
@@ -1244,15 +1250,15 @@ void load_hud() {
 #pragma region actions
 // ACTIONS
     auto eactions = scene.addEntity(egame, "Action Panel");
-    eactions->addComponent(make_unique<Sprite>(glm::vec2{1520,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
+    eactions->addComponent(make_unique<Sprite>(glm::vec2{1520, 0}, glm::vec2{400, 400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
     ent = hud->createButton(
-        glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
-        [](){
-            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
-            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
-            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_1, glfwGetKeyScancode(GLFW_KEY_1), GLFW_PRESS, mods, "Passing selection of unit 1 via action menu to handle_controls func.");
-        },
-        eactions, ztgk::game::ui_data.gr_actions, false
+            glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
+            []() {
+                auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+                mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+                *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_1, glfwGetKeyScancode(GLFW_KEY_1), GLFW_PRESS, mods, "Passing selection of unit 1 via action menu to handle_controls func.");
+            },
+            eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
@@ -1262,13 +1268,13 @@ void load_hud() {
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
     ent = hud->createButton(
-        glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
-        [](){
-            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
-            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
-            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_2, glfwGetKeyScancode(GLFW_KEY_2), GLFW_PRESS, mods, "Passing selection of unit 2 via action menu to handle_controls func.");
-        },
-        eactions, ztgk::game::ui_data.gr_actions, false
+            glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
+            []() {
+                auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+                mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+                *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_2, glfwGetKeyScancode(GLFW_KEY_2), GLFW_PRESS, mods, "Passing selection of unit 2 via action menu to handle_controls func.");
+            },
+            eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
@@ -1278,12 +1284,12 @@ void load_hud() {
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
     ent = hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
-        [](){
-            auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
-            mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
-            *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_3, glfwGetKeyScancode(GLFW_KEY_3), GLFW_PRESS, mods, "Passing selection of unit 3 via action menu to handle_controls func.");
-        },
-        eactions, ztgk::game::ui_data.gr_actions, false
+                            []() {
+                                auto mods = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ? GLFW_MOD_CONTROL : 0;
+                                mods |= glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS ? GLFW_MOD_ALT : 0;
+                                *ztgk::game::signalQueue += KeySignalData::signal(GLFW_KEY_3, glfwGetKeyScancode(GLFW_KEY_3), GLFW_PRESS, mods, "Passing selection of unit 3 via action menu to handle_controls func.");
+                            },
+                            eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
     ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
@@ -1292,34 +1298,34 @@ void load_hud() {
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
-    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png", [](){
-            if (ztgk::game::ui_data.tracked_unit_id == -1) return;
-            auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
-                                  scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
-            if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
+    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png", []() {
+        if (ztgk::game::ui_data.tracked_unit_id == -1) return;
+        auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                 scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit *unit) { return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+        if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
 
-            auto item = (*unit)->equipment[1];
-            if (item == nullptr) return;
-            InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
-            ztgk::update_weapon_hud(*unit);
-        }, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png", [](){
-            if (ztgk::game::ui_data.tracked_unit_id == -1) return;
-            auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
-                                  scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit * unit){ return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
-            if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
+        auto item = (*unit)->equipment[1];
+        if (item == nullptr) return;
+        InventoryManager::instance->unassign_item(*unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
+        ztgk::update_weapon_hud(*unit);
+    }, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png", []() {
+        if (ztgk::game::ui_data.tracked_unit_id == -1) return;
+        auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
+                                 scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit *unit) { return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
+        if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
 
-            auto item = (*unit)->equipment[2];
-            if (item == nullptr) return;
-            InventoryManager::instance->unassign_item(*unit, item);
-            InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
-            ztgk::update_weapon_hud(*unit);
-        }, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", [](){}, eactions, ztgk::game::ui_data.gr_actions, false);
+        auto item = (*unit)->equipment[2];
+        if (item == nullptr) return;
+        InventoryManager::instance->unassign_item(*unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
+        ztgk::update_weapon_hud(*unit);
+    }, eactions, ztgk::game::ui_data.gr_actions, false);
+    hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
 #pragma endregion
 
 #pragma region top panel
@@ -1335,12 +1341,12 @@ void load_hud() {
 //        etop, ztgk::game::ui_data.gr_top
 //    );
     ent = hud->createButton(
-        top_anchor - glm::vec2{0, 15}, glm::vec2{30, 30},
-        "res/textures/icons/pause.png", "res/textures/transparent.png",
-        [hud](){
-            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
-        },
-        etop, ztgk::game::ui_data.gr_top
+            top_anchor - glm::vec2{0, 15}, glm::vec2{30, 30},
+            "res/textures/icons/pause.png", "res/textures/transparent.png",
+            [hud]() {
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+            },
+            etop, ztgk::game::ui_data.gr_top
     );
     ent->getChild("Background")->getComponent<Sprite>()->round(0.2f)->frame(2, ztgk::color.BLACK);
 //    ent->getComponent<Text>()->pos.x -= 1;
@@ -1382,58 +1388,61 @@ void load_hud() {
 
 // settings
     auto esettings = scene.addEntity(ehud, "Settings");
-    esettings->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_settings));
-    esettings->addComponent(make_unique<Text>("Settings", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 100}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_settings));
+    esettings->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_settings));
+    esettings->addComponent(make_unique<Text>("Settings", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 100}, glm::vec2(1.5), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_settings));
     esettings->getComponent<Text>()->mode = TOP_CENTER;
 
     auto eslider_gamma = scene.addEntity(esettings, "Gamma ");
-    eslider_gamma->addComponent(make_unique<Text>("Gamma", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 300}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_gamma->addComponent(make_unique<Text>("Gamma", glm::vec2{(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 300}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_gamma->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 300}, {1000, 50}, eslider_gamma, gr_settingSliders, 3, 0.75, "{:.2f}");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 300}, {1000, 50}, eslider_gamma, gr_settingSliders, 3, 0.75, "{:.2f}");
     eslider_gamma->getChild("Setting Slider")->getComponent<HUDSlider>()->set_in_display_range(scene.systemManager.getSystem<PhongPipeline>()->getGamma());
 
     auto eslider_master = scene.addEntity(esettings, "Master Volume ");
-    eslider_master->addComponent(make_unique<Text>("Master Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_master->addComponent(make_unique<Text>("Master Volume", glm::vec2{(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 400}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_master->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 400}, {1000, 50}, eslider_master, gr_settingSliders, 100, 0, "{:.0f}%");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 400}, {1000, 50}, eslider_master, gr_settingSliders, 100, 0, "{:.0f}%");
 
     auto eslider_ambient = scene.addEntity(esettings, "Music Volume ");
-    eslider_ambient->addComponent(make_unique<Text>("Music Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 500}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_ambient->addComponent(make_unique<Text>("Music Volume", glm::vec2{(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 500}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_ambient->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 500}, {1000, 50}, eslider_ambient, gr_settingSliders, 100, 0, "{:.0f}%");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 500}, {1000, 50}, eslider_ambient, gr_settingSliders, 100, 0, "{:.0f}%");
 
     auto eslider_sfx = scene.addEntity(esettings, "SFX Volume ");
-    eslider_sfx->addComponent(make_unique<Text>("SFX Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_sfx->addComponent(make_unique<Text>("SFX Volume", glm::vec2{(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 600}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_sfx->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 600}, {1000, 50}, eslider_sfx, gr_settingSliders, 100, 0, "{:.0f}%");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 600}, {1000, 50}, eslider_sfx, gr_settingSliders, 100, 0, "{:.0f}%");
 
     auto eslider_click = scene.addEntity(esettings, "Click Volume ");
-    eslider_click->addComponent(make_unique<Text>("Click Volume", glm::vec2{(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 700}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
+    eslider_click->addComponent(make_unique<Text>("Click Volume", glm::vec2{(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 700}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, gr_settingHeaders));
     eslider_click->getComponent<Text>()->mode = MIDDLE_RIGHT;
-    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x-1000)/2, ztgk::game::window_size.y - 700}, {1000, 50}, eslider_click, gr_settingSliders, 100, 0, "{:.0f}%");
+    hud->createSlider_SettingBar(HORIZONTAL, {(ztgk::game::window_size.x - 1000) / 2, ztgk::game::window_size.y - 700}, {1000, 50}, eslider_click, gr_settingSliders, 100, 0, "{:.0f}%");
     eslider_click->getChild("Setting Slider")->getComponent<HUDSlider>()->set_in_display_range(6);
 
-    ent = hud->createButton("Save", {ztgk::game::window_size.x/2, 100}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [eslider_master, eslider_ambient, eslider_sfx, eslider_click, eslider_gamma]() {
-            ztgk::game::audioManager->setGlobalVolume(eslider_master->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
-            ztgk::game::audioManager->setVolumeForGroup("ambient", eslider_ambient->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
-            ztgk::game::audioManager->setVolumeForGroup("sfx", eslider_sfx->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
-            ztgk::game::audioManager->setVolumeForGroup("click", eslider_click->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
-            ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->setGamma(eslider_gamma->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
-        },
-        esettings, ztgk::game::ui_data.gr_settings
+    ent = hud->createButton("Save", {ztgk::game::window_size.x / 2, 100}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+                            [eslider_master, eslider_ambient, eslider_sfx, eslider_click, eslider_gamma]() {
+                                ztgk::game::audioManager->setGlobalVolume(eslider_master->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+                                ztgk::game::audioManager->setVolumeForGroup("ambient", eslider_ambient->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+                                ztgk::game::audioManager->setVolumeForGroup("sfx", eslider_sfx->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+                                ztgk::game::audioManager->setVolumeForGroup("click", eslider_click->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range() * 1.28f);
+                                ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->setGamma(eslider_gamma->getChild("Setting Slider")->getComponent<HUDSlider>()->get_in_display_range());
+                            },
+                            esettings, ztgk::game::ui_data.gr_settings
     );
 
     hud->createButton("<Back", {200, 125}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
-        esettings, ztgk::game::ui_data.gr_settings
+                      [hud]() {
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(true);
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+                      },
+                      esettings, ztgk::game::ui_data.gr_settings
     );
 #pragma endregion
 
 #pragma region credits
 // credits
     auto ecredits = scene.addEntity(ehud, "Credits");
-    ecredits->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_credits));
+    ecredits->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_credits));
 
     std::string licenses;
     std::ifstream file("res/sounds/CREDITS.txt");
@@ -1443,51 +1452,60 @@ void load_hud() {
     }
     auto eteam = scene.addEntity(ecredits, "Team Credits");
     eteam->addComponent(make_unique<Text>(
-        "Bubble Bliss Games\n\nGrzegorz Ludziejewski\nIgor Kusidel\nKrzysztof Czerwinski\nAmelia Kwasniewska\nJan Filipowicz",
-        glm::vec2{100, ztgk::game::window_size.y - 100}, glm::vec2(1), glm::vec4{36, 54, 110, 255}/255.0f, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_credits
+            "Bubble Bliss Games\n\nGrzegorz Ludziejewski\nIgor Kusidel\nKrzysztof Czerwinski\nAmelia Kwasniewska\nJan Filipowicz",
+            glm::vec2{100, ztgk::game::window_size.y - 100}, glm::vec2(1), glm::vec4{36, 54, 110, 255} / 255.0f, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_credits
     ));
     eteam->getComponent<Text>()->mode = TOP_LEFT;
-    eteam->addComponent(make_unique<Sprite>(glm::vec2{100,400}, glm::vec2{400, 225}, ztgk::color.WHITE, ztgk::game::ui_data.gr_credits, "res/textures/credits.png"));
+    eteam->addComponent(make_unique<Sprite>(glm::vec2{100, 400}, glm::vec2{400, 225}, ztgk::color.WHITE, ztgk::game::ui_data.gr_credits, "res/textures/credits.png"));
     eteam->getComponent<Sprite>()->mode = MIDDLE_LEFT;
 
     auto elicenses = scene.addEntity(ecredits, "Licenses");
     elicenses->addComponent(make_unique<Text>(
-        licenses,
-        glm::vec2{ztgk::game::window_size.x - 100, ztgk::game::window_size.y - 100}, glm::vec2(0.5), glm::vec4{36, 54, 110, 255}/255.0f, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_credits
+            licenses,
+            glm::vec2{ztgk::game::window_size.x - 100, ztgk::game::window_size.y - 100}, glm::vec2(0.5), glm::vec4{36, 54, 110, 255} / 255.0f, ztgk::font.Fam_Nunito + ztgk::font.regular, NONE, ztgk::game::ui_data.gr_credits
     ));
     elicenses->getComponent<Text>()->mode = TOP_RIGHT;
 
     hud->createButton("<Back", {200, 125}, {200, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
-        ecredits, ztgk::game::ui_data.gr_credits
+                      [hud]() {
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true);
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+                      },
+                      ecredits, ztgk::game::ui_data.gr_credits
     );
 #pragma endregion
 
 #pragma region win-lose screen
     // Game Won -> 4 pranium delivered to Washing Machine
     auto egamewon = scene.addEntity(emenu, "Win Screen");
-    egamewon->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
-    egamewon->addComponent(make_unique<Text>("VICTORY", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 200}, glm::vec2(2), ztgk::color.GOLD, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    egamewon->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_won));
+    egamewon->addComponent(make_unique<Text>("VICTORY", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 200}, glm::vec2(2), ztgk::color.GOLD, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
     egamewon->getComponent<Text>()->mode = CENTER;
     auto egamewon_desc = scene.addEntity(egamewon, "Win Screen Flavor");
-    egamewon_desc->addComponent(make_unique<Text>("The world is now a cleaner place.", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
+    egamewon_desc->addComponent(make_unique<Text>("The world is now a cleaner place.", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y / 2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
     egamewon_desc->getComponent<Text>()->mode = CENTER;
-    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
-        egamewon, ztgk::game::ui_data.gr_game_won
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x / 2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+                      [hud]() {
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true);
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+                      },
+                      egamewon, ztgk::game::ui_data.gr_game_won
     );
 
     // Game Lost -> All Gompkas are dead
     auto egamelost = scene.addEntity(emenu, "Lose Screen");
-    egamelost->addComponent(make_unique<Sprite>(glm::vec2{0,0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
-    egamelost->addComponent(make_unique<Text>("DEFEAT", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y - 200}, glm::vec2(1.5), ztgk::color.RED, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    egamelost->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_game_lost));
+    egamelost->addComponent(make_unique<Text>("DEFEAT", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 200}, glm::vec2(1.5), ztgk::color.RED, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
     egamelost->getComponent<Text>()->mode = CENTER;
     auto egamelost_desc = scene.addEntity(egamelost, "Lose Screen Flavor");
-    egamelost_desc->addComponent(make_unique<Text>("As The Flith emerges, entropy increases...", glm::vec2{ztgk::game::window_size.x/2, ztgk::game::window_size.y/2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
+    egamelost_desc->addComponent(make_unique<Text>("As The Flith emerges, entropy increases...", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y / 2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
     egamelost_desc->getComponent<Text>()->mode = CENTER;
-    hud->createButton("Return to main menu", {ztgk::game::window_size.x/2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
-        [hud]() { hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true); hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false); },
-        egamelost, ztgk::game::ui_data.gr_game_lost
+    hud->createButton("Return to main menu", {ztgk::game::window_size.x / 2, 200}, {400, 80}, ztgk::color.ROSE, ztgk::color.ROSE - glm::vec4{0.1, 0.1, 0.1, 0}, ztgk::color.ROSE - glm::vec4{0.2, 0.2, 0.2, 0},
+                      [hud]() {
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true);
+                          hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+                      },
+                      egamelost, ztgk::game::ui_data.gr_game_lost
     );
 #pragma endregion
 
@@ -1698,9 +1716,9 @@ void imgui_render() {
             .unitCount = 3,
             .chestCount = 10,
             .lootTable = {
-                {0, 1.f, 0.f},
-                {1, 0.5f, 0.5f},
-                {2, 0.f, 1.f},
+                    {0, 1.f,  0.f},
+                    {1, 0.5f, 0.5f},
+                    {2, 0.f,  1.f},
             },
             .encounterTable = {
                 {'x', 1.f, 1.f},
@@ -1836,13 +1854,13 @@ void processInput(GLFWwindow *window) {
         timeStepKeyPressed = false;
     }
 
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed){
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed) {
         ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
         spdlog::debug("clearing tiles in radius");
         isXpressed = true;
 //        radiusToRemove +=1;
     }
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE){
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE) {
         isXpressed = false;
     }
 
@@ -1866,8 +1884,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
-        ztgk::game::cursor.move({xposIn, yposIn});
-    
+    ztgk::game::cursor.move({xposIn, yposIn});
+
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
@@ -1876,7 +1894,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     if (ztgk::game::gameStarted) {
 
         ztgk::game::cursor.scroll({xoffset, yoffset});
-    camera.MoveCamera(yoffset);
+        camera.MoveCamera(yoffset);
     }
 }
 
@@ -1905,7 +1923,7 @@ void update_dragged_tiles() {
             }
         }
         selectedTiles = tilesInArea;
-        for(auto tile : tilesInArea){
+        for (auto tile: tilesInArea) {
             scene.systemManager.getSystem<Grid>()->getTileAt(tile)->setTileSelectionState(POINTED_AT);
         }
 
@@ -1958,7 +1976,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         if (LmouseHeldReleaseTime - LmouseHeldStartTime < 0.2f) {
 
             //check for double click
-            if(glfwGetTime() - lastLeftClickTime < 0.2f){
+            if (glfwGetTime() - lastLeftClickTime < 0.2f) {
                 spdlog::debug("Left double click detected");
                 //deselect all units
                 scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
@@ -1966,12 +1984,12 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
             }
             lastLeftClickTime = glfwGetTime();
             // if ray hits an allied unit
-            Unit * hitAlly = nullptr;
+            Unit *hitAlly = nullptr;
             if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && ray->getHitEntity()->getComponent<Unit>()->isAlly) {
                 hitAlly = ray->getHitEntity()->getComponent<Unit>();
             } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
-                    && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
-                    && ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                       && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
+                       && ray->getHitEntity()->getComponent<Tile>()->unit->isAlly) {
                 hitAlly = ray->getHitEntity()->getComponent<Tile>()->unit;
             }
 
@@ -1989,12 +2007,12 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 }
             }
 
-            Unit * hitEnemy = nullptr;
+            Unit *hitEnemy = nullptr;
             if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Unit>() != nullptr && !ray->getHitEntity()->getComponent<Unit>()->isAlly) {
                 hitEnemy = ray->getHitEntity()->getComponent<Unit>();
             } else if (ray->getHitEntity() != nullptr && ray->getHitEntity()->getComponent<Tile>() != nullptr
                        && ray->getHitEntity()->getComponent<Tile>()->unit != nullptr
-                       && !ray->getHitEntity()->getComponent<Tile>()->unit->isAlly){
+                       && !ray->getHitEntity()->getComponent<Tile>()->unit->isAlly) {
                 hitEnemy = ray->getHitEntity()->getComponent<Tile>()->unit;
             }
 
@@ -2014,13 +2032,13 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                 tilesInArea = VectorUtils::getAllTilesBetween(mouseHeldStartGridPos, mouseHeldEndGridPos);
                 selectedTiles = tilesInArea;
-                std::vector<Tile*> tiles;
+                std::vector<Tile *> tiles;
 
                 //get all tiles in the area
                 for (auto tile: tilesInArea) {
                     tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
                 }
-                std::vector<Unit*> Sponges;
+                std::vector<Unit *> Sponges;
                 //get all units and mineables in the area
                 for (auto tile: tiles) {
                     if (tile->unit != nullptr) {
@@ -2047,34 +2065,33 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         isRightMouseButtonHeld = false;
 
         Entity *hit = ray->getHitEntity();
-        if(hit == nullptr){
+        if (hit == nullptr) {
             return;
         }
 
 
         //if mouse was held for less than 0.2 seconds, consider it a click
-        if(RmouseHeldReleaseTime - RmouseHeldStartTime < 0.2f){
-            if(glfwGetTime() - lastRightClickTime < 0.2f){
+        if (RmouseHeldReleaseTime - RmouseHeldStartTime < 0.2f) {
+            if (glfwGetTime() - lastRightClickTime < 0.2f) {
                 spdlog::debug("Right double click detected");
             }
             lastRightClickTime = glfwGetTime();
 
 
-
-            std::vector<Unit*> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
-            if(!selectedSponges.empty()){
+            std::vector<Unit *> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
+            if (!selectedSponges.empty()) {
                 auto kiddo = hit->getChild("OnMapItem");
-                PickupubleItem* pickupableItem = nullptr;
-                if(kiddo != nullptr) {
+                PickupubleItem *pickupableItem = nullptr;
+                if (kiddo != nullptr) {
                     pickupableItem = hit->getChild("OnMapItem")->getComponent<PickupubleItem>();
-                }
-                else{
+                } else {
                     pickupableItem = hit->getComponent<PickupubleItem>();
                 }
-                if(pickupableItem != nullptr){
+                if (pickupableItem != nullptr) {
                     //sort sponges by distance to pickupable item ascending using pickupableItem->getEntity()->transform.getLocalPosition()
-                    std::sort(selectedSponges.begin(), selectedSponges.end(), [pickupableItem](Unit* a, Unit* b){
-                        return VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(a->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition())) < VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(b->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition()));
+                    std::sort(selectedSponges.begin(), selectedSponges.end(), [pickupableItem](Unit *a, Unit *b) {
+                        return VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(a->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition())) <
+                               VectorUtils::Distance(VectorUtils::GlmVec3ToVector3(b->getEntity()->transform.getGlobalPosition()), VectorUtils::GlmVec3ToVector3(pickupableItem->getEntity()->transform.getGlobalPosition()));
                     });
 
                     selectedSponges[0]->pickupTarget = pickupableItem;
@@ -2086,27 +2103,27 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     return;
 
                 }
-                Entity* hitWashingMachine = nullptr;
-                if(hit->getComponent<BoxCollider>()->collisionType == CollisionType::WASHING_MACHINE){
+                Entity *hitWashingMachine = nullptr;
+                if (hit->getComponent<BoxCollider>()->collisionType == CollisionType::WASHING_MACHINE) {
                     hitWashingMachine = hit;
                 }
                 auto hitMineable = hit->getMineableComponent<IMineable>(hit);
-                if(hitMineable == nullptr){
-                    Entity* chestChild = hit->getChild("ChestChild");
-                    if(chestChild != nullptr){
+                if (hitMineable == nullptr) {
+                    Entity *chestChild = hit->getChild("ChestChild");
+                    if (chestChild != nullptr) {
                         hitMineable = chestChild->getMineableComponent<IMineable>(chestChild);
                     }
                 }
 
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
-                if(hitUnit == nullptr && hitTile != nullptr){
+                if (hitUnit == nullptr && hitTile != nullptr) {
                     if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
-                         hitUnit = hitTile->unit;
+                        hitUnit = hitTile->unit;
                     }
                 }
 
-                for(auto sponge : selectedSponges){
+                for (auto sponge: selectedSponges) {
                     sponge->hasMovementTarget = false;
                     sponge->miningTargets.clear();
                     sponge->currentMiningTarget = nullptr;
@@ -2115,7 +2132,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     sponge->hasCombatTarget = false;
                     sponge->pathfinding.path.clear();
 
-                    if(hitWashingMachine != nullptr){
+                    if (hitWashingMachine != nullptr) {
                         sponge->ForcedMovementState = true;
                         sponge->forcedMovementTarget = sponge->pathfinding.GetNearestVacantTile(scene.systemManager.getSystem<Grid>()->GetNearestWashingMachineTile(sponge->gridPosition), sponge->gridPosition);
 
@@ -2132,17 +2149,17 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     }
 
 
-                    if(hitUnit!= nullptr){
-                        if(hitUnit->isAlly){} //do nothing
-                        else{
+                    if (hitUnit != nullptr) {
+                        if (hitUnit->isAlly) {} //do nothing
+                        else {
                             sponge->hasCombatTarget = true;
                             sponge->combatTarget = hitUnit;
                             continue;
                         }
                     }
 
-                    if(hitMineable != nullptr){
-                        if(!hitMineable->isMined){
+                    if (hitMineable != nullptr) {
+                        if (!hitMineable->isMined) {
                             sponge->miningTargets.clear();
                             sponge->miningTargets.emplace_back(hitMineable);
                             sponge->hasMiningTarget = true;
@@ -2152,7 +2169,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                         }
                     }
 
-                    if(hitTile != nullptr) {
+                    if (hitTile != nullptr) {
                         sponge->ForcedMovementState = true;
                         sponge->forcedMovementTarget = hitTile->index;
 
@@ -2172,8 +2189,8 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
             }
         }
-        //if mouse was held for more, consider it a drag
-        else{
+            //if mouse was held for more, consider it a drag
+        else {
             if (ray->getHitEntity() != nullptr) {
                 mouseHeldEndPos = ray->getHitEntity()->transform.getGlobalPosition();
                 Vector2Int mouseHeldStartGridPos = scene.systemManager.getSystem<Grid>()->WorldToGridPosition(
@@ -2190,35 +2207,35 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 update_dragged_tiles();
                 std::vector<Tile *> tiles;
 
-                std::vector<IMineable*> Mineables = {};
-                std::vector<Unit*> Enemies = {};
+                std::vector<IMineable *> Mineables = {};
+                std::vector<Unit *> Enemies = {};
 
-                for(auto tile : tilesInArea){
+                for (auto tile: tilesInArea) {
                     tiles.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(tile));
                 }
 
-                for(auto tile: tiles){
+                for (auto tile: tiles) {
                     auto possibleMineable = tile->getEntity()->getMineableComponent<IMineable>(tile->getEntity());
-                    if(possibleMineable != nullptr) {
+                    if (possibleMineable != nullptr) {
                         Mineables.push_back(possibleMineable);
                     }
 
-                    if(tile->unit != nullptr){
-                        if(!tile->unit->isAlly){
+                    if (tile->unit != nullptr) {
+                        if (!tile->unit->isAlly) {
                             Enemies.push_back(tile->unit);
                         }
                     }
                 }
-                if(!Enemies.empty()){
-                    if(!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
-                        for(auto Sponge : scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                if (!Enemies.empty()) {
+                    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
+                        for (auto Sponge: scene.systemManager.getSystem<UnitSystem>()->selectedUnits) {
                             //sort enemies by distance to sponge ascending
-                            std::sort(Enemies.begin(), Enemies.end(), [Sponge](Unit* a, Unit* b){
+                            std::sort(Enemies.begin(), Enemies.end(), [Sponge](Unit *a, Unit *b) {
                                 return VectorUtils::Distance(Sponge->gridPosition, a->gridPosition) < VectorUtils::Distance(Sponge->gridPosition, b->gridPosition);
                             });
 
-                            for(auto enemy : Enemies){
-                                if(Sponge->canPathToAttackTarget(enemy)){
+                            for (auto enemy: Enemies) {
+                                if (Sponge->canPathToAttackTarget(enemy)) {
                                     Sponge->hasCombatTarget = true;
                                     Sponge->combatTarget = enemy;
                                     break;
@@ -2227,13 +2244,12 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
                         }
                     }
-                }
-                else if(!Mineables.empty()){
-                    if(!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()){
-                        for(auto Sponge : scene.systemManager.getSystem<UnitSystem>()->selectedUnits){
+                } else if (!Mineables.empty()) {
+                    if (!scene.systemManager.getSystem<UnitSystem>()->selectedUnits.empty()) {
+                        for (auto Sponge: scene.systemManager.getSystem<UnitSystem>()->selectedUnits) {
                             Sponge->miningTargets.clear();
-                            for(auto mineable : Mineables){
-                                if(!mineable->isMined){
+                            for (auto mineable: Mineables) {
+                                if (!mineable->isMined) {
                                     Sponge->miningTargets.emplace_back(mineable);
                                     Sponge->hasMiningTarget = true;
                                     tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
@@ -2261,9 +2277,9 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 void handleControls(int key, int scancode, int action, int mods) {
     if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == 0 && action == GLFW_PRESS) {
         scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
-        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) { return unit->isAlly; });
         auto idx = key - GLFW_KEY_1;
-        for (auto ally : allies) {
+        for (auto ally: allies) {
             if (idx == 0) {
                 scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
                 ztgk::game::ui_data.tracked_unit_id = ally->uniqueID;
@@ -2273,9 +2289,9 @@ void handleControls(int key, int scancode, int action, int mods) {
         }
     }
     if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
-        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) { return unit->isAlly; });
         auto idx = key - GLFW_KEY_1;
-        for (auto ally : allies) {
+        for (auto ally: allies) {
             if (idx == 0) {
                 scene.systemManager.getSystem<UnitSystem>()->selectUnit(ally);
                 break;
@@ -2285,9 +2301,9 @@ void handleControls(int key, int scancode, int action, int mods) {
         ztgk::game::ui_data.tracked_unit_id = -1;
     }
     if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && mods == GLFW_MOD_ALT && action == GLFW_PRESS) {
-        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;});
+        auto allies = scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) { return unit->isAlly; });
         auto idx = key - GLFW_KEY_1;
-        for (auto ally : allies) {
+        for (auto ally: allies) {
             if (idx == 0) {
                 scene.systemManager.getSystem<UnitSystem>()->deselectUnit(ally);
                 if (ztgk::game::ui_data.tracked_unit_id == ally->uniqueID)
@@ -2308,7 +2324,7 @@ void handleControls(int key, int scancode, int action, int mods) {
         glfwSetWindowShouldClose(window, true);
     }
     if (key == GLFW_KEY_A && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
-        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+        for (auto unit: scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) { return unit->isAlly; })) {
             scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
         }
     }
@@ -2318,10 +2334,10 @@ void handleControls(int key, int scancode, int action, int mods) {
     }
     if (key == GLFW_KEY_A && mods == (GLFW_MOD_CONTROL | GLFW_MOD_SHIFT) && action == GLFW_PRESS) {
         auto old_selection = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
-        for (auto unit : scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) {return unit->isAlly;})) {
+        for (auto unit: scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) { return unit->isAlly; })) {
             scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
         }
-        for (auto unit : old_selection) {
+        for (auto unit: old_selection) {
             scene.systemManager.getSystem<UnitSystem>()->deselectUnit(unit);
         }
         ztgk::game::ui_data.tracked_unit_id = -1;
@@ -2388,12 +2404,12 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .unitCount = 3,                        //3        <---
             .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
             .lootTable = {
-                {static_cast<int>(Item::item_types.mop), 1.f, 0.f},
-                {static_cast<int>(Item::item_types.super_mop), 0.5f, 0.5f},
-                {static_cast<int>(Item::item_types.water_gun), 0.f, 1.f},
-                {static_cast<int>(Item::item_types.beacon), 10.f, 0.f, 2},
-                {static_cast<int>(Item::item_types.detergent), 0.5f, 0.5f},
-                {static_cast<int>(Item::item_types.pendant), 0.5f, 1.5f},
+                    {static_cast<int>(Item::item_types.mop),       1.f,  0.f},
+                    {static_cast<int>(Item::item_types.super_mop), 0.5f, 0.5f},
+                    {static_cast<int>(Item::item_types.water_gun), 0.f,  1.f},
+                    {static_cast<int>(Item::item_types.beacon),    10.f, 0.f, 2},
+                    {static_cast<int>(Item::item_types.detergent), 0.5f, 0.5f},
+                    {static_cast<int>(Item::item_types.pendant),   0.5f, 1.5f},
             },
             .encounterTable = {
                 {'x', 1.f, 1.f},
