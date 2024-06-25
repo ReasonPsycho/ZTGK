@@ -107,7 +107,10 @@ string modelMopPath = "res/models/items/mop/mop.fbx";
 string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
 string modelTidyPodLauncherPath = "res/models/items/tidyPodLauncher/tidyPodLauncher.fbx";
 string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
-string modelPathShroom = "res/models/shroom/shroom.fbx";
+string modelPathShroom = "res/models/Mushroom/shroom.fbx";
+string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
+string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
+string modelPathShroomSpit = "res/models/Mushroom/shroom_spit.fbx";
 string modelPathHangerMop = "res/models/chest/hanger_and_items_models/hanger_mop.fbx";
 string modelPathHangerRotationMop = "res/models/chest/hanger_and_items_models/hanger_rotation_mop.fbx";
 string modelPathHangerTidyPodLauncher = "res/models/chest/hanger_and_items_models/hanger_launcher.fbx";
@@ -667,7 +670,7 @@ void load_enteties() {
     ztgk::game::mopModel = mopModel;
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
-    ztgk::game::shroomModel = ztgk::game::modelLoadingManager->GetModel("res/models/Mushroom/shroom.fbx");
+    ztgk::game::shroomModel = ztgk::game::modelLoadingManager->GetModel(modelPathShroom);
     ztgk::game::hangerMopModel = hangerMopModel;
     ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
     ztgk::game::hangerTidyPodLauncherModel = hangerTidyPodLauncherModel;
@@ -879,14 +882,18 @@ void load_units() {
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
 
-//    playerUnit = scene.addEntity("Shroom");
-//    playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
-//    playerUnit->addComponent(make_unique<ColorMask>());
-//    playerUnit->addComponent(make_unique<AnimationPlayer>());
-//  playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
-//    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
-//    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
-//    playerUnit->updateSelfAndChild();
+    playerUnit = scene.addEntity("Shroom");
+    playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
+    playerUnit->addComponent(make_unique<ColorMask>());
+    playerUnit->addComponent(make_unique<AnimationPlayer>());
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathShroomIdle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomIdle, ztgk::game::shroomModel);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathShroomSpit] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomSpit, ztgk::game::shroomModel);
+    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathShroomMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomMove, ztgk::game::shroomModel);
+
+    playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
+    playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
+    playerUnit->updateSelfAndChild();
 
     /*
 playerUnit = scene.addEntity("Player1");
