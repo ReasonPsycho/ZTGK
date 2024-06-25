@@ -260,6 +260,8 @@ bool isRightMouseButtonHeld = false;
 float RmouseHeldStartTime = 0.0f;
 float RmouseHeldReleaseTime = 0.0f;
 
+glm::vec2 mouseHeldStartPosScr;
+
 glm::vec3 mouseHeldStartPos;
 glm::vec3 mouseHeldEndPos;
 
@@ -1934,7 +1936,6 @@ void update_dragged_tiles() {
             auto cTile = scene.systemManager.getSystem<Grid>()->getTileAt(tile);
             if (isLeftMouseButtonHeld)
                 cTile->setHighlight(SELECTION_LMB_GREEN);
-            // do not select it blue - that is handled every update just for mining targets
             else if (isRightMouseButtonHeld)
                 cTile->setHighlight(SELECTION_RMB_BLUE);
         }
@@ -1962,6 +1963,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
     //if left mouse button is pressed, start timer and save position of the mouse press
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         LmouseHeldStartTime = glfwGetTime();
+        mouseHeldStartPosScr = ztgk::game::cursor.raw_pos;
         isLeftMouseButtonHeld = true;
         if (ray->getHitEntity() != nullptr) {
             mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
@@ -1970,6 +1972,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         RmouseHeldStartTime = glfwGetTime();
+        mouseHeldStartPosScr = ztgk::game::cursor.raw_pos;
         isRightMouseButtonHeld = true;
         if (ray->getHitEntity() != nullptr) {
             mouseHeldStartPos = ray->getHitEntity()->transform.getGlobalPosition();
@@ -1982,11 +1985,11 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
         isLeftMouseButtonHeld = false;
 
         //if mouse was held for less than 0.1 seconds, consider it a click
-        if (LmouseHeldReleaseTime - LmouseHeldStartTime < 0.2f) {
+        if (LmouseHeldReleaseTime - LmouseHeldStartTime < 0.2f && glm::length(mouseHeldStartPosScr - ztgk::game::cursor.raw_pos) < 10) {
 
             //check for double click
             if (glfwGetTime() - lastLeftClickTime < 0.2f) {
-                spdlog::debug("Left double click detected");
+//                spdlog::debug("Left double click detected");
                 //deselect all units
                 scene.systemManager.getSystem<UnitSystem>()->deselectAllUnits();
                 ztgk::game::ui_data.tracked_unit_id = -1;
@@ -2091,14 +2094,14 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
 
 
         //if mouse was held for less than 0.2 seconds, consider it a click
-        if (RmouseHeldReleaseTime - RmouseHeldStartTime < 0.2f) {
+        if (RmouseHeldReleaseTime - RmouseHeldStartTime < 0.2f && glm::length(mouseHeldStartPosScr - ztgk::game::cursor.raw_pos) < 10) {
             if (glfwGetTime() - lastRightClickTime < 0.2f) {
-                spdlog::debug("Right double click detected");
+//                spdlog::debug("Right double click detected");
             }
             lastRightClickTime = glfwGetTime();
 
-
             std::vector<Unit *> selectedSponges = scene.systemManager.getSystem<UnitSystem>()->selectedUnits;
+
             if (!selectedSponges.empty()) {
                 auto kiddo = hit->getChild("OnMapItem");
                 PickupubleItem *pickupableItem = nullptr;
