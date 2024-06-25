@@ -850,7 +850,7 @@ void load_enteties() {
 //
 //    scene.systemManager.getSystem<HUD>()->getDefaultGroup()->setHidden(true);
 
-    //load_units();
+    load_units();
 
 
 }
@@ -859,6 +859,9 @@ void load_units() {
 
 //     playerUnit = scene.addEntity("Gabka");
 //    playerUnit->addComponent(make_unique<Render>(gabka));
+// 
+     playerUnit = scene.addEntity("Mop");
+    playerUnit->addComponent(make_unique<Render>(mopModel));
 //    playerUnit->addComponent(make_unique<ColorMask>());
 //    playerUnit->addComponent(make_unique<AnimationPlayer>());
 //    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka);
