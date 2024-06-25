@@ -165,6 +165,17 @@ State *IdleState::RunCurrentState() {
             }
 
         }
+        if(unit->unitType == UNIT_SHROOM && !grid->getTileAt(unit->gridPosition)->isInFogOfWar){
+            auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+            if(anim!= nullptr){
+                string modelPathShroomMove = "res/models/Mushroom/shroom_idle.fbx";
+                if (unit->animationcooldown > anim->animationMap[modelPathShroomMove]->GetDuration() /
+                                              (anim->animationMap[modelPathShroomMove]->GetTicksPerSecond() * 2.0f)) {
+                    anim->PlayAnimation(modelPathShroomMove, false, 2.0f);
+                    unit->animationcooldown = 0;
+                }
+            }
+        }
     }
 
     return this;

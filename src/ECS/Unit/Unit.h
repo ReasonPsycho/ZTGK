@@ -137,6 +137,8 @@ public:
     float animationcooldown = 0;
 
     bool checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot();
+
+    bool lastUsedRightAttack = true;
 private:
     Vector2Int previousGridPosition;
     void onFirstUpdate();

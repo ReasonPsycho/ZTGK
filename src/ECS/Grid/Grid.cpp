@@ -695,11 +695,16 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
     string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
     string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
-    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack_right.fbx";
+    string modelPathGabkaAttackR = "res/models/gabka/pan_gabka_attack_right.fbx";
+    string modelPathGabkaAttackL = "res/models/gabka/pan_gabka_attack_left.fbx";
 
     string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
     string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
     string modelPathZuczekMove = "res/models/zuczek/Zuczek_run - copia.fbx";
+
+    string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
+    string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
+    string modelPathShroomSpit = "res/models/Mushroom/shroom_spit.fbx";
 
     if (!read_names) {
         std::string line;
@@ -746,8 +751,10 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
                 modelPathGabkaIdle, gabka);
         UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
                 modelPathGabkaMine, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttack, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackR] = modelLoadingManager->GetAnimation(
+                modelPathGabkaAttackR, gabka);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackL] = modelLoadingManager->GetAnimation(
+                modelPathGabkaAttackL, gabka);
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
@@ -763,6 +770,10 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     } else if(unit->unitType == UnitType::UNIT_SHROOM) {
         InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
+        UnitEntity->addComponent(make_unique<AnimationPlayer>());
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomMove, shroom);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomIdle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomIdle, shroom);
+        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomSpit] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomSpit, shroom);
     }
     return UnitEntity;
 }
