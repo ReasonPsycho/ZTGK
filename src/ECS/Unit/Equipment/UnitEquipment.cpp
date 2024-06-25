@@ -4,6 +4,7 @@
 
 #include "UnitEquipment.h"
 #include "InventoryManager.h"
+#include "ECS/Unit/Unit.h"
 
 #include <iostream>
 
@@ -44,6 +45,7 @@ std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
             else ret.second = unequipItem(2);
         }
         item1 = item;
+        if (unit->IsAlly()) unit->getEntity()->getChild("RHand")->addComponent(std::make_unique<Render>(item1->model));
         return ret;
     }
     if (slot == 1) {
@@ -52,6 +54,7 @@ std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
         else if (item2 != nullptr && item2->takesTwoSlots)
             ret.first = unequipItem(2);
         item1 = item;
+        if (unit->IsAlly()) unit->getEntity()->getChild("RHand")->addComponent(std::make_unique<Render>(item1->model));
         return ret;
     } else if (slot == 2) {
         if (item2 != nullptr)
@@ -59,6 +62,7 @@ std::pair<Item *, Item *> UnitEquipment::equipItem(Item *item, short slot) {
         else if (item1 != nullptr && item1->takesTwoSlots)
             ret.first = unequipItem(1);
         item2 = item;
+        if (unit->IsAlly()) unit->getEntity()->getChild("LHand")->addComponent(std::make_unique<Render>(item2->model));
         return ret;
     } else {
         spdlog::error("Invalid slot. Trying to equip item into {}. slot, while unit has only 2.", slot);
@@ -70,11 +74,19 @@ Item * UnitEquipment::unequipItem(short slot) {
     if (slot == 1) {
         Item *temp = item1;
         item1 = nullptr;
+        if (unit->IsAlly()) {
+            auto render = unit->getEntity()->getChild("RHand")->getComponent<Render>();
+            if (render) render->Remove();
+        }
         return temp;
     }
     if (slot == 2) {
         Item *temp = item2;
         item2 = nullptr;
+        if (unit->IsAlly()) {
+            auto render = unit->getEntity()->getChild("LHand")->getComponent<Render>();
+            if (render) render->Remove();
+        }
         return temp;
     }
     spdlog::error("Invalid slot. Trying to unequip item from {}. slot, while unit has only 2.", slot);
