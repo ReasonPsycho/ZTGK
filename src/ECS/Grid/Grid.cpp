@@ -693,7 +693,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
     string modelPathGabkaIdle = "res/models/gabka/pan_gabka_idle.fbx";
     string modelPathGabkaMine = "res/models/gabka/pan_gabka_mine.fbx";
-    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack.fbx";
+    string modelPathGabkaAttack = "res/models/gabka/pan_gabka_attack_right.fbx";
 
     if (!read_names) {
         std::string line;
