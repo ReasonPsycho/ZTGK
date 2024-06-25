@@ -77,3 +77,18 @@ void Animation::ReadHeirarchyData(AssimpNodeData &dest, const aiNode *src) {
 
 Animation::~Animation() {
 }
+
+const glm::mat4 Animation::GetBoneOffSet(string name) {
+
+    auto it = m_BoneInfoMap.find(name);
+
+    if(it != m_BoneInfoMap.end())
+    {
+        BoneInfo info = it->second;
+        return info.offset;
+    }
+    else
+    {
+        return glm::mat4(1);
+    }
+}

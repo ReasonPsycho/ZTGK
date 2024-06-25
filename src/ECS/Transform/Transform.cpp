@@ -174,3 +174,19 @@ const glm::quat &Transform::getGlobalRotation() const {
     return glm::quat_cast(m_modelMatrix);
 }
 
+void Transform::setLocalMatrix(const glm::mat4 &transformMatrix) {
+    glm::vec3 scale;
+    glm::quat rotation;
+    glm::vec3 translation;
+    glm::vec3 skew;
+    glm::vec4 perspective;
+    glm::decompose(transformMatrix, scale, rotation, translation, skew, perspective);
+    rotation = glm::conjugate(rotation);
+    
+    setLocalRotation(rotation);
+    setLocalPosition(translation);
+    setLocalScale(scale);
+}
+
+
+
