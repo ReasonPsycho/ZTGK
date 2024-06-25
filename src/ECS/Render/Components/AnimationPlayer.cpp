@@ -8,6 +8,19 @@ AnimationPlayer::AnimationPlayer() {
     name = "Animation Player";
 }
 
+std::string glm_mat4_to_string(const glm::mat4& matrix) {
+    std::ostringstream ss;
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            ss << matrix[i][j] << ' ';
+        }
+        ss << std::endl;
+    }
+    return ss.str();
+}
+
 void AnimationPlayer::UpdateImpl() {
     if(isPlaying){
         animator.UpdateAnimation((float )Time::Instance().DeltaTime() * animationSpeed);
@@ -21,6 +34,10 @@ void AnimationPlayer::UpdateImpl() {
             looping = false;
             animationSpeed = 1.0f;
         }
+        
+   //     spdlog::info(glm_mat4_to_string(animator.m_CurrentAnimation->GetBoneOffSet("Hand.L")));
+   //     spdlog::info(glm_mat4_to_string(animator.m_CurrentAnimation->GetBoneOffSet("Hand.R")));
+        
     } else{
         Render *render = getEntity()->getComponent<Render>();
         if (render != nullptr) {
