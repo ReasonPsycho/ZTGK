@@ -751,6 +751,9 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
+
+        ztgk::game::scene->addEntity(UnitEntity, "RHand");
+        ztgk::game::scene->addEntity(UnitEntity, "LHand");
     } else if (unit->unitType == UnitType::UNIT_BUG) {
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
