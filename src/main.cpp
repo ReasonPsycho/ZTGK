@@ -2403,16 +2403,16 @@ void gen_and_load_lvl(bool gen_new_lvl) {
             .size {100, 100},
             .wallThickness = 1.f,
             .baseRadius = RNG::RandomFloat(8.f, 12.f),
-            .keyRadius = RNG::RandomFloat(3.f, 5.f),
-            .pocketRadius = RNG::RandomFloat(4.f, 8.f),
+            .keyRadius = RNG::RandomFloat(5.f, 8.f),
+            .pocketRadius = RNG::RandomFloat(3.f, 8.f),
             .noiseImpact = RNG::RandomFloat(0.1f, 0.3f),
             .keyDistances {20.f, 20.f, 30.f, 30.f, 40.f},
             .extraPocketAttempts = 10000,
-            .keyEnemies = RNG::RandomInt(1, 3),
-            .minEnemies = 0,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
-            .maxEnemies = 4,                       //4        <---
+            .keyEnemies = RNG::RandomInt(3, 4),
+            .minEnemies = 2,                       //0        <--- if those values are different from those in comments, I forgot to change them after debugging
+            .maxEnemies = 5,                       //4        <---
             .unitCount = 3,                        //3        <---
-            .chestCount = RNG::RandomInt(10, 15),  //10, 15    <---
+            .chestCount = RNG::RandomInt(20, 30),  //20, 30    <---
             .lootTable = {
                     {static_cast<int>(Item::item_types.mop),       1.f,  0.f},
                     {static_cast<int>(Item::item_types.super_mop), 0.5f, 0.5f},
