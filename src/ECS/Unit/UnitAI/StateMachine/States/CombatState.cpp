@@ -133,7 +133,7 @@ void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
         anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
     } else if(unit->unitType == UNIT_BUG){
         string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
-        anim->PlayAnimation(modelPathBugMove, false, 2.0f);
+        anim->PlayAnimation(modelPathBugMove, false, 5.0f);
     } else if(unit->unitType == UNIT_SHROOM){
 //        string modelPathShroomMove = "res/models/grzyb/grzyb_attack.fbx";
 //        anim->PlayAnimation(modelPathShroomMove, false, 5.0f);
