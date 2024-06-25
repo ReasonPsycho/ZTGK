@@ -116,6 +116,10 @@ void CombatState::AttackTarget() {
     auto target = unit->combatTarget;
     if(target == nullptr) return; //todo expand on this
 
+    AttackSideFX(useItem, unit, target);
+}
+
+void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
     useItem->cd_sec = useItem->stats.cd_max_sec;
     unit->equipment.cd_between_sec = unit->equipment.cd_between_max_sec;
 
@@ -128,11 +132,15 @@ void CombatState::AttackTarget() {
         string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack.fbx";
         anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
     }
-
+    // todo highlight tiles, play particles
 }
 
 void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     target->stats.hp -= damage;
+    // avoid overheal
+    if (target->stats.hp > target->stats.max_hp + target->stats.added.max_hp)
+        target->stats.hp = target->stats.max_hp + target->stats.added.max_hp;
+
     ColorMask* cm;
     if(target!= nullptr && target->getEntity() != nullptr)
         cm = target->getEntity()->getComponent<ColorMask>();
@@ -149,13 +157,13 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     if (damage < 0) { // heal
         // todo make tile flash this color too
         cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
-        unit->speaker->PlayRandomSoundFromGroup("heal");
-        unit->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
+        ztgk::game::audioManager->playRandomSoundFromGroup("heal");
+        target->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
     } else {
         // todo make tile flash this color too
         cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
-        unit->speaker->PlayRandomSoundFromGroup("punch");
-        unit->tryToSendEmote(unit->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
+        ztgk::game::audioManager->playRandomSoundFromGroup("punch");
+        target->tryToSendEmote(target->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
     }
 
     if(target->stats.hp <= 0){

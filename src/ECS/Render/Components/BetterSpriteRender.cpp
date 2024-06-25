@@ -11,15 +11,31 @@
 
 bool BetterSpriteRender::draw(Shader &regularShader, Frustum *frustum) {
     ZoneScopedN("Draw");
-    if(aabb.isOnFrustum(*frustum,getEntity()->transform)) {
+    if(aabb.isOnFrustum(*frustum,getEntity()->transform) && !isInFogOfWar) {
         regularShader.use();
         regularShader.setFloat("alpha", alpha);
         texture->use(GL_TEXTURE0);
         regularShader.setInt("diffuseTexture", 0);
         regularShader.setFloat("depthBias", depthBias);
         regularShader.setFloat("scale", scale);
-        regularShader.setBool("isBilborded", isBilborded);
-        regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
+        glm::mat4 localModel = getEntity()->transform.getModelMatrix();
+        if(isBilborded) {
+            glm::vec3 scale  = glm::vec3(glm::length(localModel[0]), glm::length(localModel[1]), glm::length(localModel[2])); // Preserve object's scale
+            glm::vec3 billboard_position = glm::vec3(localModel[3]);
+
+            glm::vec3 look = glm::normalize(ztgk::game::camera->Position - billboard_position);
+            glm::vec3 right = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), look);
+            glm::vec3 up = glm::cross(look, right);
+
+            localModel = glm::mat4(
+                    glm::vec4(right * scale.x, 0.0f),
+                    glm::vec4(up * scale.y, 0.0f),
+                    glm::vec4(look * scale.z, 0.0f),
+                    glm::vec4(billboard_position, 1.0f)
+            );
+        }
+        
+        regularShader.setMatrix4("model", false, glm::value_ptr(localModel));
         return true;
     }
     return false;

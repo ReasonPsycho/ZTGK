@@ -455,6 +455,23 @@ void Unit::UpdateImpl() {
         equipment.item2->cd_sec -= Time::Instance().DeltaTime() * (stats.atk_spd + stats.added.atk_speed);
     if (equipment.cd_between_sec > 0)
         equipment.cd_between_sec -= Time::Instance().DeltaTime() * (stats.atk_spd + stats.added.atk_speed);
+
+    if (isAlive) {
+        // item has an ability with cooldown but isn't used for attack
+        if (equipment.item1 && equipment.item1->active && equipment.item1->cd_sec <= 0) {
+            auto target = equipment.item1->determine_target(this);
+            if (target) {
+                CombatState::AttackSideFX(equipment.item1, this, target);
+            }
+        }
+        if (equipment.item2 && equipment.item2->active && equipment.item2->cd_sec <= 0) {
+            auto target = equipment.item2->determine_target(this);
+            if (target) {
+                CombatState::AttackSideFX(equipment.item2, this, target);
+            }
+        }
+    }
+
 }
 
 Unit *Unit::GetClosestEnemyInWeaponRange() {

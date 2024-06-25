@@ -198,7 +198,7 @@ void InstanceRenderSystem::PushToSSBO(Camera *camera) {
 void InstanceRenderSystem::DrawLights(Shader *regularShader, Camera *camera) {
     ZoneScopedN("Simple draw tiles");
     LightSystem *lightSystem = systemManager->getSystem<LightSystem>();
-    PhongPipeline *phongPipline = systemManager->getSystem<PhongPipeline>();\
+    PhongPipeline *phongPipline = systemManager->getSystem<PhongPipeline>();
     glEnable(GL_BLEND);
     glDisablei(GL_BLEND, phongPipline->colorAttachments[2]);
     regularShader->use();

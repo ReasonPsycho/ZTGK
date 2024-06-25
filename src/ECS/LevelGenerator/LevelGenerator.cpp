@@ -16,8 +16,7 @@ std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 		{TileType::ore,   '^'},
 		{TileType::core,  'c'},
 		{TileType::unit,  '+'},
-		{TileType::bug,   'x'},
-        {TileType::shroom,'s'}
+		{TileType::enemy, 'x'},
 	};
 	os << "# ---LAYOUT START---";
 	for (std::size_t i = 0; i < level.grid.size(); i++) {
@@ -26,6 +25,8 @@ std::ostream& operator<<(std::ostream& os, const LevelLayout& level) {
 		const auto& tile = level.grid[i];
 		if (tile.type == TileType::chest && tile.itemId >= 0 && tile.itemId < 10) {
 			os << tile.itemId;
+		} else if (tile.type == TileType::enemy) {
+			os << tile.enemyId;
 		} else {
 			os << chars.at(tile.type);
 		}
@@ -114,6 +115,7 @@ void LevelGenerator::operator()(const Config& config) {
 		};
 	}
 	assignChestItems(center, config.lootTable, rand);
+	assignEnemyTypes(center, config.encounterTable, rand);
 }
 
 inline void LevelGenerator::generatePerlinNoiseGrid(glm::ivec2 size, PcgEngine& rand) noexcept {
@@ -224,8 +226,7 @@ void LevelGenerator::hollowOutPocket(int index, float padding, float noiseImpact
 }
 
 void LevelGenerator::addEnemiesToPocket(int index, int count, PcgEngine& rand) noexcept {
-	std::bernoulli_distribution dist(0.5);
-	addAtRandomToPocket(index, count, dist(rand) ? Tile::Type::bug : Tile::Type::shroom, rand, [](glm::ivec2) {
+	addAtRandomToPocket(index, count, Tile::Type::enemy, rand, [](glm::ivec2) {
 		return true;
 	});
 }
@@ -275,5 +276,36 @@ void LevelGenerator::assignChestItems(glm::vec2 center, const std::vector<ItemTe
 		auto index = std::ranges::upper_bound(partialSums, value) - partialSums.begin();
 		chests[i]->itemId = lootTable[index].id;
 		alreadyGenerated[index]++;
+	}
+}
+
+void LevelGenerator::assignEnemyTypes(glm::vec2 center, const std::vector<EnemyTemplate>& encounterTable, PcgEngine& rand) {
+	float minDist = std::numeric_limits<float>::max();
+	float maxDist = 0.f;
+	for (auto&& tile : level.grid) {
+		if (tile.type == Tile::Type::enemy) {
+			float dist = glm::distance(center, pockets[tile.pocketIndex].center);
+			if (dist < minDist)
+				minDist = dist;
+			if (dist > maxDist)
+				maxDist = dist;
+		}
+	}
+	if (minDist == maxDist) {
+		minDist = 0.f;
+		maxDist *= 2.f;
+	}
+	float distSlope = 1.f / (maxDist - minDist);
+	std::vector<float> weights(encounterTable.size());
+	for (auto&& tile : level.grid) {
+		if (tile.type != Tile::Type::enemy)
+			continue;
+		float dist = glm::distance(center, pockets[tile.pocketIndex].center);
+		float lateGame = (dist - minDist) * distSlope;
+		std::ranges::transform(encounterTable, weights.begin(), [&](const EnemyTemplate& enemy) {
+			return std::max(0.f, glm::mix(enemy.chanceEarlyGame, enemy.chanceLateGame, lateGame));
+		});
+		std::discrete_distribution<std::size_t> distribution(weights.begin(), weights.end());
+		tile.enemyId = encounterTable[distribution(rand)].id;
 	}
 }

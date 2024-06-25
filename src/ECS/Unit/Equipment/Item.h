@@ -26,6 +26,7 @@ public:
     unsigned uniqueID;
 
     bool offensive{false};
+    bool active{false}; // item has an ability with cooldown but isn't used for attack
     float cd_sec{0};
 
     // bool on_ground{false};
@@ -47,7 +48,8 @@ public:
     static void do_ranged_aoe_attack(Unit * me, Unit * target, Item * usedItem);
     static void do_heal(Unit * me, Unit * target, Item * usedItem);
 
-    static Unit * default_determine_target(Unit * me, GridRange * range, bool findAlly = false);
+    static Unit * default_determine_target(Unit * me, GridRange * range);
+    static Unit * determine_healing_target(Unit * me, GridRange * range);
     static void play_atk_anim(Unit * me);
 
 // damage formulas
