@@ -170,6 +170,7 @@ void Unit::UpdateImpl() {
     if(firstUpdate){
         onFirstUpdate();
     }
+    animationcooldown += Time::Instance().DeltaTime();
 
 
     if (stats.hp <= 0) {
@@ -382,12 +383,10 @@ void Unit::UpdateImpl() {
         auto anim = getEntity()->getComponent<AnimationPlayer>();
         if (anim == nullptr) {
             spdlog::error("No animation player component found");
-        } else {
+        } else if(unitType == UNIT_SPONGE){
             string modelPathGabkaMove = "res/models/gabka/pan_gabka_move.fbx";
             anim->PlayAnimation(modelPathGabkaMove, false, 6.0f);
         }
-
-
     }
 
     getEntity()->transform.setLocalPosition(worldPosition);

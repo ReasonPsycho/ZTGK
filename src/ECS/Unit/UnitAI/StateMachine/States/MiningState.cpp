@@ -136,7 +136,7 @@ void MiningState::Mine() {
             {
                 spdlog::error("No animation player component found");
             }
-            else
+            else if(unit->unitType == UnitType::UNIT_SPONGE)
             {
                 string modelPathGabkaMove = "res/models/gabka/pan_gabka_mine.fbx";
                 anim->PlayAnimation(modelPathGabkaMove, true, 4.0f);
