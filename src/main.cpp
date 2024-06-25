@@ -251,6 +251,8 @@ Entity *playerUnit;
 
 std::vector<Vector2Int> selectedTiles;
 std::vector<Tile *> tilesSelectedToMine;
+std::vector<Tile *> movementTargets;
+std::vector<Tile *> combatTargets;
 
 bool isLeftMouseButtonHeld = false;
 float LmouseHeldStartTime = 0.0f;
@@ -1597,13 +1599,45 @@ void update() {
         tile->setHighlightPresetFromState();
     }
     tilesSelectedToMine.clear();
+    for (auto tile : combatTargets) {
+        tile->setHighlight(CLEAR);
+        tile->setHighlightPresetFromState();
+    }
+    combatTargets.clear();
+    for (auto tile : movementTargets) {
+        tile->setHighlight(CLEAR);
+        tile->setHighlightPresetFromState();
+    }
+    movementTargets.clear();
     update_dragged_tiles();
+    auto grid = scene.systemManager.getSystem<Grid>();
     for (auto sponge : scene.systemManager.getSystem<UnitSystem>()->allies) {
         for (auto mineable : sponge->miningTargets)
-            tilesSelectedToMine.push_back(scene.systemManager.getSystem<Grid>()->getTileAt(mineable->gridPosition));
+            tilesSelectedToMine.push_back(grid->getTileAt(mineable->gridPosition));
+        if (sponge->hasCombatTarget)
+            combatTargets.push_back(grid->getTileAt(sponge->combatTarget->gridPosition));
+        if (sponge->hasMovementTarget) {
+            if (sponge->ForcedMovementState) {
+                auto tile = grid->getTileAt(sponge->forcedMovementTarget);
+//            if (tile->state == FLOOR)
+                if (tile)
+                    movementTargets.push_back(grid->getTileAt(sponge->forcedMovementTarget));
+            } else {
+                auto tile = grid->getTileAt(sponge->forcedMovementTarget);
+                if (tile)
+//            if (tile->state == FLOOR)
+                    movementTargets.push_back(grid->getTileAt(sponge->movementTarget));
+            }
+        }
     }
     for (auto tile: tilesSelectedToMine) {
         tile->setHighlight(TileHighlightState::SELECTION_RMB_BLUE);
+    }
+    for (auto tile: combatTargets) {
+        tile->setHighlight(TileHighlightState::HIGHLIGHT_ENEMY_RED);
+    }
+    for (auto tile: movementTargets) {
+        tile->setHighlight(TileHighlightState::MOVE_ORDER_YELLOW);
     }
 
     scene.systemManager.getSystem<CollisionSystem>()->Update();
@@ -1936,8 +1970,12 @@ void update_dragged_tiles() {
             auto cTile = scene.systemManager.getSystem<Grid>()->getTileAt(tile);
             if (isLeftMouseButtonHeld)
                 cTile->setHighlight(SELECTION_LMB_GREEN);
-            else if (isRightMouseButtonHeld)
-                cTile->setHighlight(SELECTION_RMB_BLUE);
+            else if (isRightMouseButtonHeld) {
+                if (cTile->state == BUG || cTile->state == SHROOM)
+                    cTile->setHighlight(HIGHLIGHT_ENEMY_RED);
+                else if (cTile->state != CHEST && cTile->state != ORE)
+                    cTile->setHighlight(SELECTION_RMB_BLUE);
+            }
         }
 
     }

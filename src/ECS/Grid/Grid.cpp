@@ -230,7 +230,6 @@ void Grid::InitializeTileEntities() {
             }
 
             tile->isInFogOfWar = true;
-            tile->setHighlightPresetFromState();
 
             switch (tile->state) {
                 // todo these once relevant
@@ -382,7 +381,6 @@ void Grid::SetUpWalls() {
 }
 
 void Grid::SetUpWall(Tile *tile) {
-    // todo handle core, ore, etc. states with different models/textures or render as floor and create entity (as is now)
 
     Chunk *wallChunk = getChunkAt(tile->index);
     float translateLength = tileSize / 2.0f;
@@ -439,6 +437,9 @@ void Grid::SetUpWall(Tile *tile) {
         tile->walls.push_back(
                 wallChunk->addWallData(make_unique<WallData>(topMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
     }
+
+    // here because it sets wall data
+    tile->setHighlightPresetFromState();
 }
 
 void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
