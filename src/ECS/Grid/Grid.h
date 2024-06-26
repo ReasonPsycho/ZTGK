@@ -141,6 +141,7 @@ private:
     };
 
     Entity * SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug);
+    void SpawnHanger(Vector2Int gridPos, Tile* tile);
 };
 
 
