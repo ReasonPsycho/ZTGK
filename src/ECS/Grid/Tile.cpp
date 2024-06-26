@@ -8,7 +8,8 @@
 #include "ECS/Unit/Unit.h"
 #include "ECS/Grid/Chunk.h"
 #include "ECS/Render/Components/BetterSpriteRender.h"
-#include "ECS/Utils/CooldownComponentXDD.h"
+#include "ECS/SignalQueue/Signal.h"
+#include "ECS/SignalQueue/DataCargo/TestSignalData.h"
 
 
 Tile::~Tile() {
@@ -45,6 +46,9 @@ void Tile::changeWallsSelection(TileHighlightState state) {
 }
 
 void Tile::setHighlight(TileHighlightState state) {
+    if (overrideState != CLEAR)
+        return;
+
     changeWallsSelection(state);
     tileHighlightState = state;
 }
@@ -89,6 +93,9 @@ void Tile::UpdateImpl() {
 }
 
 void Tile::setHighlightPresetFromState() {
+    if (overrideState != CLEAR)
+        return;
+
     switch (state) {
         case CHEST:
             setHighlight(HIGHLIGHT_ITEM_GOLD);
@@ -98,6 +105,25 @@ void Tile::setHighlightPresetFromState() {
             break;
         default: break; // do not change existing state
     }
+}
+
+void Tile::setHighlightOverride(TileHighlightState state, float time_sec) {
+    setHighlight(state);
+    overrideState = state;
+
+    auto signal = TestSignalData::signal();
+    signal.time_to_live = time_sec * 1000.0f;
+    signal.callback = [this, state](){
+        // only reset if the current state matches this assignment, otherwise assume it was overridden in the meantime and responsibility is passed to the new signal
+        if (overrideState == state)
+            overrideState = CLEAR;
+    };
+
+//
+//    getEntity()->addComponent(std::make_unique<CooldownComponentXDD>(time_sec, [this](){
+//        overrideState = CLEAR;
+//        setHighlightPresetFromState();
+//    }));
 }
 
 

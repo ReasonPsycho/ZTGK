@@ -276,7 +276,7 @@ void Grid::InitializeTileEntities() {
 //                    }
 //                    else {
                         // todo make this główny model wieszaka?????
-                        model = ztgk::game::hangerMopModel;
+                        model = ztgk::game::chestModel;
 //                    }
                     chestChild->addComponent(std::make_unique<Render>(model));
                     //chestChild->transform.setLocalScale(glm::vec3(1, 1, 2));

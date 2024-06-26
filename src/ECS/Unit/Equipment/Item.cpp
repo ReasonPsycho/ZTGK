@@ -116,6 +116,9 @@ void Item::do_ranged_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
 
 void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
     auto targets = me->equipment.range_of(usedItem)->find_my_allies({target->gridPosition.x, target->gridPosition.z}, me->IsAlly());
+    for (auto tile : me->equipment.range_of(usedItem)->get_tiles(VectorUtils::Vector2IntToGlmVec2(me->gridPosition))) {
+        tile->setHighlightOverride(TileHighlightState::HEAL_LIGHT_GREEN, 0.25f);
+    }
 
     for (auto & tgt : targets) {
         float totalHealAmount = usedItem->determine_damage(me, tgt, {me->gridPosition.x, me->gridPosition.z}); // hit point here is explosion center so original ME position - this is for beacon centered on unit
