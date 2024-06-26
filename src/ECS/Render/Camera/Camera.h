@@ -93,6 +93,8 @@ public:
 
     int saved_display_w = 1920;
     int saved_display_h = 1080;
+
+    void Rotate(bool clockwise, float angle = 3);
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();

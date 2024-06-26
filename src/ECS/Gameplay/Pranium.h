@@ -13,7 +13,7 @@ public:
     Pranium(float timeToMine, Vector2Int gridPosition, Grid* grid);
     ~Pranium() override;
 
-    void onMine(Unit * unit) override;
+    void onMine(Unit * unit);
     void onMined(Unit * unit) override;
 
     void generatePranium(Model * model);

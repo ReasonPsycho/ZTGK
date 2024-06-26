@@ -6,6 +6,18 @@
 #include "ECS/Render/Pipelines/Phong/PhongPipeline.h"
 
 void ParticleSystem::UpdateImpl() {
+    particle_cooldown += Time::Instance().DeltaTime();
+    if(particle_cooldown > 2){
+        particle_cooldown = 0;
+        get_Tiles_to_emmit();
+        for(auto tile: tiles_to_emmit){
+            if(tile->dirtinessLevel == 0){
+                tile->tryToSendParticle(RNG::RandomBool()? 3 : 4);
+            }
+        }
+    }
+
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, particleBuffer);
     auto* ptr = static_cast<ParticleData*>(glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY));
 
@@ -72,4 +84,13 @@ void ParticleSystem::Innit() {
 
 ParticleSystem::ParticleSystem() {
 name = "ParticleSystem";
+}
+
+void ParticleSystem::get_Tiles_to_emmit() {
+    tiles_to_emmit.clear();
+    for(int i = 100; i> 0; i--){
+        auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt({RNG::RandomInt(0, 99), RNG::RandomInt(0, 99)});
+        if(tile != nullptr)
+            tiles_to_emmit.push_back(tile);
+    }
 }

@@ -22,6 +22,7 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Utils/CooldownComponentXDD.h"
 #include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 150,
@@ -181,6 +182,8 @@ void Unit::UpdateImpl() {
         }
     }
     if (!isAlive && isAlly) {
+        gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+
         ztgk::game::scene->systemManager.getSystem<UnitSystem>()->deselectUnit(this);
         //if unit stands next to washing machine it will be healed by it
         auto neighTiles = grid->GetNeighbours(gridPosition, true);
@@ -197,21 +200,10 @@ void Unit::UpdateImpl() {
         }
     }
     if (!isAlive && !isAlly) {
-        deathTimer -= Time::Instance().DeltaTime();
-        if(deathTimer<= 0){
-            Omae_wa_mou_shindeiru = true;
-            return;
-        }
-        else{
-            //move unit in flingdirection
-            worldPosition += glm::vec3(flingDirection.x * Time::Instance().DeltaTime() * 50, flingDirection.y * Time::Instance().DeltaTime() * 10, flingDirection.z * Time::Instance().DeltaTime() * 50);
-            getEntity()->transform.setLocalPosition(worldPosition);
-            getEntity()->updateSelfAndChild();
-            return;
-        }
+        isDestinedToDie = true;
+
+        return;
     }
-
-
 
     if (isAlive) {
         gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
@@ -226,6 +218,10 @@ void Unit::UpdateImpl() {
                         newDirtLvl = 0;
                     }
                     neigh->changeDirtinessLevel(newDirtLvl);
+                    if(newDirtLvl == 0 && neigh->particle_sent == false){
+                        neigh->tryToSendParticle(RNG::RandomBool()? 3 : 4);
+                        neigh->particle_sent = true;
+                    }
                 }
             }
         }else{
@@ -243,7 +239,7 @@ void Unit::UpdateImpl() {
         }
 
 
-        if (combatTarget != nullptr && (!combatTarget->isAlive || combatTarget->Omae_wa_mou_shindeiru)) {
+        if (combatTarget != nullptr &&  !combatTarget->isAlive ) {
             combatTarget = nullptr;
             hasCombatTarget = false;
         }
@@ -304,11 +300,33 @@ void Unit::UpdateImpl() {
             }
         }
 
-        std::vector<Tile *> neiTiles = grid->GetNeighbours(gridPosition, false);
-        for (auto &tile: neiTiles) {
-            if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
-                combatTarget = tile->unit;
-                break;
+
+        static GridRange searchRange{4, 0};
+
+        if (!hasCombatTarget) {
+            if (isAlly) {
+                GridRange *maxRange;
+                if (equipment.use_default()) {
+                    maxRange = &equipment.rangeEff0;
+                } else if (equipment.item1 && equipment.item1->offensive && equipment.item2 &&
+                           equipment.item2->offensive) {
+                    maxRange = equipment.rangeEff1.add >= equipment.rangeEff2.add ? &equipment.rangeEff1
+                                                                                  : &equipment.rangeEff2;
+                } else if (equipment.item1 && equipment.item1->offensive) {
+                    maxRange = &equipment.rangeEff1;
+                } else if (equipment.item2 && equipment.item2->offensive) {
+                    maxRange = &equipment.rangeEff2;
+                }
+                searchRange = GridRange(maxRange->add + 1, maxRange->remove);
+            }
+
+            auto in_search_range = searchRange.find_my_enemies(VectorUtils::Vector2IntToGlmVec2(gridPosition), isAlly);
+            if (!in_search_range.empty()) {
+                std::sort(in_search_range.begin(), in_search_range.end(), [this](Unit *a, Unit *b) {
+                    return VectorUtils::GridDistance(this->gridPosition, a->gridPosition) <
+                           VectorUtils::GridDistance(this->gridPosition, b->gridPosition);
+                });
+                combatTarget = in_search_range.at(0);
             }
         }
 
@@ -498,10 +516,14 @@ Unit *Unit::GetClosestEnemyInWeaponRange() {
     }
 
     if (equipment.item1 != nullptr && equipment.item1->offensive) {
-        enemies.push_back(equipment.item1->determine_target(this));
+        auto target = equipment.item1->determine_target(this);
+        if (target)
+            enemies.push_back(target);
     }
     if (equipment.item2 != nullptr && equipment.item2->offensive) {
-        enemies.push_back(equipment.item2->determine_target(this));
+        auto target = equipment.item2->determine_target(this);
+        if (target)
+            enemies.push_back(target);
     }
 
     if (enemies.empty())
@@ -865,13 +887,5 @@ bool Unit::checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTar
     return false;
 }
 
-glm::vec3 Unit::calculateFlingDirection(Vector2Int killerPos) {
-    glm::vec3 direction = glm::vec3(0, 0, 0);
-    glm::vec3 killerPos3D = grid->GridToWorldPosition(killerPos);
-    glm::vec3 unitPos3D = grid->GridToWorldPosition(gridPosition);
-    direction = glm::normalize(unitPos3D - killerPos3D);
-    direction.y += RNG::RandomFloat(1.0f, 3.f);
 
-    return direction;
-}
 

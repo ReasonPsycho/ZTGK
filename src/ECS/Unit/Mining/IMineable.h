@@ -19,7 +19,7 @@ public:
     Grid* grid;
     explicit  IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid);
     ~IMineable();
-    virtual void onMine(Unit * unit) { /*todo fire particles!*/ };
+    void onMine(Unit * unit);
     virtual void onMined(Unit * unit) { /**/ };
     void Mine(Unit * unit);
 
@@ -34,6 +34,7 @@ public:
 
 protected:
     float timeToMineRemaining;
+    float particle_cooldown = 0;
 };
 
 

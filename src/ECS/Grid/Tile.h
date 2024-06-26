@@ -47,6 +47,7 @@ enum TileHighlightState {
     HIGHLIGHT_ITEM_GOLD,
     EXPLOSION_LIGHT_BLUE,
     HEAL_LIGHT_GREEN,
+    DAMAGE_LIGHT_RED,
     HIGHLIGHT_RANGE_V_LIGHT_BLUE,
 };
 
@@ -69,6 +70,7 @@ public:
     bool isInFogOfWar = false;
     float dirtinessLevel = 100;
     void setHighlight(TileHighlightState state);
+    void setHighlightOverride(TileHighlightState state, float time_sec);
     TileHighlightState getTileSelectionState();
     // Constructors
     explicit Tile(Vector2Int index, Chunk* chunkPtr = nullptr, TileState state = FLOOR, std::string name = "Tile");
@@ -91,9 +93,13 @@ public:
     
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
 
-    
+
+    void tryToSendParticle(int particle_type, float y = 0);
+    bool particle_sent = false;
+
 private:
     TileHighlightState tileHighlightState = CLEAR;
+    TileHighlightState overrideState = CLEAR;
     void tryToSendBubble();
 };
 

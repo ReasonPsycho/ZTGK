@@ -5,7 +5,7 @@
 #include "Camera.h"
 #include "GLFW/glfw3.h"
 #include "ECS/Utils/Time.h"
-
+#include <glm/gtx/rotate_vector.hpp>
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float nearClip, float farClip) : Front(
         glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM), nearClip(
@@ -262,6 +262,48 @@ void Camera::MoveCamera(float scroll) {
 
     }
 }
+
+void Camera::Rotate(bool clockwise, float angle){
+    float radians = glm::radians(angle);
+
+    // Determine the direction of rotation
+    if (clockwise) {
+        radians = -radians;
+    }
+
+    // Calculate the point in front of the camera (for rotation pivot)
+    glm::vec3 pivot = Position + Front * 50.0f; // 10 units in front of the camera
+
+    // Translate the camera to the origin (relative to the pivot)
+    glm::vec3 translatedPosition = Position - pivot;
+
+    // Perform the rotation around the Y axis
+    float cosAngle = cos(radians);
+    float sinAngle = sin(radians);
+    float newX = translatedPosition.x * cosAngle - translatedPosition.z * sinAngle;
+    float newZ = translatedPosition.x * sinAngle + translatedPosition.z * cosAngle;
+    translatedPosition.x = newX;
+    translatedPosition.z = newZ;
+
+    // Translate the camera back to its original position (relative to the pivot)
+    Position = translatedPosition + pivot;
+
+    // Update the camera's Yaw angle
+    Yaw += (clockwise ? -angle : angle);
+
+    // Ensure Yaw stays within the bounds of 0 to 360 degrees
+    if (Yaw > 360.0f) {
+        Yaw -= 360.0f;
+    } else if (Yaw < 0.0f) {
+        Yaw += 360.0f;
+    }
+
+    // Update camera vectors using the updated Yaw
+    updateCameraVectors();
+}
+
+
+
 
 
 

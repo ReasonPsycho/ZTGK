@@ -17,6 +17,7 @@
 #include "ECS/Unit/Equipment/Projectile/Projectile.h"
 #include "ECS/Render/Components/AnimationPlayer.h"
 #include "ECS/Render/Components/BetterSpriteRender.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 State *CombatState::RunCurrentState() {
     unit->playinIdleAnimation = false;
@@ -86,13 +87,13 @@ bool CombatState::isTargetInRange() {
         unit->hasCombatTarget = false;
         return false;
     }
-        Unit *targ = unit->GetClosestEnemyInWeaponRange();
-        if (targ == nullptr) {
-            return false;
-        }
-        unit->combatTarget = targ;
-        unit->isTargetInRange = true;
-        return true;
+    Unit *targ = unit->GetClosestEnemyInWeaponRange();
+    if (targ == nullptr) {
+        return false;
+    }
+    unit->combatTarget = targ;
+    unit->isTargetInRange = true;
+    return true;
 
 
 }
@@ -182,15 +183,20 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
     }
 
     if (damage < 0) { // heal
+        // do_heal flashes tiles green-ish here
         // todo make tile flash this color too
         cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
         ztgk::game::audioManager->playRandomSoundFromGroup("heal");
         target->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
+        auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition);
+        tile->tryToSendParticle(5);
     } else {
-        // todo make tile flash this color too
+        ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition)->setHighlightOverride(DAMAGE_LIGHT_RED, 0.25f);
         cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
         ztgk::game::audioManager->playRandomSoundFromGroup("punch");
         target->tryToSendEmote(target->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
+        auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition);
+        tile->tryToSendParticle(unit->isAlly ? RNG::RandomBool()? 8 : 9 : 6);
     }
 
     if(target->stats.hp <= 0){
@@ -202,9 +208,9 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
 
         if(!target->isAlly){
             target->isAlive = false;
-            target->flingDirection = target->calculateFlingDirection(unit->gridPosition);
         }
         else{
+            target->isAlive = false;
             target->hasCombatTarget = false;
             target->combatTarget = nullptr;
             target->currentMiningTarget = nullptr;
@@ -238,38 +244,34 @@ bool CombatState::isAttackOnCooldown() {
     glm::ivec2 pos = {unit->gridPosition.x, unit->gridPosition.z};
     glm::ivec2 tpos = {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z};
 
-    // sort by shorter range, with target within range
-    // since use_default() returns false, either of the items is not null and offensive
-    if (unit->equipment.item1 == nullptr && unit->equipment.rangeEff2.is_in_range(pos, tpos))
-        it = unit->equipment.item2;
-    else if (unit->equipment.item2 == nullptr && unit->equipment.rangeEff1.is_in_range(pos, tpos))
-        it = unit->equipment.item1;
-    else {
-        // both are offensive items
-        if (unit->equipment.item1->offensive && unit->equipment.item2->offensive) {
-            bool in_range_1 = unit->equipment.rangeEff1.is_in_range(pos, tpos);
-            bool in_range_2 = unit->equipment.rangeEff2.is_in_range(pos, tpos);
+    // since use_default() returns false, either of the items is not null and offensive, find which one
+    bool first = unit->equipment.item1 && unit->equipment.item1->offensive;
+    bool second = unit->equipment.item2 && unit->equipment.item2->offensive;
 
-            // in range of both
-            if (in_range_1 && in_range_2) {
-                // set by shorter range
-                if (unit->equipment.rangeEff1.add <= unit->equipment.rangeEff2.add) {
-                    it = unit->equipment.item1; sec_it = unit->equipment.item2;
-                } else {
-                    it = unit->equipment.item2; sec_it = unit->equipment.item1;
-                }
-            // set the one that's in range
-            } else if (in_range_1) {
-                it = unit->equipment.item1;
+    // if only one is offensive, use it only if it's in range
+    if (first xor second) {
+        if (first && unit->equipment.rangeEff1.is_in_range(pos, tpos)) it = unit->equipment.item1;
+        else if (second && unit->equipment.rangeEff2.is_in_range(pos, tpos)) it = unit->equipment.item2;
+    } else {
+        // if both are null or not offensive, use_defualt returns earlier, if only one - the above if check takes care of that, so the only case left is both are not null & offensive
+        // both are offensive items
+
+        bool in_range_1 = unit->equipment.rangeEff1.is_in_range(pos, tpos);
+        bool in_range_2 = unit->equipment.rangeEff2.is_in_range(pos, tpos);
+
+        // in range of both
+        if (in_range_1 && in_range_2) {
+            // set by shorter range
+            if (unit->equipment.rangeEff1.add <= unit->equipment.rangeEff2.add) {
+                it = unit->equipment.item1; sec_it = unit->equipment.item2;
             } else {
-                it = unit->equipment.item2;
+                it = unit->equipment.item2; sec_it = unit->equipment.item1;
             }
         // set the one that's in range
+        } else if (in_range_1) {
+            it = unit->equipment.item1;
         } else {
-            if (unit->equipment.item1->offensive && unit->equipment.rangeEff1.is_in_range(pos, tpos))
-                it = unit->equipment.item1;
-            else if (unit->equipment.item2->offensive && unit->equipment.rangeEff2.is_in_range(pos, tpos))
-                it = unit->equipment.item2;
+            it = unit->equipment.item2;
         }
     }
 

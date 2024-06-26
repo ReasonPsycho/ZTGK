@@ -212,6 +212,8 @@ void update_dragged_tiles();
 
 void gen_and_load_lvl(bool gen_new_lvl = false);
 
+void update_camera_rotation();
+
 #pragma endregion Function definitions
 
 #pragma region Orginal set up
@@ -259,6 +261,11 @@ float LmouseHeldReleaseTime = 0.0f;
 bool isRightMouseButtonHeld = false;
 float RmouseHeldStartTime = 0.0f;
 float RmouseHeldReleaseTime = 0.0f;
+
+glm::vec2 MiddleMouseButtonClickScreenPos;
+glm::vec2 MiddleMouseButtonCurrentScreenPos;
+bool isMiddleButtonPressed;
+
 
 glm::vec2 mouseHeldStartPosScr;
 
@@ -575,9 +582,12 @@ void load_sounds() {
     //death sounds OOF
     ztgk::game::audioManager->loadSound("res/sounds/sfx_deathEnemy1.mp3", "sfx_deathEnemy1");
     ztgk::game::audioManager->loadSound("res/sounds/sfx_deathEnemy2.mp3", "sfx_deathEnemy2");
-    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge1.wav", "sfx_deathSponge1");
-    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge2.wav", "sfx_deathSponge2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge1.mp3", "sfx_deathSponge1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge2.mp3", "sfx_deathSponge2");
     ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge3.mp3", "sfx_deathSponge3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge4.mp3", "sfx_deathSponge4");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge5.mp3", "sfx_deathSponge5");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge6.mp3", "sfx_deathSponge6");
 
     //gabka walking
     ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka1.mp3", "sfx_gabka1");
@@ -630,6 +640,8 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/click_click1.mp3", HUDButton::sound_light);
     ztgk::game::audioManager->loadSound("res/sounds/click_click2.mp3", HUDButton::sound_normal);
     ztgk::game::audioManager->setVolumeForGroup("click", 6);
+
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_ping.mp3", "sfx_ping");
 
 }
 
@@ -1481,7 +1493,11 @@ void update() {
     scene.systemManager.getSystem<ProjectileSystem>()->Update();
     scene.systemManager.getSystem<Grid>()->Update();
     scene.systemManager.getSystem<AudioManager>()->Update();
-//
+
+
+    update_camera_rotation();
+
+    //
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
 //            spdlog::info("Unit: {} -- State: {}  -- currentMinTarg {} {}", u->name, u->currentState->name, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.x, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.z);
@@ -1730,14 +1746,21 @@ void processInput(GLFWwindow *window) {
         timeStepKeyPressed = false;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed) {
-        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
-        spdlog::debug("clearing tiles in radius");
-        isXpressed = true;
-//        radiusToRemove +=1;
+//    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !isXpressed) {
+//        ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
+//        spdlog::debug("clearing tiles in radius");
+//        isXpressed = true;
+////        radiusToRemove +=1;
+//    }
+//    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE) {
+//        isXpressed = false;
+//    }
+
+    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
+        camera.Rotate(true);
     }
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE) {
-        isXpressed = false;
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
+        camera.Rotate(false);
     }
 
 }
@@ -1776,8 +1799,14 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     ztgk::game::cursor.click(button, action, mods);
-//    if (ztgk::game::cursor.config.capture_click)
-//        handle_picking(window, button, action, mods);
+
+    if(GLFW_MOUSE_BUTTON_MIDDLE == button && GLFW_PRESS == action && !isMiddleButtonPressed){
+        isMiddleButtonPressed = true;
+        MiddleMouseButtonClickScreenPos = ztgk::game::cursor.raw_pos;
+    }
+    if(GLFW_MOUSE_BUTTON_MIDDLE == button && GLFW_RELEASE == action){
+        isMiddleButtonPressed = false;
+    }
 
 }
 
@@ -2326,5 +2355,18 @@ void gen_and_load_lvl(bool gen_new_lvl) {
     LevelSaving::load();
 
 }
+void update_camera_rotation(){
+    if(isMiddleButtonPressed){
+        MiddleMouseButtonCurrentScreenPos = ztgk::game::cursor.raw_pos;
+        if(MiddleMouseButtonClickScreenPos != MiddleMouseButtonCurrentScreenPos){
+            bool left = MiddleMouseButtonClickScreenPos.x < MiddleMouseButtonCurrentScreenPos.x;
+
+            camera.Rotate(left, abs(MiddleMouseButtonClickScreenPos.x - MiddleMouseButtonCurrentScreenPos.x )/5.f);
+
+            MiddleMouseButtonClickScreenPos = MiddleMouseButtonCurrentScreenPos;
+        }
+    }
+}
+
 
 #pragma endregion Functions
