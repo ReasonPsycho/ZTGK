@@ -87,13 +87,13 @@ bool CombatState::isTargetInRange() {
         unit->hasCombatTarget = false;
         return false;
     }
-        Unit *targ = unit->GetClosestEnemyInWeaponRange();
-        if (targ == nullptr) {
-            return false;
-        }
-        unit->combatTarget = targ;
-        unit->isTargetInRange = true;
-        return true;
+    Unit *targ = unit->GetClosestEnemyInWeaponRange();
+    if (targ == nullptr) {
+        return false;
+    }
+    unit->combatTarget = targ;
+    unit->isTargetInRange = true;
+    return true;
 
 
 }
