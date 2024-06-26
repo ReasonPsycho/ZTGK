@@ -46,9 +46,6 @@ namespace ztgk::game {
     
     
     Model * game::tidyPodLauncherModel = nullptr;
-    Model * game::hangerMopModel = nullptr;
-    Model * game::hangerMopObrotowyModel = nullptr;
-    Model * game::hangerTidyPodLauncherModel = nullptr;
 
     bool game::enableWashingMachineSwaying = true;
 

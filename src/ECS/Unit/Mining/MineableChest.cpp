@@ -23,9 +23,16 @@ void MineableChest::onMined(Unit *unit) {
         parentEntity->getComponent<Render>()->Remove();
     parentEntity->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
     auto item = InventoryManager::instance->create_item(item_type_id);
-//    auto pos = grid->GridToWorldPosition(gridPosition);
-//    InventoryManager::instance->spawn_item_on_map(item, gridPosition);
     InventoryManager::instance->assign_item(item, unit, -1);
+    auto itemEntity = getEntity()->getChild("ItemChild");
+    if(itemEntity != nullptr){
+        auto itemRender = itemEntity->getComponent<Render>();
+        if(itemRender != nullptr)
+            itemRender->Remove();
+        itemEntity->Destroy();
+    }
+
+
 
     //To prevent unit from walking on empty hanger vvvv
     grid->getTileAt(gridPosition)->state = CHEST;
@@ -39,6 +46,12 @@ void MineableChest::UpdateImpl() {
     auto render = getEntity()->getComponent<Render>();
     if(tile == nullptr || render == nullptr) return;
     render->isInFogOfWar = tile->isInFogOfWar;
+    auto itemEntity = getEntity()->getChild("ItemChild");
+    if(itemEntity != nullptr){
+        auto itemRender = itemEntity->getComponent<Render>();
+        if(itemRender != nullptr)
+            itemRender->isInFogOfWar = tile->isInFogOfWar;
+    }
 }
 
 MineableChest::MineableChest(const Vector2Int &gridPosition, Grid *grid, unsigned int itemTypeId) : IMineable(timeToMine, gridPosition, grid) {

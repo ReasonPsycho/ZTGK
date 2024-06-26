@@ -111,9 +111,6 @@ string modelPathShroom = "res/models/Mushroom/shroom.fbx";
 string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
 string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
 string modelPathShroomSpit = "res/models/Mushroom/shroom_spit.fbx";
-string modelPathHangerMop = "res/models/chest/chest.fbx";
-string modelPathHangerRotationMop = "res/models/chest/chest.fbx";
-string modelPathHangerTidyPodLauncher = "res/models/chest/chest.fbx";
 
 Model *tileModel;
 Model *model;
@@ -131,9 +128,6 @@ Model *mopObrotowyModel;
 Model *tidyPodLauncherModel;
 Model *praniumModel;
 Model *shroomModel;
-Model *hangerMopModel;
-Model *hangerMopObrotowyModel;
-Model *hangerTidyPodLauncherModel;
 
 
 unsigned bggroup, zmgroup;
@@ -658,9 +652,6 @@ void load_enteties() {
     mopObrotowyModel = ztgk::game::modelLoadingManager->GetModel(modelMopObrotowyPath);
     tidyPodLauncherModel = ztgk::game::modelLoadingManager->GetModel(modelTidyPodLauncherPath);
     praniumModel = ztgk::game::modelLoadingManager->GetModel(modelPraniumPath);
-    hangerMopModel = ztgk::game::modelLoadingManager->GetModel(modelPathHangerMop);
-    hangerMopObrotowyModel = ztgk::game::modelLoadingManager->GetModel(modelPathHangerRotationMop);
-    hangerTidyPodLauncherModel = ztgk::game::modelLoadingManager->GetModel(modelPathHangerTidyPodLauncher);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
@@ -683,9 +674,6 @@ void load_enteties() {
     
     
     ztgk::game::shroomModel = ztgk::game::modelLoadingManager->GetModel(modelPathShroom);
-    ztgk::game::hangerMopModel = hangerMopModel;
-    ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
-    ztgk::game::hangerTidyPodLauncherModel = hangerTidyPodLauncherModel;
 
 
     ztgk::game::emotes.insert(std::make_pair(ztgk::game::EMOTES::BUBBLE_CUTE, std::make_shared<Texture>("res/textures/emotes/blue_3.png", "")));
