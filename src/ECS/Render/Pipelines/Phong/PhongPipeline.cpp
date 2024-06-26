@@ -40,7 +40,7 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     Color foamColor = {0, 0, 0, 0};  // Normal map neutral
 
     foamMaterial = new MaterialPhong(foamColor);
-    foamMaterial->diffuseTextures[0] = make_shared<Texture>("res/textures/foam.png","");
+    foamMaterial->diffuseTextures[0] = make_shared<Texture>("res/textures/foamCut.png","");
     isInnit = true;
 }
 
