@@ -135,19 +135,12 @@ public:
     bool checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTargetAndReturnBooleanSayingTrueIfItHasAndFalseIfItDoesNot();
 
     bool lastUsedRightAttack = true;
-
-    glm::vec3 calculateFlingDirection(Vector2Int killerPos);
-    glm::vec3 flingDirection;
-
-    //bool to decide if the unit is dead -> cannot kill right in Update because UnitSystem update crashes if we remove a unit from the list while iterating over it
-    bool Omae_wa_mou_shindeiru = false;
+    bool isDestinedToDie = false;
 
 private:
     Vector2Int previousGridPosition;
     void onFirstUpdate();
     bool firstUpdate = true;
-    float deathTimer = 3;
-
 };
 
 

@@ -69,13 +69,19 @@ void UnitSystem::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void UnitSystem::UpdateImpl() {
+    std::vector<Unit*> toDie;
     std::vector<Unit*> Spongies;
-    std::vector<Unit*> DestinedToDie;
     for (Unit* unit: unitComponents) {
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
         unit->Update();
-        unit->getEntity()->getComponent<UnitAI>()->Update();
-        unit->getEntity()->getComponent<BoxCollider>()->Update();
+        if(!unit->isDestinedToDie){
+            unit->getEntity()->getComponent<UnitAI>()->Update();
+            unit->getEntity()->getComponent<BoxCollider>()->Update();
+        }
+        else{
+            toDie.push_back(unit);
+        }
+
 
 
         if(std::find(unitComponents.begin(), unitComponents.end(), unit) == unitComponents.end()) continue;
@@ -83,9 +89,6 @@ void UnitSystem::UpdateImpl() {
         //those find statements are needed because unit can be deleted in the UpdateImpl() function, which does not update unitComponents vector
         if(unit->isAlly && unit->isAlive){
             Spongies.push_back(unit);
-        }
-        if(unit->Omae_wa_mou_shindeiru){
-            DestinedToDie.push_back(unit);
         }
 
     }
@@ -97,12 +100,12 @@ void UnitSystem::UpdateImpl() {
         ztgk::game::gameLost = true;
 
     }
-    for(auto alreadyDead : DestinedToDie){
-        alreadyDead->DIEXD();
-    }
+
 
     fixOverlappingUnits();
-
+    for(auto unit: toDie){
+        unit->DIEXD();
+    }
 
 
 }
