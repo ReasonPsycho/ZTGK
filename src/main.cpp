@@ -582,9 +582,12 @@ void load_sounds() {
     //death sounds OOF
     ztgk::game::audioManager->loadSound("res/sounds/sfx_deathEnemy1.mp3", "sfx_deathEnemy1");
     ztgk::game::audioManager->loadSound("res/sounds/sfx_deathEnemy2.mp3", "sfx_deathEnemy2");
-    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge1.wav", "sfx_deathSponge1");
-    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge2.wav", "sfx_deathSponge2");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge1.mp3", "sfx_deathSponge1");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge2.mp3", "sfx_deathSponge2");
     ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge3.mp3", "sfx_deathSponge3");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge4.mp3", "sfx_deathSponge4");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge5.mp3", "sfx_deathSponge5");
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_deathSponge6.mp3", "sfx_deathSponge6");
 
     //gabka walking
     ztgk::game::audioManager->loadSound("res/sounds/sfx_gabka1.mp3", "sfx_gabka1");
@@ -637,6 +640,8 @@ void load_sounds() {
     ztgk::game::audioManager->loadSound("res/sounds/click_click1.mp3", HUDButton::sound_light);
     ztgk::game::audioManager->loadSound("res/sounds/click_click2.mp3", HUDButton::sound_normal);
     ztgk::game::audioManager->setVolumeForGroup("click", 6);
+
+    ztgk::game::audioManager->loadSound("res/sounds/sfx_ping.mp3", "sfx_ping");
 
 }
 
