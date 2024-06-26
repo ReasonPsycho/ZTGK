@@ -64,7 +64,7 @@ void Animator::CalculateNodeTransform(const AssimpNodeData *node, glm::mat4 pare
         boneTransform = Bone->GetLocalTransform();
     }
     
-    glm::mat4 globalTransformation = parentTransform * nodeTransform;
+    glm::mat4 globalTransformation = parentTransform * boneTransform;
 
     auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
     if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {
