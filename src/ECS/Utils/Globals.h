@@ -108,7 +108,8 @@ namespace ztgk::game {
     extern Model* kulki;
     extern Model* healingo;
     extern Model* proszek;
-    
+    extern Model* praniumItem;
+
     extern Model* tidyPodLauncherModel;
 
     extern bool enableWashingMachineSwaying;

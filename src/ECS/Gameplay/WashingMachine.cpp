@@ -57,6 +57,7 @@ void WashingMachine::showImGuiDetailsImpl(Camera *camera) {
 void WashingMachine::UpdateImpl() {
     if(!tilesToClear_walls.empty()){
         clearNextTile_walls();
+
     }
     if(!tilesToClear_floors.empty()){
         clearNextTile_floors();
@@ -250,6 +251,7 @@ void WashingMachine::clearNextTile_walls() {
             grid->SetUpWall(n);
         }
     }
+    tile->tryToSendParticle(RNG::RandomBool()? 3:4);
 
     auto mineable = grid->getTileAt(tile->index)->getEntity()->getComponent<IMineable>();
     if(mineable != nullptr){

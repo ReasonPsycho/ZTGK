@@ -43,6 +43,7 @@ namespace ztgk::game {
     Model* game::kulki= nullptr;
     Model* game::healingo= nullptr;
     Model* game::proszek= nullptr;
+    Model* game::praniumItem= nullptr;
     
     
     Model * game::tidyPodLauncherModel = nullptr;
