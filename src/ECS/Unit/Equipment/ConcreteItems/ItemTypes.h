@@ -19,6 +19,7 @@ struct s_item_types {
     unsigned detergent;
     unsigned pendant;
     unsigned pranium_ore;
+    unsigned proszek;
 
     std::unordered_map<unsigned, std::string> map;
 

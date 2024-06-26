@@ -14,6 +14,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/Pendant.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Detergent.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Beacon.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Proszek.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
 #include "ECS/Utils/Util.h"
 
@@ -31,6 +32,7 @@ void InventoryManager::init() {
     item_constructors.emplace(Item::item_types.detergent, [](){ return new Detergent(); });
     item_constructors.emplace(Item::item_types.pendant, [](){ return new Pendant(); });
     item_constructors.emplace(Item::item_types.pranium_ore, [](){ return new PraniumOre(); });
+    item_constructors.emplace(Item::item_types.proszek, [](){ return new Proszek(); });
 }
 
 Item *InventoryManager::create_item(unsigned int type_id) {
@@ -168,26 +170,26 @@ void InventoryManager::spawn_item_on_map(Item *item, Vector2Int grid_pos) {
     kiddo->addComponent(std::make_unique<Render>(item->model));
     kiddo->addComponent(std::make_unique<PickupubleItem>(item, grid_pos));
 
-    if(item->name == "Pranium Ore"){
+    if(Item::item_types.id_of(item) == Item::item_types.pranium_ore){
         kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
         kiddo->transform.setLocalScale(glm::vec3(.75f, .75f, .75f));
         kiddo->transform.setLocalPosition(glm::vec3(0, -1, 0));
         kiddo->updateSelfAndChild();
-    }else if (item->name == "Mop" || item->name == "Rotary Mop"){
+    }else if (Item::item_types.id_of(item) == Item::item_types.mop || Item::item_types.id_of(item) == Item::item_types.super_mop){
         kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
         kiddo->transform.setLocalScale(glm::vec3(2.f, 2.f, 2.f));
         kiddo->transform.setLocalPosition(glm::vec3(0, 0, 0));
         kiddo->updateSelfAndChild();
-    }else if(item->name == "Capsule Gun"){
+    }else if(Item::item_types.id_of(item) == Item::item_types.water_gun){
         kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
         kiddo->transform.setLocalScale(glm::vec3(2.f, 2.f, 2.f));
         kiddo->transform.setLocalPosition(glm::vec3(0, -2.5, -1));
-
-       //proszek tez tutaj pasuje ale nie mam itema
-    }else if(item->name == "Detergent" || item->name == "Pendant" || item->name == "Soap Refill"){
+        kiddo->updateSelfAndChild();
+    }else if(Item::item_types.id_of(item) == Item::item_types.detergent || Item::item_types.id_of(item) == Item::item_types.proszek || Item::item_types.id_of(item) == Item::item_types.pendant || Item::item_types.id_of(item) == Item::item_types.test_buff_item || Item::item_types.id_of(item) == Item::item_types.beacon){
         kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
         kiddo->transform.setLocalScale(glm::vec3(2.f, 2.f, 2.f));
         kiddo->transform.setLocalPosition(glm::vec3(0, -2, 0));
+        kiddo->updateSelfAndChild();
     }
 }
 

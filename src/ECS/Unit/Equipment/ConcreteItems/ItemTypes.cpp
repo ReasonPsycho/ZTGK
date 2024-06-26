@@ -10,6 +10,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/Pendant.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Detergent.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Beacon.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Proszek.h"
 
 using namespace ztgk;
 #define quote(x) #x
@@ -24,6 +25,7 @@ s_item_types::s_item_types() {
     detergent = 6;
     pendant = 7;
     pranium_ore = 8;
+    proszek = 9;
 
     map = {};
     map.emplace(hands, quote(hands));
@@ -35,29 +37,30 @@ s_item_types::s_item_types() {
     map.emplace(detergent, quote(detergent));
     map.emplace(pendant, quote(pendant));
     map.emplace(pranium_ore, quote(pranium_ore));
+    map.emplace(proszek, quote(proszek));
 }
 
 unsigned s_item_types::id_of(Item *item) const {
-    auto type = std::type_index(typeid(*item));
-
-    if (type == std::type_index(typeid(Hands)))
+    if (item->type_id == hands)
         return hands;
-    if (type == std::type_index(typeid(Mop)))
+    if (item->type_id == mop)
         return mop;
-    if (type == std::type_index(typeid(SuperMop)))
+    if (item->type_id == super_mop)
         return super_mop;
-    if (type == std::type_index(typeid(WaterGun)))
+    if (item->type_id == water_gun)
         return water_gun;
-    if (type == std::type_index(typeid(Beacon)))
+    if (item->type_id == beacon)
         return beacon;
-    if (type == std::type_index(typeid(TestBuffItem)))
+    if (item->type_id == test_buff_item)
         return test_buff_item;
-    if (type == std::type_index(typeid(Detergent)))
+    if (item->type_id == detergent)
         return detergent;
-    if (type == std::type_index(typeid(Pendant)))
+    if (item->type_id == pendant)
         return pendant;
-    if (type == std::type_index(typeid(PraniumOre)))
+    if (item->type_id == pranium_ore)
         return pranium_ore;
+    if (item->type_id == proszek)
+        return proszek;
 }
 
 std::string s_item_types::types_string() const {

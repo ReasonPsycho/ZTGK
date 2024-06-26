@@ -810,8 +810,7 @@ void Unit::Pickup(PickupubleItem *item) {
 
     auto target = pickupTarget;
     auto spawn_origin = target->gridPosition;
-    for (auto unit: ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents |
-                    std::views::filter([](Unit *unit) { return unit->IsAlly(); })) {
+    for (auto unit: ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies) {
         if (unit->hasPickupTarget && unit->pickupTarget == target) {
             unit->hasPickupTarget = false;
             unit->pickupTarget = nullptr;

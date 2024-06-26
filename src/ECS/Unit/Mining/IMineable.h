@@ -15,6 +15,7 @@ public:
     IMineable(IMineable *pMineable);
 
     float timeToMine;
+    float timeToMineRemaining;
     Vector2Int gridPosition;
     Grid* grid;
     explicit  IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid);
@@ -33,7 +34,6 @@ public:
     bool isMined = false;
 
 protected:
-    float timeToMineRemaining;
     float particle_cooldown = 0;
 };
 

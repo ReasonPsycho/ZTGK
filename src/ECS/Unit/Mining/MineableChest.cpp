@@ -7,6 +7,7 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Entity.h"
 #include "ECS/Unit/Mining/MiningSystem.h"
+#include "ECS/Unit/Unit.h"
 
 
 void MineableChest::showImGuiDetailsImpl(Camera *camera) {
@@ -19,11 +20,12 @@ void MineableChest::showImGuiDetailsImpl(Camera *camera) {
 // todo fix item swaps
 void MineableChest::onMined(Unit *unit) {
     IMineable::onMined(unit);
+
     if (parentEntity->getComponent<Render>())
         parentEntity->getComponent<Render>()->Remove();
-    parentEntity->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
     auto item = InventoryManager::instance->create_item(item_type_id);
-    InventoryManager::instance->assign_item(item, unit, -1);
+    auto drop = InventoryManager::instance->assign_item(item, unit, -1);
+
     auto itemEntity = getEntity()->getChild("ItemChild");
     if(itemEntity != nullptr){
         auto itemRender = itemEntity->getComponent<Render>();
@@ -32,7 +34,50 @@ void MineableChest::onMined(Unit *unit) {
         itemEntity->Destroy();
     }
 
+    Vector2Int spawn_origin = gridPosition;
+//    Item * putOnHanger = nullptr;
+//    Item * putOnGround = nullptr;
 
+    Vector2Int first_pos = unit->pathfinding.GetNearestVacantTileAround(spawn_origin, {spawn_origin});
+    if (drop.first)
+        InventoryManager::instance->spawn_item_on_map(drop.first, first_pos);
+    if (drop.second)
+        InventoryManager::instance->spawn_item_on_map(
+                drop.second,
+                unit->pathfinding.GetNearestVacantTileAround(spawn_origin,drop.first ? std::vector{spawn_origin,first_pos} : std::vector{spawn_origin}));
+
+    // todo if starczy czasu..
+//    if (drop.first && Item::item_types.id_of(drop.first) != Item::item_types.pranium_ore) {
+//        putOnHanger = drop.first;
+//    } else if (drop.first && Item::item_types.id_of(drop.first) == Item::item_types.pranium_ore) {
+//        putOnGround = drop.first;
+//    }
+//
+//    if (drop.second && Item::item_types.id_of(drop.second) != Item::item_types.pranium_ore) {
+//        if (!putOnHanger) {
+//            putOnHanger = drop.second;
+//        } else {
+//            putOnGround = drop.second;
+//        }
+//    } else if (drop.second && Item::item_types.id_of(drop.second) == Item::item_types.pranium_ore) {
+//        putOnGround = drop.second;
+//    }
+//
+//    if (putOnHanger) {
+//        grid->MakeHangerComponents(parentEntity, Item::item_types.id_of(putOnHanger));
+//        InventoryManager::instance->delete_item(putOnHanger);
+//        this->isMined = false;
+////        this->timeToMineRemaining = timeToMine;
+//
+//    }
+//    if (putOnGround) {
+//        InventoryManager::instance->spawn_item_on_map(putOnGround,
+//                                                      unit->pathfinding.GetNearestVacantTileAround(spawn_origin,
+//                                                                                                   {spawn_origin}));
+//    }
+//
+//    if (!putOnHanger && !putOnGround)
+        parentEntity->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
 
     //To prevent unit from walking on empty hanger vvvv
     grid->getTileAt(gridPosition)->setTileState(CHEST);
