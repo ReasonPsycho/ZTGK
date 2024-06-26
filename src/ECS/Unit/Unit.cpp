@@ -304,13 +304,40 @@ void Unit::UpdateImpl() {
             }
         }
 
-        std::vector<Tile *> neiTiles = grid->GetNeighbours(gridPosition, false);
-        for (auto &tile: neiTiles) {
-            if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
-                combatTarget = tile->unit;
-                break;
+
+        static GridRange searchRange{4, 0};
+
+        if (isAlly) {
+            GridRange * maxRange;
+            if (equipment.use_default()) {
+                maxRange = &equipment.rangeEff0;
+            } else if (equipment.item1 && equipment.item1->offensive && equipment.item2 && equipment.item2->offensive) {
+                maxRange = equipment.rangeEff1.add >= equipment.rangeEff2.add ? &equipment.rangeEff1 : &equipment.rangeEff2;
+            } else if (equipment.item1 && equipment.item1->offensive) {
+                maxRange = &equipment.rangeEff1;
+            } else if (equipment.item2 && equipment.item2->offensive) {
+                maxRange = &equipment.rangeEff2;
             }
+            searchRange = GridRange(maxRange->add + 1, maxRange->remove);
         }
+
+        auto in_search_range = searchRange.find_my_enemies(VectorUtils::Vector2IntToGlmVec2(gridPosition), isAlly);
+        if (!in_search_range.empty()) {
+            std::sort(in_search_range.begin(), in_search_range.end(), [this](Unit *a, Unit *b) {
+                return VectorUtils::GridDistance(this->gridPosition, a->gridPosition) <
+                       VectorUtils::GridDistance(this->gridPosition, b->gridPosition);
+            });
+            combatTarget = in_search_range.at(0);
+        }
+
+//        combatTarget = GetClosestEnemyInWeaponRange();
+//        std::vector<Tile *> neiTiles = grid->GetNeighbours(gridPosition, false);
+//        for (auto &tile: neiTiles) {
+//            if (tile->unit != nullptr && tile->unit->IsAlly() != isAlly) {
+//                combatTarget = tile->unit;
+//                break;
+//            }
+//        }
 
         if (combatTarget != nullptr && !ForcedMovementState) {
             hasCombatTarget = true;
