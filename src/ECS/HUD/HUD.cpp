@@ -29,7 +29,6 @@ void HUD::init() {
     z_sorted_groups.push_back(&groups.at(0));
     textRenderer = make_unique<TextRenderer>(this);
     spriteRenderer = make_unique<SpriteRenderer>(this);
-    minimapRenderer = make_unique<MinimapRenderer>(this);
     signalReceiver = make_unique<SignalReceiver>(Signal::signal_types.all_hud | Signal::signal_types.mouse_move_signal | Signal::signal_types.mouse_button_signal);
     signalReceiver->receive = [this](Signal & signal) {
         if ( signal.stype == Signal::signal_types.hud_sort_z_depth_signal ) {
@@ -224,7 +223,6 @@ void HUD::addComponent(void *component) {
             break;
         }
         case hudcType::MINIMAP: {
-            minimap = reinterpret_cast<Minimap *>(component);
             break;
         }
     }

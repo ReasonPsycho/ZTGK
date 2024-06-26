@@ -43,7 +43,7 @@ void InstanceRenderSystem::DrawTiles(Shader *regularShader, Camera *camera) {
         }
     }
 
-    PushToSSBO(camera);
+    PushToSSBO();
 
     regularShader->use();
     wallMaterial.loadInstancedMaterial(regularShader);
@@ -76,7 +76,7 @@ void InstanceRenderSystem::SimpleDrawTiles(Shader *regularShader, Camera *camera
         }
     }
 
-    PushToSSBO(camera);
+    PushToSSBO();
 
     glPolygonOffset(factor, units); // You can experiment with these values
     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -193,13 +193,35 @@ void InstanceRenderSystem::Innit() {
     }
 
     particleMaterial.mapTextureArrays();
+
+    glGenTextures(1, &minimap);
+
+//Specify your desired texture dimensions
+    int width = 400;
+    int height = 400;
+
+// Bind the texture object and specify its parameters
+    glBindTexture(GL_TEXTURE_2D, minimap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glGenFramebuffers(1, &minimapFbo);
+
+// Bind the framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, minimapFbo);
+
+// Attach the texture to the framebuffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, minimap, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 InstanceRenderSystem::InstanceRenderSystem(Camera *camera) : camera(camera) {
     name = "InstanceRenderSystem";
 }
 
-void InstanceRenderSystem::PushToSSBO(Camera *camera) {
+void InstanceRenderSystem::PushToSSBO() {
     ZoneScopedN("InstanceRenderSystem - PushToSSBO");
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, wallDataBufferID);
@@ -245,4 +267,38 @@ void InstanceRenderSystem::DrawParticles(Shader *regularShader, Camera *camera) 
                                 GL_UNSIGNED_INT, 0, systemManager->getSystem<ParticleSystem>()->particlesData.size());
         glBindVertexArray(0);
     }
+}
+
+void InstanceRenderSystem::DrawMinimap(Shader *regularShader) {
+//it must be here bcs if we mine wall we need to UpdateImpl walls
+    //Innit();
+    ZoneScopedN("Draw tiles");
+
+    glBindFramebuffer(GL_FRAMEBUFFER, minimapFbo);
+
+    wallData.clear();
+    Grid *grid = systemManager->getSystem<Grid>();
+
+    for (int x = 0; x < grid->width / grid->chunkWidth; ++x) {
+        for (int z = 0; z < grid->height / grid->chunkHeight; ++z) {
+            Chunk *chunk = grid->chunkArray[x][z];
+            for (auto &wallDataPtr: chunk->wallDataArray) {
+                wallData.push_back(*wallDataPtr);
+            }
+        }
+    }
+    PushToSSBO();
+    regularShader->use();
+    regularShader->setMatrix4("projection", false, glm::value_ptr(projection));
+    regularShader->setMatrix4("view", false, glm::value_ptr(view));
+    regularShader->setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+
+    for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
+        glBindVertexArray(tileModel->meshes[i].VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[i].indices.size()),
+                                GL_UNSIGNED_INT, 0, wallData.size());
+        glBindVertexArray(0);
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

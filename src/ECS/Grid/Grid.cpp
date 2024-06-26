@@ -225,7 +225,7 @@ void Grid::InitializeTileEntities() {
 
             auto tileEntity = tile->getEntity();
             tileEntity->getComponent<BoxCollider>()->setCenter(
-                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
+                    tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->getTileState() == FLOOR ? -2 : 0, 0));
             tileEntity->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xz";
             if(tileEntity->getComponent<BoxCollider>()->getCenter().y == -2){
                 tileEntity->getComponent<BoxCollider>()->boxColliderData.color = glm::vec4(0, 1, 0, 1);
@@ -233,7 +233,7 @@ void Grid::InitializeTileEntities() {
 
             tile->isInFogOfWar = true;
 
-            switch (tile->state) {
+            switch (tile->getTileState()) {
                 // todo these once relevant
                 // stateData will be set by the serializer, here init components & stuff as necessary from the loaded state
                 default:
@@ -302,15 +302,15 @@ void Grid::LoadTileEntities(float scale) {
                     tileEntity->transform.setLocalScale(glm::vec3(scale, scale, scale));
 
                     if ((i >= chunkWidth / 4 && i < (chunkWidth - chunkWidth / 4) && j >= chunkHeight / 4 && j < (chunkHeight - chunkHeight / 4)) && (x * i != 40 || z * j != 40)) {
-                        tileEntity->getComponent<Tile>()->state = FLOOR;
+                        tileEntity->getComponent<Tile>()->setTileState(FLOOR);
 
                     } else {
-                        tileEntity->getComponent<Tile>()->state = WALL;
+                        tileEntity->getComponent<Tile>()->setTileState(WALL);
                         tileEntity->addComponent(std::make_unique<IMineable>(1.0f, tileEntity->getComponent<Tile>()->index, this));
 
                     }
                     if (i * x > 40 && i * x < 44 && j * z > 40 && j * z < 44) {
-                        tileEntity->getComponent<Tile>()->state = ORE;
+                        tileEntity->getComponent<Tile>()->setTileState(ORE);
                         tileEntity->addComponent(std::make_unique<Pranium>(5.0f, tileEntity->getComponent<Tile>()->index, this));
                         tileEntity->getComponent<Pranium>()->generatePranium(ztgk::game::washingMachineModel);
                     }
@@ -319,7 +319,7 @@ void Grid::LoadTileEntities(float scale) {
                     tileEntity->addComponent(
                             std::make_unique<BoxCollider>(tileEntity, glm::vec4(1, 1, 1, 1), CollisionType::TILE));
                     tileEntity->getComponent<BoxCollider>()->setCenter(
-                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->state == FLOOR ? -2 : 0, 0));
+                            tileEntity->transform.getGlobalPosition() + glm::vec3(0, tileEntity->getComponent<Tile>()->getTileState() == FLOOR ? -2 : 0, 0));
                 }
             }
 
@@ -368,16 +368,16 @@ void Grid::SetUpWall(Tile *tile) {
     bool isDiagonal = ((tile->index.x + tile->index.z) % 2 == 0);
     ClearWall(tile);
     bool isSurrounded = true;
-    if (tile->state != WALL) {
+    if (tile->getTileState() != WALL) {
         tile->dirtinessLevel = std::rand() % 101;
         glm::mat4x4 floorMatrix = tile->getEntity()->transform.getModelMatrix();
         floorMatrix = glm::translate(floorMatrix, glm::vec3(0, -translateLength, 0));
         floorMatrix = glm::rotate(floorMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(
                 wallChunk->addWallData(make_unique<WallData>(floorMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, (isDiagonal ? 1 : 2), (isDiagonal ? 1 : 2), 0, (isDiagonal ? 1 : 2))));
-    } else if (tile->state == WALL) {
+    } else if (tile->getTileState() == WALL) {
         Tile *northNeighbour = getTileAt(tile->index.x + 1, tile->index.z);
-        if (northNeighbour == nullptr || northNeighbour->state != WALL) {
+        if (northNeighbour == nullptr || northNeighbour->getTileState() != WALL) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
             northMatrix = glm::translate(northMatrix, glm::vec3(translateLength, 0, 0));
             northMatrix = glm::rotate(northMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
@@ -386,7 +386,7 @@ void Grid::SetUpWall(Tile *tile) {
         }
 
         Tile *southNeighbour = getTileAt(tile->index.x - 1, tile->index.z);
-        if (southNeighbour == nullptr || southNeighbour->state != WALL) {
+        if (southNeighbour == nullptr || southNeighbour->getTileState() != WALL) {
             glm::mat4x4 southMatrix = tile->getEntity()->transform.getModelMatrix();
             southMatrix = glm::translate(southMatrix, glm::vec3(-translateLength, 0, 0));
             southMatrix = glm::rotate(southMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
@@ -395,7 +395,7 @@ void Grid::SetUpWall(Tile *tile) {
         }
 
         Tile *eastNeighbour = getTileAt(tile->index.x, tile->index.z + 1);
-        if (eastNeighbour == nullptr || eastNeighbour->state != WALL) {
+        if (eastNeighbour == nullptr || eastNeighbour->getTileState() != WALL) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
             eastMatrix = glm::translate(eastMatrix, glm::vec3(0, 0, translateLength));
             eastMatrix = glm::rotate(eastMatrix, glm::radians(-90.0f), glm::vec3(0, 0, 1));
@@ -404,7 +404,7 @@ void Grid::SetUpWall(Tile *tile) {
         }
 
         Tile *westNeighbour = getTileAt(tile->index.x, tile->index.z - 1);
-        if (westNeighbour == nullptr || westNeighbour->state != WALL) {
+        if (westNeighbour == nullptr || westNeighbour->getTileState() != WALL) {
             glm::mat4x4 westMatrix = tile->getEntity()->transform.getModelMatrix();
             westMatrix = glm::translate(westMatrix, glm::vec3(0, 0, -translateLength));
             westMatrix = glm::rotate(westMatrix, glm::radians(180.0f), glm::vec3(1, 0, 0));
@@ -425,7 +425,7 @@ void Grid::SetUpWall(Tile *tile) {
 
 void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
     Tile *currentTile = getTileAt(tileIndex);
-    currentTile->state = FLOOR;
+    currentTile->setTileState( FLOOR);
     vector<Tile *> neighbours;
 
     neighbours.push_back(getTileAt(tileIndex.x + 1, tileIndex.z));
@@ -613,7 +613,7 @@ void Grid::UpdateFogData(Tile *tile) {
 
             Tile *neighbourTile = getTileAt(neighbourIndex.x, neighbourIndex.z);
             if (neighbourTile != nullptr) {
-                if (neighbourTile->state == FLOOR || neighbourTile->state == CORE || neighbourTile->state == CHEST || neighbourTile->state == SPONGE) {
+                if (neighbourTile->getTileState() == FLOOR || neighbourTile->getTileState() == CORE || neighbourTile->getTileState() == CHEST || neighbourTile->getTileState() == SPONGE) {
                     open.push_back(neighbourIndex);
                 } else {
                     edgeSet.insert(neighbourIndex);

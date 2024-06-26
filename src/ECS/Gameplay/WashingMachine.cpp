@@ -130,7 +130,7 @@ std::vector<Tile*> WashingMachine::getTilesToClearInRaiuds(Vector2Int position, 
             int dz = z - position.z;
             if(dx*dx + dz*dz <= radius*radius){
                 auto tile= grid->getTileAt(x, z);
-                if(tile != nullptr && tile->state == TileState::WALL){
+                if(tile != nullptr && tile->getTileState() == TileState::WALL){
                     tiles.push_back(tile);
                 }
             }
@@ -241,13 +241,13 @@ void WashingMachine::clearNextTile_walls() {
 
     auto tile = tilesToClear_walls[0];
     tilesToClear_walls.erase(tilesToClear_walls.begin());
-    tile->state = TileState::FLOOR;
+    tile->setTileState(TileState::FLOOR);
     auto grid = ztgk::game::scene->systemManager.getSystem<Grid>();
     grid->SetUpWall(tile);
 
     auto neigh = grid->GetNeighbours(tile->index);
     for(auto n : neigh) {
-        if(n != nullptr && n->state == TileState::WALL) {
+        if(n != nullptr && n->getTileState() == TileState::WALL) {
             grid->SetUpWall(n);
         }
     }
