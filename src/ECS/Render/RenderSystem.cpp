@@ -11,15 +11,16 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
     Frustum frustum = createFrustumFromCamera(*camera);
 
     for (auto &renderComponent: renderComponents) {
-        if(!renderComponent->isInFogOfWar){
+        if (!renderComponent->isInFogOfWar) {
             renderComponent->draw(*regularShader, &frustum);
         }
     }
     PhongPipeline *phongPipline = systemManager->getSystem<PhongPipeline>();
     glEnable(GL_BLEND);
     glDisablei(GL_BLEND, phongPipline->colorAttachments[2]);
-    for (auto & betterRender: betterRenderPlayerComponents) {
-        if(betterRender!= nullptr && betterRender->getEntity() != nullptr) {
+    glDisablei(GL_BLEND, phongPipline->colorAttachments[0]);
+    for (auto &betterRender: betterRenderPlayerComponents) {
+        if (betterRender != nullptr && betterRender->getEntity() != nullptr) {
             if (betterRender->draw(ztgk::game::scene->systemManager.getSystem<PhongPipeline>()->spriteRenderShader,
                                    &frustum)) {
                 glBindVertexArray(tileModel->meshes[0].VAO);
@@ -36,7 +37,7 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
 
 void RenderSystem::SimpleDrawScene(Shader *regularShader, glm::vec3 viewPos, float farPlane) {
     for (auto &renderComponent: renderComponents) {
-        if (!renderComponent->isInFogOfWar && glm::distance(renderComponent->getEntity()->transform.getGlobalPosition(), viewPos) < farPlane){
+        if (!renderComponent->isInFogOfWar && glm::distance(renderComponent->getEntity()->transform.getGlobalPosition(), viewPos) < farPlane) {
             auto rc = renderComponent;
             renderComponent->simpleDraw(*regularShader);
         }
@@ -45,7 +46,7 @@ void RenderSystem::SimpleDrawScene(Shader *regularShader, glm::vec3 viewPos, flo
 
 void RenderSystem::showImGuiDetailsImpl(Camera *camera) {
 
-    
+
 }
 
 RenderSystem::RenderSystem() {
@@ -53,40 +54,49 @@ RenderSystem::RenderSystem() {
 }
 
 void RenderSystem::addComponent(void *component) {
-    Component* basePtr = static_cast<Component*>(component);
+    Component *basePtr = static_cast<Component *>(component);
 
-    Render* renderPtr = dynamic_cast<Render*>(basePtr);
-    if(renderPtr != nullptr)
-    {
+    Render *renderPtr = dynamic_cast<Render *>(basePtr);
+    if (renderPtr != nullptr) {
         renderComponents.push_back(renderPtr);
     }
 
-    BetterSpriteRender* BetterRenderPtr = dynamic_cast<BetterSpriteRender*>(basePtr);
-    if(BetterRenderPtr != nullptr)
-    {
+    BetterSpriteRender *BetterRenderPtr = dynamic_cast<BetterSpriteRender *>(basePtr);
+    if (BetterRenderPtr != nullptr) {
         betterRenderPlayerComponents.push_back(BetterRenderPtr);
     }
 
-    ColorMask* colorMaskPtr = dynamic_cast<ColorMask*>(basePtr);
-    if(colorMaskPtr != nullptr)
-    {
+    ColorMask *colorMaskPtr = dynamic_cast<ColorMask *>(basePtr);
+    if (colorMaskPtr != nullptr) {
         colorMaskComponents.push_back(colorMaskPtr);
     }
 
-    AnimationPlayer* animationPlayerPtr = dynamic_cast<AnimationPlayer*>(basePtr);
-    if(animationPlayerPtr != nullptr)
-    {
+    AnimationPlayer *animationPlayerPtr = dynamic_cast<AnimationPlayer *>(basePtr);
+    if (animationPlayerPtr != nullptr) {
         animationPlayerComponents.push_back(animationPlayerPtr);
     }
 }
 
 void RenderSystem::UpdateImpl() {
-    for (auto colorMask: colorMaskComponents) {
-        colorMask->Update();
-    }
 
     for (auto animationPlayer: animationPlayerComponents) {
-        animationPlayer->Update();
+
+
+        futures.push_back(std::async(std::launch::async, [animationPlayer]() { // capture animationPlayer by value here
+            animationPlayer->Update();
+        }));
+
+    }
+
+
+    for (std::future<void> &fut: futures) {
+        fut.wait();
+    }
+
+    futures.clear();
+
+    for (auto colorMask: colorMaskComponents) {
+        colorMask->Update();
     }
 
     std::vector<BetterSpriteRender *> toBeDeleted;

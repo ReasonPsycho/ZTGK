@@ -157,8 +157,8 @@ State *IdleState::RunCurrentState() {
             auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
             if(anim!= nullptr){
                 string modelPathBugMove = "res/models/zuczek/Zuczek_sleep - copia.fbx";
-                if (unit->animationcooldown > anim->animationMap[modelPathBugMove]->GetDuration() /
-                                              (anim->animationMap[modelPathBugMove]->GetTicksPerSecond() * 2.0f)) {
+                if (unit->animationcooldown > anim->animationMap[modelPathBugMove].GetDuration() /
+                                              (anim->animationMap[modelPathBugMove].GetTicksPerSecond() * 2.0f)) {
                     anim->PlayAnimation(modelPathBugMove, false, 2.0f);
                     unit->animationcooldown = 0;
                 }
@@ -169,8 +169,8 @@ State *IdleState::RunCurrentState() {
             auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
             if(anim!= nullptr){
                 string modelPathShroomMove = "res/models/Mushroom/shroom_idle.fbx";
-                if (unit->animationcooldown > anim->animationMap[modelPathShroomMove]->GetDuration() /
-                                              (anim->animationMap[modelPathShroomMove]->GetTicksPerSecond() * 2.0f)) {
+                if (unit->animationcooldown > anim->animationMap[modelPathShroomMove].GetDuration() /
+                                              (anim->animationMap[modelPathShroomMove].GetTicksPerSecond() * 2.0f)) {
                     anim->PlayAnimation(modelPathShroomMove, false, 2.0f);
                     unit->animationcooldown = 0;
                 }

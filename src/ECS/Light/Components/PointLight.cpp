@@ -72,6 +72,8 @@ void PointLight::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void PointLight::UpdateData(int height, int width) {
+    ZoneScopedN("UpdateData");
+
     shadowTransforms.clear();
     this->getEntity()->forceUpdateSelfAndChild();
     data.position = glm::vec4(this->getEntity()->transform.getGlobalPosition(), far_plane);

@@ -12,6 +12,7 @@ Render::Render(Model *pModel):pModel(pModel),aabb(generateAABB(*pModel)) {
 
 void Render::draw(Shader &regularShader) {
     ZoneScopedN("Draw");
+    isRendered = true;
     regularShader.use();
     regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
     regularShader.setFloat("heightScale", 1.0);
@@ -31,6 +32,7 @@ void Render::draw(Shader &regularShader) {
 void Render::draw(Shader &regularShader, Frustum *frustum) {
     ZoneScopedN("Draw");
     if(aabb.isOnFrustum(*frustum,getEntity()->transform)){
+        isRendered = true;
         regularShader.setMatrix4("model", false, glm::value_ptr(getEntity()->transform.getModelMatrix()));
         regularShader.setVec4("colorMask", colorMask);
         regularShader.setFloat("dirtLevel", dirtLevel);
@@ -42,6 +44,8 @@ void Render::draw(Shader &regularShader, Frustum *frustum) {
         }
 
         pModel->Draw(regularShader);    
+    }else{
+        isRendered = false;
     }
 }
 

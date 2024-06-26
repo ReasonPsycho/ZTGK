@@ -26,7 +26,20 @@ class Animation
 {
 public:
     Animation() = default;
+    Animation& operator=(const Animation &source) {
+        // Check for self-assignment
+        if (this == &source) {
+            return *this;
+        }
+        m_Duration = source.m_Duration;
+        m_TicksPerSecond = source.m_TicksPerSecond;
+        m_Bones = source.m_Bones;
+        m_RootNode = source.m_RootNode;
+        m_BoneInfoMap = source.m_BoneInfoMap;
+        // Possibly add guards to delete old data
 
+        return *this;
+    }
     Animation(const std::string& animationPath, Model* model);
 
     ~Animation();

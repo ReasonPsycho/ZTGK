@@ -117,6 +117,7 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
     add_definitions(-DRELEASE_BUILD)
 endif()
 
+
 if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)
 endif ()

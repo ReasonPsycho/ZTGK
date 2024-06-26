@@ -15,6 +15,7 @@
 #include "ECS/Render/Pipelines/Phong/PhongPipeline.h"
 
 #include <algorithm>
+#include <future>
 
 
 class RenderSystem : public System  {
@@ -33,7 +34,7 @@ public:
     Model* tileModel;
 
 private:
-    
+    std::vector<std::future<void>> futures;
     std::vector<Render *> renderComponents;
     std::vector<ColorMask *> colorMaskComponents;
     std::vector<AnimationPlayer *> animationPlayerComponents;

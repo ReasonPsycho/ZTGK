@@ -24,6 +24,7 @@ public:
     bool isInFogOfWar = false;
     bool isAnimated = false;
     std::vector<glm::mat4> animationTransforms;
+    bool isRendered = false;
 private:
     Model *pModel{};
     AABB aabb;
