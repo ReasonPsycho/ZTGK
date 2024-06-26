@@ -9,13 +9,10 @@
 
 class Detergent : public Item {
 public:
-    Detergent() : Item("Detergent", "Extended power! Sparkling lemon!", false,
+    Detergent() : Item(Item::item_types.detergent, "Gabka GO", "Extended power! Sparkling lemon!", false,
                       ItemStats(
                               0,0,GridRange(0, 0), GridRange(0, 0),
-                              {
-                                  .dmg_perc = 0.1,
-                                  .dmg_flat = 5,
-                              }), false) {
+                              {/* RANDOM */}), false) {
         icon_path = "res/textures/icons/item_detergent.png";
         model = ztgk::game::superPlyn; // todo change model
 

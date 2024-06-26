@@ -155,7 +155,7 @@ void MiningState::Mine() {
         float angle = atan2(unit->currentMiningTarget->gridPosition.x - unit->gridPosition.x, unit->currentMiningTarget->gridPosition.z - unit->gridPosition.z);
         unit->rotation = angle;
 
-
+        auto oldMined = unit->currentMiningTarget;
         if(unit->currentMiningTarget->getTimeToMineRemaining() <= 0){
             auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
             if(anim == nullptr)
@@ -175,6 +175,10 @@ void MiningState::Mine() {
             }
 
             unit->currentMiningTarget = unit->findClosestMineable();
+
+            if (!oldMined->isMined) {
+                oldMined->timeToMineRemaining = oldMined->timeToMine;
+            }
         }
     }
 //    else{

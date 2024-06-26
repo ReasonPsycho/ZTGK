@@ -925,9 +925,11 @@ void load_hud() {
 // game
     auto egame = scene.addEntity(ehud, "Game");
     auto emap = scene.addEntity(egame, "Map");
-//    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
-    emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
-    emap->getComponent<Text>()->mode = CENTER;
+    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{200    ,400}, ztgk::color.WHITE, ztgk::game::ui_data.gr_map));
+    emap->getComponent<Sprite>()->texture = scene.systemManager.getSystem<InstanceRenderSystem>()->minimap;
+    emap->getComponent<Sprite>()->hasTexture = true;
+//    emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
+//    emap->getComponent<Text>()->mode = CENTER;
 
 #pragma region unit details
     auto emiddle = scene.addEntity(egame, "Unit Details");
@@ -2333,11 +2335,12 @@ void gen_and_load_lvl(bool gen_new_lvl) {
                     {static_cast<int>(Item::item_types.water_gun), 0.f,  1.f},
                     {static_cast<int>(Item::item_types.beacon),    10.f, 0.f, 2},
                     {static_cast<int>(Item::item_types.detergent), 0.5f, 0.5f},
-                    {static_cast<int>(Item::item_types.pendant),   0.5f, 1.5f},
+                    {static_cast<int>(Item::item_types.pendant),   0.5f, 0.5f},
+                    {static_cast<int>(Item::item_types.proszek),     0.5f, 0.5f},
             },
             .encounterTable = {
                 {'x', 1.f, 1.f},
-                {'s', 0.f, 2.f},
+                {'s', 1.f, 2.f},
             },
     };
 
