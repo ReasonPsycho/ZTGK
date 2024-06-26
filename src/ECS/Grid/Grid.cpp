@@ -873,17 +873,14 @@ void Grid::SpawnHanger(Vector2Int gridPos, Tile* tile) {
                 break;
 
             }
-
-            //todo Grzesiu zmień sobie tutaj co musisz jak zrobisz ten ostatni item
-//            case 7:{
-//
-//                itemChild->addComponent(std::make_unique<Render>(ztgk::game::proszek));
-//                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(-45.f), glm::radians(45.f), glm::radians(90.f)));
-//                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
-//                itemChild->transform.setLocalPosition(glm::vec3(1,  0.8, -2.1));
-//                itemChild->updateSelfAndChild();
-//                break;
-//            }
+            case 9:{
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::proszek));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(-45.f), glm::radians(45.f), glm::radians(90.f)));
+                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
+                itemChild->transform.setLocalPosition(glm::vec3(1,  0.8, -2.1));
+                itemChild->updateSelfAndChild();
+                break;
+            }
         }
 
 

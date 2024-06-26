@@ -14,6 +14,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/Pendant.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Detergent.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Beacon.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Proszek.h"
 #include "ECS/Unit/Mining/PickupubleItem.h"
 #include "ECS/Utils/Util.h"
 
@@ -31,6 +32,7 @@ void InventoryManager::init() {
     item_constructors.emplace(Item::item_types.detergent, [](){ return new Detergent(); });
     item_constructors.emplace(Item::item_types.pendant, [](){ return new Pendant(); });
     item_constructors.emplace(Item::item_types.pranium_ore, [](){ return new PraniumOre(); });
+    item_constructors.emplace(Item::item_types.proszek, [](){ return new Proszek(); });
 }
 
 Item *InventoryManager::create_item(unsigned int type_id) {

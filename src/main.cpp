@@ -2323,11 +2323,12 @@ void gen_and_load_lvl(bool gen_new_lvl) {
                     {static_cast<int>(Item::item_types.water_gun), 0.f,  1.f},
                     {static_cast<int>(Item::item_types.beacon),    10.f, 0.f, 2},
                     {static_cast<int>(Item::item_types.detergent), 0.5f, 0.5f},
-                    {static_cast<int>(Item::item_types.pendant),   0.5f, 1.5f},
+                    {static_cast<int>(Item::item_types.pendant),   0.5f, 0.5f},
+                    {static_cast<int>(Item::item_types.proszek),     0.5f, 0.5f},
             },
             .encounterTable = {
                 {'x', 1.f, 1.f},
-                {'s', 0.f, 2.f},
+                {'s', 1.f, 2.f},
             },
     };
 

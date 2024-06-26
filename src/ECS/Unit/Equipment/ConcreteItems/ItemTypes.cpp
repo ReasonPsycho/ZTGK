@@ -10,6 +10,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/Pendant.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Detergent.h"
 #include "ECS/Unit/Equipment/ConcreteItems/Beacon.h"
+#include "ECS/Unit/Equipment/ConcreteItems/Proszek.h"
 
 using namespace ztgk;
 #define quote(x) #x
@@ -24,6 +25,7 @@ s_item_types::s_item_types() {
     detergent = 6;
     pendant = 7;
     pranium_ore = 8;
+    proszek = 9;
 
     map = {};
     map.emplace(hands, quote(hands));
@@ -35,6 +37,7 @@ s_item_types::s_item_types() {
     map.emplace(detergent, quote(detergent));
     map.emplace(pendant, quote(pendant));
     map.emplace(pranium_ore, quote(pranium_ore));
+    map.emplace(proszek, quote(proszek));
 }
 
 unsigned s_item_types::id_of(Item *item) const {
@@ -58,6 +61,8 @@ unsigned s_item_types::id_of(Item *item) const {
         return pendant;
     if (type == std::type_index(typeid(PraniumOre)))
         return pranium_ore;
+    if (type == std::type_index(typeid(Proszek)))
+        return proszek;
 }
 
 std::string s_item_types::types_string() const {
