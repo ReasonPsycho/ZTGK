@@ -266,17 +266,18 @@ void Grid::InitializeTileEntities() {
                     tile->getEntity()->getComponent<BoxCollider>()->setCenter(
                             tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
 
-                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
-                        model = ztgk::game::hangerTidyPodLauncherModel;
-                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
-                        model = ztgk::game::hangerMopModel;
-                    }
+//                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
+//                        model = ztgk::game::hangerTidyPodLauncherModel;
+//                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
+//                        model = ztgk::game::hangerMopModel;
+//                    }
 //                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
 //                        model = ztgk::game::hangerMopObrotowyModel;
 //                    }
-                    else {
-                        model = ztgk::game::chestModel;
-                    }
+//                    else {
+                        // todo make this główny model wieszaka?????
+                        model = ztgk::game::hangerMopModel;
+//                    }
                     chestChild->addComponent(std::make_unique<Render>(model));
                     //chestChild->transform.setLocalScale(glm::vec3(1, 1, 2));
                     //chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
@@ -381,7 +382,6 @@ void Grid::SetUpWalls() {
 }
 
 void Grid::SetUpWall(Tile *tile) {
-    // todo handle core, ore, etc. states with different models/textures or render as floor and create entity (as is now)
 
     Chunk *wallChunk = getChunkAt(tile->index);
     float translateLength = tileSize / 2.0f;
@@ -438,6 +438,9 @@ void Grid::SetUpWall(Tile *tile) {
         tile->walls.push_back(
                 wallChunk->addWallData(make_unique<WallData>(topMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
     }
+
+    // here because it sets wall data
+    tile->setHighlightPresetFromState();
 }
 
 void Grid::DestroyWallsOnTile(Vector2Int tileIndex) {
@@ -745,16 +748,12 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     auto unit = UnitEntity->getComponent<Unit>();
     if(unit->unitType == UnitType::UNIT_SPONGE) {
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMove, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
-                modelPathGabkaIdle, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMine, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackR] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttackR, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackL] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttackL, gabka);
+
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMine,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackR,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackR, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackL,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackL, gabka));
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
@@ -764,16 +763,16 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     } else if (unit->unitType == UnitType::UNIT_BUG) {
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekAttack,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczekTest));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekIddle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczekTest));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczekTest));
     } else if(unit->unitType == UnitType::UNIT_SHROOM) {
         InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomMove, shroom);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomIdle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomIdle, shroom);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomSpit] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomSpit, shroom);
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomIdle, shroom));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomSpit,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomSpit, shroom));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, shroom));
     }
     return UnitEntity;
 }

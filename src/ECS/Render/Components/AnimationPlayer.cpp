@@ -35,8 +35,8 @@ void AnimationPlayer::UpdateImpl() {
             animationSpeed = 1.0f;
         }
         
-   //     spdlog::info(glm_mat4_to_string(animator.m_CurrentAnimation->GetBoneOffSet("Hand.L")));
-   //     spdlog::info(glm_mat4_to_string(animator.m_CurrentAnimation->GetBoneOffSet("Hand.R")));
+        //spdlog::info(glm_mat4_to_string(animator.m_CurrentAnimation->GetBoneTranslationMatrix("Hand.L")));
+       // spdlog::info(glm_mat4_to_string(animator.m_CurrentAnimation->GetBoneTranslationMatrix("Hand.R")));
         
     } else{
         Render *render = getEntity()->getComponent<Render>();
@@ -80,4 +80,12 @@ void AnimationPlayer::StopAnimation() {
     isPlaying = false;
     looping = false;
     animationSpeed = 1.0f;
+}
+
+void AnimationPlayer::AddAnimation(std::string name, Animation *animation) {
+    animationMap[name] = animation;
+    if(   this->animator.m_CurrentAnimation == nullptr){
+        this->animator.m_CurrentAnimation = animationMap[name];
+        animator.UpdateAnimation(0);
+    }
 }

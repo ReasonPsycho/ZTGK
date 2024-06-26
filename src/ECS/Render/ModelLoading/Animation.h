@@ -41,7 +41,8 @@ public:
     const AssimpNodeData& GetRootNode();
 
     const std::map<std::string,BoneInfo>& GetBoneIDMap();
-    const glm::mat4 GetBoneOffSet(string name);
+    glm::mat4 GetBoneTranslationMatrix(string name);
+    int GetBoneIdFromName(string name);
 
 private:
     void ReadMissingBones(const aiAnimation* animation, Model& model);

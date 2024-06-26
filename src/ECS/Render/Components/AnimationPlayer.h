@@ -19,6 +19,7 @@ public:
 
     void PlayAnimation(std::string path, bool looping = false, float animationSpeed = 1.0f);
     void StopAnimation();
+    void AddAnimation(std::string name, Animation* animation);
 
     
     void UpdateImpl() override;

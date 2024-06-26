@@ -99,10 +99,23 @@ namespace ztgk::game {
     extern Model* oreModel;
     extern Model* chestModel;
     extern Model* projectileModel;
+
+    //Items <33333
     extern Model* mopModel;
     extern Model* mopObrotowyModel;
+    extern Model* tideGun;
+    extern Model* superPlyn;
+    extern Model* kulki;
+    extern Model* healingo;
+    extern Model* proszek;
+    
+    
     extern Model* tidyPodLauncherModel;
     extern Model* hangerMopModel;
+    
+    
+    
+    
     extern Model* hangerMopObrotowyModel;
     extern Model* hangerTidyPodLauncherModel;
 

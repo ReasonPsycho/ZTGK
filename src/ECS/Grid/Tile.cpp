@@ -38,19 +38,19 @@ void Tile::showImGuiDetailsImpl(Camera *camera) {
     state = (TileState)state_select;
 }
 
-void Tile::changeWallsSelection(TileSelectionState state) {
+void Tile::changeWallsSelection(TileHighlightState state) {
     for(auto wall : walls){
         wall->data[2] = state;
     }
 }
 
-void Tile::setTileSelectionState(TileSelectionState state) {
+void Tile::setHighlight(TileHighlightState state) {
     changeWallsSelection(state);
-    tileSelectionState = state;
+    tileHighlightState = state;
 }
 
-TileSelectionState Tile::getTileSelectionState() {
-    return tileSelectionState;
+TileHighlightState Tile::getTileSelectionState() {
+    return tileHighlightState;
 }
 
 void Tile::changeDirtinessLevel(float newDirtLevel) {
@@ -86,6 +86,18 @@ void Tile::tryToSendBubble() {
 
 void Tile::UpdateImpl() {
     tryToSendBubble();
+}
+
+void Tile::setHighlightPresetFromState() {
+    switch (state) {
+        case CHEST:
+            setHighlight(HIGHLIGHT_ITEM_GOLD);
+            break;
+        case ORE:
+            setHighlight(HIGHLIGHT_ITEM_GOLD);
+            break;
+        default: break; // do not change existing state
+    }
 }
 
 

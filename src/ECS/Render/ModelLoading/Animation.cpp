@@ -78,17 +78,29 @@ void Animation::ReadHeirarchyData(AssimpNodeData &dest, const aiNode *src) {
 Animation::~Animation() {
 }
 
-const glm::mat4 Animation::GetBoneOffSet(string name) {
+ glm::mat4 Animation::GetBoneTranslationMatrix(string name) {
 
     auto it = m_BoneInfoMap.find(name);
-
-    if(it != m_BoneInfoMap.end())
+    std::vector<glm::mat4> boneTranslationPath;
+    while(it != m_BoneInfoMap.end())
     {
         BoneInfo info = it->second;
-        return info.offset;
+        boneTranslationPath.push_back(info.offset);
+        it = m_BoneInfoMap.find(info.parentNode);
     }
-    else
-    {
-        return glm::mat4(1);
+    glm::mat4 translationMatrix = glm::mat4(1);
+    std::reverse(boneTranslationPath.begin(), boneTranslationPath.end());
+    for (int i = 0; i < boneTranslationPath.size(); ++i) {
+        translationMatrix *= boneTranslationPath[i];
+    }
+    return translationMatrix;
+}
+
+int Animation::GetBoneIdFromName(string name) {
+    auto it = m_BoneInfoMap.find(name);
+    if (it != m_BoneInfoMap.end()) {
+        return it->second.id;
+    } else {
+        return -1;
     }
 }
