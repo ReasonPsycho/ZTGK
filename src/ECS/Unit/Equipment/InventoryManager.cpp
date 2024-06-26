@@ -167,9 +167,17 @@ void InventoryManager::spawn_item_on_map(Item *item, Vector2Int grid_pos) {
     auto kiddo = ztgk::game::scene->addEntity(tile->parentEntity,"OnMapItem");
     kiddo->addComponent(std::make_unique<Render>(item->model));
     kiddo->addComponent(std::make_unique<PickupubleItem>(item, grid_pos));
-    kiddo->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
-    kiddo->transform.setLocalScale(glm::vec3(0.5f, 0.5f, 2.0f));
-    kiddo->updateSelfAndChild();
+
+    if(item->name == "Pranium Ore"){
+        kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
+        kiddo->transform.setLocalScale(glm::vec3(.75f, .75f, .75f));
+        kiddo->transform.setLocalPosition(glm::vec3(0, -1, 0));
+        kiddo->updateSelfAndChild();
+    }else {
+        kiddo->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
+        kiddo->transform.setLocalScale(glm::vec3(0.5f, 0.5f, 2.0f));
+        kiddo->updateSelfAndChild();
+    }
 }
 
 void InventoryManager::showImGuiDetailsImpl(Camera *camera) {
