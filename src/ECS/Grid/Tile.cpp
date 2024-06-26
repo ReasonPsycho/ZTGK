@@ -157,4 +157,15 @@ void Tile::tryToSendParticle(int particle_type, float y) {
 
 }
 
+void Tile::setTileState(TileState tileState) {
+    for (auto wall: walls) {
+        wall->data[3] = tileState;
+    }
+    state = tileState;
+}
+
+TileState Tile::getTileState() {
+    return state;
+}
+
 

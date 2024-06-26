@@ -53,7 +53,7 @@ char ztgk::tile_state_to_token(TileState state, TileStateData data) {
 
 void ztgk::tile_state_from_token(char token, Tile * tile) {
     if (token >= TOKEN_TREASURE_CHEST_0 && token <= TOKEN_TREASURE_CHEST_9) {
-        tile->state = CHEST;
+        tile->setTileState(CHEST);
         tile->stateData.chestItemTypeId = token - TOKEN_TREASURE_CHEST_0;
         return;
     }
@@ -62,34 +62,34 @@ void ztgk::tile_state_from_token(char token, Tile * tile) {
         default:
         case TOKEN_ERROR:
             spdlog::error(std::format("Couldn't initialize tile x{} z{} from token '{}'", tile->index.x, tile->index.z, token));
-            tile->state = FLOOR;
+            tile->setTileState(FLOOR);
             break;
         case TOKEN_FLOOR:
-            tile->state = FLOOR;
+            tile->setTileState(FLOOR);
             break;
         case TOKEN_WALL:
-            tile->state = WALL;
+            tile->setTileState(WALL) ;
             break;
         case TOKEN_TREASURE_CHEST:
-            tile->state = CHEST;
+            tile->setTileState(CHEST);
             // todo itemTypeId, once relevant
             break;
         case TOKEN_CORE:
-            tile->state = CORE;
+            tile->setTileState  (CORE);
             break;
         case TOKEN_ORE:
-            tile->state = ORE;
+            tile->setTileState  (ORE);
             break;
         case TOKEN_ENEMY_BUG:
-            tile->state = BUG;
+            tile->setTileState  (BUG);
             break;
         case TOKEN_ENEMY_SHROOM:
-            tile->state = SHROOM;
+            tile->setTileState  (SHROOM);
             break;
         case TOKEN_PLAYER:
             // tile doesn't hold any unit reference anymore (ID serialization is unreliable, some other type of manually assigned ID would be necessary)
             //  todo if there are other tokens for unit types, add them here, tile is unaware of any specifics about the unit standing on it
-            tile->state = SPONGE;
+            tile->setTileState  (SPONGE);
             break;
     }
 }
@@ -110,7 +110,7 @@ void LevelSaving::save(const std::string& path) {
                 auto tile = grid->getTileAt(x, z);
 
                 if ( tile == nullptr ) token = TOKEN_ERROR;
-                else token = ztgk::tile_state_to_token(tile->state);
+                else token = ztgk::tile_state_to_token(tile->getTileState());
 
 //                else if ( tile->state == FLOOR ) token = TOKEN_FLOOR;
 //                else token = TOKEN_WALL;

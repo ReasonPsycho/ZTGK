@@ -23,10 +23,11 @@ public:
     
     void Innit();
     void DrawTiles(Shader* regularShader,Camera * camera);
+    void DrawMinimap(Shader *regularShader);
     void DrawParticles(Shader* regularShader,Camera * camera);
     void DrawLights(Shader* regularShader,Camera * camera);
     void SimpleDrawTiles(Shader *regularShader, Camera *camera, glm::vec3 viewPos, float renderDistance);
-    void PushToSSBO(Camera* camera);
+    void PushToSSBO();
 
     //ECS
     void registerComponents() override{};
@@ -40,6 +41,8 @@ public:
     
     Model* tileModel;
 
+    GLuint minimap;
+    GLuint minimapFbo;
 
 private:
     Camera * camera;
@@ -64,7 +67,29 @@ private:
     MaterialPhong particleMaterial;
     MaterialPhong lightMaterial;
     std::vector<WallData> wallData;
+    // minimap camera
 
+    float left = -100.0f;
+    float right = 100.0f;
+    float bottom = -100.0f;
+    float top = 100.0f;
+    float near = 0.1f;
+    float far = 100.0f;
+
+    glm::mat4 projection = glm::ortho(left, right, bottom, top, near, far);
+
+    // Camera matrix
+    glm::vec3 cameraPos   = glm::vec3(100.0f, 50.0f, 100.0f);
+    glm::vec3 cameraTarget = glm::vec3(100.0f, 0.0f, 100.0f);
+    glm::vec3 upVector = glm::vec3(0.0f, 0.0f, -1.0f);
+
+    glm::mat4 view = glm::lookAt(
+            cameraPos,  // Camera position
+            cameraTarget,  // Look towards this point
+            upVector  // Head is up
+    );
+    
+    
 
     //ECS
     std::array<std::type_index, 0> componentTypes = {};

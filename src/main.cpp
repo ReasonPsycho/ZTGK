@@ -928,7 +928,6 @@ void load_hud() {
 //    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_map));
     emap->addComponent(make_unique<Text>("Map", glm::vec2{200, 200}, glm::vec2(1), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.italic, NONE, ztgk::game::ui_data.gr_map));
     emap->getComponent<Text>()->mode = CENTER;
-    emap->addComponent(make_unique<Minimap>(glm::vec2{0, 0}, glm::vec2{400, 400}, ztgk::game::ui_data.gr_map));
 
 #pragma region unit details
     auto emiddle = scene.addEntity(egame, "Unit Details");
@@ -1528,6 +1527,8 @@ void render() {
 
     scene.systemManager.getSystem<PhongPipeline>()->PrepareFoamMap(&camera);
 
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawMinimap(&scene.systemManager.getSystem<PhongPipeline>()->minimap);
+    
     scene.systemManager.getSystem<PhongPipeline>()->PrebindPipeline(&camera);
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
@@ -1664,8 +1665,8 @@ void imgui_render() {
     ImGui::InputInt("Item Type ID", &chestitem);
     if (ImGui::Button("Add chest")) {
         auto tile = scene.systemManager.getSystem<Grid>()->getTileAt(chestpos.x, chestpos.y);
-        if (tile->state == WALL) {
-            tile->state = CHEST;
+        if (tile->getTileState() == WALL) {
+            tile->setTileState(CHEST);
             tile->getEntity()->getComponent<IMineable>()->Remove();
             tile->getEntity()->addComponent(make_unique<MineableChest>(Vector2Int(chestpos.x, chestpos.y),
                                                                        scene.systemManager.getSystem<Grid>(),
@@ -1674,10 +1675,10 @@ void imgui_render() {
             tile->getEntity()->getComponent<PointLight>()->data.diffuse = ztgk::color.YELLOW;
             tile->getEntity()->getComponent<PointLight>()->data.specular = ztgk::color.YELLOW;
             scene.stopRenderingImgui = true;
-        } else if (tile->state == FLOOR) {
-            tile->state = WALL;
+        } else if (tile->getTileState() == FLOOR) {
+            tile->setTileState(WALL);
             scene.systemManager.getSystem<Grid>()->SetUpWall(tile);
-            tile->state = CHEST;
+            tile->setTileState(CHEST);
             tile->getEntity()->addComponent(make_unique<MineableChest>(Vector2Int(chestpos.x, chestpos.y),
                                                                        scene.systemManager.getSystem<Grid>(),
                                                                        chestitem));
@@ -1839,9 +1840,9 @@ void update_dragged_tiles() {
             if (isLeftMouseButtonHeld)
                 cTile->setHighlight(SELECTION_LMB_GREEN);
             else if (isRightMouseButtonHeld) {
-                if (cTile->state == BUG || cTile->state == SHROOM)
+                if (cTile->getTileState() == BUG || cTile->getTileState() == SHROOM)
                     cTile->setHighlight(HIGHLIGHT_ENEMY_RED);
-                else if (cTile->state != CHEST && cTile->state != ORE)
+                else if (cTile->getTileState() != CHEST && cTile->getTileState() != ORE)
                     cTile->setHighlight(SELECTION_RMB_BLUE);
             }
         }
@@ -2052,7 +2053,7 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                 auto hitTile = hit->getComponent<Tile>();
                 auto hitUnit = hit->getComponent<Unit>();
                 if (hitUnit == nullptr && hitTile != nullptr) {
-                    if (!hitUnit && hitTile && (hitTile->state == SPONGE || hitTile->state == BUG || hitTile->state == SHROOM)) {
+                    if (!hitUnit && hitTile && (hitTile->getTileState() == SPONGE || hitTile->getTileState() == BUG || hitTile->getTileState() == SHROOM)) {
                         hitUnit = hitTile->unit;
                     }
                 }

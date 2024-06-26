@@ -65,7 +65,7 @@ Unit::Unit(std::string name, Grid *grid, Vector2Int gridPosition, UnitStats base
     this->stats = baseStats;
     this->isAlly = isAlly;
     this->previousGridPosition = gridPosition;
-    grid->getTileAt(gridPosition)->state = SPONGE;
+    grid->getTileAt(gridPosition)->setTileState(SPONGE);
     grid->getTileAt(gridPosition)->unit = this;
     // todo switch on isAlly & randomize gabka portraits
     icon_path = "res/textures/icons/gabka_cool.png";
@@ -356,8 +356,8 @@ void Unit::UpdateImpl() {
     }
 
     if (gridPosition != previousGridPosition) {
-        grid->getTileAt(previousGridPosition)->state = FLOOR;
-        grid->getTileAt(gridPosition)->state = SPONGE;
+        grid->getTileAt(previousGridPosition)->setTileState(FLOOR);
+        grid->getTileAt(gridPosition)->setTileState(SPONGE);
         grid->getTileAt(previousGridPosition)->unit = nullptr;
         grid->getTileAt(gridPosition)->unit = this;
         auto emote =ztgk::game::EMOTES::BUBBLE_TONGUE;
@@ -428,7 +428,7 @@ void Unit::UpdateImpl() {
         (equipment.item2 != nullptr && equipment.item2->name == "Pranium Ore")) {
         std::vector<Tile *> neighTiles = grid->GetNeighbours(gridPosition);
         for (auto &tile: neighTiles) {
-            if (tile->state == TileState::CORE) {
+            if (tile->getTileState() == TileState::CORE) {
                 if (equipment.item1 != nullptr && equipment.item1->name == "Pranium Ore") {
                     equipment.unequipItem(1);
                     ztgk::game::scene->systemManager.getSystem<WashingMachine>()->onPraniumDelivered();
@@ -710,7 +710,7 @@ void Unit::DIEXD() {
     }
 
     grid->getTileAt(gridPosition)->unit = nullptr;
-    grid->getTileAt(gridPosition)->state = FLOOR;
+    grid->getTileAt(gridPosition)->setTileState(FLOOR);
     ztgk::game::scene->systemManager.getSystem<UnitSystem>()->removeComponent(this);
     ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeComponent(getEntity()->getComponent<Render>());
     ztgk::game::scene->systemManager.getSystem<RenderSystem>()->removeColorMaskComponent(
@@ -816,7 +816,7 @@ void Unit::Pickup(PickupubleItem *item) {
             unit->pickupTarget = nullptr;
         }
     }
-    grid->getTileAt(target->gridPosition)->state = FLOOR;
+    grid->getTileAt(target->gridPosition)->setTileState(FLOOR);
     target->getEntity()->getComponent<Render>()->Remove();
     target->Remove();
 

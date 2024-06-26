@@ -80,7 +80,7 @@ void MineableChest::onMined(Unit *unit) {
         parentEntity->addComponent(std::make_unique<Render>(ztgk::game::chestModel));
 
     //To prevent unit from walking on empty hanger vvvv
-    grid->getTileAt(gridPosition)->state = CHEST;
+    grid->getTileAt(gridPosition)->setTileState(CHEST);
     spdlog::debug("Mined chest");
 }
 
