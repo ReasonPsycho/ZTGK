@@ -196,7 +196,7 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
         ztgk::game::audioManager->playRandomSoundFromGroup("punch");
         target->tryToSendEmote(target->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
         auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition);
-        tile->tryToSendParticle(6);
+        tile->tryToSendParticle(unit->isAlly ? RNG::RandomBool()? 8 : 9 : 6);
     }
 
     if(target->stats.hp <= 0){
