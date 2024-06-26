@@ -52,3 +52,21 @@ void ParticleEmiter::EmitCircleOfParticles(int timeToLive, int bilborded, int te
     }
 }
 
+void ParticleEmiter::EmitBurstOfParticles(int n, int timeToLive, int bilborded, int texture, glm::vec3 position, float gravity,
+                                          glm::vec4 rotation, glm::vec4 scale, glm::vec4 velocity,
+                                          glm::vec4 angularVelocity) {
+    if(n == 0 ) return;
+    for(int i = 0; i < n; i++){
+        EmitParticle(timeToLive * RNG::RandomFloat(0.8f, 1.5f),
+                     bilborded, texture,
+                     position + glm::vec3(RNG::RandomFloat(-0.5f, 0.5f), RNG::RandomFloat(-0.5f, 0.5f), RNG::RandomFloat(-0.5f, 0.5f)),
+                     gravity * RNG::RandomFloat(0.9f, 1.1f),
+                     rotation * glm::vec4(RNG::RandomFloat(0.2f, 1.8f), RNG::RandomFloat(0.2f, 1.8f), RNG::RandomFloat(0.2f, 1.8f), 1),
+                     scale * RNG::RandomFloat(0.9f, 1.1f),
+                     velocity * glm::vec4(RNG::RandomFloat(0.2f, 1.8f), RNG::RandomFloat(0.2f, 1.8f), RNG::RandomFloat(0.2f, 1.8f), 1),
+                     angularVelocity * RNG::RandomFloat(0.5f, 2.0f));
+    }
+
+
+}
+

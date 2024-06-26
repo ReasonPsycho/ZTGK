@@ -22,6 +22,7 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Utils/CooldownComponentXDD.h"
 #include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 const UnitStats Unit::ALLY_BASE = {
         .max_hp = 150,
@@ -217,6 +218,10 @@ void Unit::UpdateImpl() {
                         newDirtLvl = 0;
                     }
                     neigh->changeDirtinessLevel(newDirtLvl);
+                    if(newDirtLvl == 0 && neigh->particle_sent == false){
+                        neigh->tryToSendParticle(RNG::RandomBool()? 3 : 4);
+                        neigh->particle_sent = true;
+                    }
                 }
             }
         }else{

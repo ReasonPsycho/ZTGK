@@ -93,7 +93,10 @@ public:
     
     constexpr static const char * state_names[] = TILE_STATE_NAMES;
 
-    
+
+    void tryToSendParticle(int particle_type, float y = 0);
+    bool particle_sent = false;
+
 private:
     TileHighlightState tileHighlightState = CLEAR;
     TileHighlightState overrideState = CLEAR;

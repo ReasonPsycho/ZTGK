@@ -17,6 +17,7 @@
 #include "ECS/Unit/Equipment/Projectile/Projectile.h"
 #include "ECS/Render/Components/AnimationPlayer.h"
 #include "ECS/Render/Components/BetterSpriteRender.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 State *CombatState::RunCurrentState() {
     unit->playinIdleAnimation = false;
@@ -187,11 +188,15 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
         cm->AddMask("Healing", glm::vec4(0, 255, 0, 255), 0.25f);
         ztgk::game::audioManager->playRandomSoundFromGroup("heal");
         target->tryToSendEmote(unit->isAlly ? ztgk::game::EMOTES::BUBBLE_TONGUE : ztgk::game::EMOTES::P_BUBBLE_TONGUE);
+        auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition);
+        tile->tryToSendParticle(5);
     } else {
         ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition)->setHighlightOverride(DAMAGE_LIGHT_RED, 0.25f);
         cm->AddMask("DMG_taken", {200.0f/250.0f, 0, 0, 0.5f}, 0.25f);
         ztgk::game::audioManager->playRandomSoundFromGroup("punch");
         target->tryToSendEmote(target->isAlly ? (RNG::RandomBool() ? ztgk::game::EMOTES::Y_BUBBLE_ANGRY : ztgk::game::EMOTES::Y_BUBBLE_SAD) : ztgk::game::EMOTES::P_BUBBLE_SAD);
+        auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(target->gridPosition);
+        tile->tryToSendParticle(6);
     }
 
     if(target->stats.hp <= 0){

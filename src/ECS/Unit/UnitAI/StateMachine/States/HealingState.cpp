@@ -22,6 +22,7 @@ State *HealingState::RunCurrentState() {
     if (unit->stats.hp < unit->stats.max_hp) {
         HealSelf();
         unit->tryToSendEmote(ztgk::game::EMOTES::BUBBLE_CUTE, 0.5f);
+
     } else {
         unit->isAlive = true;
         unit->isBeingHealedByWashingMachine = false;
@@ -47,6 +48,8 @@ void HealingState::HealSelf() {
        lastHealingTime = glfwGetTime();
        colorMask->AddMask("Healing", glm::vec4(0, 255, 0, 255), 1);
         unit->speaker->PlayRandomSoundFromGroup("heal");
+        auto tile = grid->getTileAt(unit->gridPosition);
+        tile->tryToSendParticle(5);
    }
     else{
         auto value = colorMask->GetMaskColor("Healing").a - 255.f * 1.3*Time::Instance().DeltaTime();
