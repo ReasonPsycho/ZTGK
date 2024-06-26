@@ -35,7 +35,7 @@ void MineableChest::onMined(Unit *unit) {
 
 
     //To prevent unit from walking on empty hanger vvvv
-    grid->getTileAt(gridPosition)->state = CHEST;
+    grid->getTileAt(gridPosition)->setTileState(CHEST);
     spdlog::debug("Mined chest");
 }
 

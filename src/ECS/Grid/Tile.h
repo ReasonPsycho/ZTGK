@@ -17,8 +17,8 @@ struct WallData {
             : matrix(matrixInput) {
         data[0] = d1; //Dirtness 0-100
         data[1] = d2; //Is in fog of war
-        data[2] = d3;
-        data[3] = d4;
+        data[2] = d3;  //selection state
+        data[3] = d4; //Tile state
         textures[0] = t1; // diffuse
         textures[1] = t2; // specular
         textures[2] = t3; // normal
@@ -63,12 +63,13 @@ class Tile : public Component{
 public:
     Vector2Int index{};
     std::vector<WallData*> walls;
-    TileState state;
     TileStateData stateData;
     Unit* unit = nullptr;
     Chunk* chunk = nullptr;
     bool isInFogOfWar = false;
     float dirtinessLevel = 100;
+    TileState getTileState();
+    void setTileState(TileState tileState);
     void setHighlight(TileHighlightState state);
     void setHighlightOverride(TileHighlightState state, float time_sec);
     TileHighlightState getTileSelectionState();
@@ -98,6 +99,7 @@ public:
     bool particle_sent = false;
 
 private:
+    TileState state;
     TileHighlightState tileHighlightState = CLEAR;
     TileHighlightState overrideState = CLEAR;
     void tryToSendBubble();

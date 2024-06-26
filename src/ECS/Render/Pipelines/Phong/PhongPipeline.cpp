@@ -18,6 +18,7 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     foamMaskShader.init();
     spriteRenderShader.init();
     particleShader.init();
+    minimap.init();
     
     particle.init();
     downscale.init();
@@ -260,7 +261,7 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         }
     }
-
+    
     textureSampler.use();
     glActiveTexture(GL_TEXTURE0); // Work with Texture Unit 0
     glBindTexture(GL_TEXTURE_2D, colorAttachments[0]); // Bind it to GL_TEXTURE_2D

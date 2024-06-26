@@ -82,7 +82,7 @@ void Chunk::CalculateChunkData() {
     minedTiles = 0;
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
-            TileState state = chunkTileArray[x][y]->state;
+            TileState state = chunkTileArray[x][y]->getTileState();
             if (state != WALL && state != ORE){
                 minedTiles++;
             }

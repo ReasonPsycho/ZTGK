@@ -50,6 +50,7 @@ public:
     Shader stencilTest = Shader("res/shaders/fogOfWarMask.vert", "res/shaders/fogOfWarMask.frag");
     Shader foamMaskShader = Shader("res/shaders/foamShader.vert", "res/shaders/foamShader.frag");
     Shader particleShader = Shader("res/shaders/particle.vert", "res/shaders/particle.frag");
+    Shader minimap = Shader("res/shaders/minimap.vert", "res/shaders/minimap.frag");
     ComputeShader particle = ComputeShader("res/shaders/particleMovment.comp");
     ComputeShader downscale = ComputeShader("res/shaders/downscale.comp");
     ComputeShader upscale = ComputeShader("res/shaders/upscale.comp");

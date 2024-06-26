@@ -214,7 +214,7 @@ std::vector<IMineable> MiningState::findMiningPath() {
     Vector2Int target = GetNearestFloorTile(unit->gridPosition, start);
     std::vector<Vector2Int> neighbours = GetNeighbours(target, true);
     for(auto &neigh : neighbours){
-        if(grid->getTileAt(neigh)->state != FLOOR){
+        if(grid->getTileAt(neigh)->getTileState() != FLOOR){
             target = neigh;
             break;
         }
@@ -247,7 +247,7 @@ std::vector<IMineable> MiningState::findMiningPath() {
         closedSet.insert(current);
 
         for(auto neigh: GetNeighbours(current, true)){
-            if(closedSet.contains(neigh) || grid->getTileAt(neigh)->state == FLOOR){
+            if(closedSet.contains(neigh) || grid->getTileAt(neigh)->getTileState() == FLOOR){
                 continue;
             }
 
@@ -307,7 +307,7 @@ Vector2Int MiningState::GetNearestFloorTile(Vector2Int target, Vector2Int origin
     while (list.size() > 0) {
         Vector2Int current = list[0];
         list.erase(list.begin());
-        if (grid->getTileAt(current)->state == FLOOR || current == origin) {
+        if (grid->getTileAt(current)->getTileState() == FLOOR || current == origin) {
             return current;
         }
 
@@ -340,22 +340,22 @@ std::vector<Vector2Int> MiningState::GetNeighbours(Vector2Int current, bool incl
 
 
     //right
-    if(right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr && grid->getTileAt(right)->state !=FLOOR){
+    if(right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr && grid->getTileAt(right)->getTileState() !=FLOOR){
         neighbours.push_back(right);
     }
 
     //left
-    if(left.x >= 0 && left.z >=0 &&  grid->getTileAt(left) != nullptr && grid->getTileAt(left)->state !=FLOOR){
+    if(left.x >= 0 && left.z >=0 &&  grid->getTileAt(left) != nullptr && grid->getTileAt(left)->getTileState() !=FLOOR){
         neighbours.push_back(left);
     }
 
     //up
-    if(up.x >= 0 && up.z >=0 &&grid->getTileAt(up) != nullptr && grid->getTileAt(up)->state !=FLOOR){
+    if(up.x >= 0 && up.z >=0 &&grid->getTileAt(up) != nullptr && grid->getTileAt(up)->getTileState() !=FLOOR){
         neighbours.push_back(up);
     }
 
     //down
-    if(down.x >= 0 && down.z >=0 &&grid->getTileAt(down) != nullptr && grid->getTileAt(down)->state !=FLOOR){
+    if(down.x >= 0 && down.z >=0 &&grid->getTileAt(down) != nullptr && grid->getTileAt(down)->getTileState() !=FLOOR){
         neighbours.push_back(down);
     }
 
@@ -364,7 +364,7 @@ std::vector<Vector2Int> MiningState::GetNeighbours(Vector2Int current, bool incl
     //UpRight
     if((up.x >= 0 && up.z >=0 &&right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr)){
         Vector2Int upRight = current + Vector2Int(1, 1);
-        if(upRight.x >= 0 && upRight.z >=0 && grid->getTileAt(upRight) != nullptr && grid->getTileAt(upRight)->state !=FLOOR){
+        if(upRight.x >= 0 && upRight.z >=0 && grid->getTileAt(upRight) != nullptr && grid->getTileAt(upRight)->getTileState() !=FLOOR){
             neighbours.push_back(upRight);
         }
     }
@@ -372,7 +372,7 @@ std::vector<Vector2Int> MiningState::GetNeighbours(Vector2Int current, bool incl
     //DownRight
     if((down.x >= 0 && down.z >=0 &&right.x >= 0 && right.z >=0 &&grid->getTileAt(right) != nullptr)){
         Vector2Int downRight = current + Vector2Int(1, -1);
-        if(downRight.x >= 0 && downRight.z >=0 &&grid->getTileAt(downRight) != nullptr && grid->getTileAt(downRight)->state !=FLOOR){
+        if(downRight.x >= 0 && downRight.z >=0 &&grid->getTileAt(downRight) != nullptr && grid->getTileAt(downRight)->getTileState() !=FLOOR){
             neighbours.push_back(downRight);
         }
     }
@@ -380,7 +380,7 @@ std::vector<Vector2Int> MiningState::GetNeighbours(Vector2Int current, bool incl
     //UpLeft
     if((up.x >= 0 && up.z >=0 &&left.x >= 0 && left.z >=0 && grid->getTileAt(left) != nullptr )){
         Vector2Int upLeft = current + Vector2Int(-1, 1);
-        if(upLeft.x >= 0 && upLeft.z >=0 &&grid->getTileAt(upLeft) != nullptr && grid->getTileAt(upLeft)->state !=FLOOR){
+        if(upLeft.x >= 0 && upLeft.z >=0 &&grid->getTileAt(upLeft) != nullptr && grid->getTileAt(upLeft)->getTileState() !=FLOOR){
             neighbours.push_back(upLeft);
         }
     }
@@ -388,7 +388,7 @@ std::vector<Vector2Int> MiningState::GetNeighbours(Vector2Int current, bool incl
     //DownLeft
     if((down.x >= 0 && down.z >=0 &&left.x >= 0 && left.z >=0 && grid->getTileAt(left) != nullptr )){
         Vector2Int downLeft = current + Vector2Int(-1, -1);
-        if(downLeft.x >= 0 && downLeft.z >=0 &&grid->getTileAt(downLeft) != nullptr && grid->getTileAt(downLeft)->state !=FLOOR){
+        if(downLeft.x >= 0 && downLeft.z >=0 &&grid->getTileAt(downLeft) != nullptr && grid->getTileAt(downLeft)->getTileState() !=FLOOR){
             neighbours.push_back(downLeft);
         }
     }
