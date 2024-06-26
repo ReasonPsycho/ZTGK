@@ -15,7 +15,7 @@ void RenderSystem::DrawScene(Shader *regularShader, Camera *camera) {
             renderComponent->draw(*regularShader, &frustum);
         }
     }
-    PhongPipeline *phongPipline = systemManager->getSystem<PhongPipeline>();\
+    PhongPipeline *phongPipline = systemManager->getSystem<PhongPipeline>();
     glEnable(GL_BLEND);
     glDisablei(GL_BLEND, phongPipline->colorAttachments[2]);
     for (auto & betterRender: betterRenderPlayerComponents) {
