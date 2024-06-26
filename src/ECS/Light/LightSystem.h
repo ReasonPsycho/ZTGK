@@ -18,6 +18,7 @@
 #include "Components/DirLight.h"
 #include "Components/PointLight.h"
 #include "Components/SpotLight.h"
+#include "Components/LightMover.h"
 #include "../System.h"
 #include "../Component.h"
 #include "ECS/Scene.h"
@@ -45,7 +46,7 @@ public:
 
 
     const std::type_index* getComponentTypes() override {return reinterpret_cast<const std::type_index *>(&componentTypes); };
-    int getNumComponentTypes() override { return 4;};
+    int getNumComponentTypes() override { return 5;};
 
 
     void addComponent(void* component) override;
@@ -66,6 +67,7 @@ public:
     std::vector<DirLight*> dirLights;
     std::vector<PointLight*> pointLights;
     std::vector<SpotLight*> spotLights;
+    std::vector<LightMover*> lightMovers;
 
     PointLightData gloabalPointLightData = PointLightData(glm::vec4(glm::vec3(1), 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.1f, 0.2f,0.2f);
 private:
@@ -109,11 +111,12 @@ private:
 
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
-    std::array<std::type_index, 4> componentTypes = {
+    std::array<std::type_index, 5> componentTypes = {
             std::type_index(typeid(ILight)),
             std::type_index(typeid(DirLight)),
             std::type_index(typeid(PointLight)),
-            std::type_index(typeid(SpotLight))
+            std::type_index(typeid(SpotLight)),
+            std::type_index(typeid(LightMover))
     };
 
 

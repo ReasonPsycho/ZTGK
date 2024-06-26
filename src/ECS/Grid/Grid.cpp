@@ -22,6 +22,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/ItemTypes.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
+#include "ECS/Light/Components/LightMover.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -207,7 +208,7 @@ void Grid::GenerateTileEntities(float scale) {
             glm::vec3 specularColor = glm::vec3 (diffuseColor.x /10,diffuseColor.y /10,diffuseColor.z /10);
                     
             localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(diffuseColor, 1), glm::vec4(specularColor, 1), glm::vec4(1, 1, 1, 1), 0.001f, 0.001f,0.015f)));
-            localLight->transform.setLocalPosition(glm::vec3(RNG::RandomFloat(-4,4), 7 + RNG::RandomFloat(-0.5,0.5),RNG::RandomFloat(-4,4)));
+            localLight->addComponent(make_unique<LightMover>(glm::vec3 (0,7,0)));
             chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
             localLight->forceUpdateSelfAndChild();
             localLight->getComponent<PointLight>()->setIsDirty(true);

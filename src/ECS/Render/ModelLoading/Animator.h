@@ -7,6 +7,7 @@
 
 #include "Animation.h"
 #include <glm/glm.hpp>
+#include <future>
 
 class Animator
 {
