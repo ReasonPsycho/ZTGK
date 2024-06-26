@@ -77,6 +77,11 @@ void Item::do_meele_attack(Unit *me, Unit *target, Item *usedItem) {
 void Item::do_meele_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
     auto targets = usedItem->stats.aoe_range.find_my_enemies({target->gridPosition.x, target->gridPosition.z}, me->IsAlly());
 
+    auto tiles = usedItem->stats.aoe_range.get_tiles(VectorUtils::Vector2IntToGlmVec2(target->gridPosition));
+    for (auto tile : tiles) {
+        tile->setHighlightOverride(TileHighlightState::EXPLOSION_LIGHT_BLUE, 0.20f);
+    }
+
     for (auto & tgt : targets) {
         float totalAttackDamage = usedItem->determine_damage(me, tgt, {target->gridPosition.x, target->gridPosition.z}); // hit point here is explosion center so original target position
         CombatState::applyDamage(me, tgt, totalAttackDamage);
@@ -105,14 +110,14 @@ void Item::do_ranged_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
     projectileEntity->updateSelfAndChild();
     auto projectile = projectileEntity->getComponent<Projectile>();
     projectile->onHit = [projectile]() -> std::vector<Unit *> {
+        auto tiles = projectile->sourceItem->stats.aoe_range.get_tiles(VectorUtils::Vector2IntToGlmVec2(projectile->target->gridPosition));
+        for (auto tile : tiles) {
+            tile->setHighlightOverride(TileHighlightState::EXPLOSION_LIGHT_BLUE, 0.20f);
+        }
         auto targets = projectile->sourceItem->stats.aoe_range.find_my_enemies({projectile->target->gridPosition.x, projectile->target->gridPosition.z}, projectile->unit->IsAlly());
         for (auto & tgt : targets) {
             float totalAttackDamage = projectile->sourceItem->determine_damage(projectile->unit, tgt, {projectile->target->gridPosition.x, projectile->target->gridPosition.z}); // hit point here is explosion center so original target position
             CombatState::applyDamage(projectile->unit, tgt, totalAttackDamage);
-        }
-        auto tiles = projectile->sourceItem->stats.aoe_range.get_tiles(VectorUtils::Vector2IntToGlmVec2(projectile->target->gridPosition));
-        for (auto tile : tiles) {
-            tile->setHighlightOverride(TileHighlightState::EXPLOSION_LIGHT_BLUE, 0.20f);
         }
         return targets;
     };
