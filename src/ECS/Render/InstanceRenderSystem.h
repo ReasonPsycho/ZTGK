@@ -23,6 +23,7 @@ public:
     
     void Innit();
     void DrawTiles(Shader* regularShader,Camera * camera);
+    void DrawParticles(Shader* regularShader,Camera * camera);
     void DrawLights(Shader* regularShader,Camera * camera);
     void SimpleDrawTiles(Shader *regularShader, Camera *camera, glm::vec3 viewPos, float renderDistance);
     void PushToSSBO(Camera* camera);
@@ -60,6 +61,7 @@ private:
 
     std::vector<Chunk* > loadedChunks;
     MaterialPhong wallMaterial;
+    MaterialPhong particleMaterial;
     MaterialPhong lightMaterial;
     std::vector<WallData> wallData;
 

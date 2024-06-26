@@ -7,7 +7,7 @@
 Beacon::Beacon() : Item("Soap Refill", "Refresh for the bravest!", false, ItemStats(10, 5, GridRange(4, 0), GridRange(0, 0)), true) {
     active = true;
     icon_path = "res/textures/icons/item_beacon.png";
-    model = ztgk::game::tidyPodLauncherModel; // todo change model
+    model = ztgk::game::healingo; // todo change model
 
     determine_target = [this](Unit * me) { return Item::determine_healing_target(me, me->equipment.range_of(this)); };
     do_attack = [this](Unit * me, Unit * target){ Item::do_heal(me, target, this); };
