@@ -49,6 +49,8 @@ public:
     Shader textureSampler = Shader("res/shaders/textureSampler.vert", "res/shaders/textureSampler.frag");
     Shader stencilTest = Shader("res/shaders/fogOfWarMask.vert", "res/shaders/fogOfWarMask.frag");
     Shader foamMaskShader = Shader("res/shaders/foamShader.vert", "res/shaders/foamShader.frag");
+    Shader particleShader = Shader("res/shaders/particle.vert", "res/shaders/particle.frag");
+    ComputeShader particle = ComputeShader("res/shaders/particleMovment.comp");
     ComputeShader downscale = ComputeShader("res/shaders/downscale.comp");
     ComputeShader upscale = ComputeShader("res/shaders/upscale.comp");
 
@@ -101,6 +103,7 @@ private:
     bool normalShaderOutlineMapping = true;
     bool lightShaderOutlineMapping = true;
     bool instanceShaderOutlineMapping = false;
+    bool particleShaderOutlineMapping = false;
     float depth_threshold = 1;
     float depth_normal_threshold = 1;
     float depth_normal_threshold_scale = 0.2;

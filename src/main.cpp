@@ -78,6 +78,7 @@
 #include "ECS/Audio/AudioManager.h"
 #include "ECS/Render/ModelLoading/ModelLoadingManager.h"
 #include "ECS/Unit/Equipment/Projectile/ProjectileSystem.h"
+#include "ECS/Render/ParticleSystem.h"
 
 #include <filesystem>
 
@@ -496,6 +497,8 @@ void init_systems() {
     scene.systemManager.addSystem(std::make_unique<PhongPipeline>());
     scene.systemManager.addSystem(std::make_unique<MiningSystem>());
     scene.systemManager.addSystem(std::make_unique<ProjectileSystem>());
+    scene.systemManager.addSystem(std::make_unique<ParticleSystem>());
+    scene.systemManager.getSystem<ParticleSystem>()->Innit();
 
     scene.systemManager.getSystem<PhongPipeline>()->Init(&camera, &primitives);
     bloomSystem.Init(camera.saved_display_w, camera.saved_display_h);
@@ -744,12 +747,17 @@ void load_enteties() {
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->Innit();
 
-    //load_units();
+    load_units();
 
 
 }
 
 void load_units() {
+    playerUnit = scene.addEntity("Particle emiter");
+    playerUnit->addComponent(make_unique<ParticleEmiter>());
+    playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
+   
+    /*
     playerUnit = scene.addEntity("Mop");
     playerUnit->addComponent(make_unique<Render>(mopModel));
     playerUnit->addComponent(make_unique<ColorMask>());
@@ -786,7 +794,7 @@ void load_units() {
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
     playerUnit->updateSelfAndChild();
-
+    */
 }
 
 void load_hud() {
@@ -1424,7 +1432,8 @@ void update() {
     ztgk::game::cursor.update();
     scene.systemManager.Update();
     scene.updateScene();
-
+    
+    scene.systemManager.getSystem<ParticleSystem>()->Update();
     scene.systemManager.getSystem<InstanceRenderSystem>()->Update();
     scene.systemManager.getSystem<LightSystem>()->Update();
     scene.systemManager.getSystem<WireRenderSystem>()->Update();
@@ -1518,6 +1527,7 @@ void render() {
     scene.systemManager.getSystem<PhongPipeline>()->PrebindPipeline(&camera);
 
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawTiles(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceShader, &camera);
+    scene.systemManager.getSystem<InstanceRenderSystem>()->DrawParticles(&scene.systemManager.getSystem<PhongPipeline>()->particleShader, &camera);
     scene.systemManager.getSystem<RenderSystem>()->DrawScene(&scene.systemManager.getSystem<PhongPipeline>()->phongShader, &camera);
     scene.systemManager.getSystem<InstanceRenderSystem>()->DrawLights(&scene.systemManager.getSystem<PhongPipeline>()->phongInstanceLightShader, &camera);
 
