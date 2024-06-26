@@ -197,21 +197,10 @@ void Unit::UpdateImpl() {
         }
     }
     if (!isAlive && !isAlly) {
-        deathTimer -= Time::Instance().DeltaTime();
-        if(deathTimer<= 0){
-            Omae_wa_mou_shindeiru = true;
-            return;
-        }
-        else{
-            //move unit in flingdirection
-            worldPosition += glm::vec3(flingDirection.x * Time::Instance().DeltaTime() * 50, flingDirection.y * Time::Instance().DeltaTime() * 10, flingDirection.z * Time::Instance().DeltaTime() * 50);
-            getEntity()->transform.setLocalPosition(worldPosition);
-            getEntity()->updateSelfAndChild();
-            return;
-        }
+        isDestinedToDie = true;
+
+        return;
     }
-
-
 
     if (isAlive) {
         gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
@@ -243,7 +232,7 @@ void Unit::UpdateImpl() {
         }
 
 
-        if (combatTarget != nullptr && (!combatTarget->isAlive || combatTarget->Omae_wa_mou_shindeiru)) {
+        if (combatTarget != nullptr &&  !combatTarget->isAlive ) {
             combatTarget = nullptr;
             hasCombatTarget = false;
         }
@@ -865,13 +854,5 @@ bool Unit::checkIfMaybeOtherUnitHasThisIMineableComponentAsThierCurrentMiningTar
     return false;
 }
 
-glm::vec3 Unit::calculateFlingDirection(Vector2Int killerPos) {
-    glm::vec3 direction = glm::vec3(0, 0, 0);
-    glm::vec3 killerPos3D = grid->GridToWorldPosition(killerPos);
-    glm::vec3 unitPos3D = grid->GridToWorldPosition(gridPosition);
-    direction = glm::normalize(unitPos3D - killerPos3D);
-    direction.y += RNG::RandomFloat(1.0f, 3.f);
 
-    return direction;
-}
 
