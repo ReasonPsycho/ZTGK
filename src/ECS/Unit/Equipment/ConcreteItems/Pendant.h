@@ -13,7 +13,7 @@ public:
     Pendant() : Item("Pendant", "Sea Breeze. Now lasting 200 flushes!", false,
                       ItemStats(0,0,GridRange(0, 0), GridRange(0, 0)), false) {
         icon_path = "res/textures/icons/item_pendant.png";
-        model = ztgk::game::tidyPodLauncherModel; // todo change model
+        model = ztgk::game::kulki; // todo change model
 
         std::vector<ItemStats> random_stats = {
             ItemStats(

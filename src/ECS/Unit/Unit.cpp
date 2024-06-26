@@ -469,15 +469,22 @@ void Unit::UpdateImpl() {
         Entity *child = parentEntity->getChild("RHand");
         AnimationPlayer *player;
         if (child) {
-            player = child->getComponent<AnimationPlayer>();
-            if (player)
-                child->transform.setLocalMatrix(player->animator.m_CurrentAnimation->GetBoneOffSet("Hand.R"));
+            player = getEntity()->getComponent<AnimationPlayer>();
+            if (player)    {
+                player->animator.UpdateNodes();
+                std::vector<glm::mat4> finalBoneMatrices =   player->animator.GetFinalNodeMatrices();
+                child->transform.setLocalMatrix(finalBoneMatrices[player->animator.m_CurrentAnimation->GetBoneIdFromName("Hand.R")])  ;
+            }
+
         }
         child = parentEntity->getChild("LHand");
         if (child) {
-            player = child->getComponent<AnimationPlayer>();
-            if (player)
-                child->transform.setLocalMatrix(player->animator.m_CurrentAnimation->GetBoneOffSet("Hand.L"));
+            player = getEntity()->getComponent<AnimationPlayer>();
+            if (player){
+                player->animator.UpdateNodes();
+                std::vector<glm::mat4> finalBoneMatrices =   player->animator.GetFinalNodeMatrices();
+                child->transform.setLocalMatrix(finalBoneMatrices[player->animator.m_CurrentAnimation->GetBoneIdFromName("Hand.L")]);
+            }
         }
     }
 

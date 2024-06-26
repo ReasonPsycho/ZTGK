@@ -10,7 +10,6 @@
 void LightSystem::PushToSSBO() {
 
 
-    
     std::vector<DirLightData> dirLightDataArray;
     for (const DirLight *light: dirLights) {
         dirLightDataArray.push_back(light->data);
@@ -28,9 +27,9 @@ void LightSystem::PushToSSBO() {
 
     GLenum err = glGetError();
 
-    
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, maxDirLight * sizeof(DirLightData),NULL,
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxDirLight * sizeof(DirLightData), NULL,
                  GL_DYNAMIC_DRAW);
     glBufferData(GL_SHADER_STORAGE_BUFFER, maxDirLight * sizeof(DirLightData), dirLightDataArray.data(),
                  GL_DYNAMIC_DRAW);
@@ -48,17 +47,17 @@ void LightSystem::PushToSSBO() {
                  pointLightDataArray.data(),
                  GL_DYNAMIC_DRAW);
 
-    
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, pointLightBufferBindingPoint, pointLightBufferId);
 
-    
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
     glBufferData(GL_SHADER_STORAGE_BUFFER, maxSpotLight * sizeof(SpotLightData), NULL,
                  GL_DYNAMIC_DRAW);
     glBufferData(GL_SHADER_STORAGE_BUFFER, maxSpotLight * sizeof(SpotLightData), spotLightDataArray.data(),
                  GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, spotLightBufferBindingPoint, spotLightBufferId);
-    
+
     dirLightDataArray.clear();
     pointLightDataArray.clear();
     spotLightDataArray.clear();
@@ -101,13 +100,13 @@ void LightSystem::Init() {
         whiteImage[i + 1] = whitePixel[1];
         whiteImage[i + 2] = whitePixel[2];
     }
-    
+
     planeDepthShader.init();
     cubeDepthShader.init();
 
     instancePlaneDepthShader.init();
     instanceCubeDepthShader.init();
-    
+
     createPlaneShadowMap();
     createCubeShadowMap();
 
@@ -117,7 +116,7 @@ void LightSystem::Init() {
     glGenBuffers(1, &dirLightBufferId);
     glGenBuffers(1, &pointLightBufferId);
     glGenBuffers(1, &spotLightBufferId);
-    
+
     GenerateShadowBuffers();
 }
 
@@ -145,6 +144,10 @@ void LightSystem::UpdateImpl() {
         }
     }
 
+    for (auto &lightMover: lightMovers) {
+        lightMover->Update();
+    }
+
     PushToSSBO();
 
     RenderCubeDepthMap();
@@ -154,22 +157,32 @@ void LightSystem::UpdateImpl() {
 }
 
 void LightSystem::addComponent(void *component) {
-    ILight *light = static_cast<ILight *>(component);
-    ZoneScopedN("Add Light");
 
-    switch (light->lightType) {
-        case Point:
-            pointLights.push_back(reinterpret_cast<PointLight *>(light));
-            break;
-        case Directional:
-            dirLights.push_back(reinterpret_cast<DirLight *>(light));
-            break;
-        case Spot:
-            spotLights.push_back(reinterpret_cast<SpotLight *>(light));
-            break;
+    Component *basePtr = static_cast<Component *>(component);
+
+    LightMover *pLightMover = dynamic_cast<LightMover *>(basePtr);
+    if (pLightMover != nullptr) {
+        lightMovers.push_back(pLightMover);
+    } else {
+        ILight *light = static_cast<ILight *>(component);
+
+
+        ZoneScopedN("Add Light");
+        switch (light->lightType) {
+            case Point:
+                pointLights.push_back(reinterpret_cast<PointLight *>(light));
+                break;
+            case Directional:
+                dirLights.push_back(reinterpret_cast<DirLight *>(light));
+                break;
+            case Spot:
+                spotLights.push_back(reinterpret_cast<SpotLight *>(light));
+                break;
+        }
+
+        lights.push_back(light);
     }
-    
-    lights.push_back(light);
+
 }
 
 void LightSystem::showImGuiDetailsImpl(Camera *camera) {
@@ -178,7 +191,7 @@ void LightSystem::showImGuiDetailsImpl(Camera *camera) {
     ImGui::InputFloat("Constant", &gloabalPointLightData.constant);
     ImGui::InputFloat("Linear", &gloabalPointLightData.linear);
     ImGui::InputFloat("Quadratic", &gloabalPointLightData.quadratic);
-    if (ImGui::Button("Update lights globally")){
+    if (ImGui::Button("Update lights globally")) {
         for (auto pointLight: pointLights) {
             pointLight->data = gloabalPointLightData;
             pointLight->setIsDirty(true);
@@ -187,52 +200,59 @@ void LightSystem::showImGuiDetailsImpl(Camera *camera) {
 }
 
 void LightSystem::removeComponent(void *component) {
-    ILight *light = static_cast<ILight *>(component);
-
-    std::vector<PointLight *>::iterator pointLight_iter;
-    std::vector<DirLight *>::iterator dirLight_iter;
-    std::vector<SpotLight *>::iterator spotLight_iter;
-
-
-    switch (light->lightType) {
-        case Point:
-            pointLight_iter = std::find(pointLights.begin(), pointLights.end(),
-                                        reinterpret_cast<PointLight *const>(component));
-            if (pointLight_iter != pointLights.end()) {
-                pointLights.erase(pointLight_iter);
-            }
-            break;
-        case Directional:
-            dirLight_iter = std::find(dirLights.begin(), dirLights.end(), reinterpret_cast<DirLight *const>(component));
-
-            if (dirLight_iter != dirLights.end()) {
-                dirLights.erase(dirLight_iter);
-            }
-            break;
-        case Spot:
-            spotLight_iter = std::find(spotLights.begin(), spotLights.end(),
-                                       reinterpret_cast<SpotLight *const>(component));
-            if (spotLight_iter != spotLights.end()) {
-                spotLights.erase(spotLight_iter);
-            }
-            break;
-    }
     
-    auto light_iter = std::find(lights.begin(), lights.end(),reinterpret_cast<ILight *const>(component));
-    if (light_iter != lights.end()) {
-        lights.erase(light_iter);
+    auto component_iter = std::find(lightMovers.begin(), lightMovers.end(), reinterpret_cast<LightMover *const>(component));
+
+    if (component_iter != lightMovers.end()) {
+        lightMovers.erase(component_iter);
+    } else {
+        ILight *light = static_cast<ILight *>(component);
+
+        std::vector<PointLight *>::iterator pointLight_iter;
+        std::vector<DirLight *>::iterator dirLight_iter;
+        std::vector<SpotLight *>::iterator spotLight_iter;
+
+
+        switch (light->lightType) {
+            case Point:
+                pointLight_iter = std::find(pointLights.begin(), pointLights.end(),
+                                            reinterpret_cast<PointLight *const>(component));
+                if (pointLight_iter != pointLights.end()) {
+                    pointLights.erase(pointLight_iter);
+                }
+                break;
+            case Directional:
+                dirLight_iter = std::find(dirLights.begin(), dirLights.end(), reinterpret_cast<DirLight *const>(component));
+
+                if (dirLight_iter != dirLights.end()) {
+                    dirLights.erase(dirLight_iter);
+                }
+                break;
+            case Spot:
+                spotLight_iter = std::find(spotLights.begin(), spotLights.end(),
+                                           reinterpret_cast<SpotLight *const>(component));
+                if (spotLight_iter != spotLights.end()) {
+                    spotLights.erase(spotLight_iter);
+                }
+                break;
+        }
+
+        auto light_iter = std::find(lights.begin(), lights.end(), reinterpret_cast<ILight *const>(component));
+        if (light_iter != lights.end()) {
+            lights.erase(light_iter);
+        }
     }
 }
 
 void LightSystem::createPlaneShadowMap() {
-    
+
 
     glGenTextures(1, &planeShadowMaps);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, planeShadowMaps);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,maxDirLight + maxSpotLight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, maxDirLight + maxSpotLight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     for (GLsizei layer = 0; layer < maxDirLight + maxSpotLight; layer++) {
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE,whiteImage);
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, SHADOW_WIDTH, SHADOW_HEIGHT, 1, GL_RGB, GL_UNSIGNED_BYTE, whiteImage);
     }
 
 
@@ -264,7 +284,7 @@ void LightSystem::createCubeShadowMap() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);;
-    
+
 }
 
 void LightSystem::RenderPlaneDepthMapInstanced() {
@@ -276,7 +296,7 @@ void LightSystem::RenderPlaneDepthMapInstanced() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
         ZoneScopedN("DirLight");
-        if(light->isActive) {
+        if (light->isActive) {
 
             light->SetUpShadowBuffer(&instancePlaneDepthShader,
                                      planeShadowMaps, index, 0);
@@ -289,7 +309,7 @@ void LightSystem::RenderPlaneDepthMapInstanced() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
     for (auto &light: spotLights) {
         ZoneScopedN("SpotLight");
-        if(light->isActive) {
+        if (light->isActive) {
 
             light->SetUpShadowBuffer(&instancePlaneDepthShader,
                                      planeShadowMaps, index, 0);
@@ -313,9 +333,9 @@ void LightSystem::RenderPlaneDepthMap() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, dirLightBufferId);
     for (auto &light: dirLights) {
         ZoneScopedN("DirLight");
-        if(light->isActive) {
+        if (light->isActive) {
             light->SetUpShadowBuffer(&planeDepthShader,
-                                     planeShadowMaps,index , 0);
+                                     planeShadowMaps, index, 0);
             planeDepthShader.use();
             renderSystem->SimpleDrawScene(&planeDepthShader, light->data.position, 100);
         }
@@ -325,7 +345,7 @@ void LightSystem::RenderPlaneDepthMap() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightBufferId);
     for (auto &light: spotLights) {
         ZoneScopedN("SpotLight");
-        if(light->isActive) {
+        if (light->isActive) {
 
             light->SetUpShadowBuffer(&planeDepthShader,
                                      planeShadowMaps, index, 0);
@@ -378,7 +398,7 @@ void LightSystem::RenderCubeDepthMap() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBufferId);
     for (auto &light: pointLights) {
         ZoneScopedN("PointLight");
-        if(light->isActive) {
+        if (light->isActive) {
             for (int i = 0; i < 6; i++) {
 
                 light->SetUpShadowBuffer(&cubeDepthShader,

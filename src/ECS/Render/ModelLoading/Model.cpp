@@ -21,7 +21,7 @@ void Model::loadModel() {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(*path,
                                              aiProcess_Triangulate | aiProcess_GenSmoothNormals | // aiProcess_FlipUVs | 
-                                             aiProcess_CalcTangentSpace );
+                                             aiProcess_CalcTangentSpace);
     // check for errors
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
     {
@@ -151,6 +151,11 @@ void Model::ExtractBoneWeightForVertices(vector<Vertex> &vertices, aiMesh *mesh,
             BoneInfo newBoneInfo;
             newBoneInfo.id = boneCount;
             newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+            if(mesh->mBones[boneIndex]->mNode != NULL && mesh->mBones[boneIndex]->mNode->mParent){
+                newBoneInfo.parentNode = mesh->mBones[boneIndex]->mNode->mParent->mName.C_Str();   
+            }else{
+                newBoneInfo.parentNode = "";
+            }
             boneInfoMap[boneName] = newBoneInfo;
             boneID = boneCount;
             boneCount++;

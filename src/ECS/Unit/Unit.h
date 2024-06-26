@@ -96,7 +96,9 @@ public:
 
     // serializer
     // only use this with serializer!
-    Unit() : equipment(this) {};
+    Unit() : equipment(this) {
+        name = "Unit";
+    };
     // completes the serialization started by the new entity func
     void serializer_init(Grid * pGrid);
     // partially sets up the required components, always call serializer_init after this, before returning to the main loop!!

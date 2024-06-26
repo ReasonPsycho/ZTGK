@@ -22,6 +22,7 @@
 #include "ECS/Unit/Equipment/ConcreteItems/ItemTypes.h"
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
+#include "ECS/Light/Components/LightMover.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -207,7 +208,7 @@ void Grid::GenerateTileEntities(float scale) {
             glm::vec3 specularColor = glm::vec3 (diffuseColor.x /10,diffuseColor.y /10,diffuseColor.z /10);
                     
             localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(diffuseColor, 1), glm::vec4(specularColor, 1), glm::vec4(1, 1, 1, 1), 0.001f, 0.001f,0.015f)));
-            localLight->transform.setLocalPosition(glm::vec3(RNG::RandomFloat(-4,4), 7 + RNG::RandomFloat(-0.5,0.5),RNG::RandomFloat(-4,4)));
+            localLight->addComponent(make_unique<LightMover>(glm::vec3 (0,7,0)));
             chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
             localLight->forceUpdateSelfAndChild();
             localLight->getComponent<PointLight>()->setIsDirty(true);
@@ -257,31 +258,7 @@ void Grid::InitializeTileEntities() {
                 case state_count:   // keep this one empty or signal error, this is unreachable
                     break;
                 case CHEST: {
-                    Model* model = nullptr;
-                    auto chestChild = ztgk::game::scene->addEntity(tile->getEntity(), "ChestChild");
-                    chestChild->addComponent(
-                            std::make_unique<MineableChest>(Vector2Int(i, j), this, tile->stateData.chestItemTypeId));
-                    tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
-                    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
-                    tile->getEntity()->getComponent<BoxCollider>()->setCenter(
-                            tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
-
-//                    if (tile->stateData.chestItemTypeId == Item::item_types.water_gun) {
-//                        model = ztgk::game::hangerTidyPodLauncherModel;
-//                    } else if (tile->stateData.chestItemTypeId == Item::item_types.mop) {
-//                        model = ztgk::game::hangerMopModel;
-//                    }
-//                    else if(tile->stateData.chestItemTypeId == Item::item_types.mop_obrotowy){
-//                        model = ztgk::game::hangerMopObrotowyModel;
-//                    }
-//                    else {
-                        // todo make this główny model wieszaka?????
-                        model = ztgk::game::chestModel;
-//                    }
-                    chestChild->addComponent(std::make_unique<Render>(model));
-                    //chestChild->transform.setLocalScale(glm::vec3(1, 1, 2));
-                    //chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
-                    chestChild->updateSelfAndChild();
+                    SpawnHanger(tile->index, tile);
                     break;
                 }
                 case WALL:
@@ -748,16 +725,12 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     auto unit = UnitEntity->getComponent<Unit>();
     if(unit->unitType == UnitType::UNIT_SPONGE) {
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMove, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
-                modelPathGabkaIdle, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMine, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackR] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttackR, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackL] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttackL, gabka);
+
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMine,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackR,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackR, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackL,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackL, gabka));
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
@@ -767,16 +740,16 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     } else if (unit->unitType == UnitType::UNIT_BUG) {
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekAttack,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczekTest));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekIddle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczekTest));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczekTest));
     } else if(unit->unitType == UnitType::UNIT_SHROOM) {
         InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomMove, shroom);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomIdle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomIdle, shroom);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomSpit] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomSpit, shroom);
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomIdle, shroom));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomSpit,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomSpit, shroom));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, shroom));
     }
     return UnitEntity;
 }
@@ -823,4 +796,99 @@ void Grid::Update() {
         return;
     }
 
+}
+
+void Grid::SpawnHanger(Vector2Int gridPos, Tile* tile) {
+    Model* model = nullptr;
+    auto chestChild = ztgk::game::scene->addEntity(tile->getEntity(), "ChestChild");
+    chestChild->addComponent(
+            std::make_unique<MineableChest>(gridPos, this, tile->stateData.chestItemTypeId));
+    tile->getEntity()->getComponent<BoxCollider>()->coordsToExcludeFromUpdate = "xyz";
+    tile->getEntity()->getComponent<BoxCollider>()->size = glm::vec3(1, 1, 1);
+    tile->getEntity()->getComponent<BoxCollider>()->setCenter(
+            tile->getEntity()->transform.getGlobalPosition() + glm::vec3(0, 0, 0));
+    model = ztgk::game::chestModel;
+    unsigned int itemTypeID = tile->stateData.chestItemTypeId;
+    if(itemTypeID != 0 && itemTypeID != 8 && itemTypeID != 5){
+        auto itemChild = ztgk::game::scene->addEntity(chestChild, "ItemChild");
+        switch(itemTypeID){
+            default: break;
+            case 1:{
+                // mop
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::mopModel));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(80.f), 0, 0));
+                itemChild->transform.setLocalScale(glm::vec3(1.5,2,1.5));
+                itemChild->transform.setLocalPosition(glm::vec3(-0.5,  0.5, -3.25));
+                itemChild->updateSelfAndChild();
+                break;
+            }
+            case 2:{
+                // mop obrotowy
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::mopObrotowyModel));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(80.f), 0, glm::radians(180.f)));
+                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
+                itemChild->transform.setLocalPosition(glm::vec3(-0.5,  -0.5, -3.25));
+                itemChild->updateSelfAndChild();
+                break;
+            }
+            case 3:{
+                // tidy pod launcher aka watergun
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::tideGun));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(100.f), 0, glm::radians(180.f)));
+                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
+                itemChild->transform.setLocalPosition(glm::vec3(-0.5,  -1, -5.4));
+                itemChild->updateSelfAndChild();
+                break;
+            }
+            case 4:{
+                // beacon
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::healingo));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(80.f), 0, glm::radians(180.f)));
+                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
+                itemChild->transform.setLocalPosition(glm::vec3(-0.5,  -0.3, -2.5));
+                itemChild->updateSelfAndChild();
+                break;
+
+            }
+            case 6:{
+                // detergent
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::superPlyn));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(135.f),  glm::radians(130.f), glm::radians(-90.f)));
+                itemChild->transform.setLocalScale(glm::vec3(1.7,2.2,1.7));
+                itemChild->transform.setLocalPosition(glm::vec3(1.3,1.2,-2.4f));
+                itemChild->updateSelfAndChild();
+                break;
+            }
+            case 7:{
+                // pendant
+                itemChild->addComponent(std::make_unique<Render>(ztgk::game::kulki));
+                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(-45.f), glm::radians(45.f), glm::radians(90.f)));
+                itemChild->updateSelfAndChild();
+                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
+                itemChild->transform.setLocalPosition(glm::vec3(1,  0.8, -2.5));
+                itemChild->updateSelfAndChild();
+                break;
+
+            }
+
+            //todo Grzesiu zmień sobie tutaj co musisz jak zrobisz ten ostatni item
+//            case 7:{
+//
+//                itemChild->addComponent(std::make_unique<Render>(ztgk::game::proszek));
+//                itemChild->transform.setLocalRotation(glm::vec3(glm::radians(-45.f), glm::radians(45.f), glm::radians(90.f)));
+//                itemChild->transform.setLocalScale(glm::vec3(1.7,2,1.7));
+//                itemChild->transform.setLocalPosition(glm::vec3(1,  0.8, -2.1));
+//                itemChild->updateSelfAndChild();
+//                break;
+//            }
+        }
+
+
+    }
+    chestChild->addComponent(std::make_unique<Render>(model));
+    chestChild->transform.setLocalScale(glm::vec3(1, 1, 1));
+    chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
+    chestChild->transform.setLocalPosition(glm::vec3(-0.25, -0.25f, -0.25));
+    chestChild->updateSelfAndChild();
+    spdlog::debug("Spawned item : {} at position : {} {}", itemTypeID, gridPos.x, gridPos.z);
 }

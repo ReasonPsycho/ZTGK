@@ -17,7 +17,7 @@ public:
                                   .dmg_flat = 5,
                               }), false) {
         icon_path = "res/textures/icons/item_detergent.png";
-        model = ztgk::game::tidyPodLauncherModel; // todo change model
+        model = ztgk::game::superPlyn; // todo change model
 
         std::vector<ItemStats> random_stats = {
             ItemStats(

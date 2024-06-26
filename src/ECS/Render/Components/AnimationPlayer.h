@@ -19,17 +19,18 @@ public:
 
     void PlayAnimation(std::string path, bool looping = false, float animationSpeed = 1.0f);
     void StopAnimation();
+    void AddAnimation(std::string name, Animation* animation);
 
     
     void UpdateImpl() override;
     void showImGuiDetailsImpl(Camera *camera) override;
 
-    std::map<std::string, Animation*> animationMap;
+    std::map<std::string, Animation> animationMap;
 
     Animator animator = nullptr;
+    bool isPlaying = false;
 private:
     bool looping = false;
-    bool isPlaying = false;
     float animationSpeed = 1;
 };
 
