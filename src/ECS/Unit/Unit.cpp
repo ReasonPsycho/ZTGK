@@ -498,10 +498,14 @@ Unit *Unit::GetClosestEnemyInWeaponRange() {
     }
 
     if (equipment.item1 != nullptr && equipment.item1->offensive) {
-        enemies.push_back(equipment.item1->determine_target(this));
+        auto target = equipment.item1->determine_target(this);
+        if (target)
+            enemies.push_back(target);
     }
     if (equipment.item2 != nullptr && equipment.item2->offensive) {
-        enemies.push_back(equipment.item2->determine_target(this));
+        auto target = equipment.item2->determine_target(this);
+        if (target)
+            enemies.push_back(target);
     }
 
     if (enemies.empty())
