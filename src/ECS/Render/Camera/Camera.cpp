@@ -263,11 +263,7 @@ void Camera::MoveCamera(float scroll) {
     }
 }
 
-void Camera::Rotate(bool clockwise) {
-    // Determine the angle of rotation (in degrees)
-    float angle = 3.0f; // Rotate by 5 degrees per call
-
-    // Convert angle to radians
+void Camera::Rotate(bool clockwise, float angle){
     float radians = glm::radians(angle);
 
     // Determine the direction of rotation

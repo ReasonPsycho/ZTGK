@@ -211,6 +211,8 @@ void update_dragged_tiles();
 
 void gen_and_load_lvl(bool gen_new_lvl = false);
 
+void update_camera_rotation();
+
 #pragma endregion Function definitions
 
 #pragma region Orginal set up
@@ -258,6 +260,11 @@ float LmouseHeldReleaseTime = 0.0f;
 bool isRightMouseButtonHeld = false;
 float RmouseHeldStartTime = 0.0f;
 float RmouseHeldReleaseTime = 0.0f;
+
+glm::vec2 MiddleMouseButtonClickScreenPos;
+glm::vec2 MiddleMouseButtonCurrentScreenPos;
+bool isMiddleButtonPressed;
+
 
 glm::vec2 mouseHeldStartPosScr;
 
@@ -1472,7 +1479,11 @@ void update() {
     scene.systemManager.getSystem<ProjectileSystem>()->Update();
     scene.systemManager.getSystem<Grid>()->Update();
     scene.systemManager.getSystem<AudioManager>()->Update();
-//
+
+
+    update_camera_rotation();
+
+    //
 //    for(auto u : scene.systemManager.getSystem<UnitSystem>()->unitComponents) {
 //        if(u->isAlly)
 //            spdlog::info("Unit: {} -- State: {}  -- currentMinTarg {} {}", u->name, u->currentState->name, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.x, u->currentMiningTarget == nullptr ? 0 : u->currentMiningTarget->gridPosition.z);
@@ -1773,8 +1784,15 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     ztgk::game::cursor.click(button, action, mods);
-//    if (ztgk::game::cursor.config.capture_click)
-//        handle_picking(window, button, action, mods);
+
+    spdlog::debug("ismiddlebuttonpressed: {}", isMiddleButtonPressed ? "true" : "false");
+    if(GLFW_MOUSE_BUTTON_MIDDLE == button && GLFW_PRESS == action && !isMiddleButtonPressed){
+        isMiddleButtonPressed = true;
+        MiddleMouseButtonClickScreenPos = ztgk::game::cursor.raw_pos;
+    }
+    if(GLFW_MOUSE_BUTTON_MIDDLE == button && GLFW_RELEASE == action){
+        isMiddleButtonPressed = false;
+    }
 
 }
 
@@ -2323,5 +2341,18 @@ void gen_and_load_lvl(bool gen_new_lvl) {
     LevelSaving::load();
 
 }
+void update_camera_rotation(){
+    if(isMiddleButtonPressed){
+        MiddleMouseButtonCurrentScreenPos = ztgk::game::cursor.raw_pos;
+        if(MiddleMouseButtonClickScreenPos != MiddleMouseButtonCurrentScreenPos){
+            bool left = MiddleMouseButtonClickScreenPos.x < MiddleMouseButtonCurrentScreenPos.x;
+
+            camera.Rotate(left, abs(MiddleMouseButtonClickScreenPos.x - MiddleMouseButtonCurrentScreenPos.x )/5.f);
+
+            MiddleMouseButtonClickScreenPos = MiddleMouseButtonCurrentScreenPos;
+        }
+    }
+}
+
 
 #pragma endregion Functions
