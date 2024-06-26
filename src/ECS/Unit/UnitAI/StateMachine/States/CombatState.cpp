@@ -204,6 +204,7 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
             target->isAlive = false;
         }
         else{
+            target->isAlive = false;
             target->hasCombatTarget = false;
             target->combatTarget = nullptr;
             target->currentMiningTarget = nullptr;

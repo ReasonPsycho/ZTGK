@@ -181,6 +181,8 @@ void Unit::UpdateImpl() {
         }
     }
     if (!isAlive && isAlly) {
+        gridPosition = grid->WorldToGridPosition(VectorUtils::GlmVec3ToVector3(worldPosition));
+
         ztgk::game::scene->systemManager.getSystem<UnitSystem>()->deselectUnit(this);
         //if unit stands next to washing machine it will be healed by it
         auto neighTiles = grid->GetNeighbours(gridPosition, true);
