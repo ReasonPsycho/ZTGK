@@ -8,8 +8,8 @@ Animator::Animator(Animation *animation) {
     m_CurrentTime = 0.0;
     m_CurrentAnimation = animation;
 
-    m_FinalBoneMatrices.reserve(50);
-    m_FinalNodeMatrices.reserve(50);
+    m_FinalBoneMatrices.reserve(100);
+    m_FinalNodeMatrices.reserve(100);
 
     for (int i = 0; i < 50; i++) {
         m_FinalBoneMatrices.push_back(glm::mat4(1.0f));

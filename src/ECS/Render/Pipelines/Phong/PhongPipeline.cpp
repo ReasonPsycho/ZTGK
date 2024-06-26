@@ -17,7 +17,9 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
     stencilTest.init();
     foamMaskShader.init();
     spriteRenderShader.init();
+    particleShader.init();
     
+    particle.init();
     downscale.init();
     upscale.init();
 
@@ -124,8 +126,13 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceLightShader.setVec3("cameraUp", camera->Up.x, camera->Up.y, camera->Up.z);
     phongInstanceLightShader.setFloat("outlineMapping", lightShaderOutlineMapping);
 
-
-
+    particleShader.use();
+    particleShader.setMatrix4("projection", false, glm::value_ptr(projection));
+    particleShader.setMatrix4("view", false, glm::value_ptr(view));
+    particleShader.setVec3("camPos", cameraPos.x, cameraPos.y, cameraPos.z);
+    particleShader.setVec3("cameraUp", camera->Up.x, camera->Up.y, camera->Up.z);
+    particleShader.setFloat("outlineMapping", particleShaderOutlineMapping);
+    
     spriteRenderShader.use();
     spriteRenderShader.setMatrix4("projection", false, glm::value_ptr(projection));
     spriteRenderShader.setMatrix4("view", false, glm::value_ptr(view));
@@ -437,6 +444,7 @@ void PhongPipeline::showImGuiDetailsImpl(Camera *camera) {
 
         ImGui::Checkbox("Normal shader outline mapping", &normalShaderOutlineMapping);
         ImGui::Checkbox("Light shader outline mapping", &lightShaderOutlineMapping);
+        ImGui::Checkbox("Particle shader outline mapping", &particleShaderOutlineMapping);
         ImGui::Checkbox("Instance shader outline mapping", &instanceShaderOutlineMapping);
         ImGui::Unindent();
     }

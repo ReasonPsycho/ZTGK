@@ -2,6 +2,7 @@
 // Created by redkc on 16/04/2024.
 //
 
+#include "ECS/Render/ParticleSystem.h"
 #include "ECS/SystemManager.h"
 #include "ECS/Render/Pipelines/Phong/PhongPipeline.h"
 #include "InstanceRenderSystem.h"
@@ -166,6 +167,7 @@ void InstanceRenderSystem::Innit() {
             }
         }
     }
+    
 
     wallMaterial.mapTextureArrays();
 
@@ -176,6 +178,21 @@ void InstanceRenderSystem::Innit() {
     lightMaterial.normalTextures.push_back(std::make_shared<Texture>("res/textures/lights/Normal/NormalMap.png", ""));
     lightMaterial.specularTextures.push_back(std::make_shared<Texture>("res/textures/lights/Specular/bubble2.png", ""));
 
+
+    std::filesystem::path particleDiffuseTexturesDictionary("res/textures/particles"); // Replace with your directory
+    if (std::filesystem::exists(particleDiffuseTexturesDictionary) && std::filesystem::is_directory(particleDiffuseTexturesDictionary)) {
+        for (const auto &entry: std::filesystem::directory_iterator(particleDiffuseTexturesDictionary)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                std::cout << "PNG file located: " << entry.path().string() << std::endl;
+                particleMaterial.depthTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+                particleMaterial.diffuseTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+                particleMaterial.normalTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+                particleMaterial.specularTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+            }
+        }
+    }
+
+    particleMaterial.mapTextureArrays();
 }
 
 InstanceRenderSystem::InstanceRenderSystem(Camera *camera) : camera(camera) {
@@ -214,4 +231,18 @@ void InstanceRenderSystem::DrawLights(Shader *regularShader, Camera *camera) {
         glBindVertexArray(0);
     }
     glDisable(GL_BLEND);
+}
+
+void InstanceRenderSystem::DrawParticles(Shader *regularShader, Camera *camera) {
+//it must be here bcs if we mine wall we need to UpdateImpl walls
+    //Innit();
+    ZoneScopedN("Draw Particle");
+    regularShader->use();
+    particleMaterial.loadInstancedMaterial(regularShader);
+    for (unsigned int i = 0; i < tileModel->meshes.size(); i++) {
+        glBindVertexArray(tileModel->meshes[i].VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(tileModel->meshes[i].indices.size()),
+                                GL_UNSIGNED_INT, 0, systemManager->getSystem<ParticleSystem>()->particlesData.size());
+        glBindVertexArray(0);
+    }
 }
