@@ -109,19 +109,9 @@ namespace ztgk::game {
     extern Model* healingo;
     extern Model* proszek;
     
-    
     extern Model* tidyPodLauncherModel;
-    extern Model* hangerMopModel;
-    
-    
-    
-    
-    extern Model* hangerMopObrotowyModel;
-    extern Model* hangerTidyPodLauncherModel;
-
 
     extern bool enableWashingMachineSwaying;
-
 
     extern bool gameStarted;
     extern bool gameWon;
