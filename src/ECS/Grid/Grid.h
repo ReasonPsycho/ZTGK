@@ -125,6 +125,7 @@ public:
     std::vector<Tile*> GetNeighbours(Vector2Int gridpos, bool includeDiagonals = true);
 
     Vector2Int GetNearestWashingMachineTile(Vector2Int origin);
+    void MakeHangerComponents(Entity * entity, unsigned item_type_id);
 
     bool read_names = false;
     std::vector<std::string> gabka_names = {};
