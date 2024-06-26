@@ -748,16 +748,12 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     auto unit = UnitEntity->getComponent<Unit>();
     if(unit->unitType == UnitType::UNIT_SPONGE) {
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMove, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] = modelLoadingManager->GetAnimation(
-                modelPathGabkaIdle, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] = modelLoadingManager->GetAnimation(
-                modelPathGabkaMine, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackR] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttackR, gabka);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttackL] = modelLoadingManager->GetAnimation(
-                modelPathGabkaAttackL, gabka);
+
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMine,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackR,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackR, gabka));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackL,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackL, gabka));
 
         int ic = RNG::RandomInt(0, 1);
         UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
@@ -767,16 +763,16 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     } else if (unit->unitType == UnitType::UNIT_BUG) {
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/zuk.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekAttack,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczekTest));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekIddle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczekTest));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczekTest));
     } else if(unit->unitType == UnitType::UNIT_SHROOM) {
         InventoryManager::instance->create_and_assign_item(Item::item_types.water_gun, unit, -1);
         UnitEntity->getComponent<Unit>()->icon_path = "res/textures/icons/shroome.png";
         UnitEntity->addComponent(make_unique<AnimationPlayer>());
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomMove, shroom);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomIdle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomIdle, shroom);
-        UnitEntity->getComponent<AnimationPlayer>()->animationMap[modelPathShroomSpit] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomSpit, shroom);
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomIdle, shroom));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomSpit,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomSpit, shroom));
+        UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, shroom));
     }
     return UnitEntity;
 }

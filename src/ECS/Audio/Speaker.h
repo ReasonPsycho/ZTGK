@@ -9,7 +9,6 @@ public:
     Speaker();
     ~Speaker() override = default;
 
-    std::string name;
     int volume;
     int panning;
 

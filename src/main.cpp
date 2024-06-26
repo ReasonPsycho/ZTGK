@@ -111,9 +111,9 @@ string modelPathShroom = "res/models/Mushroom/shroom.fbx";
 string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
 string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
 string modelPathShroomSpit = "res/models/Mushroom/shroom_spit.fbx";
-string modelPathHangerMop = "res/models/chest/hanger_and_items_models/hanger_mop.fbx";
-string modelPathHangerRotationMop = "res/models/chest/hanger_and_items_models/hanger_rotation_mop.fbx";
-string modelPathHangerTidyPodLauncher = "res/models/chest/hanger_and_items_models/hanger_launcher.fbx";
+string modelPathHangerMop = "res/models/chest/chest.fbx";
+string modelPathHangerRotationMop = "res/models/chest/chest.fbx";
+string modelPathHangerTidyPodLauncher = "res/models/chest/chest.fbx";
 
 Model *tileModel;
 Model *model;
@@ -672,8 +672,16 @@ void load_enteties() {
     ztgk::game::praniumModel = praniumModel;
     ztgk::game::projectileModel = projectileModel;
     ztgk::game::mopModel = mopModel;
+    
     ztgk::game::mopObrotowyModel = mopObrotowyModel;
     ztgk::game::tidyPodLauncherModel = tidyPodLauncherModel;
+    ztgk::game::tideGun= ztgk::game::modelLoadingManager->GetModel("res/models/items/tideGun/tideGun.fbx");;
+    ztgk::game::superPlyn= ztgk::game::modelLoadingManager->GetModel("res/models/items/superPlyn/superPlyn.fbx");;
+    ztgk::game::kulki= ztgk::game::modelLoadingManager->GetModel("res/models/items/kulki/kulki.fbx");;
+    ztgk::game::healingo= ztgk::game::modelLoadingManager->GetModel("res/models/items/healingo/healingo.fbx");;
+    ztgk::game::proszek= ztgk::game::modelLoadingManager->GetModel("res/models/items/proszek/proszek.fbx");;    
+    
+    
     ztgk::game::shroomModel = ztgk::game::modelLoadingManager->GetModel(modelPathShroom);
     ztgk::game::hangerMopModel = hangerMopModel;
     ztgk::game::hangerMopObrotowyModel = hangerMopObrotowyModel;
@@ -746,10 +754,10 @@ void load_units() {
     playerUnit->addComponent(make_unique<Render>(mopModel));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMove] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaIdle] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaMine] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathGabkaAttack] =   ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttack, gabka);
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMove, gabka));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaIdle, gabka));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaMine,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaMine, gabka));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttack,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttack, gabka));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 12, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
@@ -759,9 +767,9 @@ void load_units() {
     playerUnit->addComponent(make_unique<Render>(zuczekTest));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekAttack] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekAttack, zuczekTest);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekIddle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekIddle, zuczekTest);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathZuczekMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathZuczekMove, zuczekTest);
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekAttack,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekAttack, zuczekTest));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekIddle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekIddle, zuczekTest));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathZuczekMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, zuczekTest));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
@@ -771,10 +779,9 @@ void load_units() {
     playerUnit->addComponent(make_unique<Render>(ztgk::game::shroomModel));
     playerUnit->addComponent(make_unique<ColorMask>());
     playerUnit->addComponent(make_unique<AnimationPlayer>());
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathShroomIdle] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomIdle, ztgk::game::shroomModel);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathShroomSpit] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomSpit, ztgk::game::shroomModel);
-    playerUnit->getComponent<AnimationPlayer>()->animationMap[modelPathShroomMove] = ztgk::game::modelLoadingManager->GetAnimation(modelPathShroomMove, ztgk::game::shroomModel);
-
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomIdle,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomIdle, shroomModel));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomSpit,ztgk::game::modelLoadingManager ->GetAnimation(modelPathShroomSpit, shroomModel));
+    playerUnit->getComponent<AnimationPlayer>()->AddAnimation(modelPathShroomMove,ztgk::game::modelLoadingManager ->GetAnimation(modelPathZuczekMove, shroomModel));
     playerUnit->transform.setLocalScale(glm::vec3(1, 1, 1));
     playerUnit->transform.setLocalPosition(glm::vec3(100, 7, 100));
     playerUnit->transform.setLocalRotation(glm::vec3(0, 0, 0));
