@@ -10,6 +10,7 @@
 #include "ECS/Render/Components/BetterSpriteRender.h"
 #include "ECS/SignalQueue/Signal.h"
 #include "ECS/SignalQueue/DataCargo/TestSignalData.h"
+#include "ECS/SignalQueue/SignalQueue.h"
 
 
 Tile::~Tile() {
@@ -46,11 +47,12 @@ void Tile::changeWallsSelection(TileHighlightState state) {
 }
 
 void Tile::setHighlight(TileHighlightState state) {
+    tileHighlightState = state;
+
     if (overrideState != CLEAR)
         return;
 
     changeWallsSelection(state);
-    tileHighlightState = state;
 }
 
 TileHighlightState Tile::getTileSelectionState() {
@@ -81,7 +83,7 @@ void Tile::tryToSendBubble() {
 
     if (emoChild->getComponent<BetterSpriteRender>() == nullptr) {
         emoChild->addComponent(std::make_unique<BetterSpriteRender>(ztgk::game::emotes.at(RNG::RandomBool() ? bubble1 : bubble2).get() , 4));
-        //emoChild->getComponent<BetterSpriteRender>()->isInFogOfWar = this->isInFogOfWar;
+        emoChild->getComponent<BetterSpriteRender>()->isInFogOfWar = this->isInFogOfWar;
     }
     else if(emoChild->getComponent<BetterSpriteRender>() != nullptr && emoChild->getComponent<BetterSpriteRender>()->toBeDeleted) {
         emoChild->removeComponentFromMap(emoChild->getComponent<BetterSpriteRender>());
@@ -108,17 +110,27 @@ void Tile::setHighlightPresetFromState() {
 }
 
 void Tile::setHighlightOverride(TileHighlightState state, float time_sec) {
+    auto oldstate = tileHighlightState;
+    // do this to setup wall highlights
+    overrideState = CLEAR;
     setHighlight(state);
+    // do this to set the tileHighlightState to previous (if there is no external change in the meantime, this will be returned to)
     overrideState = state;
+    setHighlight(oldstate);
 
-    auto signal = TestSignalData::signal();
-    signal.time_to_live = time_sec * 1000.0f;
-    signal.callback = [this, state](){
-        // only reset if the current state matches this assignment, otherwise assume it was overridden in the meantime and responsibility is passed to the new signal
-        if (overrideState == state)
-            overrideState = CLEAR;
-    };
+    if (state != CLEAR) {
+        auto signal = TestSignalData::signal();
+        signal.time_to_live = time_sec * 1000.0f;
+        signal.callback = [this, state]() {
+            // only reset if the current state matches this assignment, otherwise assume it was overridden in the meantime and responsibility is passed to the new signal
+            if (overrideState == state) {
+                overrideState = CLEAR;
+                setHighlight(tileHighlightState);
+            }
+        };
 
+        *ztgk::game::signalQueue += signal;
+    }
 //
 //    getEntity()->addComponent(std::make_unique<CooldownComponentXDD>(time_sec, [this](){
 //        overrideState = CLEAR;
