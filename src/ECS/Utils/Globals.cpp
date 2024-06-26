@@ -35,8 +35,16 @@ namespace ztgk::game {
     Model * game::oreModel = nullptr;
     Model * game::chestModel = nullptr;
     Model * game::projectileModel = nullptr;
+    
     Model * game::mopModel = nullptr;
     Model * game::mopObrotowyModel = nullptr;
+    Model* game::tideGun= nullptr;
+    Model* game::superPlyn= nullptr;
+    Model* game::kulki= nullptr;
+    Model* game::healingo= nullptr;
+    Model* game::proszek= nullptr;
+    
+    
     Model * game::tidyPodLauncherModel = nullptr;
     Model * game::hangerMopModel = nullptr;
     Model * game::hangerMopObrotowyModel = nullptr;

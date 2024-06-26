@@ -174,15 +174,26 @@ const glm::quat &Transform::getGlobalRotation() const {
     return glm::quat_cast(m_modelMatrix);
 }
 
+void decomposeMtx(const glm::mat4& m, glm::vec3& pos, glm::quat& rot, glm::vec3& scale)
+{
+    pos = m[3];
+    for(int i = 0; i < 3; i++)
+        scale[i] = glm::length(glm::vec3(m[i]));
+    const glm::mat3 rotMtx(
+            glm::vec3(m[0]) / scale[0],
+            glm::vec3(m[1]) / scale[1],
+            glm::vec3(m[2]) / scale[2]);
+    rot = glm::quat_cast(rotMtx);
+}
+
 void Transform::setLocalMatrix(const glm::mat4 &transformMatrix) {
     glm::vec3 scale;
     glm::quat rotation;
     glm::vec3 translation;
-    glm::vec3 skew;
-    glm::vec4 perspective;
-    glm::decompose(transformMatrix, scale, rotation, translation, skew, perspective);
-    rotation = glm::conjugate(rotation);
-    
+
+    decomposeMtx(transformMatrix,translation, rotation, scale);
+  //  translation.z += 2;
+ //   translation.y += 0.5;
     setLocalRotation(rotation);
     setLocalPosition(translation);
     setLocalScale(scale);
