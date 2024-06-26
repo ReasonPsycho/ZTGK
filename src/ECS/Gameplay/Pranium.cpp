@@ -26,8 +26,8 @@ void Pranium::onMine(Unit *unit) {
 
 void Pranium::onMined(Unit *unit) {
     IMineable::onMined(unit);
-    if (parentEntity->getChild("Pralka")->getComponent<Render>())
-        parentEntity->getChild("Pralka")->getComponent<Render>()->Remove();
+    if (parentEntity->getChild("Pranium")->getComponent<Render>())
+        parentEntity->getChild("Pranium")->getComponent<Render>()->Remove();
     auto item = InventoryManager::instance->create_item(Item::item_types.pranium_ore);
     auto pos = grid->GridToWorldPosition(gridPosition);
     InventoryManager::instance->spawn_item_on_map(item, gridPosition);
@@ -42,18 +42,18 @@ void Pranium::generatePranium(Model *model) {
     if(render != nullptr){
         parent->removeComponentFromMap(render);
     }
-    auto pralkaEntity = ztgk::game::scene->addEntity(parent, "Pralka");
-    pralkaEntity->addComponent(std::make_unique<Render>(model));
-    pralkaEntity->transform.setLocalRotation(glm::vec3(glm::radians(0.0f), glm::radians(-90.0f), glm::radians(0.f)));
-    pralkaEntity->transform.setLocalScale(glm::vec3(0.5, 0.5, 0.5));
-    pralkaEntity->transform.setLocalPosition(glm::vec3(-0.5f, 0, 0));
-    pralkaEntity->updateSelfAndChild();
+    auto PraniumEntity = ztgk::game::scene->addEntity(parent, "Pranium");
+    PraniumEntity->addComponent(std::make_unique<Render>(model));
+    PraniumEntity->transform.setLocalScale(glm::vec3(1, 1, 1));
+    PraniumEntity->transform.setLocalPosition(glm::vec3(0, -1, 0));
+    PraniumEntity->updateSelfAndChild();
+    PraniumEntity->updateSelfAndChild();
 
 }
 
 void Pranium::UpdateImpl() {
     auto tile = grid->getTileAt(gridPosition);
-    auto render = getEntity()->getChild("Pralka")->getComponent<Render>();
+    auto render = getEntity()->getChild("Pranium")->getComponent<Render>();
     if(tile == nullptr || render == nullptr) return;
     render->isInFogOfWar = tile->isInFogOfWar;
 

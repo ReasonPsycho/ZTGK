@@ -107,7 +107,8 @@ string modelChestPath = "res/models/chest/chest.fbx";
 string modelMopPath = "res/models/items/mop/mop.fbx";
 string modelMopObrotowyPath = "res/models/items/mopObrotowy/mopObrotowy.fbx";
 string modelTidyPodLauncherPath = "res/models/items/tideGun/tideGun.fbx";
-string modelPraniumPath = "res/models/pranium/praniumTemp.fbx";
+string modelPraniumPath = "res/models/pranium/pranium.fbx";
+string modelPraniumItemPath = "res/models/items/pranium/pranium.fbx";
 string modelPathShroom = "res/models/Mushroom/shroom.fbx";
 string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
 string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
@@ -128,6 +129,7 @@ Model *mopModel;
 Model *mopObrotowyModel;
 Model *tidyPodLauncherModel;
 Model *praniumModel;
+Model *praniumItemModel;
 Model *shroomModel;
 
 
@@ -667,6 +669,7 @@ void load_enteties() {
     mopObrotowyModel = ztgk::game::modelLoadingManager->GetModel(modelMopObrotowyPath);
     tidyPodLauncherModel = ztgk::game::modelLoadingManager->GetModel(modelTidyPodLauncherPath);
     praniumModel = ztgk::game::modelLoadingManager->GetModel(modelPraniumPath);
+    praniumItemModel = ztgk::game::modelLoadingManager->GetModel(modelPraniumItemPath);
 
     //quadModel = new Model(pbrprimitives.quadVAO, MaterialPhong(color), vec);
     quadModel = new Model(pbrprimitives.subdividedPlaneVAO[0], MaterialPhong(color), pbrprimitives.subdividedPlanesIndices[0]);
@@ -685,7 +688,8 @@ void load_enteties() {
     ztgk::game::superPlyn= ztgk::game::modelLoadingManager->GetModel("res/models/items/superPlyn/superPlyn.fbx");;
     ztgk::game::kulki= ztgk::game::modelLoadingManager->GetModel("res/models/items/kulki/kulki.fbx");;
     ztgk::game::healingo= ztgk::game::modelLoadingManager->GetModel("res/models/items/healingo/healingo.fbx");;
-    ztgk::game::proszek= ztgk::game::modelLoadingManager->GetModel("res/models/items/proszek/proszek.fbx");;    
+    ztgk::game::proszek= ztgk::game::modelLoadingManager->GetModel("res/models/items/proszek/proszek.fbx");;
+    ztgk::game::praniumItem = praniumItemModel;
     
     
     ztgk::game::shroomModel = ztgk::game::modelLoadingManager->GetModel(modelPathShroom);
@@ -2037,6 +2041,11 @@ void handle_picking(GLFWwindow *window, int button, int action, int mods) {
                     Entity *chestChild = hit->getChild("ChestChild");
                     if (chestChild != nullptr) {
                         hitMineable = chestChild->getMineableComponent<IMineable>(chestChild);
+                    }else{
+                        Entity *PraniumEntity = hit->getChild("Pranium");
+                        if(PraniumEntity!= nullptr){
+                            hitMineable = PraniumEntity->getMineableComponent<IMineable>(PraniumEntity);
+                        }
                     }
                 }
 
