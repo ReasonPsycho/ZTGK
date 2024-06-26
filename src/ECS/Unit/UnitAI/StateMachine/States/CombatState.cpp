@@ -239,38 +239,34 @@ bool CombatState::isAttackOnCooldown() {
     glm::ivec2 pos = {unit->gridPosition.x, unit->gridPosition.z};
     glm::ivec2 tpos = {unit->combatTarget->gridPosition.x, unit->combatTarget->gridPosition.z};
 
-    // sort by shorter range, with target within range
-    // since use_default() returns false, either of the items is not null and offensive
-    if (unit->equipment.item1 == nullptr && unit->equipment.rangeEff2.is_in_range(pos, tpos))
-        it = unit->equipment.item2;
-    else if (unit->equipment.item2 == nullptr && unit->equipment.rangeEff1.is_in_range(pos, tpos))
-        it = unit->equipment.item1;
-    else {
-        // both are offensive items
-        if (unit->equipment.item1->offensive && unit->equipment.item2->offensive) {
-            bool in_range_1 = unit->equipment.rangeEff1.is_in_range(pos, tpos);
-            bool in_range_2 = unit->equipment.rangeEff2.is_in_range(pos, tpos);
+    // since use_default() returns false, either of the items is not null and offensive, find which one
+    bool first = unit->equipment.item1 && unit->equipment.item1->offensive;
+    bool second = unit->equipment.item2 && unit->equipment.item2->offensive;
 
-            // in range of both
-            if (in_range_1 && in_range_2) {
-                // set by shorter range
-                if (unit->equipment.rangeEff1.add <= unit->equipment.rangeEff2.add) {
-                    it = unit->equipment.item1; sec_it = unit->equipment.item2;
-                } else {
-                    it = unit->equipment.item2; sec_it = unit->equipment.item1;
-                }
-            // set the one that's in range
-            } else if (in_range_1) {
-                it = unit->equipment.item1;
+    // if only one is offensive, use it only if it's in range
+    if (first xor second) {
+        if (first && unit->equipment.rangeEff1.is_in_range(pos, tpos)) it = unit->equipment.item1;
+        else if (second && unit->equipment.rangeEff2.is_in_range(pos, tpos)) it = unit->equipment.item2;
+    } else {
+        // if both are null or not offensive, use_defualt returns earlier, if only one - the above if check takes care of that, so the only case left is both are not null & offensive
+        // both are offensive items
+
+        bool in_range_1 = unit->equipment.rangeEff1.is_in_range(pos, tpos);
+        bool in_range_2 = unit->equipment.rangeEff2.is_in_range(pos, tpos);
+
+        // in range of both
+        if (in_range_1 && in_range_2) {
+            // set by shorter range
+            if (unit->equipment.rangeEff1.add <= unit->equipment.rangeEff2.add) {
+                it = unit->equipment.item1; sec_it = unit->equipment.item2;
             } else {
-                it = unit->equipment.item2;
+                it = unit->equipment.item2; sec_it = unit->equipment.item1;
             }
         // set the one that's in range
+        } else if (in_range_1) {
+            it = unit->equipment.item1;
         } else {
-            if (unit->equipment.item1->offensive && unit->equipment.rangeEff1.is_in_range(pos, tpos))
-                it = unit->equipment.item1;
-            else if (unit->equipment.item2->offensive && unit->equipment.rangeEff2.is_in_range(pos, tpos))
-                it = unit->equipment.item2;
+            it = unit->equipment.item2;
         }
     }
 
