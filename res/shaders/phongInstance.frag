@@ -286,7 +286,13 @@ void main()
 
     if (currentWallData[2] != 0){
         result = mix(result, selectionColor[currentWallData[2]] * color_mask_color(), 0.3);
-        fogOfWarData = vec4(selectionColor[currentWallData[2]], fogOfWarData.a);
+        float edgeThreshold = 0.05; // adjust this value according to your need
+        if (texCoords.x < edgeThreshold || texCoords.y < edgeThreshold ||
+        texCoords.x > 1.0 - edgeThreshold || texCoords.y > 1.0 - edgeThreshold)
+        {
+            // Change to red color at the edges
+            result -= vec3(0.2);
+        }
     }
 
     FragColor = vec4(result, 1.0);
