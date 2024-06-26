@@ -41,27 +41,25 @@ s_item_types::s_item_types() {
 }
 
 unsigned s_item_types::id_of(Item *item) const {
-    auto type = std::type_index(typeid(*item));
-
-    if (type == std::type_index(typeid(Hands)))
+    if (item->type_id == hands)
         return hands;
-    if (type == std::type_index(typeid(Mop)))
+    if (item->type_id == mop)
         return mop;
-    if (type == std::type_index(typeid(SuperMop)))
+    if (item->type_id == super_mop)
         return super_mop;
-    if (type == std::type_index(typeid(WaterGun)))
+    if (item->type_id == water_gun)
         return water_gun;
-    if (type == std::type_index(typeid(Beacon)))
+    if (item->type_id == beacon)
         return beacon;
-    if (type == std::type_index(typeid(TestBuffItem)))
+    if (item->type_id == test_buff_item)
         return test_buff_item;
-    if (type == std::type_index(typeid(Detergent)))
+    if (item->type_id == detergent)
         return detergent;
-    if (type == std::type_index(typeid(Pendant)))
+    if (item->type_id == pendant)
         return pendant;
-    if (type == std::type_index(typeid(PraniumOre)))
+    if (item->type_id == pranium_ore)
         return pranium_ore;
-    if (type == std::type_index(typeid(Proszek)))
+    if (item->type_id == proszek)
         return proszek;
 }
 

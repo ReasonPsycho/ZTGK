@@ -9,7 +9,7 @@
 
 class Detergent : public Item {
 public:
-    Detergent() : Item("Gabka GO", "Extended power! Sparkling lemon!", false,
+    Detergent() : Item(Item::item_types.detergent, "Gabka GO", "Extended power! Sparkling lemon!", false,
                       ItemStats(
                               0,0,GridRange(0, 0), GridRange(0, 0),
                               {/* RANDOM */}), false) {

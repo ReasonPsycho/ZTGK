@@ -10,7 +10,7 @@
 
 class Pendant : public Item {
 public:
-    Pendant() : Item("Pendant", "Sea Breeze. Now lasting 200 flushes!", false,
+    Pendant() : Item(Item::item_types.pendant, "Pendant", "Sea Breeze. Now lasting 200 flushes!", false,
                       ItemStats(0,0,GridRange(0, 0), GridRange(0, 0), {/* RANDOM */}), false) {
         icon_path = "res/textures/icons/item_pendant.png";
         model = ztgk::game::kulki; // todo change model

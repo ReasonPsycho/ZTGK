@@ -9,7 +9,7 @@
 
 class Proszek : public Item {
 public:
-    Proszek() : Item("Proszek", "sypki", false,
+    Proszek() : Item(Item::item_types.proszek, "Proszek", "sypki", false,
                       ItemStats(0,0,GridRange(0, 0), GridRange(0, 0),
                               {/* RANDOM */}), false) {
         icon_path = "res/textures/icons/item_proszek.png";

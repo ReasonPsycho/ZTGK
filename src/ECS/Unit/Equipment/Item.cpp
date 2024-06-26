@@ -11,8 +11,8 @@
 
 const s_item_types Item::item_types{};
 
-Item::Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots, Model * model)
-    : uniqueID(ztgk::id<ztgk::ID_POOL_ITEM>()), name(name), description(description), offensive(offensive), stats(stats), takesTwoSlots(takesTwoSlots), model(model) {
+Item::Item(unsigned type_id, std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots, Model * model)
+    : uniqueID(ztgk::id<ztgk::ID_POOL_ITEM>()), type_id(type_id), name(name), description(description), offensive(offensive), stats(stats), takesTwoSlots(takesTwoSlots), model(model) {
 
     // default impls, for hands
     determine_damage = [this](Unit * me, Unit * target, glm::vec2 explosionPoint) { return Item::default_damage_formula(me, target, this); };

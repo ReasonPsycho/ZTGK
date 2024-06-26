@@ -9,7 +9,7 @@
 
 class Hands : public Item {
 public:
-    Hands() : Item("Hands", "Even a sponge can throw hands!", true, {
+    Hands() : Item(Item::item_types.hands, "Hands", "Even a sponge can throw hands!", true, {
         .dmg = 5,
         .cd_max_sec = 1,
         .range = GridRange(1),
