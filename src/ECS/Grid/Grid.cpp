@@ -890,5 +890,4 @@ void Grid::SpawnHanger(Vector2Int gridPos, Tile* tile) {
     chestChild->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
     chestChild->transform.setLocalPosition(glm::vec3(-0.25, -0.25f, -0.25));
     chestChild->updateSelfAndChild();
-    spdlog::debug("Spawned item : {} at position : {} {}", itemTypeID, gridPos.x, gridPos.z);
 }

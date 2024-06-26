@@ -1751,10 +1751,10 @@ void processInput(GLFWwindow *window) {
 //        isXpressed = false;
 //    }
 
-    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
         camera.Rotate(true);
     }
-    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
         camera.Rotate(false);
     }
 
@@ -1795,7 +1795,6 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     ztgk::game::cursor.click(button, action, mods);
 
-    spdlog::debug("ismiddlebuttonpressed: {}", isMiddleButtonPressed ? "true" : "false");
     if(GLFW_MOUSE_BUTTON_MIDDLE == button && GLFW_PRESS == action && !isMiddleButtonPressed){
         isMiddleButtonPressed = true;
         MiddleMouseButtonClickScreenPos = ztgk::game::cursor.raw_pos;

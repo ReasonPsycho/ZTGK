@@ -203,9 +203,9 @@ void CombatState::applyDamage(Unit *unit, Unit* target, float damage) {
 
         if(!target->isAlly){
             target->isAlive = false;
-            target->flingDirection = target->calculateFlingDirection(unit->gridPosition);
         }
         else{
+            target->isAlive = false;
             target->hasCombatTarget = false;
             target->combatTarget = nullptr;
             target->currentMiningTarget = nullptr;
