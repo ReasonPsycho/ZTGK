@@ -164,7 +164,7 @@ bool InventoryManager::unassign_and_delete_item(Unit *unit, Item *item) {
 void InventoryManager::spawn_item_on_map(Item *item, Vector2Int grid_pos) {
     auto tile = ztgk::game::scene->systemManager.getSystem<Grid>()->getTileAt(grid_pos);
     tile->state = FLOOR;
-    auto kiddo = ztgk::game::scene->addEntity(tile->parentEntity,"OnMapItem");
+    auto kiddo = ztgk::game::scene->addEntity(tile->parentEntity, "OnMapItem");
     kiddo->addComponent(std::make_unique<Render>(item->model));
     kiddo->addComponent(std::make_unique<PickupubleItem>(item, grid_pos));
 
@@ -173,10 +173,21 @@ void InventoryManager::spawn_item_on_map(Item *item, Vector2Int grid_pos) {
         kiddo->transform.setLocalScale(glm::vec3(.75f, .75f, .75f));
         kiddo->transform.setLocalPosition(glm::vec3(0, -1, 0));
         kiddo->updateSelfAndChild();
-    }else {
-        kiddo->transform.setLocalRotation(glm::vec3(glm::radians(90.f), 0, 0));
-        kiddo->transform.setLocalScale(glm::vec3(0.5f, 0.5f, 2.0f));
+    }else if (item->name == "Mop" || item->name == "Rotary Mop"){
+        kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
+        kiddo->transform.setLocalScale(glm::vec3(2.f, 2.f, 2.f));
+        kiddo->transform.setLocalPosition(glm::vec3(0, 0, 0));
         kiddo->updateSelfAndChild();
+    }else if(item->name == "Capsule Gun"){
+        kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
+        kiddo->transform.setLocalScale(glm::vec3(2.f, 2.f, 2.f));
+        kiddo->transform.setLocalPosition(glm::vec3(0, -2.5, -1));
+
+       //proszek tez tutaj pasuje ale nie mam itema
+    }else if(item->name == "Detergent" || item->name == "Pendant" || item->name == "Soap Refill"){
+        kiddo->transform.setLocalRotation(glm::vec3(0, 0, 0));
+        kiddo->transform.setLocalScale(glm::vec3(2.f, 2.f, 2.f));
+        kiddo->transform.setLocalPosition(glm::vec3(0, -2, 0));
     }
 }
 
