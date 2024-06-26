@@ -11,6 +11,7 @@
 #include "ECS/SignalQueue/Signal.h"
 #include "ECS/SignalQueue/DataCargo/TestSignalData.h"
 #include "ECS/SignalQueue/SignalQueue.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 
 Tile::~Tile() {
@@ -91,7 +92,7 @@ void Tile::tryToSendBubble() {
 }
 
 void Tile::UpdateImpl() {
-    tryToSendBubble();
+    if(isInFogOfWar) tryToSendBubble();
 }
 
 void Tile::setHighlightPresetFromState() {
@@ -136,6 +137,24 @@ void Tile::setHighlightOverride(TileHighlightState state, float time_sec) {
 //        overrideState = CLEAR;
 //        setHighlightPresetFromState();
 //    }));
+}
+
+void Tile::tryToSendParticle(int particle_type, float y) {
+    auto particle_emiter = getEntity()->getComponent<ParticleEmiter>();
+    if(particle_emiter == nullptr){
+        getEntity()->addComponent(std::make_unique<ParticleEmiter>());
+        particle_emiter = getEntity()->getComponent<ParticleEmiter>();
+    }
+    particle_emiter->EmitParticle(1,1,particle_type,
+                                  glm::vec3(0 + RNG::RandomFloat(-.5f, .5f), 0,0 + RNG::RandomFloat(-.5f, .5f)),
+                                  0, glm::vec4(0, RNG::RandomInt(0, 90), 0,1), glm::vec4(0.5), glm::vec4(0,1,0,1), glm::vec4(1));
+    //send 2nd particle sometimes
+    if(RNG::RandomBool()){
+        particle_emiter->EmitParticle(1,1,particle_type,
+                                      glm::vec3(0 + RNG::RandomFloat(-.5f, .5f), y,0 + RNG::RandomFloat(-.5f, .5f)),
+                                      0, glm::vec4(0, RNG::RandomInt(0, 90), 0,1), glm::vec4(0.5), glm::vec4(0,1,0,1), glm::vec4(1));
+    }
+
 }
 
 

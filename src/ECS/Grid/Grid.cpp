@@ -23,6 +23,7 @@
 #include "ECS/Unit/Equipment/InventoryManager.h"
 #include "ECS/Unit/Equipment/ConcreteItems/WaterGun.h"
 #include "ECS/Light/Components/LightMover.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 #include <iostream>
 #include <cstdlib> // Required for rand()
@@ -722,6 +723,8 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     stateManager->currentState = new IdleState(this);
     stateManager->currentState->unit = UnitEntity->getComponent<Unit>();
     UnitEntity->addComponent(make_unique<UnitAI>(UnitEntity->getComponent<Unit>(), stateManager));
+    UnitEntity->addComponent(std::make_unique<ParticleEmiter>());
+
     auto unit = UnitEntity->getComponent<Unit>();
     if(unit->unitType == UnitType::UNIT_SPONGE) {
         UnitEntity->addComponent(make_unique<AnimationPlayer>());

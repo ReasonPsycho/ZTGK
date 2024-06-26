@@ -9,7 +9,7 @@
 #include "ECS/Render/Camera/Camera.h"
 #include "ECS/System.h"
 #include "ECS/Render/Components/ParticleEmiter.h"
-
+#include "ECS/Grid/Tile.h"
 
 
 class ParticleSystem : public System{
@@ -33,6 +33,9 @@ private:
     std::array<std::type_index, 1> componentTypes = {
             std::type_index(typeid(ParticleEmiter)) 
     };
+    void get_Tiles_to_emmit();
+    std::vector<Tile*> tiles_to_emmit;
+    float particle_cooldown = 0;
 };
 
 

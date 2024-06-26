@@ -80,6 +80,7 @@ void Item::do_meele_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
     auto tiles = usedItem->stats.aoe_range.get_tiles(VectorUtils::Vector2IntToGlmVec2(target->gridPosition));
     for (auto tile : tiles) {
         tile->setHighlightOverride(TileHighlightState::EXPLOSION_LIGHT_BLUE, 0.20f);
+
     }
 
     for (auto & tgt : targets) {
@@ -127,6 +128,7 @@ void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
     auto targets = me->equipment.range_of(usedItem)->find_my_allies({target->gridPosition.x, target->gridPosition.z}, me->IsAlly());
     for (auto tile : me->equipment.range_of(usedItem)->get_tiles(VectorUtils::Vector2IntToGlmVec2(me->gridPosition))) {
         tile->setHighlightOverride(TileHighlightState::HEAL_LIGHT_GREEN, 0.20f);
+        tile->tryToSendParticle(5);
     }
 
     for (auto & tgt : targets) {

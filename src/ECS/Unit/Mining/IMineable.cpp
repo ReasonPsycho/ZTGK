@@ -10,6 +10,7 @@
 #include "ECS/Entity.h"
 #include "ECS/Unit/Unit.h"
 #include "MiningSystem.h"
+#include "ECS/Render/Components/ParticleEmiter.h"
 
 IMineable::IMineable(float timeToMine, Vector2Int gridPosition, Grid* grid) {
     this->name = "IMineable";
@@ -69,4 +70,20 @@ IMineable::IMineable(IMineable *pMineable) {
 
 IMineable::~IMineable() {
     ztgk::game::scene->systemManager.getSystem<MiningSystem>()->removeComponent(this);
+}
+
+void IMineable::onMine(Unit *unit) {
+    auto particle_emiter = getEntity()->getComponent<ParticleEmiter>();
+    if(particle_emiter == nullptr){
+        getEntity()->addComponent(std::make_unique<ParticleEmiter>());
+    }
+    if(particle_cooldown <=0){
+        auto tile = grid->getTileAt(gridPosition);
+        tile->tryToSendParticle(RNG::RandomBool() ? 8:9, 2);
+        particle_cooldown = 0.4f;
+    }
+    else{
+        particle_cooldown -= Time::Instance().DeltaTime();
+    }
+
 }
