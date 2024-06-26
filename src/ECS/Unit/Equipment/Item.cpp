@@ -110,6 +110,10 @@ void Item::do_ranged_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
             float totalAttackDamage = projectile->sourceItem->determine_damage(projectile->unit, tgt, {projectile->target->gridPosition.x, projectile->target->gridPosition.z}); // hit point here is explosion center so original target position
             CombatState::applyDamage(projectile->unit, tgt, totalAttackDamage);
         }
+        auto tiles = projectile->sourceItem->stats.aoe_range.get_tiles(VectorUtils::Vector2IntToGlmVec2(projectile->target->gridPosition));
+        for (auto tile : tiles) {
+            tile->setHighlightOverride(TileHighlightState::EXPLOSION_LIGHT_BLUE, 0.20f);
+        }
         return targets;
     };
 }
@@ -117,7 +121,7 @@ void Item::do_ranged_aoe_attack(Unit *me, Unit *target, Item *usedItem) {
 void Item::do_heal(Unit *me, Unit *target, Item *usedItem) {
     auto targets = me->equipment.range_of(usedItem)->find_my_allies({target->gridPosition.x, target->gridPosition.z}, me->IsAlly());
     for (auto tile : me->equipment.range_of(usedItem)->get_tiles(VectorUtils::Vector2IntToGlmVec2(me->gridPosition))) {
-        tile->setHighlightOverride(TileHighlightState::HEAL_LIGHT_GREEN, 0.25f);
+        tile->setHighlightOverride(TileHighlightState::HEAL_LIGHT_GREEN, 0.20f);
     }
 
     for (auto & tgt : targets) {

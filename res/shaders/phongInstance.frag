@@ -96,16 +96,17 @@ uniform int toon_color_levels;
 
 uniform float dirtMultiplayer;
 
-vec3 selectionColor[9] = vec3[]
+vec3 selectionColor[10] = vec3[]
 (
 vec3(1, 1, 1), //Just here to simplyfiy the logic
 vec3(0, 1, 0),  // green - lmb
 vec3(0, 0, 1),  // blue - rmb
 vec3(1, 1, 0.5),  // yellow - move order
 vec3(1, 0, 0),  // red - enemy
-vec3(0.6, 0.6, 0),// gold - item
-vec3(0, 0.8, 1),   // light blue(?) - explosion/dmg aoe
-vec3(0.7, 1, 0.2),   // light green - heal aoe
+vec3(0.6, 0.6, 0),  // gold - item
+vec3(0.9, 0.7, 1),   // light blue(?) - explosion/dmg aoe
+vec3(0.6, 1, 0.4),   // light green - heal aoe
+vec3(1, 0.5, 0.5),  // light red - take damage
 vec3(0.7, 0.7, 1)  // very light blue - show item range
 );
 
