@@ -302,7 +302,7 @@ void PhongPipeline::WriteToBackBuffer(Camera *camera) {
     textureSampler.setVec3("outline_color",outline_color);  // Here 0 is the texture unit
 
     textureSampler.setFloat("exposure", exposure);  // Here 0 is the texture unit
-    textureSampler.setFloat("gamma", gamma);  // Here 0 is the texture unit
+    textureSampler.setFloat("gamma", 1.5f);  // Here 0 is the texture unit
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Depends on your needs
     _primitives->renderQuad();
