@@ -145,11 +145,11 @@ void CombatState::AttackSideFX(Item * useItem, Unit * unit, Unit * target) {
         }
         else{
             if(unit->equipment.item1 != nullptr){
-                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_left.fbx";
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_right.fbx";
                 anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
             }
             else if(unit->equipment.item2 != nullptr){
-                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_right.fbx";
+                string modelPathGabkaMove = "res/models/gabka/pan_gabka_attack_left.fbx";
                 anim->PlayAnimation(modelPathGabkaMove, false, 5.0f);
             }
         }

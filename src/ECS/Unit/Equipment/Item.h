@@ -24,6 +24,7 @@ public:
     static const s_item_types item_types;
 
     unsigned uniqueID;
+    unsigned type_id;
 
     bool offensive{false};
     bool active{false}; // item has an ability with cooldown but isn't used for attack
@@ -64,7 +65,7 @@ public:
 
     std::unordered_map<std::string, std::string> highlight_passive_stats = {};
 
-    Item(std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false, Model * model = ztgk::game::mopModel);
+    Item(unsigned type_id, std::string name, std::string description, bool offensive, ItemStats stats, bool takesTwoSlots = false, Model * model = ztgk::game::mopModel);
 
     void imgui_preview() const;
 };

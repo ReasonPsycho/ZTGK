@@ -8,7 +8,7 @@
 
 class TestBuffItem : public Item {
 public:
-    TestBuffItem() : Item("TestBuffItem", "None", false, {
+    TestBuffItem() : Item(Item::item_types.test_buff_item, "TestBuffItem", "None", false, {
         .add_to_unit = {
                 .max_hp = 10,
                 .def_perc = 5,

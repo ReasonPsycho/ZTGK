@@ -39,7 +39,6 @@ public:
     bool unassign_and_delete_item(Unit * unit, short slot);
     bool unassign_and_delete_item(Unit * unit, Item * item);
 
-    // todo
 //    void spawn_item_on_map(Item * item, glm::vec2 world_pos);
     void spawn_item_on_map(Item * item, Vector2Int grid_pos);
 

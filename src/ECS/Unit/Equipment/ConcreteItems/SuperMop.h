@@ -10,7 +10,7 @@
 
 class SuperMop : public Item{
 public:
-    SuperMop() : Item("Rotary Mop", "With a blast!", true, ItemStats(10, 1.25, GridRange(1, 0), GridRange(1, 0)), false) {
+    SuperMop() : Item(Item::item_types.super_mop, "Rotary Mop", "With a blast!", true, ItemStats(10, 1.25, GridRange(1, 0), GridRange(1, 0)), false) {
         icon_path = "res/textures/icons/item_superMop.png";
         model = ztgk::game::mopObrotowyModel;
 
