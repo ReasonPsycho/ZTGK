@@ -39,6 +39,7 @@ namespace ztgk {
                 if (!allies[i]->isSelected && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GREEN)
                     eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
                 //            else eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+                eactions->children[i]->getChild("Emote")->getComponent<Sprite>()->load(ztgk::game::emotes[allies[i]->mostRecentEmote]->path);
             }
             for (int i = 3; i < 6; ++i) {
                 static std::vector<unsigned> cd_groups = {ztgk::game::ui_data.gr_act_cd11, ztgk::game::ui_data.gr_act_cd21, ztgk::game::ui_data.gr_act_cd31};

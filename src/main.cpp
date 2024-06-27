@@ -1132,6 +1132,9 @@ void load_hud() {
     ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
+    ent = scene.addEntity(ent, "Emote");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1645, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/white.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
 
     ent = hud->createButton(
             glm::vec2{1720, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
@@ -1148,6 +1151,9 @@ void load_hud() {
     ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
+    ent = scene.addEntity(ent, "Emote");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1770, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/white.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
 
     ent = hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
                             []() {
@@ -1163,6 +1169,9 @@ void load_hud() {
     ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
+    ent = scene.addEntity(ent, "Emote");
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1895, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/white.png"));
+    ent->getComponent<Sprite>()->mode = CENTER;
 
     // second row
     ent = hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
