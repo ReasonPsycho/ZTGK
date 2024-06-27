@@ -147,12 +147,12 @@ void Tile::tryToSendParticle(int particle_type, float y) {
     }
     particle_emiter->EmitParticle(1,1,particle_type,
                                   glm::vec3(0 + RNG::RandomFloat(-.5f, .5f), 0,0 + RNG::RandomFloat(-.5f, .5f)),
-                                  0, glm::vec4(0, RNG::RandomInt(0, 90), 0,1), glm::vec4(0.5), glm::vec4(0,1,0,1), glm::vec4(1));
+                                  0, glm::vec4(0, RNG::RandomInt(0, 90), 0,1), glm::vec4(0.5), glm::vec4(0,1,0,0) + glm::vec4 (RNG::RandomFloat(-.5f, .5f)), glm::vec4(1));
     //send 2nd particle sometimes
     if(RNG::RandomBool()){
         particle_emiter->EmitParticle(1,1,particle_type,
                                       glm::vec3(0 + RNG::RandomFloat(-.5f, .5f), y,0 + RNG::RandomFloat(-.5f, .5f)),
-                                      0, glm::vec4(0, RNG::RandomInt(0, 90), 0,1), glm::vec4(0.5), glm::vec4(0,1,0,1), glm::vec4(1));
+                                      0, glm::vec4(0, RNG::RandomInt(0, 90), 0,1), glm::vec4(0.5), glm::vec4(0,1,0,1)  + glm::vec4 (RNG::RandomFloat(-.5f, .5f)), glm::vec4(1));
     }
 
 }
