@@ -156,7 +156,7 @@ State *IdleState::RunCurrentState() {
         if (unit->unitType == UNIT_BUG && !grid->getTileAt(unit->gridPosition)->isInFogOfWar) {
             auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
             if(anim!= nullptr){
-                string modelPathBugMove = "res/models/zuczek/Zuczek_sleep - copia.fbx";
+                string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
                 if (unit->animationcooldown > anim->animationMap[modelPathBugMove].GetDuration() /
                                               (anim->animationMap[modelPathBugMove].GetTicksPerSecond() * 2.0f)) {
                     anim->PlayAnimation(modelPathBugMove, false, 2.0f);

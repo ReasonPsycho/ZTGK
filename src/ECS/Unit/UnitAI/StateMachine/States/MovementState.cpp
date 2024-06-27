@@ -175,7 +175,7 @@ void MovementState::MoveOnPath() {
             if (unit->unitType == UNIT_BUG) {
                 auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
                 if(anim!= nullptr){
-                    string modelPathBugMove = "res/models/zuczek/Zuczek_run - copia.fbx";
+                    string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
                     if (unit->animationcooldown > anim->animationMap[modelPathBugMove].GetDuration() /
                                                   (anim->animationMap[modelPathBugMove].GetTicksPerSecond() * 2.0f)) {
 
