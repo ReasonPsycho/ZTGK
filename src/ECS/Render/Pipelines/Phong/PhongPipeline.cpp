@@ -104,6 +104,7 @@ void PhongPipeline::PrebindPipeline(Camera *camera) {
     phongInstanceShader.setInt("toon_color_levels", toon_color_levels);
     
     phongInstanceShader.setFloat("outlineMapping", instanceShaderOutlineMapping);
+    phongInstanceShader.setFloat("u_time", Time::Instance().CurrentTime());
 
     phongShader.use();
 

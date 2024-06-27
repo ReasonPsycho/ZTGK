@@ -208,7 +208,7 @@ void Grid::GenerateTileEntities(float scale) {
             glm::vec3 diffuseColor = glm::vec3 (RNG::RandomFloat(0.7,1),RNG::RandomFloat(0.7,1),RNG::RandomFloat(0.7,1));
             glm::vec3 specularColor = glm::vec3 (diffuseColor.x /10,diffuseColor.y /10,diffuseColor.z /10);
                     
-            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(diffuseColor, 1), glm::vec4(specularColor, 1), glm::vec4(1, 1, 1, 1), 0.001f, 0.001f,0.015f)));
+            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4( 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.001f, 0.001f,0.015f)));
             localLight->addComponent(make_unique<LightMover>(glm::vec3 (0,7,0)));
             chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
             localLight->forceUpdateSelfAndChild();
@@ -381,7 +381,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
             northMatrix = glm::translate(northMatrix, glm::vec3(translateLength, 0, 0));
             northMatrix = glm::rotate(northMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(northMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(northMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -390,7 +390,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 southMatrix = tile->getEntity()->transform.getModelMatrix();
             southMatrix = glm::translate(southMatrix, glm::vec3(-translateLength, 0, 0));
             southMatrix = glm::rotate(southMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(southMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(southMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -399,7 +399,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
             eastMatrix = glm::translate(eastMatrix, glm::vec3(0, 0, translateLength));
             eastMatrix = glm::rotate(eastMatrix, glm::radians(-90.0f), glm::vec3(0, 0, 1));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(eastMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(eastMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -408,7 +408,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 westMatrix = tile->getEntity()->transform.getModelMatrix();
             westMatrix = glm::translate(westMatrix, glm::vec3(0, 0, -translateLength));
             westMatrix = glm::rotate(westMatrix, glm::radians(180.0f), glm::vec3(1, 0, 0));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(westMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(westMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -416,7 +416,7 @@ void Grid::SetUpWall(Tile *tile) {
         topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
         topMatrix = glm::rotate(topMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(
-                wallChunk->addWallData(make_unique<WallData>(topMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+                wallChunk->addWallData(make_unique<WallData>(topMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
     }
 
     // here because it sets wall data
@@ -683,7 +683,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
 
     string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
     string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
-    string modelPathZuczekMove = "res/models/zuczek/Zuczek_run - copia.fbx";
+    string modelPathZuczekMove = "res/models/zuczek/Zuczek_sleep - copia.fbx";
 
     string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
     string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
