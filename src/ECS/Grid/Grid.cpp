@@ -208,7 +208,7 @@ void Grid::GenerateTileEntities(float scale) {
             glm::vec3 diffuseColor = glm::vec3 (RNG::RandomFloat(0.7,1),RNG::RandomFloat(0.7,1),RNG::RandomFloat(0.7,1));
             glm::vec3 specularColor = glm::vec3 (diffuseColor.x /10,diffuseColor.y /10,diffuseColor.z /10);
                     
-            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4(diffuseColor, 1), glm::vec4(specularColor, 1), glm::vec4(1, 1, 1, 1), 0.001f, 0.001f,0.015f)));
+            localLight->addComponent(make_unique<PointLight>(PointLightData(glm::vec4( 1), glm::vec4(glm::vec3(0.1), 1), glm::vec4(1, 1, 1, 1), 0.001f, 0.001f,0.015f)));
             localLight->addComponent(make_unique<LightMover>(glm::vec3 (0,7,0)));
             chunkArray[i][j]->localLight = localLight->getComponent<PointLight>();
             localLight->forceUpdateSelfAndChild();
@@ -683,7 +683,7 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
 
     string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
     string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
-    string modelPathZuczekMove = "res/models/zuczek/Zuczek_run - copia.fbx";
+    string modelPathZuczekMove = "res/models/zuczek/Zuczek_sleep - copia.fbx";
 
     string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
     string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";

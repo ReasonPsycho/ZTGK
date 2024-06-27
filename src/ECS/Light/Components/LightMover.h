@@ -22,6 +22,8 @@ private:
     glm::vec3 centerPosition;
     glm::vec3 startPosition;
 
+    glm::vec3 startColor;
+    glm::vec3 endColor;
     float speed;
     float t;
 };
