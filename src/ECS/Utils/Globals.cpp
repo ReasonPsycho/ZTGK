@@ -29,6 +29,7 @@ namespace ztgk::game {
     AudioManager * game::audioManager = nullptr;
     SignalReceiver * game::selectionHandler = nullptr;
     ModelLoadingManager * game::modelLoadingManager = nullptr;
+    Sprite * game::minimap = nullptr;
     Model * game::playerModel = nullptr;
     Model * game::bugModel = nullptr;
     Model * game::shroomModel = nullptr;

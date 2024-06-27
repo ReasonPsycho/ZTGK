@@ -15,6 +15,7 @@ class SignalReceiver;
 struct GLFWwindow;
 class ModelLoadingManager;
 struct Text;
+struct Sprite;
 
 namespace ztgk::game {
     enum EMOTES {
@@ -81,6 +82,7 @@ namespace ztgk::game {
     extern AudioManager * audioManager;
     extern ModelLoadingManager * modelLoadingManager;
     extern SignalReceiver * selectionHandler;
+    extern Sprite * minimap;
 
     extern Cursor cursor;
 
