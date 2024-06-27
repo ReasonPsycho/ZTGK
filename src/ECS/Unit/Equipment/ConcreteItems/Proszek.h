@@ -12,7 +12,7 @@ public:
     Proszek() : Item(Item::item_types.proszek, "Proszek", "sypki", false,
                       ItemStats(0,0,GridRange(0, 0), GridRange(0, 0),
                               {/* RANDOM */}), false) {
-        icon_path = "res/textures/icons/item_proszek.png";
+        icon_path = "res/textures/icons/item_powder.png";
         model = ztgk::game::proszek; // todo change model
 
         std::vector<ItemStats> random_stats = {
@@ -47,16 +47,16 @@ public:
         };
 
         this->stats = random_stats[rand() % random_stats.size()];
-        if (stats.add_to_unit.max_hp != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/hp.png", std::to_string(stats.add_to_unit.max_hp)});
-        if (stats.add_to_unit.def_perc != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/def.png", std::format("{:.0}%", stats.add_to_unit.def_perc * 100)});
-        if (stats.add_to_unit.def_flat != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/def.png", std::to_string(stats.add_to_unit.def_flat)});
-        if (stats.add_to_unit.move_speed != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/mvspd.png", std::format("{:.0}%", stats.add_to_unit.move_speed * 100)});
-        if (stats.add_to_unit.mine_speed != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/mnspd.png", std::format("{:.0}%", stats.add_to_unit.mine_speed * 100)});
+        if (stats.add_to_unit.max_hp > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/hp.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.max_hp)));
+        if (stats.add_to_unit.def_perc > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/def.png", std::format("{:1.2}", std::to_string(stats.add_to_unit.def_perc)));
+        if (stats.add_to_unit.def_flat > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/def.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.def_flat)));
+        if (stats.add_to_unit.move_speed > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/mvspd.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.move_speed)));
+        if (stats.add_to_unit.mine_speed > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/mnspd.png", std::format("{:1.2}", std::to_string(stats.add_to_unit.mine_speed)));
     }
 
 };

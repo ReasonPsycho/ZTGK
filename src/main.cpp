@@ -974,7 +974,7 @@ void load_hud() {
     eportrait->getComponent<Sprite>()->frame(3, ztgk::color.BLACK);
 
     auto ename = scene.addEntity(emiddle, "Name");
-    ename->addComponent(make_unique<Text>("SPONGE", glm::vec2{700, 240}, glm::vec2(1.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
+    ename->addComponent(make_unique<Text>("SPONGE", glm::vec2{690, 240}, glm::vec2(1.5), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_middle));
     ename->getComponent<Text>()->mode = TOP_LEFT;
 
     auto emodstip = scene.addEntity(emiddle, "Modstip");

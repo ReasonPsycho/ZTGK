@@ -148,18 +148,16 @@ namespace ztgk {
                 ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(false);
     
                 auto ent = eitem1->getChild("Passive Stats");
+                for (int i = 1; i < 5; ++i) {
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(true);
+                }
                 int i = 1;
                 for (auto stats : item->highlight_passive_stats) {
                     if (i > 5) break;
                     string ent_name = "STAT" + to_string(i);
                     ent->getChild(ent_name)->getComponent<Sprite>()->load(stats.first);
                     ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                    i++;
                     ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(false);
-                }
-                if (i > 1) i++;
-                while (i <= 4) {
-                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 1 STAT " + to_string(i))->setHidden(true);
                     i++;
                 }
             }
@@ -197,18 +195,17 @@ namespace ztgk {
                 ztgk::game::scene->systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(false);
     
                 auto ent = eitem2->getChild("Passive Stats");
+                for (int i = 1; i < 5; ++i) {
+                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(true);
+                }
+
                 int i = 1;
                 for (auto stats : item->highlight_passive_stats) {
                     if (i > 4) break;
                     string ent_name = "STAT" + to_string(i);
                     ent->getChild(ent_name)->getComponent<Sprite>()->load(stats.first);
                     ent->getChild(ent_name)->getComponent<Text>()->content = stats.second;
-                    i++;
                     ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(false);
-                }
-                if (i > 1) i++;
-                while (i <= 4) {
-                    ztgk::game::scene->systemManager.getSystem<HUD>()->findGroupByName("Weapon 2 STAT " + to_string(i))->setHidden(true);
                     i++;
                 }
             }
