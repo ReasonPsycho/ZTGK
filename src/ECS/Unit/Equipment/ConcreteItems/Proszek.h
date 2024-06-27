@@ -48,15 +48,15 @@ public:
 
         this->stats = random_stats[rand() % random_stats.size()];
         if (stats.add_to_unit.max_hp > 0.1)
-            highlight_passive_stats.emplace("res/textures/icons/stat/hp.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.max_hp)));
+            highlight_passive_stats.emplace("res/textures/icons/stat/hp.png", std::format("{:1.0f}", (stats.add_to_unit.max_hp)));
         if (stats.add_to_unit.def_perc > 0.1)
-            highlight_passive_stats.emplace("res/textures/icons/stat/def.png", std::format("{:1.2}", std::to_string(stats.add_to_unit.def_perc)));
+            highlight_passive_stats.emplace("res/textures/icons/stat/def.png", std::format("{:1.0f}%", (stats.add_to_unit.def_perc * 100)));
         if (stats.add_to_unit.def_flat > 0.1)
-            highlight_passive_stats.emplace("res/textures/icons/stat/def.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.def_flat)));
+            highlight_passive_stats.emplace("res/textures/icons/stat/def.png", std::format("{:1.0f}", (stats.add_to_unit.def_flat)));
         if (stats.add_to_unit.move_speed > 0.1)
-            highlight_passive_stats.emplace("res/textures/icons/stat/mvspd.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.move_speed)));
+            highlight_passive_stats.emplace("res/textures/icons/stat/mvspd.png", std::format("{:1.0f}", (stats.add_to_unit.move_speed)));
         if (stats.add_to_unit.mine_speed > 0.1)
-            highlight_passive_stats.emplace("res/textures/icons/stat/mnspd.png", std::format("{:1.2}", std::to_string(stats.add_to_unit.mine_speed)));
+            highlight_passive_stats.emplace("res/textures/icons/stat/mnspd.png", std::format("{:1.0f}%", (stats.add_to_unit.mine_speed * 100)));
     }
 
 };
