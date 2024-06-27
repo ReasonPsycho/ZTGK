@@ -172,19 +172,19 @@ void MovementState::MoveOnPath() {
             }
         }
         else{
-            if (unit->unitType == UNIT_BUG) {
-                auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
-                if(anim!= nullptr){
-                    string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
-                    if (unit->animationcooldown > anim->animationMap[modelPathBugMove].GetDuration() /
-                                                  (anim->animationMap[modelPathBugMove].GetTicksPerSecond() * 2.0f)) {
-
-                        anim->PlayAnimation(modelPathBugMove, false, 2.0f);
-                        unit->animationcooldown = 0;
-                    }
-                }
-
-            }
+//            if (unit->unitType == UNIT_BUG) {
+//                auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
+//                if(anim!= nullptr){
+//                    string modelPathBugMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
+//                    if (unit->animationcooldown > anim->animationMap[modelPathBugMove].GetDuration() /
+//                                                  (anim->animationMap[modelPathBugMove].GetTicksPerSecond() * 2.0f)) {
+//
+//                        anim->PlayAnimation(modelPathBugMove, false, 2.0f);
+//                        unit->animationcooldown = 0;
+//                    }
+//                }
+//
+//            }
             if(unit->unitType == UNIT_SHROOM){
                 auto anim = unit->getEntity()->getComponent<AnimationPlayer>();
                 if(anim!= nullptr){
