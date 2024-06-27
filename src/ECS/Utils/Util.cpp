@@ -22,22 +22,58 @@ namespace ztgk {
         // this should only happen once due to path re-load guard in Sprite.load
         auto allies = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->unitComponents | ranges::views::filter([](Unit * unit){ return unit->isAlly; }) | std::ranges::to<std::vector<Unit *>>();
         static auto eactions = ztgk::game::scene->getChild("HUD")->getChild("Game")->getChild("Action Panel");
+        auto hud = ztgk::game::scene->systemManager.getSystem<HUD>();
 
-        if (!allies.empty())
-        for (int i = 0; i < 3; ++i) {
-            eactions->children[i]->getComponent<Text>()->content = allies[i]->name;
-            eactions->children[i]->getComponent<Sprite>()->load(allies[i]->icon_path);
-            eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(allies[i]->stats.hp / (allies[i]->stats.max_hp + allies[i]->stats.added.max_hp));
-            if (!allies[i]->isAlive) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GRAY;
-            // came back to life
-            if (allies[i]->isAlive && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GRAY)
-                eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
-            if (allies[i]->isSelected) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GREEN;
-            // deselected
-            if (!allies[i]->isSelected && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GREEN)
-                eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
-//            else eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        if (!allies.empty()) {
+            for (int i = 0; i < 3; ++i) {
+                eactions->children[i]->getComponent<Text>()->content = allies[i]->name;
+                eactions->children[i]->getComponent<Sprite>()->load(allies[i]->icon_path);
+                eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(
+                        allies[i]->stats.hp / (allies[i]->stats.max_hp + allies[i]->stats.added.max_hp));
+                if (!allies[i]->isAlive) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GRAY;
+                // came back to life
+                if (allies[i]->isAlive && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GRAY)
+                    eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+                if (allies[i]->isSelected) eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.GREEN;
+                // deselected
+                if (!allies[i]->isSelected && eactions->children[i]->getComponent<Sprite>()->color == ztgk::color.GREEN)
+                    eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+                //            else eactions->children[i]->getComponent<Sprite>()->color = ztgk::color.WHITE;
+            }
+            for (int i = 3; i < 6; ++i) {
+                static std::vector<unsigned> cd_groups = {ztgk::game::ui_data.gr_act_cd11, ztgk::game::ui_data.gr_act_cd21, ztgk::game::ui_data.gr_act_cd31};
+
+                if (!allies[i % 3]->equipment.item1 && !allies[i % 3]->equipment.item2) {
+                    eactions->children[i]->children[0]->getComponent<Sprite>()->load(allies[i % 3]->equipment.item0->icon_path);
+                    eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(
+                            allies[i % 3]->equipment.item0->cd_sec / allies[i % 3]->equipment.item0->stats.cd_max_sec);
+                    hud->getGroupOrDefault(cd_groups[i % 3])->setHidden(false);
+                } else if (allies[i % 3]->equipment.item1) {
+                    eactions->children[i]->children[0]->getComponent<Sprite>()->load(allies[i % 3]->equipment.item1->icon_path);
+                    eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(
+                            allies[i % 3]->equipment.item1->cd_sec / allies[i % 3]->equipment.item1->stats.cd_max_sec);
+                    hud->getGroupOrDefault(cd_groups[i % 3])->setHidden(false);
+                } else {
+                    eactions->children[i]->children[0]->getComponent<Sprite>()->load("res/textures/question_mark.png");
+                    hud->getGroupOrDefault(cd_groups[i % 3])->setHidden(true);
+                }
+            }
+            for (int i = 6; i < 9; ++i) {
+                static std::vector<unsigned> cd_groups = {ztgk::game::ui_data.gr_act_cd12, ztgk::game::ui_data.gr_act_cd22, ztgk::game::ui_data.gr_act_cd32};
+
+                if (allies[i % 3]->equipment.item2) {
+                    eactions->children[i]->children[0]->getComponent<Sprite>()->load(allies[i % 3]->equipment.item2->icon_path);
+                    eactions->children[i]->getChild("Display Bar")->getComponent<HUDSlider>()->set(
+                            allies[i % 3]->equipment.item2->cd_sec / allies[i % 3]->equipment.item2->stats.cd_max_sec);
+                    hud->getGroupOrDefault(cd_groups[i % 3])->setHidden(false);
+                } else {
+                    eactions->children[i]->children[0]->getComponent<Sprite>()->load("res/textures/question_mark.png");
+                    hud->getGroupOrDefault(cd_groups[i % 3])->setHidden(true);
+                }
+
+            }
         }
+
 
 
         // todo determine group hud

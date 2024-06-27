@@ -809,6 +809,14 @@ void load_hud() {
     ztgk::game::ui_data.gr_map = hud->addGroup(ztgk::game::ui_data.gr_game, "Map");
     ztgk::game::ui_data.gr_middle = hud->addGroup(ztgk::game::ui_data.gr_game, "Unit Details");
     ztgk::game::ui_data.gr_actions = hud->addGroup(ztgk::game::ui_data.gr_game, "Action Panel");
+
+    ztgk::game::ui_data.gr_act_cd11 = hud->addGroup(ztgk::game::ui_data.gr_actions, "Action-Preview CD 1-1");
+    ztgk::game::ui_data.gr_act_cd12 = hud->addGroup(ztgk::game::ui_data.gr_actions, "Action-Preview CD 1-2");
+    ztgk::game::ui_data.gr_act_cd21 = hud->addGroup(ztgk::game::ui_data.gr_actions, "Action-Preview CD 2-1");
+    ztgk::game::ui_data.gr_act_cd22 = hud->addGroup(ztgk::game::ui_data.gr_actions, "Action-Preview CD 2-2");
+    ztgk::game::ui_data.gr_act_cd31 = hud->addGroup(ztgk::game::ui_data.gr_actions, "Action-Preview CD 3-1");
+    ztgk::game::ui_data.gr_act_cd32 = hud->addGroup(ztgk::game::ui_data.gr_actions, "Action-Preview CD 3-2");
+
     ztgk::game::ui_data.gr_top = hud->addGroup(ztgk::game::ui_data.gr_game, "Top Panel");
 
     ztgk::game::ui_data.gr_item = hud->addGroup(ztgk::game::ui_data.gr_middle, "Item Details");
@@ -1105,7 +1113,10 @@ void load_hud() {
 #pragma region actions
 // ACTIONS
     auto eactions = scene.addEntity(egame, "Action Panel");
-    eactions->addComponent(make_unique<Sprite>(glm::vec2{1520, 0}, glm::vec2{400, 400}, ztgk::color.GRAY * 0.75f, ztgk::game::ui_data.gr_actions));
+    eactions->addComponent(make_unique<Sprite>(glm::vec2{1520, 0}, glm::vec2{403,435}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/bgs/2.png"));
+    eactions->getComponent<Sprite>()->mode = BOTTOM_LEFT;
+
+    // first row
     ent = hud->createButton(
             glm::vec2{1595, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
             []() {
@@ -1153,34 +1164,151 @@ void load_hud() {
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
 
-    hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_1.png", "res/textures/transparent.png", []() {
-        if (ztgk::game::ui_data.tracked_unit_id == -1) return;
-        auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
-                                 scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit *unit) { return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
-        if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
-
-        auto item = (*unit)->equipment[1];
+    // second row
+    ent = hud->createButton(glm::vec2{1595, 200}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 150}, glm::vec2{100, 10}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_act_cd11);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
+    ent->getComponent<HUDHoverable>()->onHoverEnter = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+    };
+    ent->getComponent<HUDHoverable>()->onHoverExit = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{1,1,1, 0};
+    };
+    ent->getComponent<HUDButton>()->_onPress = [](HUDButton * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{0.8, 0.8, 0.8, 1};
+    };
+    ent->getComponent<HUDButton>()->_onRelease = [](HUDButton * self){
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        auto unit = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies[0];
+        auto item = unit->equipment[1];
         if (item == nullptr) return;
-        InventoryManager::instance->unassign_item(*unit, item);
-        InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
-        ztgk::update_weapon_hud(*unit);
-    }, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/action_drop_2.png", "res/textures/transparent.png", []() {
-        if (ztgk::game::ui_data.tracked_unit_id == -1) return;
-        auto unit = std::find_if(scene.systemManager.getSystem<UnitSystem>()->unitComponents.begin(),
-                                 scene.systemManager.getSystem<UnitSystem>()->unitComponents.end(), [](Unit *unit) { return unit->uniqueID == ztgk::game::ui_data.tracked_unit_id; });
-        if (unit == scene.systemManager.getSystem<UnitSystem>()->unitComponents.end()) return;
+        InventoryManager::instance->unassign_item(unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, unit->pathfinding.GetNearestVacantTileAround(unit->gridPosition, {unit->gridPosition}));
+    };
+    ent->getComponent<Sprite>()->color.a = 0;
 
-        auto item = (*unit)->equipment[2];
+    ent = hud->createButton(glm::vec2{1720, 200}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 150}, glm::vec2{100, 10}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_act_cd21);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
+        ent->getComponent<HUDHoverable>()->onHoverEnter = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+    };
+    ent->getComponent<HUDHoverable>()->onHoverExit = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{1,1,1, 0};
+    };
+    ent->getComponent<HUDButton>()->_onPress = [](HUDButton * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{0.8, 0.8, 0.8, 1};
+    };
+    ent->getComponent<HUDButton>()->_onRelease = [](HUDButton * self){
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        auto unit = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies[1];
+        auto item = unit->equipment[1];
         if (item == nullptr) return;
-        InventoryManager::instance->unassign_item(*unit, item);
-        InventoryManager::instance->spawn_item_on_map(item, (*unit)->pathfinding.GetNearestVacantTileAround((*unit)->gridPosition, {(*unit)->gridPosition}));
-        ztgk::update_weapon_hud(*unit);
-    }, eactions, ztgk::game::ui_data.gr_actions, false);
-    hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+        InventoryManager::instance->unassign_item(unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, unit->pathfinding.GetNearestVacantTileAround(unit->gridPosition, {unit->gridPosition}));
+    };
+    ent->getComponent<Sprite>()->color.a = 0;
+
+    ent = hud->createButton(glm::vec2{1845, 200}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 150}, glm::vec2{100, 10}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_act_cd31);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
+        ent->getComponent<HUDHoverable>()->onHoverEnter = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+    };
+    ent->getComponent<HUDHoverable>()->onHoverExit = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{1,1,1, 0};
+    };
+    ent->getComponent<HUDButton>()->_onPress = [](HUDButton * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{0.8, 0.8, 0.8, 1};
+    };
+    ent->getComponent<HUDButton>()->_onRelease = [](HUDButton * self){
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        auto unit = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies[2];
+        auto item = unit->equipment[1];
+        if (item == nullptr) return;
+        InventoryManager::instance->unassign_item(unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, unit->pathfinding.GetNearestVacantTileAround(unit->gridPosition, {unit->gridPosition}));
+    };
+    ent->getComponent<Sprite>()->color.a = 0;
+
+    //third row
+    ent = hud->createButton(glm::vec2{1595, 75}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 25}, glm::vec2{100, 10}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_act_cd12);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
+        ent->getComponent<HUDHoverable>()->onHoverEnter = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+    };
+    ent->getComponent<HUDHoverable>()->onHoverExit = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{1,1,1, 0};
+    };
+    ent->getComponent<HUDButton>()->_onPress = [](HUDButton * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{0.8, 0.8, 0.8, 1};
+    };
+    ent->getComponent<HUDButton>()->_onRelease = [](HUDButton * self){
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        auto unit = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies[0];
+        auto item = unit->equipment[2];
+        if (item == nullptr) return;
+        InventoryManager::instance->unassign_item(unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, unit->pathfinding.GetNearestVacantTileAround(unit->gridPosition, {unit->gridPosition}));
+    };
+    ent->getComponent<Sprite>()->color.a = 0;
+
+    ent = hud->createButton(glm::vec2{1720, 75}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 25}, glm::vec2{100, 10}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_act_cd22);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
+        ent->getComponent<HUDHoverable>()->onHoverEnter = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+    };
+    ent->getComponent<HUDHoverable>()->onHoverExit = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{1,1,1, 0};
+    };
+    ent->getComponent<HUDButton>()->_onPress = [](HUDButton * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{0.8, 0.8, 0.8, 1};
+    };
+    ent->getComponent<HUDButton>()->_onRelease = [](HUDButton * self){
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        auto unit = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies[1];
+        auto item = unit->equipment[2];
+        if (item == nullptr) return;
+        InventoryManager::instance->unassign_item(unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, unit->pathfinding.GetNearestVacantTileAround(unit->gridPosition, {unit->gridPosition}));
+    };
+    ent->getComponent<Sprite>()->color.a = 0;
+
+    ent = hud->createButton(glm::vec2{1845, 75}, glm::vec2{100, 100}, "res/textures/icons/delete.png", "res/textures/transparent.png", []() {}, eactions, ztgk::game::ui_data.gr_actions, false);
+    ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
+    ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 25}, glm::vec2{100, 10}, ztgk::color.BLUE * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.BLUE, ent, ztgk::game::ui_data.gr_act_cd32);
+    ebar->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
+    ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLUE * glm::vec4{0.2, 0.2, 0.2, 1});
+    ent->getComponent<HUDHoverable>()->onHoverEnter = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+    };
+    ent->getComponent<HUDHoverable>()->onHoverExit = [](HUDHoverable * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{1,1,1, 0};
+    };
+    ent->getComponent<HUDButton>()->_onPress = [](HUDButton * self) {
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE * glm::vec4{0.8, 0.8, 0.8, 1};
+    };
+    ent->getComponent<HUDButton>()->_onRelease = [](HUDButton * self){
+        self->parentEntity->getComponent<Sprite>()->color = ztgk::color.WHITE;
+        auto unit = ztgk::game::scene->systemManager.getSystem<UnitSystem>()->allies[2];
+        auto item = unit->equipment[2];
+        if (item == nullptr) return;
+        InventoryManager::instance->unassign_item(unit, item);
+        InventoryManager::instance->spawn_item_on_map(item, unit->pathfinding.GetNearestVacantTileAround(unit->gridPosition, {unit->gridPosition}));
+    };
+    ent->getComponent<Sprite>()->color.a = 0;
 #pragma endregion
 
 #pragma region top panel
@@ -2252,6 +2380,12 @@ void handleControls(int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+#ifdef DEBUG_BUILD
+    if (key == GLFW_KEY_F2 && action == GLFW_PRESS) {
+        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+        scene.systemManager.getSystem<HUD>()->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(false);
+    }
+#endif
     if (key == GLFW_KEY_A && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
         for (auto unit: scene.systemManager.getSystem<UnitSystem>()->unitComponents | std::views::filter([](auto unit) { return unit->isAlly; })) {
             scene.systemManager.getSystem<UnitSystem>()->selectUnit(unit);
