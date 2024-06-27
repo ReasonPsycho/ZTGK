@@ -16,10 +16,10 @@ in VS_OUT {
 }fs_in;
 
 struct Material {
-    sampler2D diffuseTexture;
-    sampler2D specularTexture;
-    sampler2D normalTexture;
-    sampler2D depthTexture;
+    sampler2DArray diffuseTextureArray;
+    sampler2DArray specularTextureArray;
+    sampler2DArray normalTextureArray;
+    sampler2DArray depthTextureArray;
 };
 
 uniform bool useNormalMap;
@@ -43,12 +43,17 @@ uniform float rim_threshold;
 uniform float rim_amount;
 
 uniform float repeatFactor;
+uniform float u_time;
 
 
 void main() {
     // Multiply the texture coordinates by the repeat factor to increase repetition
     vec2 repeatedTexCoords = fs_in.TexCoords * repeatFactor;
-    vec4 color = texture(material.diffuseTexture, repeatedTexCoords);
+    vec4 color = vec4(texture(material.diffuseTextureArray, vec3(repeatedTexCoords, 0)));
 
+    float currentFrame = mod(u_time, 30.0);  // Normalize currentFrame to instead vary from 0.0 to 6.0
+    vec4 texture = vec4(texture(material.diffuseTextureArray, vec3(repeatedTexCoords, (currentFrame/10) + 1)));
+    color = mix(color,texture,texture.a * abs(sin(currentFrame/5)));
+    
     FoamMask = color;
 }

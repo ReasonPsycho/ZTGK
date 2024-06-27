@@ -10,6 +10,7 @@ public:
 
     double DeltaTime() const;
     double LastFrame() const;
+    double CurrentTime() const;
     void Update();
     void SetLastFrame(double lastFrame);
 
@@ -20,6 +21,7 @@ private:
     Time(const Time&) = delete; // Delete copy constructor
     Time& operator=(const Time&) = delete; // Delete assignment operator
 
+    double currentTime;
     double deltaTime;
     double lastFrame = 0.0f;
 };

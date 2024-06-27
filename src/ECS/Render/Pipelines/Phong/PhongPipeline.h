@@ -56,7 +56,7 @@ public:
     ComputeShader upscale = ComputeShader("res/shaders/upscale.comp");
 
     Texture *bloomDirtTexture;
-    MaterialPhong *foamMaterial;
+    MaterialPhong foamMaterial;
     GLuint colorAttachments[4];
     Primitives *_primitives;
     

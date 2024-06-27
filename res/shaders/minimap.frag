@@ -31,10 +31,10 @@ vec3 tileStateColor[8] = vec3[]
 
 
 void main()
-{
+{   
     vec3 result =vec3(0.7568627451,0.8745098039,0.9607843137);
     if (currentWallData[1] == 1){
-        //nothing but i don't want to join
+        vec3 result =vec3(0,0,0);
     }else if (currentWallData[2] != 0){
         result = selectionColor[currentWallData[2]] ;
     } else{

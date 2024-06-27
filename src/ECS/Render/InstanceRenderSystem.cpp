@@ -27,6 +27,19 @@ void InstanceRenderSystem::removeComponent(void *component) {
 
 void InstanceRenderSystem::showImGuiDetailsImpl(Camera *camera) {
 
+    ImGui::SliderFloat("Left", &left, -2000.0f, 2000.0f);
+    ImGui::SliderFloat("Right", &right, -2000.0f, 2000.0f);
+    ImGui::SliderFloat("Bottom", &bottom, -2000.0f, 2000.0f);
+    ImGui::SliderFloat("Top", &top, -2000.0f, 2000.0f);
+    ImGui::SliderFloat("Near", &near, 0.0f, 500.0f);
+    ImGui::SliderFloat("Far", &far, 0.0f, 500.0f);
+
+// Displaying the Camera Matrix
+    ImGui::Text("Camera Matrix");
+    ImGui::InputFloat3("Camera Position", &cameraPos[0]);
+    ImGui::InputFloat3("Camera Target", &cameraTarget[0]);
+    ImGui::InputFloat3("Up Vector", &upVector[0]);
+    
     ImGui::Text("Variable value: %zu", loadedChunks.size());
 }
 
@@ -288,6 +301,15 @@ void InstanceRenderSystem::DrawMinimap(Shader *regularShader) {
         }
     }
     PushToSSBO();
+
+    glm::mat4 projection = glm::ortho(left, right, bottom, top, near, far);
+
+    glm::mat4 view = glm::lookAt(
+            cameraPos,  // Camera position
+            cameraTarget,  // Look towards this point
+            upVector  // Head is up
+    );
+    
     regularShader->use();
     regularShader->setMatrix4("projection", false, glm::value_ptr(projection));
     regularShader->setMatrix4("view", false, glm::value_ptr(view));

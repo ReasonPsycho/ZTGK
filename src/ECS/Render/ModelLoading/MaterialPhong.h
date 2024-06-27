@@ -31,6 +31,7 @@ public:
     
     void loadMaterial(Shader* shader);
     void loadInstancedMaterial(Shader* shader);
+    void loadReapetedInstancedMaterial(Shader* shader);
     void mapTextureArrays();
     std::shared_ptr<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName,Model* model);
 };
