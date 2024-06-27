@@ -54,6 +54,7 @@ namespace ztgk::game {
         unsigned gr_settings;
         unsigned gr_menu;
         unsigned gr_credits;
+        unsigned gr_controls;
         unsigned gr_loadScreen;
         unsigned gr_mainMenu;
         unsigned gr_w1_offensive;

@@ -14,6 +14,7 @@
 #include "ECS/SignalQueue/Signal.h"
 #include "ECS/SignalQueue/SignalQueue.h"
 #include "ECS/SignalQueue/DataCargo/LevelSaveLoadSignals/LoadSignal.h"
+#include "ECS/Utils/Time.h"
 
 using namespace ztgk;
 
@@ -252,4 +253,5 @@ void LevelSaving::loadImpl(const string &path) {
     spdlog::info("Finished loading");
 
     ztgk::game::gameStarted = true;
+    ztgk::game::ui_data.game_start_time = Time::Instance().LastFrame();
 }

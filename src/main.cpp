@@ -835,6 +835,7 @@ void load_hud() {
 
     ztgk::game::ui_data.gr_loadScreen = hud->addGroup(ztgk::game::ui_data.gr_menu, "Load Screen");
     ztgk::game::ui_data.gr_mainMenu = hud->addGroup(ztgk::game::ui_data.gr_menu, "Main Menu");
+    ztgk::game::ui_data.gr_controls = hud->addGroup(ztgk::game::ui_data.gr_menu, "Controls");
 
     ztgk::game::ui_data.gr_game_won = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Won");
     ztgk::game::ui_data.gr_game_lost = hud->addGroup(ztgk::game::ui_data.gr_menu, "Game Lost");
@@ -848,12 +849,12 @@ void load_hud() {
     auto etitle = scene.addEntity(emenu, "Title");
     float ystep = (ztgk::game::window_size.y - 3 * 200) / 4.0f;
     glm::vec2 btn_pos = {ztgk::game::window_size.x * 4 / 5, ztgk::game::window_size.y - 400};
+    btn_pos += 20; // compensate for extra controls button
     hud->createButton(
         btn_pos, glm::vec2{200, 80}, "res/textures/buttons/start.png", "res/textures/transparent.png",
         [hud]() {
             gen_and_load_lvl(true);
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
-            ztgk::game::ui_data.game_start_time = Time::Instance().LastFrame();
         },
     emenu, ztgk::game::ui_data.gr_mainMenu
     );
@@ -864,16 +865,16 @@ void load_hud() {
         [hud]() {
             gen_and_load_lvl(false);
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
-            ztgk::game::ui_data.game_start_time = Time::Instance().LastFrame();
         },
     emenu, ztgk::game::ui_data.gr_mainMenu
     );
     btn_pos.y -= ystep;
     hud->createButton(
         btn_pos, glm::vec2{200, 80}, "res/textures/buttons/settings.png", "res/textures/transparent.png",
-        [hud]() {
+        [hud, ehud]() {
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(false);
+            ehud->getChild("Settings")->getComponent<Sprite>()->color.a = 1;
         },
     emenu, ztgk::game::ui_data.gr_mainMenu
     );
@@ -888,10 +889,49 @@ void load_hud() {
     );
     btn_pos.y -= ystep;
     hud->createButton(
+        btn_pos, glm::vec2{200, 80}, "res/textures/buttons/controls.png", "res/textures/transparent.png",
+        [hud]() {
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_controls)->setHidden(false);
+        },
+        emenu, ztgk::game::ui_data.gr_mainMenu
+    );
+    btn_pos.y -= ystep;
+    hud->createButton(
         btn_pos, glm::vec2{200, 80}, "res/textures/buttons/exit.png", "res/textures/transparent.png",
         []() { glfwSetWindowShouldClose(window, true); },
     emenu, ztgk::game::ui_data.gr_mainMenu
     );
+#pragma endregion
+
+#pragma region controls
+    auto econtrols = scene.addEntity(emenu, "Controls");
+    econtrols->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.LAVENDER, ztgk::game::ui_data.gr_controls));
+
+    hud->createButton(
+        glm::vec2{200, 150}, glm::vec2{200, 80}, "res/textures/buttons/back.png", "res/textures/transparent.png",
+        [hud]() {
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_controls)->setHidden(true);
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+        },
+    econtrols, ztgk::game::ui_data.gr_controls
+    );
+
+    std::string ctrls;
+    std::ifstream filee("res/others/controls.txt");
+    std::string linee;
+    while (std::getline(filee, linee)) {
+        ctrls += linee + "\n";
+    }
+    filee.close();
+
+    auto ehead = scene.addEntity(econtrols, "Controls Header");
+    ehead->addComponent(make_unique<Text>("Controls", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y - 100}, glm::vec2(2), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_controls));
+    ehead->getComponent<Text>()->mode = CENTER;
+    auto ectxt = scene.addEntity(econtrols, "Controls Text");
+    ectxt->addComponent(make_unique<Text>(ctrls, glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y / 2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_controls));
+    ectxt->getComponent<Text>()->mode = TOP_CENTER;
+
 #pragma endregion
 
 #pragma region loadscreen
@@ -1323,6 +1363,7 @@ void load_hud() {
             top_anchor - glm::vec2{0, 15}, glm::vec2{30, 30},
             "res/textures/icons/pause.png", "res/textures/transparent.png",
             [hud]() {
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(true);
                 hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
             },
             etop, ztgk::game::ui_data.gr_top
@@ -1354,6 +1395,50 @@ void load_hud() {
     eunitCounter->getComponent<Text>()->mode = MIDDLE_RIGHT;
     ztgk::game::ui_data.txt_unit_counter = eunitCounter->getComponent<Text>();
 #pragma endregion
+#pragma endregion
+
+
+#pragma region pause
+    auto epause = scene.addEntity(egame, "Pause Menu");
+    epause->addComponent(make_unique<Sprite>(glm::vec2{0, 0}, ztgk::game::window_size, ztgk::color.LAVENDER * glm::vec4{1.0, 1.0, 1.0, 0.5}, ztgk::game::ui_data.gr_pause));
+
+    ent = scene.addEntity(epause, "Controls Header");
+    ent->addComponent(make_unique<Text>("Controls", glm::vec2{100, ztgk::game::window_size.y - 300}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_pause));
+    ent = scene.addEntity(epause, "Controls");
+
+    ent->addComponent(make_unique<Text>(ctrls, glm::vec2{100, ztgk::game::window_size.y - 400}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.default_font, NONE, ztgk::game::ui_data.gr_pause));
+    ent->getComponent<Text>()->mode = TOP_LEFT;
+
+    ent = hud->createButton(
+            glm::vec2{ztgk::game::window_size.x - 150, 350}, glm::vec2{200, 80},
+            "res/textures/buttons/back.png", "res/textures/transparent.png",
+            [hud]() {
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_game)->setHidden(false);
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(true);
+            },
+            epause, ztgk::game::ui_data.gr_pause
+    );
+
+    ent = hud->createButton(
+        glm::vec2{ztgk::game::window_size.x - 150, 250}, glm::vec2{200, 80},
+        "res/textures/buttons/settings.png", "res/textures/transparent.png",
+        [hud, ehud]() {
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(false);
+            hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(true);
+            ehud->getChild("Settings")->getComponent<Sprite>()->color.a = 0.5;
+        },
+        epause, ztgk::game::ui_data.gr_pause
+    );
+
+    ent = hud->createButton(
+        glm::vec2{ztgk::game::window_size.x - 150, 150}, glm::vec2{200, 80},
+        "res/textures/buttons/exit.png", "res/textures/transparent.png",
+        [hud]() {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        },
+        epause, ztgk::game::ui_data.gr_pause
+    );
+
 #pragma endregion
 
 #pragma region settings
@@ -1410,10 +1495,13 @@ void load_hud() {
         esettings, ztgk::game::ui_data.gr_settings
     );
 
-    hud->createButton({200, 125}, {200, 80}, "res/textures/buttons/back.png", "res/textures/transparent.png",
+    hud->createButton({ztgk::game::window_size.x - 200, 125}, {200, 80}, "res/textures/buttons/back.png", "res/textures/transparent.png",
         [hud]() {
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_settings)->setHidden(true);
-            hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+            if (ztgk::game::gameStarted)
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(false);
+            else
+                hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
         },
         esettings, ztgk::game::ui_data.gr_settings
     );
@@ -1464,10 +1552,9 @@ void load_hud() {
     auto egamewon_desc = scene.addEntity(egamewon, "Win Screen Flavor");
     egamewon_desc->addComponent(make_unique<Text>("The world is now a cleaner place.", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y / 2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_won));
     egamewon_desc->getComponent<Text>()->mode = CENTER;
-    hud->createButton({ztgk::game::window_size.x / 2, 200}, {400, 80}, "res/textures/buttons/back.png", "res/textures/transparent.png",
+    hud->createButton({ztgk::game::window_size.x / 2, 200}, {200, 80}, "res/textures/buttons/exit.png", "res/textures/transparent.png",
         [hud]() {
-            hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_won)->setHidden(true);
-            hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
         },
         egamewon, ztgk::game::ui_data.gr_game_won
     );
@@ -1480,10 +1567,9 @@ void load_hud() {
     auto egamelost_desc = scene.addEntity(egamelost, "Lose Screen Flavor");
     egamelost_desc->addComponent(make_unique<Text>("As The Flith emerges, entropy increases...", glm::vec2{ztgk::game::window_size.x / 2, ztgk::game::window_size.y / 2}, glm::vec2(1), ztgk::color.ROSE, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_game_lost));
     egamelost_desc->getComponent<Text>()->mode = CENTER;
-    hud->createButton({ztgk::game::window_size.x / 2, 200}, {400, 80}, "res/textures/buttons/back.png", "res/textures/transparent.png",
+    hud->createButton({ztgk::game::window_size.x / 2, 200}, {200, 80}, "res/textures/buttons/exit.png", "res/textures/transparent.png",
         [hud]() {
-              hud->getGroupOrDefault(ztgk::game::ui_data.gr_game_lost)->setHidden(true);
-              hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(false);
+              glfwSetWindowShouldClose(window, GLFW_TRUE);
           },
           egamelost, ztgk::game::ui_data.gr_game_lost
     );
@@ -1499,6 +1585,7 @@ void load_hud() {
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_pause)->setHidden(true);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_loadScreen)->setHidden(true);
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_credits)->setHidden(true);
+    hud->getGroupOrDefault(ztgk::game::ui_data.gr_controls)->setHidden(true);
 
     hud->getGroupOrDefault(ztgk::game::ui_data.gr_w1_passive)->setHidden(true);
 //    hud->getGroupOrDefault(ztgk::game::ui_data.gr_w2_passive)->setHidden(true);
