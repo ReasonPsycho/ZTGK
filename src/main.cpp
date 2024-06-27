@@ -964,7 +964,7 @@ void load_hud() {
     auto emap = scene.addEntity(egame, "Map");
     auto emapbg = scene.addEntity(emap, "MapBG");
     emapbg->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{468,475}, ztgk::color.WHITE, gr_mapzn2, "res/textures/bgs/map.png"));
-    emap->addComponent(make_unique<Sprite>(glm::vec2{0,0}, glm::vec2{400,400}, ztgk::color.WHITE, gr_mapzn1));
+    emap->addComponent(make_unique<Sprite>(glm::vec2{0,-35}, glm::vec2{400,435}, ztgk::color.WHITE, gr_mapzn1));
     emap->getComponent<Sprite>()->texture = scene.systemManager.getSystem<InstanceRenderSystem>()->minimap;
     emap->getComponent<Sprite>()->hasTexture = true;
     ztgk::game::minimap = emap->getComponent<Sprite>();
