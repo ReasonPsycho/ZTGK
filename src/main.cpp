@@ -1112,6 +1112,11 @@ void load_hud() {
 
 #pragma region actions
 // ACTIONS
+    auto gr_names = hud->addGroup(ztgk::game::ui_data.gr_actions, "Names");
+    auto gr_emotes = hud->addGroup(ztgk::game::ui_data.gr_actions, "Emotes");
+    hud->getGroupOrAddDefault(gr_names)->offset.z = -2;
+    hud->getGroupOrAddDefault(gr_emotes)->offset = {-10, -10, -1};
+
     auto eactions = scene.addEntity(egame, "Action Panel");
     eactions->addComponent(make_unique<Sprite>(glm::vec2{1520, 0}, glm::vec2{403,435}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/bgs/2.png"));
     eactions->getComponent<Sprite>()->mode = BOTTOM_LEFT;
@@ -1127,13 +1132,13 @@ void load_hud() {
             eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
-    ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->addComponent(make_unique<Text>("1", glm::vec2{1595, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_names));
     ent->getComponent<Text>()->mode = CENTER;
     ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1545, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
     ent = scene.addEntity(ent, "Emote");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1645, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/white.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1645, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, gr_emotes, "res/textures/white.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
 
     ent = hud->createButton(
@@ -1146,13 +1151,13 @@ void load_hud() {
             eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
-    ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->addComponent(make_unique<Text>("2", glm::vec2{1720, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_names));
     ent->getComponent<Text>()->mode = CENTER;
     ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1670, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
     ent = scene.addEntity(ent, "Emote");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1770, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/white.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1770, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, gr_emotes, "res/textures/white.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
 
     ent = hud->createButton(glm::vec2{1845, 325}, glm::vec2{100, 100}, "res/textures/transparent.png", "res/textures/transparent.png",
@@ -1164,13 +1169,13 @@ void load_hud() {
                             eactions, ztgk::game::ui_data.gr_actions, false
     );
     ent->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.BLACK);
-    ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, ztgk::game::ui_data.gr_actions));
+    ent->addComponent(make_unique<Text>("3", glm::vec2{1845, 390}, glm::vec2(0.4), ztgk::color.BLACK, ztgk::font.Fam_Nunito + ztgk::font.bold, NONE, gr_names));
     ent->getComponent<Text>()->mode = CENTER;
     ebar = hud->createSlider_Bar(HORIZONTAL, glm::vec2{1795, 270}, glm::vec2{100, 10}, ztgk::color.GREEN * glm::vec4{0.5, 0.5, 0.5, 1}, ztgk::color.GREEN, ent, ztgk::game::ui_data.gr_actions);
     ebar->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.3, 0.3, 0.3, 1})->round(0.1);
     ebar->getChild("Background")->getComponent<Sprite>()->frame(1, ztgk::color.GREEN * glm::vec4{0.2, 0.2, 0.2, 1});
     ent = scene.addEntity(ent, "Emote");
-    ent->addComponent(make_unique<Sprite>(glm::vec2{1895, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, ztgk::game::ui_data.gr_actions, "res/textures/white.png"));
+    ent->addComponent(make_unique<Sprite>(glm::vec2{1895, 375}, glm::vec2{50, 50}, ztgk::color.WHITE, gr_emotes, "res/textures/white.png"));
     ent->getComponent<Sprite>()->mode = CENTER;
 
     // second row
