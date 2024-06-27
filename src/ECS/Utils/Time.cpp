@@ -15,7 +15,7 @@ double Time::LastFrame() const {
 }
 
 void Time::Update() {
-    double currentTime = glfwGetTime();
+    currentTime = glfwGetTime();
     deltaTime = currentTime - lastFrame;
     lastFrame = currentTime;
 }
@@ -27,4 +27,9 @@ void Time::SetLastFrame(double lastFrame) {
 Time::Time() {
     deltaTime = 0.0f;
     lastFrame = glfwGetTime();
+    currentTime = lastFrame;
+}
+
+double Time::CurrentTime() const {
+    return currentTime;
 }
