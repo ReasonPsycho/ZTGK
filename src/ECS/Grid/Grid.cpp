@@ -682,8 +682,8 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
     string modelPathGabkaAttackL = "res/models/gabka/pan_gabka_attack_left.fbx";
 
     string modelPathZuczekAttack = "res/models/zuczek/Zuczek_attack - copia.fbx";
-    string modelPathZuczekIddle = "res/models/zuczek/Zuczek_sleep - copia.fbx";
-    string modelPathZuczekMove = "res/models/zuczek/Zuczek_sleep - copia.fbx";
+    string modelPathZuczekIddle = "res/models/zuczek/Zuczek_attack - copia.fbx";
+    string modelPathZuczekMove = "res/models/zuczek/Zuczek_attack - copia.fbx";
 
     string modelPathShroomMove = "res/models/Mushroom/shroom_move.fbx";
     string modelPathShroomIdle = "res/models/Mushroom/shroom_idle.fbx";
