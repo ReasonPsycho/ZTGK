@@ -1,0 +1,5 @@
+1-3 - exclusively select unit
+ctrl + 1-3 - add unit to selection
+alt  + 1-3 - remove unit from selection
+ctrl + a - select all
+ctrl + alt + a - negate selection

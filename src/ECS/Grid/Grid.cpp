@@ -706,6 +706,24 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
         read_names = true;
     }
     std::string name = isAlly ? gabka_names[RNG::RandomInt(0, gabka_names.size() - 1)] : bug ? zuk_names[RNG::RandomInt(0, zuk_names.size() - 1)] : shroom_names[RNG::RandomInt(0, shroom_names.size() - 1)];
+    if (isAlly) {
+        gabka_names.erase(std::remove(gabka_names.begin(), gabka_names.end(), name), gabka_names.end());
+        if (gabka_names.empty()) {
+            read_names = false;
+        }
+    } else {
+        if (bug) {
+            zuk_names.erase(std::remove(zuk_names.begin(), zuk_names.end(), name), zuk_names.end());
+            if (zuk_names.empty()) {
+                read_names = false;
+            }
+        } else {
+            shroom_names.erase(std::remove(shroom_names.begin(), shroom_names.end(), name), shroom_names.end());
+            if (shroom_names.empty()) {
+                read_names = false;
+            }
+        }
+    }
 
     if (!read_icons) {
         // todo
@@ -737,8 +755,10 @@ Entity * Grid::SpawnUnit(Vector2Int gridPos, bool isAlly, bool bug){
         UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackR,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackR, gabka));
         UnitEntity->getComponent<AnimationPlayer>()->AddAnimation(modelPathGabkaAttackL,ztgk::game::modelLoadingManager ->GetAnimation(modelPathGabkaAttackL, gabka));
 
-        int ic = RNG::RandomInt(0, 1);
-        UnitEntity->getComponent<Unit>()->icon_path = ic ? "res/textures/icons/gabka_shy.png" : "res/textures/icons/gabka_cool.png";
+        static std::vector<std::string> icons = {"res/textures/icons/gabka_shy.png", "res/textures/icons/gabka_cool.png", "res/textures/icons/gabka3.png"};
+        int ic = RNG::RandomInt(0, icons.size() - 1);
+        UnitEntity->getComponent<Unit>()->icon_path = icons[ic];
+        icons.erase(icons.begin() + ic);
 
         ztgk::game::scene->addEntity(UnitEntity, "RHand");
         ztgk::game::scene->addEntity(UnitEntity, "LHand");

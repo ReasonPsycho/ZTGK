@@ -54,6 +54,7 @@ namespace ztgk::game {
         unsigned gr_settings;
         unsigned gr_menu;
         unsigned gr_credits;
+        unsigned gr_controls;
         unsigned gr_loadScreen;
         unsigned gr_mainMenu;
         unsigned gr_w1_offensive;
@@ -62,6 +63,13 @@ namespace ztgk::game {
         unsigned gr_w2_passive;
         unsigned gr_game_won;
         unsigned gr_game_lost;
+
+        unsigned gr_act_cd11;
+        unsigned gr_act_cd12;
+        unsigned gr_act_cd21;
+        unsigned gr_act_cd22;
+        unsigned gr_act_cd31;
+        unsigned gr_act_cd32;
 
         Text * txt_time_display = nullptr;
         Text * txt_pranium_counter = nullptr;

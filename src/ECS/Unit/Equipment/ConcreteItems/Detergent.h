@@ -44,19 +44,19 @@ public:
             ItemStats(
                 0,0,GridRange(0, 0), GridRange(0, 0),
                 {
-                    .atk_speed = 0.25
+                    .atk_speed = 0.3
                 }),
         };
 
         this->stats = random_stats[rand() % random_stats.size()];
-        if (stats.add_to_unit.dmg_perc != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/atk.png", std::format("{:.0}%", stats.add_to_unit.dmg_perc * 100)});
-        if (stats.add_to_unit.dmg_flat != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/atk.png", std::to_string(stats.add_to_unit.dmg_flat)});
-        if (stats.add_to_unit.atk_speed != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/aspd.png", std::to_string(stats.add_to_unit.atk_speed)});
+        if (stats.add_to_unit.dmg_perc > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/atk.png", std::format("{:1.2}", std::to_string(stats.add_to_unit.dmg_perc)));
+        if (stats.add_to_unit.dmg_flat > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/atk.png", std::format("{:1.0}", std::to_string(stats.add_to_unit.dmg_flat)));
+        if (stats.add_to_unit.atk_speed > 0.1)
+            highlight_passive_stats.emplace("res/textures/icons/stat/aspd.png", std::format("{:.12}", std::to_string(stats.add_to_unit.atk_speed)));
         if (stats.add_to_unit.rng_add != 0)
-            highlight_passive_stats.insert({"res/textures/icons/stat/rng.png", std::to_string(stats.add_to_unit.rng_add)});
+            highlight_passive_stats.emplace("res/textures/icons/stat/rng.png", std::to_string(stats.add_to_unit.rng_add));
     }
 
 };

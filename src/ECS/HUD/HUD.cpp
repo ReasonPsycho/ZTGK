@@ -813,7 +813,7 @@ void HUD::UpdateImpl() {
         ztgk::game::ui_data.txt_unit_counter->content = std::format("{}/{}", alive, allies);
         if (alive <= 1)
             ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.RED;
-        else ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.YELLOW;
+        else ztgk::game::ui_data.txt_unit_counter->color = ztgk::color.NAVY;
     }
     // lose in UnitSystem
     // win in WashingMachine
