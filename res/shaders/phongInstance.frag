@@ -207,6 +207,7 @@ uniform float dark_shade_cutoff;
 
 uniform float ambient;
 uniform bool outlineMapping;
+uniform float u_time;
 
 
 void main()
@@ -215,9 +216,14 @@ void main()
     vec3 viewDir = normalize(fs_in.tangentData.ViewPos - fs_in.tangentData.FragPos);
     vec4 fogOfWarData = vec4(0);
 
-    float dirtinessMap  =  1 *  cnoise(fs_in.WorldPos*2) +
-    +  0.5 * cnoise(fs_in.WorldPos*4) +
-    + 0.25 * cnoise(fs_in.WorldPos*8);
+    vec3 dirtPosition =fs_in.WorldPos;
+    if(currentTextures[0] == 0){
+        dirtPosition += vec3(u_time) / 20.0f;
+    }
+    
+    float dirtinessMap  =  1 *  cnoise(dirtPosition*2) +
+    +  0.5 * cnoise(dirtPosition*4) +
+    + 0.25 * cnoise(dirtPosition*8);
     dirtinessMap = dirtinessMap / (1 + 0.5 + 0.25);
     dirtinessMap = pow(dirtinessMap, currentWallData[0]/100.0 * 4);
     //dirtinessMap = (dirtinessMap + 1) * 0.5; // Scale the noise from -1.0 - 1.0 to 0.0 - 1.0
@@ -241,14 +247,21 @@ void main()
     vec3 specular = vec3(texture(material.specularTextureArray, vec3(texCoords, float(currentTextures[1]))));
 
 
+
     if (dirtinessMap > 0.1){
         diffuse -= vec3(dirtinessMap) * dirtMultiplayer;
         specular -= vec3(dirtinessMap)* dirtMultiplayer;
     }
 
+    
     vec3 result = vec3(0);
     if (currentWallData[1] != 1){
 
+        if(currentTextures[0] == 0){
+            dirtinessMap = clamp(dirtinessMap, 0.0, 1.0);
+            diffuse = mix(vec3(0.25),vec3(0.1),dirtinessMap);
+        }
+        
         result = ambient * diffuse;//We do be calculating ambient here
         int index = 0;
         for (int i = 0; i < dirLightAmount; ++i) {

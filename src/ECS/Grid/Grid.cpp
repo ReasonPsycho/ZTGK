@@ -381,7 +381,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 northMatrix = tile->getEntity()->transform.getModelMatrix();
             northMatrix = glm::translate(northMatrix, glm::vec3(translateLength, 0, 0));
             northMatrix = glm::rotate(northMatrix, glm::radians(90.0f), glm::vec3(0, 1, 0));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(northMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(northMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -390,7 +390,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 southMatrix = tile->getEntity()->transform.getModelMatrix();
             southMatrix = glm::translate(southMatrix, glm::vec3(-translateLength, 0, 0));
             southMatrix = glm::rotate(southMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(southMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(southMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -399,7 +399,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 eastMatrix = tile->getEntity()->transform.getModelMatrix();
             eastMatrix = glm::translate(eastMatrix, glm::vec3(0, 0, translateLength));
             eastMatrix = glm::rotate(eastMatrix, glm::radians(-90.0f), glm::vec3(0, 0, 1));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(eastMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(eastMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -408,7 +408,7 @@ void Grid::SetUpWall(Tile *tile) {
             glm::mat4x4 westMatrix = tile->getEntity()->transform.getModelMatrix();
             westMatrix = glm::translate(westMatrix, glm::vec3(0, 0, -translateLength));
             westMatrix = glm::rotate(westMatrix, glm::radians(180.0f), glm::vec3(1, 0, 0));
-            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(westMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+            tile->walls.push_back(wallChunk->addWallData(make_unique<WallData>(westMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
             isSurrounded = false;
         }
 
@@ -416,7 +416,7 @@ void Grid::SetUpWall(Tile *tile) {
         topMatrix = glm::translate(topMatrix, glm::vec3(0, translateLength, 0));
         topMatrix = glm::rotate(topMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
         tile->walls.push_back(
-                wallChunk->addWallData(make_unique<WallData>(topMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 0, 0)));
+                wallChunk->addWallData(make_unique<WallData>(topMatrix, tile->dirtinessLevel, tile->isInFogOfWar, 0, 0, 0, 0, 1, 3)));
     }
 
     // here because it sets wall data

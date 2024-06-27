@@ -85,7 +85,7 @@ private:
     float m_bloom_dirt_intensity = 0.0f;
     
     //toonshader
-    float ambient = 0.3;
+    float ambient = 0.25;
     float diffuse_levels = 3;
     float specular_levels = 3;
     float light_shade_cutoff = 0.8f;
