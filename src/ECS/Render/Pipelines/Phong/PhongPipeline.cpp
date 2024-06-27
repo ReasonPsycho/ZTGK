@@ -1,7 +1,7 @@
 //
 // Created by redkc on 15/04/2024.
-//
-
+#include "ECS/Utils/Time.h"
+#include <filesystem>
 #include "PhongPipeline.h"
 
 
@@ -39,8 +39,20 @@ void PhongPipeline::Init(Camera* camera,Primitives* primitives)  {
 
     Color foamColor = {0, 0, 0, 0};  // Normal map neutral
 
-    foamMaterial = new MaterialPhong(foamColor);
-    foamMaterial->diffuseTextures[0] = make_shared<Texture>("res/textures/foamCut.png","");
+    std::filesystem::path foamMapTexturesDictionary("res/textures/foamMap"); // Replace with your directory
+    if (std::filesystem::exists(foamMapTexturesDictionary) && std::filesystem::is_directory(foamMapTexturesDictionary)) {
+        for (const auto &entry: std::filesystem::directory_iterator(foamMapTexturesDictionary)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                std::cout << "PNG file located: " << entry.path().string() << std::endl;
+                foamMaterial.depthTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+                foamMaterial.diffuseTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+                foamMaterial.normalTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+                foamMaterial.specularTextures.push_back(std::make_shared<Texture>(entry.path().string(), ""));
+            }
+        }
+    }
+
+    foamMaterial.mapTextureArrays();
     isInnit = true;
 }
 
@@ -357,14 +369,15 @@ void PhongPipeline::PrepareFoamMap(Camera* camera) {
     foamMaskShader.setFloat("rim_threshold", rim_threshold);
     foamMaskShader.setFloat("rim_amount", rim_amount);
     
-    foamMaskShader.setFloat("repeatFactor", 100);
+    foamMaskShader.setFloat("repeatFactor", 30);
+    foamMaskShader.setFloat("u_time",Time::Instance().CurrentTime());
 
     glm::mat4x4 model = glm::mat4x4 (1);
     model = glm::translate(model,glm::vec3(100,1, 100));
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));
     model = glm::scale(model,glm::vec3(100));
     foamMaskShader.setMatrix4("model", false, glm::value_ptr(model));
-    foamMaterial->loadMaterial(&foamMaskShader);
+    foamMaterial.loadReapetedInstancedMaterial(&foamMaskShader);
     _primitives->renderQuad();
     
     glDisable(GL_BLEND);

@@ -138,3 +138,30 @@ void MaterialPhong::mapTextureArrays() {
     normalTextureArray = make_shared<TextureArray>(normalTextures);
     depthTextureArray = make_shared<TextureArray>(depthTextures);
 }
+
+void MaterialPhong::loadReapetedInstancedMaterial(Shader *shader) {
+    shader->use();
+    glActiveTexture(GL_TEXTURE3); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.diffuseTextureArray"), 3);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseTextureArray->ID);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glActiveTexture(GL_TEXTURE4); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.specularTextureArray"), 4);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, specularTextureArray->ID);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glActiveTexture(GL_TEXTURE5); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.normalTextureArray"), 5);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, normalTextureArray->ID);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glActiveTexture(GL_TEXTURE6); // active proper texture unit before binding
+    glUniform1i(glGetUniformLocation(shader->ID, "material.depthTextureArray"), 6);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, depthTextureArray->ID);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
