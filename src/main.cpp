@@ -853,6 +853,7 @@ void load_hud() {
         [hud]() {
             gen_and_load_lvl(true);
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+            ztgk::game::ui_data.game_start_time = Time::Instance().LastFrame();
         },
     emenu, ztgk::game::ui_data.gr_mainMenu
     );
@@ -863,6 +864,7 @@ void load_hud() {
         [hud]() {
             gen_and_load_lvl(false);
             hud->getGroupOrDefault(ztgk::game::ui_data.gr_mainMenu)->setHidden(true);
+            ztgk::game::ui_data.game_start_time = Time::Instance().LastFrame();
         },
     emenu, ztgk::game::ui_data.gr_mainMenu
     );
